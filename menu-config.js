@@ -77,12 +77,12 @@ const MENU_CONFIG = [
     children: [
       {
         name: '模型配置',
-        page: '系统设置/model-config.html',
+        page: '素材管理/原料库.html',
         icon: '<path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path>'
       },
 {
         name: '算力成本',
-        page: '系统设置/compute-cost.html',
+        page: '素材管理/原料库.html',
         icon: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'
       }
     ]
@@ -114,6 +114,11 @@ const BOTTOM_MENU = [
     name: '我的任务',
     page: '首页/my-tasks.html',
     icon: '<path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>'
+  },
+  {
+    name: '成本中心',
+    page: '素材管理/原料库.html',
+    icon: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'
   }
 ];
 

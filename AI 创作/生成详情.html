@@ -82,13 +82,67 @@
             display: flex; flex-wrap: wrap; gap: 10px;
             margin-top: 10px;
         }
-        .result-img {
-            width: 180px; height: 180px; border-radius: 12px;
-            object-fit: cover; border: 1px solid rgba(0,0,0,0.07);
-            background: #f5f5f5; cursor: pointer;
-            transition: transform 0.15s, box-shadow 0.15s;
+
+        /* 图片卡片 & hover 操作 */
+        .img-card {
+            position: relative; width: 180px; height: 180px;
+            border-radius: 12px; overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.07); background: #f5f5f5;
+            flex-shrink: 0; cursor: pointer;
         }
-        .result-img:hover { transform: scale(1.03); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+        .img-card img {
+            width: 100%; height: 100%; object-fit: cover; display: block;
+            transition: transform 0.2s;
+        }
+        .img-card:hover img { transform: scale(1.04); }
+        .img-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.38);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.18s;
+        }
+        .img-card:hover .img-overlay { opacity: 1; }
+        .img-actions { display: flex; gap: 10px; }
+        .img-action-btn {
+            position: relative; width: 38px; height: 38px; border-radius: 50%;
+            border: none; background: rgba(255,255,255,0.18);
+            color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.15s; backdrop-filter: blur(4px);
+        }
+        .img-action-btn:hover { background: rgba(255,255,255,0.35); }
+        .img-action-btn svg { flex-shrink: 0; pointer-events: none; }
+        .img-action-tip {
+            position: absolute; bottom: calc(100% + 7px); left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20,20,20,0.88); color: #fff;
+            font-size: 11px; padding: 4px 9px; border-radius: 5px;
+            white-space: nowrap; pointer-events: none;
+            opacity: 0; transition: opacity 0.15s;
+        }
+        .img-action-btn:hover .img-action-tip { opacity: 1; }
+
+        /* 再次生成行 */
+        .regen-row { margin-top: 12px; }
+        .regen-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            height: 32px; padding: 0 14px; border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.15); background: rgba(0,0,0,0.02);
+            color: #555; font-size: 13px; font-family: inherit;
+            cursor: pointer; transition: border-color 0.14s, background 0.14s, color 0.14s;
+        }
+        .regen-btn:hover { color: #1a1a1a; border-color: rgba(0,0,0,0.28); background: rgba(0,0,0,0.04); }
+
+        /* 使用提示词 */
+        .use-prompt-row { margin-top: 7px; display: flex; justify-content: flex-end; }
+        .use-prompt-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            height: 28px; padding: 0 12px; border-radius: 20px;
+            border: 1px solid rgba(0,0,0,0.12); background: rgba(0,0,0,0.02);
+            color: #888; font-size: 12px; font-family: inherit;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .use-prompt-btn:hover { color: #1677ff; border-color: rgba(22,119,255,0.35); background: rgba(22,119,255,0.05); }
 
         /* ── 底部输入区 ── */
         .input-area {
@@ -795,15 +849,54 @@ function addMsg(role, content, images) {
     const avatarText = role === 'user' ? 'ME' : 'AI';
     let body = `<div class="msg-body">
         <div class="msg-bubble">${escapeHtml(content)}</div>`;
-    if (images && images.length) {
-        body += `<div class="result-grid">
-            ${images.map(src => `<img class="result-img" src="${src}" alt="生成结果" onclick="previewImg(this.src)">`).join('')}
+    if (role === 'user') {
+        body += `<div class="use-prompt-row">
+            <button class="use-prompt-btn" onclick="usePrompt(${JSON.stringify(content)})">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                使用提示词
+            </button>
         </div>`;
+    }
+    if (images && images.length) {
+        body += makeResultGridHTML(images, content);
     }
     body += `<div class="msg-meta">${role === 'user' ? '我' : 'AI 助手'} · 刚刚</div></div>`;
     div.innerHTML = `<div class="msg-avatar">${avatarText}</div>${body}`;
     area.appendChild(div);
     area.scrollTop = area.scrollHeight;
+}
+
+function makeImgCardHTML(src) {
+    return `<div class="img-card">
+        <img src="${src}" alt="生成结果" onclick="previewImg('${src}')">
+        <div class="img-overlay">
+            <div class="img-actions">
+                <button class="img-action-btn" onclick="downloadImg(event,'${src}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span class="img-action-tip">下载</span>
+                </button>
+                <button class="img-action-btn" onclick="archiveImg(event,'${src}')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+                    <span class="img-action-tip">入库</span>
+                </button>
+                <button class="img-action-btn" onclick="regenFromImg(event)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                    <span class="img-action-tip">再次生成</span>
+                </button>
+            </div>
+        </div>
+    </div>`;
+}
+
+function makeResultGridHTML(imgs, prompt) {
+    const promptEsc = (prompt || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    return `<div class="result-grid">${imgs.map(src => makeImgCardHTML(src)).join('')}</div>
+        <div class="regen-row">
+            <button class="regen-btn" onclick="triggerRegen('${promptEsc}')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                再次生成
+            </button>
+        </div>`;
 }
 
 function addAIMessage(content) {
@@ -1584,33 +1677,90 @@ function doGenerate() {
         btn.className = 'gen-btn has-text';
         genText.style.display = '';
         spin.style.display = 'none';
-        addAIMessage(`已为您生成 ${count} 张图片，如需调整参数可继续输入。`);
-        const lastMsg = document.getElementById('chatArea').lastElementChild;
-        if (lastMsg) {
-            const bubble = lastMsg.querySelector('.msg-bubble');
-            if (bubble) {
-                const grid = document.createElement('div');
-                grid.className = 'result-grid';
-                imgs.forEach(src => {
-                    const img = document.createElement('img');
-                    img.className = 'result-img';
-                    img.src = src;
-                    img.alt = '生成结果';
-                    img.onclick = () => previewImg(src);
-                    grid.appendChild(img);
-                });
-                bubble.after(grid);
-            }
-        }
-        document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+        const area = document.getElementById('chatArea');
+        const div = document.createElement('div');
+        div.className = 'msg ai';
+        div.innerHTML = `<div class="msg-avatar">AI</div>
+            <div class="msg-body">
+                <div class="msg-bubble">已为您生成 ${count} 张图片，如需调整参数可继续输入。</div>
+                ${makeResultGridHTML(imgs, txt)}
+                <div class="msg-meta">AI 助手 · 刚刚</div>
+            </div>`;
+        area.appendChild(div);
+        area.scrollTop = area.scrollHeight;
         showToast(count > 1 ? `生成完成，共 ${count} 张` : '生成完成');
     }, 2000);
+}
+
+function usePrompt(text) {
+    document.getElementById('prompt').value = text;
+    onInput();
+    document.getElementById('prompt').focus();
+}
+
+function triggerRegen(prompt) {
+    document.getElementById('prompt').value = prompt;
+    onInput();
+    doGenerate();
+}
+
+function downloadImg(e, src) {
+    e.stopPropagation();
+    const a = document.createElement('a');
+    a.href = src; a.download = 'generated.jpg'; a.click();
+    showToast('已开始下载');
+}
+
+function archiveImg(e, src) {
+    e.stopPropagation();
+    showToast('已入库');
+}
+
+function regenFromImg(e) {
+    e.stopPropagation();
+    doGenerate();
+}
+
+function loadMockData() {
+    const area = document.getElementById('chatArea');
+    if (area.children.length > 0) return;
+    const prompt = '一瓶高端护肤精华，透明玻璃瓶身，白色简洁背景，产品摄影风格，光线柔和，高清细节';
+    const imgs = [
+        'https://picsum.photos/seed/gen1/400/400',
+        'https://picsum.photos/seed/gen2/400/400',
+        'https://picsum.photos/seed/gen3/400/400',
+    ];
+    const userDiv = document.createElement('div');
+    userDiv.className = 'msg user';
+    userDiv.innerHTML = `<div class="msg-avatar">ME</div>
+        <div class="msg-body">
+            <div class="msg-bubble">${escapeHtml(prompt)}</div>
+            <div class="use-prompt-row">
+                <button class="use-prompt-btn" onclick="usePrompt(${JSON.stringify(prompt)})">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    使用提示词
+                </button>
+            </div>
+            <div class="msg-meta">我 · 10:32</div>
+        </div>`;
+    area.appendChild(userDiv);
+
+    const aiDiv = document.createElement('div');
+    aiDiv.className = 'msg ai';
+    aiDiv.innerHTML = `<div class="msg-avatar">AI</div>
+        <div class="msg-body">
+            <div class="msg-bubble">已为您生成 3 张图片，如需调整参数可继续输入。</div>
+            ${makeResultGridHTML(imgs, prompt)}
+            <div class="msg-meta">AI 助手 · 10:34</div>
+        </div>`;
+    area.appendChild(aiDiv);
 }
 
 document.addEventListener('click', closeAll);
 
 updateSize(sel.image.ratio, sel.image.res);
 loadPendingGen();
+loadMockData();
 renderOpts();
 </script>
 </body>
