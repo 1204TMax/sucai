@@ -235,6 +235,31 @@
             background: #e6f7ff;
         }
 
+        .menu-item-label {
+            flex: 1;
+        }
+
+        .menu-badges {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .menu-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #999;
+        }
+
+        .menu-badge img {
+            width: 13px;
+            height: 13px;
+            opacity: 0.75;
+        }
+
         .submenu-item svg {
             width: 16px;
             height: 16px;
@@ -525,7 +550,18 @@
                     const item = document.createElement('div');
                     item.className = 'submenu-item' + (moduleIndex === 0 && childIndex === 0 ? ' active' : '');
                     item.dataset.page = child.page;
-                    item.innerHTML = (child.icon ? svgIcon(child.icon) : '') + child.name;
+
+                    if (child.badge) {
+                        item.innerHTML = (child.icon ? svgIcon(child.icon) : '')
+                            + `<span class="menu-item-label">${child.name}</span>`
+                            + `<span class="menu-badges">`
+                            + `<span class="menu-badge generating"><img src="icon/生成中 2.svg">${child.badge.generating}</span>`
+                            + `<span class="menu-badge unviewed"><img src="icon/已完成 2.svg">${child.badge.unviewed}</span>`
+                            + `</span>`;
+                    } else {
+                        item.innerHTML = (child.icon ? svgIcon(child.icon) : '') + child.name;
+                    }
+
                     item.addEventListener('click', () => onSubmenuClick(item));
                     section.appendChild(item);
                 });

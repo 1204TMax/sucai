@@ -47,17 +47,18 @@ const MENU_CONFIG = [
       },
       {
         name: '我的任务',
-        page: '首页/my-tasks.html',
-        icon: '<path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>'
+        page: 'AI 创作/我的任务.html',
+        icon: '<path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>',
+        badge: { generating: 3, unviewed: 5 }
       },
       {
         name: '品类管理',
-        page: '素材管理/category.html',
+        page: 'AI 创作/品类管理.html',
         icon: '<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path>'
       },
       {
         name: '产品管理',
-        page: '素材管理/product.html',
+        page: 'AI 创作/产品管理.html',
         icon: '<path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>'
       }
     ]
@@ -78,7 +79,7 @@ const MENU_CONFIG = [
       },
       {
         name: '混剪策略',
-        page: '素材管理/原料库.html',
+        page: '素材管理/混剪策略.html',
         icon: '<polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>'
       }
     ]
@@ -89,12 +90,12 @@ const MENU_CONFIG = [
     children: [
       {
         name: '模型配置',
-        page: '素材管理/原料库.html',
+        page: '系统设置/模型配置.html',
         icon: '<path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path>'
       },
       {
         name: '算力成本',
-        page: '素材管理/原料库.html',
+        page: '系统设置/算力成本.html',
         icon: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'
       }
     ]
