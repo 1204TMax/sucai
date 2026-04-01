@@ -243,10 +243,31 @@
         }
 
         .group-title-bottom {
-            padding: 12px 20px 8px 20px;
-            color: #999;
+            padding: 12px 20px 4px 20px;
+            color: rgba(0, 0, 0, 0.45);
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .shortcut-item {
+            display: block;
+            padding: 8px 20px 8px 24px;
+            color: rgba(0, 0, 0, 0.65);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .shortcut-item:hover {
+            color: #4a9eff;
+            background: #f5f7fa;
+        }
+
+        .shortcut-item.active {
+            color: #4a9eff;
+            background: #e6f7ff;
         }
 
         .menu-divider {
@@ -510,54 +531,37 @@
                 });
 
                 contentDiv.appendChild(section);
+
+                // 渲染快捷入口（如首页的"常用功能"）
+                if (module.shortcuts) {
+                    const divider = document.createElement('div');
+                    divider.className = 'menu-divider';
+                    contentDiv.appendChild(divider);
+
+                    const groupTitle = document.createElement('div');
+                    groupTitle.className = 'group-title-bottom';
+                    groupTitle.textContent = module.shortcuts.title;
+                    contentDiv.appendChild(groupTitle);
+
+                    const shortcutSection = document.createElement('div');
+                    shortcutSection.className = 'submenu-section';
+
+                    module.shortcuts.items.forEach(child => {
+                        const item = document.createElement('div');
+                        item.className = 'shortcut-item';
+                        item.dataset.page = child.page;
+                        item.textContent = child.name;
+                        item.addEventListener('click', () => onSubmenuClick(item));
+                        shortcutSection.appendChild(item);
+                    });
+
+                    contentDiv.appendChild(shortcutSection);
+                }
+
                 topDiv.appendChild(contentDiv);
             });
 
             sidebar.appendChild(topDiv);
-
-            // 底部固定菜单 - 常用功能
-            if (typeof BOTTOM_SHORTCUTS !== 'undefined' && BOTTOM_SHORTCUTS.length > 0) {
-                const shortcutsDiv = document.createElement('div');
-                shortcutsDiv.className = 'sidebar-bottom';
-                shortcutsDiv.innerHTML = '<div class="menu-divider"></div><div class="group-title-bottom">常用功能</div>';
-
-                const section = document.createElement('div');
-                section.className = 'submenu-section';
-
-                BOTTOM_SHORTCUTS.forEach(child => {
-                    const item = document.createElement('div');
-                    item.className = 'submenu-item';
-                    item.dataset.page = child.page;
-                    item.innerHTML = (child.icon ? svgIcon(child.icon) : '') + child.name;
-                    item.addEventListener('click', () => onSubmenuClick(item));
-                    section.appendChild(item);
-                });
-
-                shortcutsDiv.appendChild(section);
-                sidebar.appendChild(shortcutsDiv);
-            }
-
-            // 底部固定菜单 - 我的
-            if (BOTTOM_MENU && BOTTOM_MENU.length > 0) {
-                const bottomDiv = document.createElement('div');
-                bottomDiv.className = 'sidebar-bottom';
-                bottomDiv.innerHTML = '<div class="menu-divider"></div><div class="group-title-bottom">我的</div>';
-
-                const section = document.createElement('div');
-                section.className = 'submenu-section';
-
-                BOTTOM_MENU.forEach(child => {
-                    const item = document.createElement('div');
-                    item.className = 'submenu-item';
-                    item.dataset.page = child.page;
-                    item.innerHTML = (child.icon ? svgIcon(child.icon) : '') + child.name;
-                    item.addEventListener('click', () => onSubmenuClick(item));
-                    section.appendChild(item);
-                });
-
-                bottomDiv.appendChild(section);
-                sidebar.appendChild(bottomDiv);
-            }
         }
 
         // ---------- 切换一级菜单 ----------
@@ -575,7 +579,7 @@
             // 加载该模块第一个页面
             const firstItem = document.querySelector(`.sidebar-content[data-for="${moduleId}"] .submenu-item`);
             if (firstItem) {
-                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.submenu-item, .shortcut-item').forEach(i => i.classList.remove('active'));
                 firstItem.classList.add('active');
                 loadPage(firstItem.textContent.trim(), firstItem.dataset.page);
             }
@@ -585,7 +589,7 @@
 
         // ---------- 侧边栏菜单点击 ----------
         function onSubmenuClick(item) {
-            document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+            document.querySelectorAll('.submenu-item, .shortcut-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             loadPage(item.textContent.trim(), item.dataset.page);
         }
