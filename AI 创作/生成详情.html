@@ -1723,7 +1723,6 @@ function regenFromImg(e) {
 
 function loadMockData() {
     const area = document.getElementById('chatArea');
-    if (area.children.length > 0) return;
     const prompt = '一瓶高端护肤精华，透明玻璃瓶身，白色简洁背景，产品摄影风格，光线柔和，高清细节';
     const imgs = [
         'https://picsum.photos/seed/gen1/400/400',
@@ -1743,7 +1742,7 @@ function loadMockData() {
             </div>
             <div class="msg-meta">我 · 10:32</div>
         </div>`;
-    area.appendChild(userDiv);
+    area.insertBefore(userDiv, area.firstChild);
 
     const aiDiv = document.createElement('div');
     aiDiv.className = 'msg ai';
@@ -1753,7 +1752,7 @@ function loadMockData() {
             ${makeResultGridHTML(imgs, prompt)}
             <div class="msg-meta">AI 助手 · 10:34</div>
         </div>`;
-    area.appendChild(aiDiv);
+    area.insertBefore(aiDiv, area.children[1] || null);
 }
 
 document.addEventListener('click', closeAll);
