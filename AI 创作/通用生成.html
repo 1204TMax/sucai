@@ -663,7 +663,8 @@
         }
         .sel-panel-grid {
             flex: 1; overflow-y: auto; padding: 0 10px 10px;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+            align-content: start;
         }
         .sel-panel-item {
             position: relative; aspect-ratio: 1; border-radius: 6px;
@@ -1347,14 +1348,11 @@ function switchAssetCat(el) {
     document.querySelectorAll('.asset-sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
     assetCurrentCat = el.dataset.cat;
-    assetSelected.clear();
-    assetSelectedMap.clear();
     document.getElementById('assetModalTitle').textContent = assetCurrentCat === '我的任务' ? '我的任务' : '选择' + assetCurrentCat.replace('库', '');
     renderFilterBar();
     backToTaskList();
     renderAssetContent();
     updateAssetFooter();
-    updateSelectionPanel();
 }
 
 function renderAssetContent() {
