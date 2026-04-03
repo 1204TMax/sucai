@@ -122,6 +122,7 @@
 
         /* ── Buttons ── */
         /* [Ant Design buttons spec: 次按钮/主按钮/危险按钮] */
+        .btn.icon-only { width: 32px; padding: 0; justify-content: center; }
         .btn {
             display: inline-flex;
             align-items: center;
@@ -522,6 +523,98 @@
             color: var(--text-secondary);
             margin-right: 4px;
         }
+
+        /* ── Info Section ── */
+        .info-section {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            min-width: 0;
+            line-height: 1.5715;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+            width: 48px;
+            text-align: right;
+            padding-top: 1px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: var(--text-primary);
+            min-width: 0;
+            flex: 1;
+        }
+
+        .prompt-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .type-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 20px;
+        }
+
+        .type-badge.image { background: #e6f4ff; color: #1677ff; }
+        .type-badge.video { background: #f6ffed; color: #52c41a; }
+
+        .ref-thumbs {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .ref-thumb {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .ref-thumb:hover {
+            transform: scale(1.06);
+            box-shadow: var(--shadow-1);
+        }
+
+        .settings-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .setting-tag {
+            display: inline-block;
+            padding: 0 8px;
+            height: 22px;
+            line-height: 20px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            background: rgba(0,0,0,0.04);
+            color: var(--text-secondary);
+            border: 1px solid rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
@@ -531,11 +624,38 @@
 ══════════════════════════════════════════ -->
 <div class="toolbar-card">
     <div class="toolbar-top">
-        <div class="task-info">
-            <div class="task-name">图像素材衍生#22</div>
-            <div class="task-meta">
-                <span>创建时间：2026-03-30 14:32</span>
-                <span>创建人：张三</span>
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-label">生成入口</span>
+                <span class="info-value" id="infoEntry"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">生成类型</span>
+                <span class="info-value" id="infoType"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">提示词</span>
+                <span class="info-value prompt-text" id="infoPrompt"></span>
+            </div>
+            <div class="info-row" id="refRow">
+                <span class="info-label">参考图</span>
+                <span class="info-value">
+                    <div class="ref-thumbs" id="refThumbs"></div>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">模型</span>
+                <span class="info-value" id="infoModel"></span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">相关设置</span>
+                <span class="info-value">
+                    <div class="settings-tags" id="infoSettings"></div>
+                </span>
+            </div>
+            <div class="info-row" id="projectRow">
+                <span class="info-label">项目</span>
+                <span class="info-value" id="infoProject"></span>
             </div>
         </div>
 
@@ -564,10 +684,9 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     下载
                 </button>
-                <!-- [Ant Design buttons: 危险按钮 for delete] -->
-                <button class="btn btn-danger" onclick="batchDelete()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                    删除
+                <button class="btn" onclick="batchArchive()">
+                    <svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>
+                    入库
                 </button>
             </div>
         </div>
@@ -621,6 +740,81 @@
 
 <script>
 // ═══════════════════════════════════════════════════
+// Page Info (single model)
+// ═══════════════════════════════════════════════════
+const PAGE_INFO = {
+    entry:   '通用生成',          // '通用生成' 或 '工作流：xxx'
+    type:    'image',             // 'image' | 'video'
+    prompt:  '在阳光明媚的草地上奔跑的金毛寻回犬，毛发蓬松，背景虚化，高清写实风格，自然光照',
+    refs:    [
+        { color: '#FF6B6B', name: '参考图 1' },
+        { color: '#4ECDC4', name: '参考图 2' },
+    ],
+    model:   'Flux Pro 1.1',
+    settings: {
+        ratios:   ['9:16', '16:9', '1:1'],
+        clarity:  '标准',   // image only；视频传 null
+        duration: null,     // video only；图片传 null
+    },
+    project: '走路赚金币',  // 无项目时传 null
+};
+
+function renderInfo() {
+    const p = PAGE_INFO;
+
+    document.getElementById('infoEntry').textContent = p.entry;
+    document.getElementById('infoType').innerHTML =
+        `<span class="type-badge ${p.type}">${p.type === 'image' ? '图片' : '视频'}</span>`;
+    document.getElementById('infoPrompt').textContent = p.prompt;
+
+    const refRow    = document.getElementById('refRow');
+    const refThumbs = document.getElementById('refThumbs');
+    if (p.refs && p.refs.length) {
+        refThumbs.innerHTML = p.refs.map((r, i) =>
+            `<div class="ref-thumb" style="background:${r.color}" title="${r.name}"
+                  onclick="openRefPreview(${i})"></div>`
+        ).join('');
+        refRow.style.display = '';
+    } else {
+        refRow.style.display = 'none';
+    }
+
+    document.getElementById('infoModel').textContent = p.model;
+
+    const tags = [];
+    (p.settings.ratios || []).forEach(r => tags.push(r));
+    if (p.type === 'image' && p.settings.clarity)  tags.push('清晰度：' + p.settings.clarity);
+    if (p.type === 'video' && p.settings.duration) tags.push('时长：'   + p.settings.duration);
+    document.getElementById('infoSettings').innerHTML =
+        tags.map(t => `<span class="setting-tag">${t}</span>`).join('');
+
+    const projRow = document.getElementById('projectRow');
+    if (p.project) {
+        document.getElementById('infoProject').textContent = p.project;
+        projRow.style.display = '';
+    } else {
+        projRow.style.display = 'none';
+    }
+}
+
+function openRefPreview(idx) {
+    const ref = PAGE_INFO.refs[idx];
+    if (!ref) return;
+    const mask   = document.getElementById('previewMask');
+    const canvas = document.getElementById('previewCanvas');
+    const foot   = document.getElementById('previewFoot');
+    canvas.style.cssText = `
+        background: ${ref.color};
+        width: 400px; height: 400px;
+        max-width: 80vw; max-height: 70vh;
+        border-radius: 8px 8px 0 0;
+    `;
+    canvas.textContent = ref.name;
+    foot.innerHTML = `<button class="btn" onclick="closePreview()">关闭</button>`;
+    mask.classList.add('visible');
+}
+
+// ═══════════════════════════════════════════════════
 // Mock Data — 16 images, 3 ratio groups
 // ═══════════════════════════════════════════════════
 const COLORS = [
@@ -664,11 +858,12 @@ const GAP = 8;
 // SVG icon helpers
 // ═══════════════════════════════════════════════════
 const ico = {
-    dl:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
-    del:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>',
-    redo: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>',
-    eye:  '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
-    chk:  '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+    dl:     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+    del:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>',
+    eye:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
+    inbox:  '<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>',
+    edit:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
+    chk:    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
 };
 
 // ═══════════════════════════════════════════════════
@@ -770,12 +965,10 @@ function mkCard(item) {
 
 function mkActions(item) {
     let h = '';
-    if (batchMode) {
-        h += ibtn('预览', ico.eye, `openPreview(find(${item.id}))`);
-    }
-    h += ibtn('下载',     ico.dl,   `dlItem(${item.id})`);
-    h += ibtn('再次生成', ico.redo, `regenItem(${item.id})`);
-    h += ibtn('删除',     ico.del,  `askDel('single',${item.id})`, true);
+    h += ibtn('预览', ico.eye,   `openPreview(find(${item.id}))`);
+    h += ibtn('下载', ico.dl,    `dlItem(${item.id})`);
+    h += ibtn('入库', ico.inbox, `archiveItem(${item.id})`);
+    h += ibtn('编辑', ico.edit,  `editItem(${item.id})`);
     return h;
 }
 
@@ -835,9 +1028,10 @@ function updateSelCount() {
 
 function downloadAll()   { alert('下载全部（' + filtered().length + ' 张）'); }
 function batchDownload()  { if (!selected.size) return alert('请先选择图像'); alert('下载已选 ' + selected.size + ' 张'); }
-function batchDelete()    { if (!selected.size) return alert('请先选择图像'); askDel('batch'); }
+function batchArchive()   { if (!selected.size) return alert('请先选择图像'); alert('入库已选 ' + selected.size + ' 张'); }
 function dlItem(id)       { alert('下载：' + find(id).name); }
-function regenItem(id)    { alert('再次生成：' + find(id).name); }
+function archiveItem(id)  { alert('入库：' + find(id).name); }
+function editItem(id)     { alert('编辑：' + find(id).name); }
 
 // ═══════════════════════════════════════════════════
 // Delete Confirm
@@ -896,17 +1090,10 @@ function openPreview(item) {
     `;
     canvas.textContent = item.name;
 
-    // 预览模式下不展示「预览」按钮
     foot.innerHTML = `
-        <button class="btn" onclick="dlItem(${item.id})">
-            ${ico.dl} 下载
-        </button>
-        <button class="btn" onclick="regenItem(${item.id})">
-            ${ico.redo} 再次生成
-        </button>
-        <button class="btn btn-danger" onclick="closePreview();askDel('single',${item.id})">
-            ${ico.del} 删除
-        </button>
+        <button class="btn icon-only" title="下载" onclick="dlItem(${item.id})">${ico.dl}</button>
+        <button class="btn icon-only" title="入库" onclick="archiveItem(${item.id})">${ico.inbox}</button>
+        <button class="btn icon-only" title="编辑" onclick="editItem(${item.id})">${ico.edit}</button>
     `;
     mask.classList.add('visible');
 }
@@ -923,6 +1110,7 @@ function render() { renderTabs(); renderGrid(); }
 let _rt;
 window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(renderGrid, 100); });
 
+renderInfo();
 render();
 </script>
 </body>

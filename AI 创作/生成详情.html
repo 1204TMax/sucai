@@ -346,7 +346,7 @@
 <body>
 
 <div class="toast" id="toast"></div>
-<div class="img-preview-mask" id="imgPreviewMask" onclick="this.style.display='none'">
+<div class="img-preview-mask" id="imgPreviewMask" onclick="this.classList.remove('show')">
   <img class="img-preview-img" id="imgPreviewImg" src="" alt="" onclick="event.stopPropagation()">
   <button class="img-preview-dl" id="imgPreviewDl" onclick="event.stopPropagation();var a=document.createElement('a');a.href=document.getElementById('imgPreviewImg').src;a.download='download.png';a.click();" title="下载">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -459,7 +459,7 @@ const MODELS_MAP = { seedream5: 'seedream 5.0', banana2: 'banana 2', minimax1: '
 const VIDEO_GRADIENTS = [['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140']];
 const GEN_SOURCES = { universal:'通用生成', poster:'大字报衍生', workflow:'工作流生成' };
 const img = s => ({ type:'image', thumb:`https://picsum.photos/seed/${s}/200/200`, url:`https://picsum.photos/seed/${s}/800/800` });
-const vid = (s,i,d) => ({ type:'video', thumb:'', url:'', gradientIdx:i||0, duration:d||'5s' });
+const vid = (s,i,d) => ({ type:'video', thumb:`https://picsum.photos/seed/${s}/800/800`, url:`https://picsum.photos/seed/${s}/800/800`, gradientIdx:i||0, duration:d||'5s' });
 
 // ═══ Mock 数据 ═══
 const INITIAL_TASKS = [
@@ -534,7 +534,10 @@ function VideoThumb({ item, collapsed }) {
   const gi = item.gradientIdx || 0;
   const g = VIDEO_GRADIENTS[gi % 5];
   const dur = item.duration || '5s';
-  return <div className="o-thumb">
+  const [showEdit, setShowEdit] = React.useState(false);
+  const [showStorage, setShowStorage] = React.useState(false);
+  const RECENT_WORKFLOWS = ['大字报裂变工作流','产品展示工作流','品牌形象工作流'];
+  return <div className="o-thumb" data-preview-url={item.thumb||item.url} style={{cursor:'pointer'}} onClick={()=>window.__previewImage(item.thumb||item.url)}>
     <div className="vid-thumb-inner" style={{background:`linear-gradient(135deg,${g[0]},${g[1]})`}}>
       <div className="vid-play">
         <svg width={collapsed?10:14} height={collapsed?10:14} viewBox="0 0 24 24" fill="#333"><polygon points="6 3 20 12 6 21"/></svg>
@@ -542,12 +545,32 @@ function VideoThumb({ item, collapsed }) {
       <span className="vid-dur">{dur}</span>
     </div>
     <span className="ai-badge">AI生成</span>
-    <div className="thumb-overlay">
-      <button className="thumb-act" title="预览" onClick={e=>{e.stopPropagation();message.info('预览功能开发中')}}>
+    <div className="thumb-overlay" style={{alignItems:'flex-end',justifyContent:'flex-end',padding:6}}>
+      <button className="thumb-act" title="预览" onClick={e=>{e.stopPropagation();window.__previewImage(item.thumb||item.url);}}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
       <button className="thumb-act" title="下载" onClick={e=>{e.stopPropagation();message.success('已下载')}}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button className="thumb-act" title="入库" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowStorage(!showStorage);setShowEdit(false);}}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+        {showStorage && <div className="storage-dropdown" style={{bottom:'calc(100% + 4px)',right:0,left:'auto'}} onClick={e=>e.stopPropagation()}>
+          {STORAGE_TARGETS.map(t=><div key={t} className="storage-dd-item" onClick={()=>{showToast(`已入库到${t}`);setShowStorage(false);}}>{t}</div>)}
+        </div>}
+      </button>
+      <button className="thumb-act" title="编辑" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowEdit(!showEdit);setShowStorage(false);}}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        {showEdit && <div className="edit-menu" onClick={e=>e.stopPropagation()}>
+          <div className="edit-menu-item" onClick={()=>{showToast('已添加到图像生成');setShowEdit(false);}}>图像</div>
+          <div className="edit-menu-item" onClick={()=>{showToast('已添加到视频生成');setShowEdit(false);}}>视频</div>
+          <div className="edit-menu-item" onClick={()=>{showToast('已添加到对话');setShowEdit(false);}}>对话</div>
+          <div className="edit-menu-item" style={{position:'relative'}}>
+            工作流 <span className="sub-arrow">▸</span>
+            <div className="edit-submenu">
+              {RECENT_WORKFLOWS.map(w=><div key={w} className="edit-submenu-item" onClick={()=>{showToast(`已添加到${w}`);setShowEdit(false);}}>{w}</div>)}
+            </div>
+          </div>
+        </div>}
       </button>
     </div>
   </div>;
@@ -565,10 +588,13 @@ function ImageThumb({ item, index }) {
     showToast('已开始下载');
   };
 
-  return <div className="o-thumb" onClick={()=>window.__previewImage(item.url||item.thumb)} style={{cursor:'pointer'}}>
+  return <div className="o-thumb" data-preview-url={item.url||item.thumb} style={{cursor:'pointer'}} onClick={()=>window.__previewImage(item.url||item.thumb)}>
     <img src={item.thumb || item.url} alt="" loading="lazy"/>
     <span className="ai-badge">AI生成</span>
     <div className="thumb-overlay" style={{alignItems:'flex-end',justifyContent:'flex-end',padding:6}}>
+      <button className="thumb-act" title="预览" onClick={e=>{e.stopPropagation();window.__previewImage(item.url||item.thumb);}}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
       <button className="thumb-act" title="下载" onClick={doDownload}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
@@ -699,7 +725,7 @@ function TaskCard({ task, viewMode, onOpenDetail }) {
     <div className="card-header">
       <span className="c-tag" style={{background:'#f5f5f5',color:'#666'}}>{sourceName}</span>
       {task.input.refImages && task.input.refImages.length > 0 && <div className="card-ref-thumbs">
-        {task.input.refImages.slice(0,3).map((ref,i) => <div key={i} className="card-ref-thumb" onClick={()=>window.__previewImage(ref.url||ref.thumb)}>
+        {task.input.refImages.slice(0,3).map((ref,i) => <div key={i} className="card-ref-thumb" data-preview-url={ref.url||ref.thumb} style={{cursor:'pointer'}} onClick={()=>window.__previewImage(ref.url||ref.thumb)}>
           <img src={ref.thumb||ref.url} alt=""/>
         </div>)}
       </div>}
@@ -739,10 +765,10 @@ function TaskCard({ task, viewMode, onOpenDetail }) {
       )}
       {task.status==='aborted' && (collapsed
         ? (currentOutput.items.length > 0
-          ? <OutputRow items={currentOutput.items} total={currentOutput.total} type={task.type} collapsed={collapsed} onViewAll={()=>onOpenDetail(task)}/>
+          ? <OutputRow items={currentOutput.items} total={currentOutput.total} type={task.type} collapsed={collapsed} onViewAll={()=>parent.postMessage({action:'openTab',title:'生成结果',url:'AI 创作/生成结果.html'},'*')}/>
           : <div style={{padding:'8px 0',fontSize:12,color:'#d97706'}}>已中止生成</div>)
         : (currentOutput.items.length > 0
-          ? <OutputRow items={currentOutput.items} total={currentOutput.total} type={task.type} collapsed={collapsed} onViewAll={()=>onOpenDetail(task)}/>
+          ? <OutputRow items={currentOutput.items} total={currentOutput.total} type={task.type} collapsed={collapsed} onViewAll={()=>parent.postMessage({action:'openTab',title:'生成结果',url:'AI 创作/生成结果.html'},'*')}/>
           : <div className="status-placeholder"><div className="status-placeholder-text">已中止生成</div></div>)
       )}
       {task.status==='pending' && (collapsed
@@ -756,7 +782,7 @@ function TaskCard({ task, viewMode, onOpenDetail }) {
         total={currentOutput.total}
         type={task.type}
         collapsed={collapsed}
-        onViewAll={()=>onOpenDetail(task)}
+        onViewAll={()=>parent.postMessage({action:'openTab',title:'生成结果',url:'AI 创作/生成结果.html'},'*')}
       />}
     </div>
 
@@ -1270,24 +1296,24 @@ window.__handleStop = function(task) {
 window.__previewImage = function(url) {
   var mask = document.getElementById('imgPreviewMask');
   var img = document.getElementById('imgPreviewImg');
-  if (!mask || !img) return;
+  if (!mask || !img || !url) return;
   img.src = url;
-  mask.style.cssText = 'display:flex!important;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;cursor:pointer;';
+  mask.classList.add('show');
 };
 
-// 用事件委托处理图片点击预览，绕开 React 合成事件和 overlay pointer-events 问题
+// 用捕获阶段处理图片点击预览，先于 React/AntD 的任何 stopPropagation
 document.addEventListener('click', function(e) {
-  if (e.target.closest('button')) return;
-  if (e.target.closest('.input-ref-del')) return;
+  if (e.target.closest('button, .input-ref-del')) return;
   if (e.target.closest('#imgPreviewMask')) return;
   var container = e.target.closest('.o-thumb, .card-ref-thumb, .input-ref-item');
   if (!container) return;
-  var img = container.querySelector('img');
-  if (img && img.src) {
-    e.stopPropagation();
-    window.__previewImage(img.src);
+  var previewUrl = container.dataset.previewUrl;
+  if (!previewUrl) {
+    var img = container.querySelector('img');
+    previewUrl = img && img.src;
   }
-}, false);
+  if (previewUrl) window.__previewImage(previewUrl);
+}, true);
 </script>
 
 <script>
