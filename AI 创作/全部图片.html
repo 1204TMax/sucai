@@ -6,308 +6,338 @@
     <title>生成结果 - 量化投放系统</title>
     <style>
         /* ══════════════════════════════════════════
-           CSS Variables
-           [Ant Design colors spec: 品牌色 #1677ff]
-           [Ant Design shadow spec: 三层阴影体系]
+           Design System Variables
         ══════════════════════════════════════════ */
         :root {
-            --primary: #1677ff;
-            --primary-hover: #4096ff;
-            --primary-bg: #e6f4ff;
-            --danger: #ff4d4f;
-            --danger-hover: #ff7875;
-            --danger-bg: #fff2f0;
-            --text-primary: rgba(0,0,0,0.88);
-            --text-secondary: rgba(0,0,0,0.45);
-            --border: rgba(0,0,0,0.15);
-            --border-light: rgba(0,0,0,0.06);
-            --bg-layout: #f0f2f6;
-            --bg-card: #ffffff;
-            --bg-hover: rgba(0,0,0,0.04);
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 12px;
-            /* shadow-1-down */
+            /* ── 主色（Blue，10 级色阶） ── */
+            --primary-1:  #E8F4FF;
+            --primary-2:  #C4E2FF;
+            --primary-3:  #96C8FF;
+            --primary-4:  #6DAFFF;
+            --primary-5:  #5AA4FF;
+            --primary-6:  #4A9EFF;
+            --primary-7:  #3580DB;
+            --primary-8:  #2463B5;
+            --primary-9:  #164A8F;
+            --primary-10: #0B336A;
+
+            /* ── 灰阶（Slate，偏蓝冷灰，12 级） ── */
+            --gray-1:  #FCFCFD;
+            --gray-2:  #F8F9FA;
+            --gray-3:  #F1F3F5;
+            --gray-4:  #E9ECEF;
+            --gray-5:  #DEE2E6;
+            --gray-6:  #CED4DA;
+            --gray-7:  #ADB5BD;
+            --gray-8:  #868E96;
+            --gray-9:  #6C757D;
+            --gray-10: #5A6169;
+            --gray-11: #495057;
+            --gray-12: #212529;
+
+            /* ── 语义映射 ── */
+            --bg-page:      var(--gray-2);
+            --bg-surface:   var(--gray-1);
+            --bg-subtle:    var(--gray-3);
+            --bg-hover:     var(--gray-4);
+            --bg-active:    var(--gray-5);
+
+            --border-1:     var(--gray-4);
+            --border-2:     var(--gray-6);
+            --border-3:     var(--gray-7);
+
+            --text-hi:      var(--gray-12);
+            --text-lo:      var(--gray-11);
+            --text-muted:   var(--gray-9);
+            --text-ghost:   var(--gray-8);
+
+            --accent-bg:      var(--primary-1);
+            --accent-border:  var(--primary-2);
+            --accent-solid:   var(--primary-6);
+            --accent-solid-h: var(--primary-5);
+            --accent-text:    var(--primary-7);
+
+            /* ── 状态色 ── */
+            --success: #34C759;
+            --warning: #FF9500;
+            --error:   #E5484D;
+
+            /* ── 字体 ── */
+            --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "Noto Sans SC", sans-serif;
+            --text-xs:   11px;
+            --text-sm:   12px;
+            --text-base: 13px;
+            --text-md:   14px;
+            --text-lg:   16px;
+
+            /* ── 间距（4px 网格） ── */
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-7: 32px;
+            --space-8: 40px;
+            --space-9: 48px;
+
+            /* ── 组件高度 ── */
+            --h-xs: 22px;
+            --h-sm: 28px;
+            --h-md: 32px;
+            --h-lg: 36px;
+
+            /* ── 圆角 ── */
+            --r-sm:   4px;
+            --r-md:   6px;
+            --r-lg:   8px;
+            --r-xl:   12px;
+            --r-full: 9999px;
+
+            /* ── 过渡 ── */
+            --ease: 120ms ease;
+
+            /* ── 阴影（页面专用） ── */
             --shadow-1: 0 1px 2px -2px rgba(0,0,0,0.16), 0 3px 6px 0 rgba(0,0,0,0.12), 0 5px 12px 4px rgba(0,0,0,0.09);
-            /* shadow-2-down */
             --shadow-2: 0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08), 0 9px 28px 8px rgba(0,0,0,0.05);
-            /* shadow-3-down */
             --shadow-3: 0 6px 16px -8px rgba(0,0,0,0.08), 0 9px 28px 0 rgba(0,0,0,0.05), 0 12px 48px 16px rgba(0,0,0,0.03);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                         "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-            font-size: 14px;
+            font-family: var(--font);
+            font-size: var(--text-md);
             line-height: 1.5715;
-            background: var(--bg-layout);
-            color: var(--text-primary);
-            padding: 20px;
+            background: var(--bg-page);
+            color: var(--text-hi);
+            padding: var(--space-5);
         }
 
-        /* ── Toolbar Card ── */
-        .toolbar-card {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+        /* ── Card ── */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-xl);
+            overflow: hidden;
+            margin-bottom: var(--space-4);
         }
 
-        .toolbar-top {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-        }
+        /* ── Row containers ── */
+        .row     { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+        .row-pad { padding: var(--space-3) var(--space-5); }
+        .row-sep { border-bottom: 1px solid var(--border-1); }
+        .row-end { margin-left: auto; display: flex; align-items: center; gap: var(--space-2); flex-shrink: 0; }
+        .sep     { width: 1px; height: 16px; background: var(--border-1); flex-shrink: 0; }
 
-        .task-info { min-width: 0; }
-
-        /* [Ant Design font spec: 标题 18px/font-weight 600] */
-        .task-name {
-            font-size: 18px;
+        /* ── Row 1: Title ── */
+        .card-title {
+            font-size: var(--text-lg);
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
+            color: var(--text-hi);
         }
-
-        .task-meta {
-            font-size: 12px;
-            color: var(--text-secondary);
-            display: flex;
-            gap: 16px;
-        }
-
-        .toolbar-actions {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        /* ── Segmented Control ── */
-        /* [Ant Design data-entry spec: Segmented 分段控制器] */
-        .segmented {
-            display: inline-flex;
-            background: rgba(0,0,0,0.04);
-            border-radius: 6px;
-            padding: 2px;
-        }
-
-        .seg-btn {
-            display: inline-flex;
-            align-items: center;
-            padding: 4px 12px;
-            border-radius: 4px;
-            border: none;
-            font-size: 13px;
-            font-family: inherit;
-            color: var(--text-secondary);
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .seg-btn:hover { color: var(--text-primary); }
-
-        .seg-btn.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-        }
-
-        /* ── Buttons ── */
-        /* [Ant Design buttons spec: 次按钮/主按钮/危险按钮] */
-        .btn.icon-only { width: 32px; padding: 0; justify-content: center; }
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 15px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            font-size: 14px;
-            font-family: inherit;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
-            height: 32px;
-        }
-
-        .btn:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-hover);
-            border-color: var(--primary-hover);
-            color: #fff;
-        }
-
-        .btn-danger {
-            color: var(--danger);
-            border-color: var(--danger);
-            background: #fff;
-        }
-
-        .btn-danger:hover {
-            background: var(--danger-bg);
-        }
-
-        .btn-danger-fill {
-            background: var(--danger);
-            border-color: var(--danger);
-            color: #fff;
-        }
-
-        .btn-danger-fill:hover {
-            background: var(--danger-hover);
-            border-color: var(--danger-hover);
-            color: #fff;
-        }
-
-        .divider-v {
-            width: 1px;
-            height: 20px;
-            background: rgba(0,0,0,0.06);
-            margin: 0 4px;
+        .card-subtitle {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
         .batch-actions {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
         }
 
-        /* ── Model Filter Chips ── */
-        .model-chips {
+        /* ── Row 2: Meta info (compact horizontal) ── */
+        .meta-label {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        .meta-value {
+            font-size: var(--text-sm);
+            color: var(--text-lo);
+            max-width: 480px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ref-thumbs {
             display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 12px;
+            gap: var(--space-2);
             flex-wrap: wrap;
         }
-
-        .model-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            height: 26px;
-            padding: 0 10px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-            font-size: 12px;
-            font-family: inherit;
-            color: var(--text-secondary);
-            background: var(--bg-card);
+        .ref-thumb {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--r-sm);
             cursor: pointer;
-            transition: all 0.15s;
-            white-space: nowrap;
-            font-weight: 400;
+            flex-shrink: 0;
+            transition: transform var(--ease), box-shadow var(--ease);
+        }
+        .ref-thumb:hover {
+            transform: scale(1.08);
+            box-shadow: var(--shadow-1);
         }
 
-        .model-chip:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: var(--primary-bg);
-        }
-
-        .model-chip.active {
-            background: var(--primary-bg);
-            border-color: var(--primary);
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .model-chip .chip-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-            opacity: 0.6;
+        /* ── Row 3: Filters ── */
+        .filter-label {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
             flex-shrink: 0;
         }
 
-        .model-chip.active .chip-dot { opacity: 1; }
-
-        .model-chip-label { color: var(--text-secondary); font-size: 12px; flex-shrink: 0; }
-
-        /* ── Ratio Tabs (胶囊型) ── */
-        /* [Ant Design navigation spec: 胶囊型 Tabs] */
-        .ratio-tabs {
-            display: flex;
-            background: rgba(0,0,0,0.04);
-            border-radius: 20px;
-            padding: 3px;
-            gap: 2px;
-            margin-top: 10px;
-        }
-
-        .ratio-tab {
+        /* ── Pill Group (density toggle) ── */
+        .pills {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 3px 12px;
-            border-radius: 16px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-full);
+            padding: 2px;
+            gap: 1px;
+            flex-shrink: 0;
+        }
+
+        .pill {
+            height: var(--h-xs);
+            padding: 0 var(--space-3);
+            border-radius: var(--r-full);
+            font: 500 var(--text-sm)/1 var(--font);
+            color: var(--text-muted);
             border: none;
-            font-size: 12px;
-            font-family: inherit;
-            color: var(--text-secondary);
             background: transparent;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all var(--ease);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
         }
 
-        .ratio-tab:hover { color: var(--text-primary); }
+        .pill:hover { color: var(--text-lo); }
 
-        .ratio-tab.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            font-weight: 500;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        .pill.on {
+            background: var(--bg-surface);
+            color: var(--text-hi);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
-        .tab-count { font-size: 11px; opacity: 0.65; }
+        .pill-n {
+            font-size: var(--text-xs);
+            color: var(--text-muted);
+            background: var(--bg-subtle);
+            padding: 0 var(--space-1);
+            border-radius: var(--r-full);
+            margin-left: 1px;
+        }
+        .pill.on .pill-n { background: var(--bg-hover); color: var(--text-lo); }
+
+        /* ── Buttons ── */
+        .b {
+            height: var(--h-sm);
+            padding: 0 var(--space-3);
+            border-radius: var(--r-md);
+            font: 500 var(--text-sm)/1 var(--font);
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-1);
+            white-space: nowrap;
+            transition: all var(--ease);
+            flex-shrink: 0;
+        }
+        .b:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 1px; }
+
+        .b-solid { background: var(--accent-solid); color: white; }
+        .b-solid:hover { background: var(--accent-solid-h); }
+
+        .b-soft { background: var(--bg-subtle); color: var(--text-lo); border-color: var(--border-1); }
+        .b-soft:hover { background: var(--bg-hover); color: var(--text-hi); border-color: var(--border-2); }
+
+        .b-ghost { background: transparent; color: var(--text-muted); }
+        .b-ghost:hover { background: var(--bg-subtle); color: var(--text-lo); }
+
+        .b-icon { width: var(--h-sm); padding: 0; }
+        .b-icon.on { background: var(--accent-bg); color: var(--accent-text); border-color: var(--accent-border); }
+
+        .b-danger { background: var(--error); border-color: var(--error); color: white; }
+        .b-danger:hover { opacity: 0.9; }
+
+        .sep {
+            width: 1px;
+            height: 16px;
+            background: var(--border-1);
+            flex-shrink: 0;
+        }
+
+        .batch-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        /* ── Filter Chips ── */
+        .f-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-1);
+            align-items: center;
+        }
+
+        .chip {
+            height: var(--h-xs);
+            padding: 0 var(--space-2);
+            border-radius: var(--r-sm);
+            font: 500 var(--text-xs)/1 var(--font);
+            color: var(--text-lo);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border-1);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-1);
+            white-space: nowrap;
+            transition: all var(--ease);
+        }
+
+        .chip:hover { border-color: var(--border-2); color: var(--text-hi); }
+
+        .chip.on {
+            background: var(--accent-bg);
+            border-color: var(--accent-border);
+            color: var(--accent-text);
+            font-weight: 600;
+        }
+
+        /* ── Ratio pills (reuses .pills / .pill above) ── */
+        .ratio-pills { }
 
         /* ── Image Grid ── */
         .grid-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
         }
 
         .grid-row-last {
             display: flex;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
         }
 
         /* ── Image Item ── */
         .img-item {
             position: relative;
-            border-radius: var(--radius-md);
+            border-radius: var(--r-lg);
             overflow: hidden;
             cursor: pointer;
             flex-shrink: 0;
-            /* [Ant Design shadow spec: Layer 0 - rest state] */
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            transition: transform var(--ease), box-shadow var(--ease);
         }
 
-        /* [Ant Design shadow spec: Layer 1 - hover 悬浮] */
-        /* [Ant Design invitation spec: 悬停邀请] */
         .img-item:hover {
             transform: translateY(-2px);
             box-shadow: var(--shadow-2);
@@ -320,7 +350,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: var(--text-sm);
             font-weight: 500;
             color: rgba(255,255,255,0.8);
             user-select: none;
@@ -341,7 +371,7 @@
             bottom: 0; left: 0; right: 0;
             height: 56px;
             background: linear-gradient(to top, rgba(0,0,0,0.45), transparent);
-            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            border-radius: 0 0 var(--r-lg) var(--r-lg);
             pointer-events: none;
         }
 
@@ -355,57 +385,59 @@
             pointer-events: auto;
         }
 
+        .img-item.selected .img-actions {
+            display: none;
+        }
+
         /* ── Overlay Action Icons ── */
-        /* [Ant Design buttons spec: 图标按钮必须有 Tooltip] */
         .img-actions {
             position: absolute;
-            bottom: 8px;
-            right: 8px;
+            bottom: var(--space-2);
+            right: var(--space-2);
             display: flex;
-            gap: 4px;
+            gap: var(--space-1);
             z-index: 2;
         }
 
         .icon-btn {
-            width: 28px;
-            height: 28px;
+            width: var(--h-sm);
+            height: var(--h-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: var(--radius-sm);
+            border-radius: var(--r-sm);
             border: none;
             background: rgba(255,255,255,0.9);
-            color: rgba(0,0,0,0.65);
+            color: var(--text-lo);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all var(--ease);
             position: relative;
         }
 
         .icon-btn:hover {
-            background: #fff;
-            color: var(--primary);
+            background: white;
+            color: var(--accent-solid);
         }
 
         .icon-btn.danger:hover {
-            background: var(--danger-bg);
-            color: var(--danger);
+            background: rgba(229,72,77,0.08);
+            color: var(--error);
         }
 
-        /* [Ant Design feedback spec: Tooltip 文字提示] */
         .icon-btn .tip {
             position: absolute;
-            bottom: calc(100% + 6px);
+            bottom: calc(100% + var(--space-2));
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0,0,0,0.75);
-            color: #fff;
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 4px;
+            color: white;
+            font-size: var(--text-sm);
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--r-sm);
             white-space: nowrap;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.15s;
+            transition: opacity var(--ease);
             z-index: 10;
         }
 
@@ -424,24 +456,24 @@
         /* ── Checkbox (batch mode) ── */
         .img-cb {
             position: absolute;
-            top: 8px;
-            left: 8px;
+            top: var(--space-2);
+            left: var(--space-2);
             z-index: 3;
             width: 18px;
             height: 18px;
-            border-radius: 4px;
+            border-radius: var(--r-sm);
             border: 2px solid rgba(255,255,255,0.85);
             background: rgba(0,0,0,0.25);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.15s;
+            transition: all var(--ease);
             opacity: 0;
         }
 
         .img-cb.checked {
-            background: var(--primary);
-            border-color: var(--primary);
+            background: var(--accent-solid);
+            border-color: var(--accent-solid);
         }
 
         .img-cb svg { opacity: 0; }
@@ -455,12 +487,11 @@
         .img-item.selected .img-cb { opacity: 1; }
 
         .img-item.selected {
-            outline: 2px solid var(--primary);
+            outline: 2px solid var(--accent-solid);
             outline-offset: -2px;
         }
 
         /* ── Modal Overlay ── */
-        /* [Ant Design feedback spec: Modal 对话框] */
         .modal-mask {
             display: none;
             position: fixed;
@@ -475,8 +506,8 @@
 
         /* ── Preview Modal ── */
         .preview-box {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
+            background: var(--bg-surface);
+            border-radius: var(--r-xl);
             box-shadow: var(--shadow-3);
             overflow: hidden;
             display: flex;
@@ -497,7 +528,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: var(--text-lg);
             font-weight: 500;
             color: rgba(255,255,255,0.85);
             user-select: none;
@@ -505,180 +536,103 @@
 
         .preview-close {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+            top: var(--space-3);
+            right: var(--space-3);
+            width: var(--h-md);
+            height: var(--h-md);
+            border-radius: var(--r-full);
             border: none;
             background: rgba(255,255,255,0.15);
-            color: #fff;
+            color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s;
+            transition: background var(--ease);
             z-index: 2;
         }
 
         .preview-close:hover { background: rgba(255,255,255,0.3); }
 
         .preview-footer {
-            padding: 12px 16px;
+            padding: var(--space-3) var(--space-4);
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 8px;
-            border-top: 1px solid var(--border-light);
+            gap: var(--space-2);
+            border-top: 1px solid var(--border-1);
         }
 
         /* ── Confirm Modal ── */
-        /* [Ant Design feedback spec: 对话框反馈 for destructive operations] */
         .confirm-box {
             width: 416px;
-            padding: 24px;
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            background: var(--bg-surface);
+            border-radius: var(--r-xl);
             box-shadow: var(--shadow-3);
         }
 
         .confirm-head {
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
         }
 
-        .confirm-icon { color: #faad14; flex-shrink: 0; margin-top: 1px; }
+        .confirm-icon { color: var(--warning); flex-shrink: 0; margin-top: 1px; }
 
-        /* [Ant Design font spec: 标题 16px/600] */
         .confirm-title {
-            font-size: 16px;
+            font-size: var(--text-lg);
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
+            color: var(--text-hi);
+            margin-bottom: var(--space-1);
         }
 
         .confirm-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
+            font-size: var(--text-md);
+            color: var(--text-muted);
         }
 
         .confirm-footer {
             display: flex;
             justify-content: flex-end;
-            gap: 8px;
+            gap: var(--space-2);
         }
 
-        /* ── Selected count badge ── */
+        /* ── Selected count ── */
         .sel-count {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-right: 4px;
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+            margin-right: var(--space-1);
         }
 
-        /* ── Info Section ── */
-        .info-section {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-width: 0;
-            flex: 1;
-        }
-
-        .info-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            min-width: 0;
-            line-height: 1.5715;
-        }
-
-        .info-label {
-            font-size: 14px;
-            color: rgba(0,0,0,0.45);
-            flex-shrink: 0;
-            width: 56px;
-            text-align: right;
-        }
-
-        .info-value {
-            font-size: 14px;
-            color: rgba(0,0,0,0.88);
-            min-width: 0;
-            flex: 1;
-        }
-
-        .prompt-text {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .type-badge {
+        /* ── Badge ── */
+        .badge {
+            height: 18px;
+            padding: 0 var(--space-2);
+            border-radius: var(--r-full);
+            font: 500 var(--text-xs)/1 var(--font);
             display: inline-flex;
             align-items: center;
-            height: 22px;
-            padding: 0 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 20px;
-            border: 1px solid transparent;
         }
+        .badge-default { background: var(--bg-subtle); color: var(--text-lo); }
+        .badge-accent  { background: var(--accent-bg); color: var(--accent-text); }
 
-        .type-badge.image {
-            background: rgba(22,119,255,0.1);
-            border-color: rgba(22,119,255,0.2);
-            color: var(--primary);
+        /* ── Range input ── */
+        .range { display: flex; align-items: center; gap: var(--space-2); }
+        .range-input {
+            height: var(--h-xs);
+            width: 88px;
+            padding: 0 var(--space-2);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-sm);
+            font: 400 var(--text-xs)/1 var(--font);
+            color: var(--text-lo);
+            text-align: center;
         }
-
-        .type-badge.video {
-            background: rgba(82,196,26,0.1);
-            border-color: rgba(82,196,26,0.2);
-            color: #52c41a;
-        }
-
-        .ref-thumbs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .ref-thumb {
-            width: 36px;
-            height: 36px;
-            border-radius: 4px;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .ref-thumb:hover {
-            transform: scale(1.08);
-            box-shadow: var(--shadow-1);
-        }
-
-        .settings-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            align-items: center;
-        }
-
-        .setting-tag {
-            display: inline-flex;
-            align-items: center;
-            padding: 0 8px;
-            height: 22px;
-            line-height: 20px;
-            border-radius: 4px;
-            font-size: 12px;
-            background: rgba(0,0,0,0.04);
-            color: rgba(0,0,0,0.65);
-            border: 1px solid rgba(0,0,0,0.06);
-        }
+        .range-input:focus { outline: none; border-color: var(--accent-border); box-shadow: 0 0 0 2px var(--accent-bg); }
+        .range-dash { color: var(--text-ghost); font-size: var(--text-xs); }
         /* ── Archive Dropdown ── */
         .archive-wrap {
             position: relative;
@@ -687,15 +641,16 @@
 
         .archive-dropdown {
             position: absolute;
-            bottom: calc(100% + 4px);
+            bottom: calc(100% + var(--space-1));
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg-card);
-            border-radius: 8px;
-            box-shadow: var(--shadow-2);
-            padding: 4px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-xl);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            padding: var(--space-2);
             min-width: 120px;
-            z-index: 20;
+            z-index: 100;
             display: none;
         }
 
@@ -703,28 +658,30 @@
 
         .archive-dropdown.drop-down {
             bottom: auto;
-            top: calc(100% + 4px);
+            top: calc(100% + var(--space-1));
         }
 
         .archive-opt {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--space-2);
             width: 100%;
-            padding: 8px 12px;
+            padding: var(--space-2) var(--space-3);
             border: none;
             background: none;
-            font-size: 14px;
+            font-size: var(--text-base);
             font-family: inherit;
-            color: var(--text-primary);
+            color: var(--text-lo);
             cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.15s;
+            border-radius: var(--r-sm);
+            transition: background var(--ease);
             white-space: nowrap;
+            text-align: left;
         }
 
         .archive-opt:hover {
-            background: rgba(0,0,0,0.04);
+            background: var(--bg-subtle);
+            color: var(--text-hi);
         }
 
     </style>
@@ -734,84 +691,63 @@
 <!-- ══════════════════════════════════════════
      Toolbar
 ══════════════════════════════════════════ -->
-<div class="toolbar-card">
-    <div class="toolbar-top">
-        <div class="info-section">
-            <div class="info-row">
-                <span class="info-label">生成入口</span>
-                <span class="info-value" id="infoEntry"></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">生成类型</span>
-                <span class="info-value" id="infoType"></span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">提示词</span>
-                <span class="info-value prompt-text" id="infoPrompt"></span>
-            </div>
-            <div class="info-row" id="refRow">
-                <span class="info-label">参考图</span>
-                <span class="info-value">
-                    <div class="ref-thumbs" id="refThumbs"></div>
-                </span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">相关设置</span>
-                <span class="info-value">
-                    <div class="settings-tags" id="infoSettings"></div>
-                </span>
-            </div>
-            <div class="info-row" id="projectRow">
-                <span class="info-label">项目</span>
-                <span class="info-value" id="infoProject"></span>
-            </div>
+<div class="card">
+    <!-- Row 1: Title -->
+    <div class="row row-pad row-sep">
+        <div style="min-width:0;flex:1;">
+            <div class="card-title" id="cardTitle"></div>
+            <div class="card-subtitle" id="cardSubtitle"></div>
+        </div>
+    </div>
+
+    <!-- Row 2: Refs + Prompt -->
+    <div class="row row-pad row-sep" style="gap:var(--space-4);flex-wrap:nowrap;" id="metaRow">
+        <div style="display:flex;align-items:center;gap:var(--space-2);flex-shrink:0;" id="refGroup">
+            <div class="ref-thumbs" id="refThumbs"></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--space-2);min-width:0;flex:1;">
+            <span class="meta-value" id="infoPrompt"></span>
+        </div>
+    </div>
+
+    <!-- Row 3: Filters + Actions -->
+    <div class="row row-pad" id="filterRow">
+        <div class="f-chips" id="modelChips"></div>
+        <div class="sep" id="filterSep1"></div>
+        <div class="pills ratio-pills" id="ratioTabs"></div>
+        <div class="sep" id="filterSep2"></div>
+        <div class="range">
+            <input class="range-input" type="text" value="2026-04-01">
+            <span class="range-dash">—</span>
+            <input class="range-input" type="text" value="2026-04-05">
         </div>
 
-        <div class="toolbar-actions" id="toolbarActions">
-            <!-- [Ant Design data-entry: Segmented for view density] -->
-            <div class="segmented">
-                <button class="seg-btn" onclick="setDensity('sparse',this)">少</button>
-                <button class="seg-btn active" onclick="setDensity('medium',this)">中等</button>
-                <button class="seg-btn" onclick="setDensity('dense',this)">多</button>
+        <div class="row-end" id="toolbarActions">
+            <!-- Density toggle -->
+            <div class="pills">
+                <button class="pill" onclick="setDensity('sparse',this)">小</button>
+                <button class="pill on" onclick="setDensity('medium',this)">中</button>
+                <button class="pill" onclick="setDensity('dense',this)">大</button>
             </div>
-
-            <div class="divider-v"></div>
-
-            <!-- [Ant Design buttons: 次按钮] -->
-            <button class="btn" id="dlAllBtn" onclick="downloadAll()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                下载全部
-            </button>
-
-            <button class="btn" id="batchBtn" onclick="toggleBatch()">批量选择</button>
+            <div class="sep"></div>
+            <button class="b b-soft" id="dlAllBtn" onclick="downloadAll()">下载全部</button>
+            <button class="b b-solid" id="batchBtn" onclick="toggleBatch()">批量选择</button>
 
             <!-- Batch action buttons -->
             <div class="batch-actions" id="batchBar" style="display:none;">
                 <span class="sel-count" id="selCount">已选 0 项</span>
-                <button class="btn" id="selAllBtn" onclick="selectAll()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    全选
-                </button>
-                <button class="btn" onclick="batchDownload()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    下载
-                </button>
+                <button class="b b-soft" id="selAllBtn" onclick="selectAll()">全选</button>
+                <button class="b b-soft" onclick="batchDownload()">下载</button>
                 <div class="archive-wrap">
-                    <button class="btn" onclick="toggleArchiveMenu(this)">
+                    <button class="b b-soft" onclick="toggleArchiveMenu(this)">
                         <svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>
                         入库
                     </button>
-                    <div class="archive-dropdown drop-down"></div>
+                    <div class="archive-dropdown"></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Model Filter Chips -->
-    <div class="model-chips" id="modelChips"></div>
-
-    <!-- [Ant Design navigation: 胶囊型 Tabs] -->
-    <div class="ratio-tabs" id="ratioTabs"></div>
 </div>
 
 <!-- ══════════════════════════════════════════
@@ -848,10 +784,10 @@
                 <div class="confirm-desc" id="cfmDesc">此操作不可撤销，图像将被永久删除。</div>
             </div>
         </div>
-        <!-- [Ant Design buttons spec: 危险主按钮 for confirm delete] -->
+        <!-- Confirm delete buttons -->
         <div class="confirm-footer">
-            <button class="btn" onclick="closeCfm()">取消</button>
-            <button class="btn btn-danger-fill" onclick="execDelete()">删除</button>
+            <button class="b b-soft" onclick="closeCfm()">取消</button>
+            <button class="b b-danger" onclick="execDelete()">删除</button>
         </div>
     </div>
 </div>
@@ -868,7 +804,7 @@ const PAGE_INFO = {
         { color: '#FF6B6B', name: '参考图 1' },
         { color: '#4ECDC4', name: '参考图 2' },
     ],
-    model:   'Flux Pro 1.1',
+    model:   'Seedream 5.0',
     settings: {
         ratios:   ['9:16', '16:9', '1:1'],
         clarity:  '2K',     // image only；视频传 null
@@ -879,36 +815,33 @@ const PAGE_INFO = {
 
 function renderInfo() {
     const p = PAGE_INFO;
+    const totalCount = images.length;
 
-    document.getElementById('infoEntry').textContent = p.entry;
-    document.getElementById('infoType').innerHTML =
-        `<span class="type-badge ${p.type}">${p.type === 'image' ? '图片' : '视频'}</span>`;
+    // Row 1: title + subtitle
+    document.getElementById('cardTitle').textContent = '生成结果 · ' + totalCount + ' 条';
+    const parts = [];
+    if (p.project) parts.push(p.project);
+    parts.push(p.entry);
+    parts.push(p.type === 'image' ? '图片' : '视频');
+    if (p.settings.ratios && p.settings.ratios.length) parts.push(p.settings.ratios.join(' / '));
+    if (p.type === 'image' && p.settings.clarity) parts.push('清晰度 ' + p.settings.clarity);
+    if (p.type === 'video' && p.settings.duration) parts.push('时长 ' + p.settings.duration);
+    document.getElementById('cardSubtitle').textContent = parts.join(' · ');
+
+    // Row 2: prompt
     document.getElementById('infoPrompt').textContent = p.prompt;
 
-    const refRow    = document.getElementById('refRow');
+    // Row 2: refs (放到提示词前面，无标题)
+    const refGroup = document.getElementById('refGroup');
     const refThumbs = document.getElementById('refThumbs');
     if (p.refs && p.refs.length) {
         refThumbs.innerHTML = p.refs.map((r, i) =>
             `<div class="ref-thumb" style="background:${r.color}" title="${r.name}"
                   onclick="openRefPreview(${i})"></div>`
         ).join('');
-        refRow.style.display = '';
+        refGroup.style.display = '';
     } else {
-        refRow.style.display = 'none';
-    }
-
-    const tags = [];
-    if (p.type === 'image' && p.settings.clarity)  tags.push('清晰度：' + p.settings.clarity);
-    if (p.type === 'video' && p.settings.duration) tags.push('时长：'   + p.settings.duration);
-    document.getElementById('infoSettings').innerHTML =
-        tags.map(t => `<span class="setting-tag">${t}</span>`).join('');
-
-    const projRow = document.getElementById('projectRow');
-    if (p.project) {
-        document.getElementById('infoProject').textContent = p.project;
-        projRow.style.display = '';
-    } else {
-        projRow.style.display = 'none';
+        refGroup.style.display = 'none';
     }
 }
 
@@ -925,7 +858,7 @@ function openRefPreview(idx) {
         border-radius: 8px 8px 0 0;
     `;
     canvas.textContent = ref.name;
-    foot.innerHTML = `<button class="btn" onclick="closePreview()">关闭</button>`;
+    foot.innerHTML = `<button class="b b-soft" onclick="closePreview()">关闭</button>`;
     mask.classList.add('visible');
 }
 
@@ -1020,26 +953,22 @@ function renderModelTabs() {
     const models = [...new Set(images.map(i => i.model))];
 
     // 只有一个模型时不显示
-    if (models.length <= 1) { el.style.display = 'none'; return; }
+    const sep1 = document.getElementById('filterSep1');
+    if (models.length <= 1) { el.style.display = 'none'; sep1.style.display = 'none'; return; }
 
     el.style.display = 'flex';
+    sep1.style.display = '';
     el.innerHTML = '';
-
-    // 「模型」标签
-    const label = document.createElement('span');
-    label.className = 'model-chip-label';
-    label.textContent = '模型';
-    el.appendChild(label);
 
     const mk = (text, key) => {
         const b = document.createElement('button');
-        b.className = 'model-chip' + (curModel === key ? ' active' : '');
-        b.innerHTML = `<span class="chip-dot"></span>${text}`;
+        b.className = 'chip' + (curModel === key ? ' on' : '');
+        b.innerHTML = text;
         b.onclick = () => { curModel = key; curRatio = 'all'; render(); };
         el.appendChild(b);
     };
 
-    mk('全部', 'all');
+    mk('全部模型', 'all');
     models.forEach(m => mk(m, m));
 }
 
@@ -1051,22 +980,24 @@ function renderTabs() {
     base.forEach(i => counts[i.ratio] = (counts[i.ratio] || 0) + 1);
     const ratios = Object.keys(counts);
 
-    // 只有一个比例时不显示 Tabs
-    if (ratios.length <= 1) { el.style.display = 'none'; return; }
+    // 只有一个比例时不显示
+    const sep2 = document.getElementById('filterSep2');
+    if (ratios.length <= 1) { el.style.display = 'none'; sep2.style.display = 'none'; return; }
 
-    el.style.display = 'flex';
+    el.style.display = 'inline-flex';
+    sep2.style.display = '';
     el.innerHTML = '';
 
     const mk = (label, key) => {
         const b = document.createElement('button');
-        b.className = 'ratio-tab' + (curRatio === key ? ' active' : '');
+        b.className = 'pill' + (curRatio === key ? ' on' : '');
         b.innerHTML = label;
         b.onclick = () => { curRatio = key; render(); };
         el.appendChild(b);
     };
 
-    mk(`全部 <span class="tab-count">(${base.length})</span>`, 'all');
-    ratios.forEach(r => mk(`${r} <span class="tab-count">(${counts[r]})</span>`, r));
+    mk(`全部比例`, 'all');
+    ratios.forEach(r => mk(`${r} <span class="pill-n"></span>`, r));
 }
 
 function renderGrid() {
@@ -1140,8 +1071,8 @@ function find(id) { return images.find(i => i.id === id); }
 
 function setDensity(d, el) {
     density = d;
-    document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
+    el.parentElement.querySelectorAll('.pill').forEach(b => b.classList.remove('on'));
+    el.classList.add('on');
     renderGrid();
 }
 
@@ -1153,13 +1084,15 @@ function toggleBatch() {
     const dlAll = document.getElementById('dlAllBtn');
     if (batchMode) {
         btn.textContent = '取消';
-        btn.classList.add('btn-primary');
+        btn.classList.remove('b-solid');
+        btn.classList.add('b-soft');
         bar.style.display = 'inline-flex';
         dlAll.style.display = 'none';
         document.body.classList.add('batch-mode');
     } else {
         btn.textContent = '批量选择';
-        btn.classList.remove('btn-primary');
+        btn.classList.remove('b-soft');
+        btn.classList.add('b-solid');
         bar.style.display = 'none';
         dlAll.style.display = '';
         document.body.classList.remove('batch-mode');
@@ -1263,7 +1196,6 @@ document.addEventListener('click', e => {
 
 // ═══════════════════════════════════════════════════
 // Delete Confirm
-// [Ant Design feedback spec: 对话框反馈 for destructive ops]
 // ═══════════════════════════════════════════════════
 function askDel(type, id) {
     delCtx = { type, id };
@@ -1319,12 +1251,12 @@ function openPreview(item) {
     canvas.textContent = item.name;
 
     foot.innerHTML = `
-        <button class="btn icon-only" title="下载" onclick="dlItem(${item.id})">${ico.dl}</button>
+        <button class="b b-icon b-soft" title="下载" onclick="dlItem(${item.id})">${ico.dl}</button>
         <div class="archive-wrap">
-            <button class="btn icon-only" title="入库" onclick="showArchiveForItem(${item.id},this)">${ico.inbox}</button>
+            <button class="b b-icon b-soft" title="入库" onclick="showArchiveForItem(${item.id},this)">${ico.inbox}</button>
             <div class="archive-dropdown"></div>
         </div>
-        <button class="btn icon-only" title="编辑" onclick="editItem(${item.id})">${ico.edit}</button>
+        <button class="b b-icon b-soft" title="编辑" onclick="editItem(${item.id})">${ico.edit}</button>
     `;
     mask.classList.add('visible');
 }
