@@ -715,12 +715,6 @@
         <div class="f-chips" id="modelChips"></div>
         <div class="sep" id="filterSep1"></div>
         <div class="pills ratio-pills" id="ratioTabs"></div>
-        <div class="sep" id="filterSep2"></div>
-        <div class="range">
-            <input class="range-input" type="text" value="2026-04-01">
-            <span class="range-dash">—</span>
-            <input class="range-input" type="text" value="2026-04-05">
-        </div>
 
         <div class="row-end" id="toolbarActions">
             <!-- Density toggle -->
@@ -823,8 +817,7 @@ function renderInfo() {
     if (p.project) parts.push(p.project);
     parts.push(p.entry);
     parts.push(p.type === 'image' ? '图片' : '视频');
-    if (p.settings.ratios && p.settings.ratios.length) parts.push(p.settings.ratios.join(' / '));
-    if (p.type === 'image' && p.settings.clarity) parts.push('清晰度 ' + p.settings.clarity);
+    if (p.type === 'image' && p.settings.clarity) parts.push(p.settings.clarity);
     if (p.type === 'video' && p.settings.duration) parts.push('时长 ' + p.settings.duration);
     document.getElementById('cardSubtitle').textContent = parts.join(' · ');
 
@@ -982,10 +975,10 @@ function renderTabs() {
 
     // 只有一个比例时不显示
     const sep2 = document.getElementById('filterSep2');
-    if (ratios.length <= 1) { el.style.display = 'none'; sep2.style.display = 'none'; return; }
+    if (ratios.length <= 1) { el.style.display = 'none'; if (sep2) sep2.style.display = 'none'; return; }
 
     el.style.display = 'inline-flex';
-    sep2.style.display = '';
+    if (sep2) sep2.style.display = '';
     el.innerHTML = '';
 
     const mk = (label, key) => {

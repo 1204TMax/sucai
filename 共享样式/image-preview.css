@@ -1,0 +1,135 @@
+/**
+ * 图片预览组件 - 样式
+ *
+ * 使用方式：
+ *   <link rel="stylesheet" href="../共享样式/image-preview.css">
+ *
+ * 依赖：页面需引入 design-system 变量（:root 变量块）
+ *
+ * 功能：点击图片放大预览，底部操作栏（关闭、下载、入库下拉、编辑下拉），
+ *       支持左右切换导航
+ */
+
+/* ── 全屏遮罩 ── */
+.img-preview-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.img-preview-mask.show { display: flex; }
+
+/* ── 预览图片 ── */
+.img-preview-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: var(--r-lg);
+  object-fit: contain;
+}
+
+/* ── 底部操作栏 ── */
+.img-preview-bar {
+  position: fixed;
+  bottom: var(--space-7);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3001;
+  display: flex;
+  gap: var(--space-3);
+}
+.img-preview-bar button {
+  width: var(--h-lg);
+  height: var(--h-lg);
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background var(--ease);
+}
+.img-preview-bar button:hover { background: rgba(255,255,255,0.35); }
+
+/* ── 左右导航 ── */
+.img-preview-nav {
+  position: fixed;
+  bottom: 90px;
+  right: var(--space-7);
+  z-index: 3001;
+  display: flex;
+  gap: var(--space-2);
+}
+.img-preview-nav button {
+  width: var(--h-lg);
+  height: var(--h-lg);
+  border-radius: var(--r-full);
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: background var(--ease);
+}
+.img-preview-nav button:hover { background: rgba(255,255,255,0.35); }
+.img-preview-nav button:disabled { opacity: 0.3; cursor: default; }
+
+/* ── 入库/编辑下拉（预览栏专用） ── */
+.img-preview-store-wrap { position: relative; }
+
+.img-preview-store-dd {
+  position: absolute;
+  bottom: calc(100% + var(--space-3));
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-surface);
+  border-radius: var(--r-xl);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: var(--space-1);
+  min-width: 140px;
+  display: none;
+}
+.img-preview-store-dd.show { display: block; }
+
+.img-preview-store-dd .pv-dd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-size: var(--text-base);
+  color: var(--text-hi);
+  transition: background var(--ease);
+  white-space: nowrap;
+  position: relative;
+}
+.img-preview-store-dd .pv-dd-item:hover { background: var(--bg-subtle); }
+.img-preview-store-dd .pv-dd-item .sub-arrow {
+  font-size: var(--text-xxs);
+  color: var(--text-muted);
+  margin-left: var(--space-2);
+}
+
+/* 子菜单 */
+.img-preview-store-dd .pv-dd-sub {
+  position: absolute;
+  left: calc(100% + var(--space-1));
+  top: 0;
+  background: var(--bg-surface);
+  border-radius: var(--r-xl);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  padding: var(--space-1);
+  min-width: 130px;
+  display: none;
+}
+.img-preview-store-dd .pv-dd-item:hover .pv-dd-sub { display: block; }
