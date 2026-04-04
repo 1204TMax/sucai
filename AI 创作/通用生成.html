@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>通用生成 - 量化投放系统</title>
+    <link rel="stylesheet" href="../共享样式/project-picker.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -533,41 +534,6 @@
             border-radius: 50%; min-width: unset; flex-shrink: 0;
         }
 
-        /* 项目选择器 */
-        .project-group + .project-group { margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(0,0,0,0.06); }
-        #dd-project { min-width: 180px; }
-        .project-cat-row {
-            display: flex; align-items: center; gap: 8px;
-            padding: 7px 10px; border-radius: 8px; cursor: pointer;
-            transition: background 0.12s;
-        }
-        .project-cat-row:hover { background: rgba(0,0,0,0.04); }
-        .project-check {
-            width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0;
-            border: 1.5px solid rgba(0,0,0,0.25);
-            display: flex; align-items: center; justify-content: center;
-            transition: all 0.15s; cursor: pointer;
-        }
-        .project-check:hover { border-color: rgba(0,0,0,0.5); }
-        .project-check.active {
-            background: #1a1a1a; border-color: #1a1a1a;
-        }
-        .project-check.active::after {
-            content: ''; width: 6px; height: 6px; border-radius: 50%; background: #fff;
-        }
-        .project-cat-name { flex: 1; font-size: 13px; font-weight: 600; color: #333; }
-        .project-expand-arr {
-            font-size: 9px; color: #bbb; transition: transform 0.18s;
-        }
-        .project-expand-arr.open { transform: rotate(180deg); }
-        .project-children { display: none; }
-        .project-children.open { display: block; }
-        .project-item {
-            padding: 6px 10px 6px 34px; border-radius: 8px; cursor: pointer;
-            font-size: 13px; color: #555; transition: background 0.12s;
-        }
-        .project-item:hover { background: rgba(0,0,0,0.04); }
-        .project-item.active { background: #1a1a1a; color: #fff; font-weight: 500; }
         .pill-clear {
             width: 16px; height: 16px; border-radius: 50%;
             border: none; background: rgba(0,0,0,0.12); color: #888;
@@ -702,6 +668,13 @@
         }
         .asset-card:hover { border-color: #d0d0d0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
         .asset-card.selected { border-color: #1677ff; box-shadow: 0 0 0 1px #1677ff; }
+        .asset-card-check {
+            position: absolute; bottom: 4px; right: 4px;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #52C41A; display: none;
+            align-items: center; justify-content: center;
+        }
+        .asset-card.selected .asset-card-check { display: flex; }
         .asset-card-thumb {
             width: 100%; aspect-ratio: 1; background: #eee;
             display: flex; align-items: center; justify-content: center;
@@ -904,11 +877,29 @@
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        .notif {
+            position: fixed; top: 16px; right: 16px;
+            display: flex; align-items: center; gap: 8px;
+            background: #F6FFED; border: 1px solid #D9F7BE;
+            border-radius: 6px; padding: 12px 16px;
+            font-size: 14px; color: #52C41A;
+            z-index: 9999; opacity: 0; pointer-events: none;
+            transform: translateY(-6px);
+            transition: opacity 0.22s, transform 0.22s;
+        }
+        .notif.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .notif-close { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #52C41A; opacity: 0.6; border-radius: 4px; flex-shrink: 0; margin-left: 4px; }
+        .notif-close:hover { opacity: 1; }
+
     </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
+<div class="notif" id="notif">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" flex-shrink="0"><circle cx="7" cy="7" r="7" fill="#52C41A"/><polyline points="3.5,7 5.5,9.5 10.5,4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>任务已开始</span>
+</div>
 
 <div class="page">
 
@@ -919,7 +910,7 @@
             <button class="type-btn" data-type="chat" onclick="switchType(this)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>对话
+                </svg>文本
             </button>
             <button class="type-btn active" data-type="image" onclick="switchType(this)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -1034,7 +1025,7 @@
 <div class="asset-modal-mask" id="assetModalMask" onclick="if(event.target===this)closeAssetModal()">
     <div class="asset-modal">
         <div class="asset-modal-header">
-            <div class="asset-modal-title" id="assetModalTitle">选择素材</div>
+            <div class="asset-modal-title" id="assetModalTitle">选择参考图/视频</div>
             <div class="asset-modal-close" onclick="closeAssetModal()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
@@ -1321,6 +1312,17 @@ function renderChatAttachStrip() {
 }
 
 function onUpload(e) {
+    if (curType === 'chat') {
+        Array.from(e.target.files).forEach(f => {
+            const url = URL.createObjectURL(f);
+            const id = 'ca' + (++_chatAttachId);
+            chatAttachments.push({ id, type: 'media', url, name: f.name, isVideo: false });
+        });
+        e.target.value = '';
+        renderChatAttachStrip();
+        return;
+    }
+
     const strip = document.getElementById('refStrip');
 
     // 第一次上传：隐藏左侧大按钮，在缩略图条最左侧插入小添加按钮
@@ -1350,6 +1352,13 @@ function onUpload(e) {
 
 // 从素材库弹窗添加图片到参考图
 function addRefFromUrl(url) {
+    if (curType === 'chat') {
+        const id = 'ca' + (++_chatAttachId);
+        chatAttachments.push({ id, type: 'media', url, name: url.split('/').pop(), isVideo: false });
+        renderChatAttachStrip();
+        return;
+    }
+
     const strip = document.getElementById('refStrip');
     if (!document.getElementById('refAddBtn')) {
         document.getElementById('uploadBlock').style.display = 'none';
@@ -1662,6 +1671,7 @@ function openProductDetail(prodId) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </div>
                 </div>
+                <div class="asset-card-check"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="asset-card-name" title="${a.name}"><span style="color:#1677ff;font-size:11px;margin-right:3px">${a.tag}</span>${a.name}</div>
         </div>
@@ -1685,6 +1695,7 @@ function openTaskDetail(taskId) {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </div>
                 </div>
+                <div class="asset-card-check"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="asset-card-name" title="${a.name}">${a.name}</div>
         </div>
@@ -1712,6 +1723,7 @@ function renderAssetGrid() {
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </div>
                 </div>
+                <div class="asset-card-check"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="asset-card-name" title="${a.name}">${a.name}</div>
         </div>
@@ -2204,28 +2216,7 @@ function renderOpts() {
         } else if (opt.type === 'project') {
             const val = sel[curType].project || '';
             pillVal = val || '项目';
-            ddInner = `<div class="dd-section">
-                <div class="dd-section-title">选择目标项目</div>
-                ${PROJECTS.map((g, gi) => {
-                    const catActive = val === g.category;
-                    const hasActiveProd = g.products.includes(val);
-                    return `
-                    <div class="project-group">
-                        <div class="project-cat-row" onclick="toggleProjectGroup(event,${gi})">
-                            <div class="project-check${catActive ? ' active' : ''}"
-                                 onclick="pickProject(event,'cat','${g.category}')"></div>
-                            <span class="project-cat-name">${g.category}</span>
-                            <span class="project-expand-arr${_projectOpen.has(gi) ? ' open' : ''}">▾</span>
-                        </div>
-                        <div class="project-children${_projectOpen.has(gi) ? ' open' : ''}">
-                            ${g.products.map(p => `
-                                <div class="project-item${val === p ? ' active' : ''}"
-                                     onclick="pickProject(event,'prod','${p}')">${p}</div>
-                            `).join('')}
-                        </div>
-                    </div>`;
-                }).join('')}
-            </div>`;
+            ddInner = null;
 
         } else if (opt.type === 'chat-model') {
             const mid = sel.chat.model;
@@ -2281,11 +2272,16 @@ function renderOpts() {
         }
 
         const clearBtn = (opt.type === 'project' && sel[curType].project)
-            ? `<button class="pill-clear" onclick="clearProject(event)">✕</button>` : '';
+            ? `<button class="pill-clear" onclick="event.stopPropagation();onProjectConfirm('')">✕</button>` : '';
 
         if (ddInner === null) {
-            // toggle pill — no dropdown, no arrow
-            pill.innerHTML = `<span class="opt-pill-val">${pillVal}</span>`;
+            if (opt.type === 'project') {
+                // project pill：无下拉，有清除按钮
+                pill.innerHTML = `<span class="opt-pill-val">${pillVal}</span>${clearBtn}`;
+            } else {
+                // toggle pill — no dropdown, no arrow
+                pill.innerHTML = `<span class="opt-pill-val">${pillVal}</span>`;
+            }
         } else {
             pill.innerHTML = `
                 <span class="opt-pill-val">${pillVal}</span>${clearBtn}
@@ -2302,6 +2298,10 @@ function renderOpts() {
             }
             if (opt.type === 'upload-btn') {
                 setTimeout(() => document.getElementById('chatFileInput').click(), 0);
+                return;
+            }
+            if (opt.type === 'project') {
+                openProjModal();
                 return;
             }
             const dd = pill.querySelector('.opt-dd');
@@ -2397,36 +2397,6 @@ function reopenModelPanel() {
 }
 
 const _projectOpen = new Set();
-
-function pickProject(e, type, value) {
-    e.stopPropagation();
-    sel[curType].project = sel[curType].project === value ? '' : value;
-    // 选中品类后自动收起该组
-    if (type === 'cat') {
-        const gi = PROJECTS.findIndex(g => g.category === value);
-        if (gi >= 0) _projectOpen.delete(gi);
-    }
-    closeAll();
-    renderOpts();
-}
-
-function toggleProjectGroup(e, gi) {
-    e.stopPropagation();
-    if (_projectOpen.has(gi)) _projectOpen.delete(gi);
-    else _projectOpen.add(gi);
-    // 只刷新展开状态，不关闭面板
-    const children = document.querySelectorAll('.project-children')[gi];
-    const arr = document.querySelectorAll('.project-expand-arr')[gi];
-    if (children) children.classList.toggle('open');
-    if (arr) arr.classList.toggle('open');
-}
-
-function clearProject(e) {
-    e.stopPropagation();
-    sel[curType].project = '';
-    closeAll();
-    renderOpts();
-}
 
 function pickDur(e, val) {
     e.stopPropagation();
@@ -2569,16 +2539,11 @@ function switchType(btn) {
     // 发送/生成按钮外观
     const genBtn = document.getElementById('genBtn');
     const genText = document.getElementById('genText');
-    if (isChat) {
-        genBtn.classList.add('send-mode');
-        genText.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`;
-    } else {
-        genBtn.classList.remove('send-mode');
-        genText.innerHTML = '生成';
-    }
+    genBtn.classList.remove('send-mode');
+    genText.innerHTML = '生成';
 
     // placeholder
-    const ph = { chat: '发送消息给 AI...', image: '尝试描述您想要创建的图像', video: '尝试描述您想要创建的视频' };
+    const ph = { chat: '尝试描述你想要的文本内容', image: '尝试描述您想要创建的图像', video: '尝试描述您想要创建的视频' };
     document.getElementById('prompt').placeholder = ph[curType] || '';
 
     closeAll();
@@ -2604,6 +2569,7 @@ function doGenerate() {
         prompt: txt,
         opts: sel[curType] ? JSON.parse(JSON.stringify(sel[curType])) : {}
     }));
+    showNotif();
     parent.postMessage({ action: 'openTab', title: '生成详情', url: 'AI 创作/生成详情.html' }, '*');
 }
 
@@ -2621,10 +2587,138 @@ function showToast(msg) {
     _tt = setTimeout(() => el.classList.remove('show'), 2400);
 }
 
+let _nt;
+function showNotif() {
+    const el = document.getElementById('notif');
+    el.classList.add('show');
+    clearTimeout(_nt);
+    _nt = setTimeout(() => el.classList.remove('show'), 4000);
+}
+function hideNotif() {
+    clearTimeout(_nt);
+    document.getElementById('notif').classList.remove('show');
+}
+
 document.addEventListener('click', closeAll);
 
 updateSize(sel.image.ratio, sel.image.res);
 renderOpts();
+</script>
+
+<!-- 项目选择弹窗 -->
+<div class="proj-modal-mask" id="projModalMask" onclick="if(event.target===this)closeProjModal()">
+  <div class="proj-modal">
+    <div class="proj-modal-header">
+      <div class="proj-modal-title">选择项目</div>
+      <div class="proj-modal-close" onclick="closeProjModal()">✕</div>
+    </div>
+    <div class="proj-modal-search">
+      <input id="projSearchInput" placeholder="搜索品类或产品..." oninput="renderProjModalBody()">
+    </div>
+    <div class="proj-modal-body">
+      <div class="proj-modal-cats" id="projCatList"></div>
+      <div class="proj-modal-products" id="projProdList"></div>
+    </div>
+    <div class="proj-modal-footer">
+      <button onclick="closeProjModal()">取消</button>
+      <button class="proj-confirm" onclick="confirmProjSelect()">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// project-picker 依赖的三个函数
+var PROJECT_TREE = PROJECTS.map(g => ({ name: g.category, children: g.products }));
+
+function getProjectValue() { return sel[curType].project || ''; }
+
+var PROJECT_TREE = PROJECTS.map(function(g) { return { name: g.category, children: g.products }; });
+var _projSelected = '';
+var _projActiveCat = '';
+
+function openProjModal() {
+    _projSelected = sel[curType].project || '';
+    _projActiveCat = '';
+    PROJECT_TREE.forEach(function(g) {
+        if (g.name === _projSelected) _projActiveCat = g.name;
+        g.children.forEach(function(c) { if (c === _projSelected) _projActiveCat = g.name; });
+    });
+    if (!_projActiveCat && PROJECT_TREE.length) _projActiveCat = PROJECT_TREE[0].name;
+    document.getElementById('projSearchInput').value = '';
+    renderProjModalBody();
+    document.getElementById('projModalMask').classList.add('show');
+}
+
+function closeProjModal() {
+    document.getElementById('projModalMask').classList.remove('show');
+}
+
+function confirmProjSelect() {
+    sel[curType].project = _projSelected;
+    closeProjModal();
+    renderOpts();
+}
+
+function projSelectItem(value) {
+    _projSelected = (_projSelected === value) ? '' : value;
+    renderProjModalBody();
+}
+
+function projClickCat(catName) {
+    _projActiveCat = catName;
+    renderProjModalBody();
+}
+
+function renderProjModalBody() {
+    var search = (document.getElementById('projSearchInput').value || '').trim().toLowerCase();
+    var filteredTree = PROJECT_TREE.map(function(g) {
+        var catMatch = !search || g.name.toLowerCase().indexOf(search) >= 0;
+        var filteredChildren = g.children.filter(function(c) {
+            return !search || c.toLowerCase().indexOf(search) >= 0;
+        });
+        if (catMatch || filteredChildren.length > 0) {
+            return { name: g.name, children: catMatch ? g.children : filteredChildren };
+        }
+        return null;
+    }).filter(Boolean);
+
+    var catNames = filteredTree.map(function(g) { return g.name; });
+    if (catNames.indexOf(_projActiveCat) < 0) _projActiveCat = catNames[0] || '';
+
+    var catHtml = filteredTree.map(function(g) {
+        var isActive = g.name === _projActiveCat;
+        var isSelected = g.name === _projSelected;
+        return '<div class="proj-cat-item'+(isActive?' active':'')+(isSelected?' checked':'')+'" onclick="projClickCat(\''+escHtml(g.name)+'\')">'
+            +'<span class="proj-cat-radio'+(isSelected?' selected':'')+'"></span>'
+            +'<span style="flex:1" onclick="event.stopPropagation();projSelectItem(\''+escHtml(g.name)+'\');projClickCat(\''+escHtml(g.name)+'\')">'+escHtml(g.name)+'</span>'
+            +'</div>';
+    }).join('');
+
+    var activeCatData = filteredTree.find(function(g) { return g.name === _projActiveCat; });
+    var prodHtml = '';
+    if (activeCatData && activeCatData.children.length > 0) {
+        prodHtml = activeCatData.children.map(function(c) {
+            var isSelected = c === _projSelected;
+            return '<div class="proj-prod-item'+(isSelected?' selected':'')+'" onclick="projSelectItem(\''+escHtml(c)+'\')">'
+                +'<span class="proj-cat-radio'+(isSelected?' selected':'')+'"></span>'
+                +escHtml(c)+'</div>';
+        }).join('');
+    } else {
+        prodHtml = '<div class="proj-modal-empty">该品类下暂无产品</div>';
+    }
+
+    document.getElementById('projCatList').innerHTML = catHtml;
+    document.getElementById('projProdList').innerHTML = prodHtml;
+}
+
+function onProjectConfirm(value) {
+    sel[curType].project = value;
+    renderOpts();
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 </script>
 </body>
 </html>

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我的任务 - 量化投放系统</title>
-  <link rel="stylesheet" href="https://unpkg.com/antd@5/dist/antd.min.css">
+  <link rel="stylesheet" href="../共享样式/project-picker.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; }
@@ -185,6 +185,21 @@
     .img-preview-img { max-width: 90vw; max-height: 90vh; border-radius: 8px; object-fit: contain; }
     .img-preview-dl { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 3001; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.2); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(4px); transition: background .15s; }
     .img-preview-dl:hover { background: rgba(255,255,255,0.4); }
+    .img-preview-bar { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); z-index: 3001; display: flex; gap: 12px; }
+    .img-preview-bar button { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(8px); transition: background .15s; }
+    .img-preview-bar button:hover { background: rgba(255,255,255,0.35); }
+    .img-preview-nav { position: fixed; bottom: 90px; right: 32px; z-index: 3001; display: flex; gap: 8px; }
+    .img-preview-nav button { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(8px); transition: background .15s; }
+    .img-preview-nav button:hover { background: rgba(255,255,255,0.35); }
+    .img-preview-nav button:disabled { opacity: 0.3; cursor: default; }
+    .img-preview-store-wrap { position: relative; }
+    .img-preview-store-dd { position: absolute; bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%); background: #fff; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); padding: 4px; min-width: 140px; display: none; }
+    .img-preview-store-dd.show { display: block; }
+    .img-preview-store-dd .pv-dd-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #333; transition: background .1s; white-space: nowrap; position: relative; }
+    .img-preview-store-dd .pv-dd-item:hover { background: #f5f5f5; }
+    .img-preview-store-dd .pv-dd-item .sub-arrow { font-size: 10px; color: #999; margin-left: 8px; }
+    .img-preview-store-dd .pv-dd-sub { position: absolute; left: calc(100% + 4px); top: 0; background: #fff; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); padding: 4px; min-width: 130px; display: none; }
+    .img-preview-store-dd .pv-dd-item:hover .pv-dd-sub { display: block; }
 
     /* 重新编辑下拉菜单 */
 
@@ -321,8 +336,10 @@
     .asset-preview-img { max-width: 90vw; max-height: 85vh; border-radius: 8px; object-fit: contain; }
 
     /* Toast */
-    .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-8px); background: rgba(20,20,20,0.82); color: #fff; padding: 7px 18px; border-radius: 8px; font-size: 13px; z-index: 9999; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast { position: fixed; top: 16px; right: 16px; display: flex; align-items: center; gap: 8px; background: #F6FFED; border: 1px solid #D9F7BE; border-radius: 6px; padding: 12px 16px; font-size: 14px; color: #52C41A; z-index: 9999; opacity: 0; pointer-events: none; transform: translateY(-6px); transition: opacity .22s, transform .22s; }
+    .toast.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .toast-close { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #52C41A; opacity: 0.6; border-radius: 4px; flex-shrink: 0; margin-left: 4px; }
+    .toast-close:hover { opacity: 1; }
 
     /* 详情弹窗补充 */
     .detail-input-section { margin-bottom: 16px; }
@@ -341,17 +358,95 @@
 
     /* 隐藏 file input */
     #uploadFileInput { display: none; }
+
+    /* filter-bar 原生 select */
+    .filter-select { height: 32px; padding: 0 8px; border: 1px solid #e5e5e5; border-radius: 8px; font-size: 13px; outline: none; background: #fff; cursor: pointer; color: #555; transition: border-color .15s; }
+    .filter-select:focus { border-color: #1677ff; }
+
+    /* 详情弹窗 */
+    .detail-modal-mask { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; }
+    .detail-modal-mask.show { display: flex; }
+    .detail-modal { width: 900px; max-width: 92vw; max-height: 88vh; background: #fff; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+    .detail-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0; }
+    .detail-modal-title { font-size: 16px; font-weight: 600; color: #1a1a1a; }
+    .detail-modal-close { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #999; font-size: 18px; transition: all .15s; line-height: 1; }
+    .detail-modal-close:hover { background: #f5f5f5; color: #333; }
+    .detail-modal-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+    .detail-modal-footer { padding: 12px 24px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+    .detail-modal-footer button { padding: 6px 16px; border-radius: 6px; border: 1px solid #d9d9d9; background: #fff; font-size: 13px; color: #333; cursor: pointer; transition: border-color .15s, color .15s; }
+    .detail-modal-footer button:hover { border-color: #1677ff; color: #1677ff; }
+    .detail-modal-footer .dm-primary { background: #1677ff; border-color: #1677ff; color: #fff; }
+    .detail-modal-footer .dm-primary:hover { background: #4096ff; border-color: #4096ff; color: #fff; }
+    .dm-pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 16px; }
+    .dm-pg-btn { padding: 4px 10px; border-radius: 4px; border: 1px solid #d9d9d9; background: #fff; font-size: 13px; cursor: pointer; color: #333; transition: all .12s; min-width: 32px; text-align: center; }
+    .dm-pg-btn:hover:not(:disabled) { border-color: #1677ff; color: #1677ff; }
+    .dm-pg-btn.active { background: #1677ff; border-color: #1677ff; color: #fff; }
+    .dm-pg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   </style>
 </head>
 <body>
 
-<div class="toast" id="toast"></div>
-<div class="img-preview-mask" id="imgPreviewMask" onclick="this.classList.remove('show')">
-  <img class="img-preview-img" id="imgPreviewImg" src="" alt="" onclick="event.stopPropagation()">
-  <button class="img-preview-dl" id="imgPreviewDl" onclick="event.stopPropagation();var a=document.createElement('a');a.href=document.getElementById('imgPreviewImg').src;a.download='download.png';a.click();" title="下载">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-  </button>
+<div class="toast" id="toast">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#52C41A"/><polyline points="3.5,7 5.5,9.5 10.5,4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="toastMsg"></span>
 </div>
+<div class="img-preview-mask" id="imgPreviewMask" onclick="this.classList.remove('show');var dd=this.querySelector('.img-preview-store-dd');if(dd)dd.classList.remove('show')">
+  <img class="img-preview-img" id="imgPreviewImg" src="" alt="" onclick="event.stopPropagation()">
+  <div class="img-preview-bar" onclick="event.stopPropagation()">
+    <button title="关闭" onclick="document.getElementById('imgPreviewMask').classList.remove('show')">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <button title="下载" onclick="var a=document.createElement('a');a.href=document.getElementById('imgPreviewImg').src;a.download='download.png';a.click();">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+    <div class="img-preview-store-wrap">
+      <button title="入库" onclick="closeAllPvDD(this);var dd=this.parentElement.querySelector('.img-preview-store-dd');dd.classList.toggle('show');">
+        <svg width="20" height="20" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>
+      </button>
+      <div class="img-preview-store-dd" onclick="event.stopPropagation()">
+        <div class="pv-dd-item" onclick="showToast('已入库到素材库');this.closest('.img-preview-store-dd').classList.remove('show')">素材库</div>
+        <div class="pv-dd-item" onclick="showToast('已入库到物料库');this.closest('.img-preview-store-dd').classList.remove('show')">物料库</div>
+        <div class="pv-dd-item" onclick="showToast('已入库到原料库');this.closest('.img-preview-store-dd').classList.remove('show')">原料库</div>
+      </div>
+    </div>
+    <div class="img-preview-store-wrap">
+      <button title="编辑" onclick="closeAllPvDD(this);var dd=this.parentElement.querySelector('.img-preview-store-dd');dd.classList.toggle('show');">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <div class="img-preview-store-dd" onclick="event.stopPropagation()">
+        <div class="pv-dd-item" onclick="showToast('已添加到文本创作');this.closest('.img-preview-store-dd').classList.remove('show')">文本创作</div>
+        <div class="pv-dd-item" onclick="showToast('已添加到图像创作');this.closest('.img-preview-store-dd').classList.remove('show')">图像创作</div>
+        <div class="pv-dd-item" onclick="showToast('已添加到视频创作');this.closest('.img-preview-store-dd').classList.remove('show')">视频创作</div>
+        <div class="pv-dd-item">工作流 <span class="sub-arrow">▸</span>
+          <div class="pv-dd-sub">
+            <div class="pv-dd-item" onclick="showToast('已添加到图片衍生工作流');this.closest('.img-preview-store-dd').classList.remove('show')">图片衍生</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 项目选择弹窗 -->
+<div class="proj-modal-mask" id="projModalMask" onclick="if(event.target===this)closeProjModal()">
+  <div class="proj-modal">
+    <div class="proj-modal-header">
+      <div class="proj-modal-title">选择项目</div>
+      <div class="proj-modal-close" onclick="closeProjModal()">✕</div>
+    </div>
+    <div class="proj-modal-search">
+      <input id="projSearchInput" placeholder="搜索品类或产品..." oninput="renderProjModalBody()">
+    </div>
+    <div class="proj-modal-body">
+      <div class="proj-modal-cats" id="projCatList"></div>
+      <div class="proj-modal-products" id="projProdList"></div>
+    </div>
+    <div class="proj-modal-footer">
+      <button onclick="closeProjModal()">取消</button>
+      <button class="proj-confirm" onclick="confirmProjSelect()">确认</button>
+    </div>
+  </div>
+</div>
+
 <div id="root"></div>
 <div id="input-box-root"></div>
 
@@ -442,22 +537,33 @@
   <img class="asset-preview-img" id="assetPreviewImg" src="" alt="">
 </div>
 
+<!-- 详情弹窗 -->
+<div class="detail-modal-mask" id="detailModalMask" onclick="if(event.target===this)closeDetailModal()">
+  <div class="detail-modal">
+    <div class="detail-modal-header">
+      <div class="detail-modal-title" id="detailModalTitle"></div>
+      <div class="detail-modal-close" onclick="closeDetailModal()">✕</div>
+    </div>
+    <div class="detail-modal-body" id="detailModalBody"></div>
+    <div class="detail-modal-footer">
+      <button onclick="showToast('已全部下载')">全部下载</button>
+      <button onclick="showToast('已批量入库')">批量入库</button>
+      <button onclick="showToast('再生成功能开发中')">再次生成</button>
+      <button class="dm-primary" onclick="closeDetailModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="uploadFileInput" accept="image/*" multiple onchange="onFileUpload(event)">
 
-<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-<script src="https://unpkg.com/dayjs@1/dayjs.min.js"></script>
-<script src="https://unpkg.com/antd@5/dist/antd.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<script type="text/babel">
-const { Modal, Empty, Select, Input, DatePicker, Button, Space, Pagination, message } = antd;
-const RangePicker = DatePicker.RangePicker;
-
+<script>
 // ═══ 常量 ═══
 const MODELS_MAP = { seedream5: 'seedream 5.0', banana2: 'banana 2', minimax1: 'MiniMax-01' };
 const VIDEO_GRADIENTS = [['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140']];
 const GEN_SOURCES = { universal:'通用生成', poster:'大字报衍生', workflow:'工作流生成' };
+const STORAGE_TARGETS = ['素材库','物料库','原料库'];
+const RECENT_WORKFLOWS = ['大字报裂变工作流','产品展示工作流','品牌形象工作流'];
+const DM_PAGE_SIZE = 24;
 const img = s => ({ type:'image', thumb:`https://picsum.photos/seed/${s}/200/200`, url:`https://picsum.photos/seed/${s}/800/800` });
 const vid = (s,i,d) => ({ type:'video', thumb:`https://picsum.photos/seed/${s}/800/800`, url:`https://picsum.photos/seed/${s}/800/800`, gradientIdx:i||0, duration:d||'5s' });
 
@@ -528,558 +634,504 @@ function getAllOutputTotal(task) {
   return Object.values(task.output.byModel).reduce((s,m) => s + (m.total||0), 0);
 }
 
-// ═══ React 组件从这里开始 ═══
-// ═══ 缩略图组件 ═══
-function VideoThumb({ item, collapsed }) {
-  const gi = item.gradientIdx || 0;
-  const g = VIDEO_GRADIENTS[gi % 5];
-  const dur = item.duration || '5s';
-  const [showEdit, setShowEdit] = React.useState(false);
-  const [showStorage, setShowStorage] = React.useState(false);
-  const RECENT_WORKFLOWS = ['大字报裂变工作流','产品展示工作流','品牌形象工作流'];
-  return <div className="o-thumb" data-preview-url={item.thumb||item.url} style={{cursor:'pointer'}} onClick={()=>window.__previewImage(item.thumb||item.url)}>
-    <div className="vid-thumb-inner" style={{background:`linear-gradient(135deg,${g[0]},${g[1]})`}}>
-      <div className="vid-play">
-        <svg width={collapsed?10:14} height={collapsed?10:14} viewBox="0 0 24 24" fill="#333"><polygon points="6 3 20 12 6 21"/></svg>
-      </div>
-      <span className="vid-dur">{dur}</span>
-    </div>
-    <span className="ai-badge">AI生成</span>
-    <div className="thumb-overlay" style={{alignItems:'flex-end',justifyContent:'flex-end',padding:6}}>
-      <button className="thumb-act" title="预览" onClick={e=>{e.stopPropagation();window.__previewImage(item.thumb||item.url);}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
-      <button className="thumb-act" title="下载" onClick={e=>{e.stopPropagation();message.success('已下载')}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </button>
-      <button className="thumb-act" title="入库" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowStorage(!showStorage);setShowEdit(false);}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
-        {showStorage && <div className="storage-dropdown" style={{bottom:'calc(100% + 4px)',right:0,left:'auto'}} onClick={e=>e.stopPropagation()}>
-          {STORAGE_TARGETS.map(t=><div key={t} className="storage-dd-item" onClick={()=>{showToast(`已入库到${t}`);setShowStorage(false);}}>{t}</div>)}
-        </div>}
-      </button>
-      <button className="thumb-act" title="编辑" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowEdit(!showEdit);setShowStorage(false);}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        {showEdit && <div className="edit-menu" onClick={e=>e.stopPropagation()}>
-          <div className="edit-menu-item" onClick={()=>{showToast('已添加到图像生成');setShowEdit(false);}}>图像</div>
-          <div className="edit-menu-item" onClick={()=>{showToast('已添加到视频生成');setShowEdit(false);}}>视频</div>
-          <div className="edit-menu-item" onClick={()=>{showToast('已添加到对话');setShowEdit(false);}}>对话</div>
-          <div className="edit-menu-item" style={{position:'relative'}}>
-            工作流 <span className="sub-arrow">▸</span>
-            <div className="edit-submenu">
-              {RECENT_WORKFLOWS.map(w=><div key={w} className="edit-submenu-item" onClick={()=>{showToast(`已添加到${w}`);setShowEdit(false);}}>{w}</div>)}
-            </div>
-          </div>
-        </div>}
-      </button>
-    </div>
-  </div>;
-}
+// ═══ 辅助函数 ═══
+function getTaskById(id) { return state.tasks.find(t => t.id === id); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function icon(path, size) { size = size||14; return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+path+'</svg>'; }
 
-function ImageThumb({ item, index }) {
-  const [showEdit, setShowEdit] = React.useState(false);
-  const [showStorage, setShowStorage] = React.useState(false);
-  const RECENT_WORKFLOWS = ['大字报裂变工作流','产品展示工作流','品牌形象工作流'];
+const SVG = {
+  eye:      '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  store:    '<rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  edit:     '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>',
+  retry:    '<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  stop:     '<rect x="6" y="6" width="12" height="12" rx="1"/>',
+  box:      '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>',
+  grid:     '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',
+  list:     '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  plus:     '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  err:      '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
+  play:     '<polygon points="6 3 20 12 6 21"/>',
+  chevDown: '<polyline points="6 9 12 15 18 9"/>',
+};
 
-  const doDownload = (e) => {
-    e.stopPropagation();
-    const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
-    const a = document.createElement('a'); a.href = item.url||item.thumb; a.download = `我-${date}-${(index||0)+1}.png`; a.click();
-    showToast('已开始下载');
-  };
-
-  return <div className="o-thumb" data-preview-url={item.url||item.thumb} style={{cursor:'pointer'}} onClick={()=>window.__previewImage(item.url||item.thumb)}>
-    <img src={item.thumb || item.url} alt="" loading="lazy"/>
-    <span className="ai-badge">AI生成</span>
-    <div className="thumb-overlay" style={{alignItems:'flex-end',justifyContent:'flex-end',padding:6}}>
-      <button className="thumb-act" title="预览" onClick={e=>{e.stopPropagation();window.__previewImage(item.url||item.thumb);}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
-      <button className="thumb-act" title="下载" onClick={doDownload}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </button>
-      <button className="thumb-act" title="入库" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowStorage(!showStorage);setShowEdit(false);}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
-        {showStorage && <div className="storage-dropdown" style={{bottom:'calc(100% + 4px)',right:0,left:'auto'}} onClick={e=>e.stopPropagation()}>
-          {STORAGE_TARGETS.map(t=><div key={t} className="storage-dd-item" onClick={()=>{showToast(`已入库到${t}`);setShowStorage(false);}}>{t}</div>)}
-        </div>}
-      </button>
-      <button className="thumb-act" title="编辑" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowEdit(!showEdit);setShowStorage(false);}}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        {showEdit && <div className="edit-menu" onClick={e=>e.stopPropagation()}>
-          <div className="edit-menu-item" onClick={()=>{showToast('已添加到图像生成');setShowEdit(false);}}>图像</div>
-          <div className="edit-menu-item" onClick={()=>{showToast('已添加到视频生成');setShowEdit(false);}}>视频</div>
-          <div className="edit-menu-item" onClick={()=>{showToast('已添加到对话');setShowEdit(false);}}>对话</div>
-          <div className="edit-menu-item" style={{position:'relative'}}>
-            工作流 <span className="sub-arrow">▸</span>
-            <div className="edit-submenu">
-              {RECENT_WORKFLOWS.map(w=><div key={w} className="edit-submenu-item" onClick={()=>{showToast(`已添加到${w}`);setShowEdit(false);}}>{w}</div>)}
-            </div>
-          </div>
-        </div>}
-      </button>
-    </div>
-  </div>;
-}
-
-function OutputRow({ items, total, type, collapsed, onViewAll }) {
-  const MAX = collapsed ? 8 : 4;
-  const showItems = items.slice(0, MAX);
-  const remaining = total - showItems.length;
-  return <div className={`output-row ${collapsed ? 'collapsed' : 'expanded'}`}>
-    {showItems.map((item, i) =>
-      item.type === 'video'
-        ? <VideoThumb key={i} item={item} collapsed={collapsed}/>
-        : <ImageThumb key={i} item={item} index={i}/>
-    )}
-    {remaining > 0 && <div className="o-thumb view-all-card" onClick={onViewAll}>
-      <div className="view-all-num">+{remaining}</div>
-      <span>查看全部</span>
-    </div>}
-  </div>;
-}
-
-// ═══ 入库下拉 ═══
-const STORAGE_TARGETS = ['素材库','物料库','原料库'];
-function StorageDropdown({ show, task, onClose }) {
-  if (!show) return null;
-  const stored = task._storedTo || {};
-  return <div className="storage-dropdown" onClick={e=>e.stopPropagation()}>
-    {STORAGE_TARGETS.map(t => <div key={t} className="storage-dd-item" onClick={()=>{
-      if (stored[t]) { showToast(`${t}已存在，无法入库`); }
-      else { task._storedTo = {...stored,[t]:true}; showToast(`已入库到${t}`); }
-      onClose();
-    }}>{t}</div>)}
-  </div>;
-}
-
-// ═══ 生成中卡片操作 ═══
-function GeneratingActions({ task, onOpenDetail }) {
-  const [showStorage, setShowStorage] = React.useState(false);
-  React.useEffect(()=>{
-    if (!showStorage) return;
-    const close = (e) => { if (!e.target.closest('.card-act-btn')) setShowStorage(false); };
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  },[showStorage]);
-
-  return <div className="card-actions">
-    <button className="card-act-btn" onClick={()=>window.__handleReEdit(task)}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      重新编辑
-    </button>
-    <button className="card-act-btn" onClick={()=>window.__handleRetry(task)}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-      再次生成
-    </button>
-    <button className="card-act-btn" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowStorage(!showStorage);}}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      批量入库
-      <StorageDropdown show={showStorage} task={task} onClose={()=>setShowStorage(false)}/>
-    </button>
-    <button className="card-act-stop" onClick={()=>window.__handleStop(task)}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
-      停止生成
-    </button>
-  </div>;
-}
-
-// ═══ 卡片操作 ═══
-function CardActions({ task, onOpenDetail }) {
-  const [showStorage, setShowStorage] = React.useState(false);
-  React.useEffect(()=>{
-    if (!showStorage) return;
-    const close = (e) => { if (!e.target.closest('.card-act-btn')) setShowStorage(false); };
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  },[showStorage]);
-
-  return <div className="card-actions">
-    <button className="card-act-btn" onClick={()=>window.__handleReEdit(task)}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      重新编辑
-    </button>
-    <button className="card-act-btn" onClick={()=>window.__handleRetry(task)}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-      再次生成
-    </button>
-    <button className="card-act-btn" style={{position:'relative'}} onClick={e=>{e.stopPropagation();setShowStorage(!showStorage);}}>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-      批量入库
-      <StorageDropdown show={showStorage} task={task} onClose={()=>setShowStorage(false)}/>
-    </button>
-    <button className="card-act-more" onClick={()=>parent.postMessage({action:'openTab',title:'全部图片',url:'AI 创作/全部图片.html'},'*')}>查看全部</button>
-  </div>;
-}
-
-// ═══ 任务卡片（核心组件） ═══
-function TaskCard({ task, viewMode, onOpenDetail }) {
-  const isMulti = task.input.models.length > 1;
-  const [activeModel, setActiveModel] = React.useState(task.input.models[0]);
-  const collapsed = viewMode === 'collapsed';
-  const currentOutput = getTaskOutput(task, activeModel);
-  const sourceName = GEN_SOURCES[task.source] || task.source || '通用生成';
-
-  return <div className={`task-card ${task._new?'new-highlight':''}`}>
-    {/* 卡片头 */}
-    <div className="card-header">
-      <span className="c-tag" style={{background:'#f5f5f5',color:'#666'}}>{sourceName}</span>
-      {task.input.refImages && task.input.refImages.length > 0 && <div className="card-ref-thumbs">
-        {task.input.refImages.slice(0,3).map((ref,i) => <div key={i} className="card-ref-thumb" data-preview-url={ref.url||ref.thumb} style={{cursor:'pointer'}} onClick={()=>window.__previewImage(ref.url||ref.thumb)}>
-          <img src={ref.thumb||ref.url} alt=""/>
-        </div>)}
-      </div>}
-      <span className="card-prompt">{task.input.prompt}</span>
-      <div className="card-meta">
-        <span className="card-meta-item">{isMulti ? '多模型' : (MODELS_MAP[activeModel]||activeModel)}</span>
-        <span className="card-meta-item">{task.input.ratio}</span>
-        {task.type==='video'
-          ? <span className="card-meta-item">{task.input.dur}</span>
-          : <span className="card-meta-item">{task.input.res}</span>
-        }
-        {task.project && <span className="card-meta-item">{task.project}</span>}
-      </div>
-    </div>
-
-    {/* 多模型 Tab */}
-    {isMulti && task.status==='completed' && <div className="model-tabs">
-      {task.input.models.map(m => <button key={m} className={`model-tab ${m===activeModel?'active':''}`} onClick={()=>setActiveModel(m)}>
-        {MODELS_MAP[m]||m}<span className="model-tab-count">({getTaskOutput(task,m).total})</span>
-      </button>)}
-    </div>}
-
-    {/* 输出区 */}
-    <div className="card-output">
-      {task.status==='generating' && <div className={`output-row ${collapsed?'collapsed':'expanded'}`}>
-        {Array.from({length:collapsed?6:4}).map((_,i)=><div key={i} className="skel-thumb"/>)}
-      </div>}
-      {task.status==='failed' && (collapsed
-        ? <div style={{padding:'8px 0',fontSize:12,color:'#dc2626'}}>生成失败 <button className="card-act-btn" style={{marginLeft:8,padding:'2px 10px',fontSize:11}} onClick={()=>window.__handleRetry(task)}>重试</button></div>
-        : <div className="status-placeholder">
-          <div className="status-placeholder-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="1.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-          </div>
-          <div className="status-placeholder-text">生成失败，请重试</div>
-          <button className="card-act-btn" onClick={()=>window.__handleRetry(task)}>重试</button>
-        </div>
-      )}
-      {task.status==='aborted' && (collapsed
-        ? (currentOutput.items.length > 0
-          ? <OutputRow items={currentOutput.items} total={currentOutput.total} type={task.type} collapsed={collapsed} onViewAll={()=>parent.postMessage({action:'openTab',title:'全部图片',url:'AI 创作/全部图片.html'},'*')}/>
-          : <div style={{padding:'8px 0',fontSize:12,color:'#d97706'}}>已中止生成</div>)
-        : (currentOutput.items.length > 0
-          ? <OutputRow items={currentOutput.items} total={currentOutput.total} type={task.type} collapsed={collapsed} onViewAll={()=>parent.postMessage({action:'openTab',title:'全部图片',url:'AI 创作/全部图片.html'},'*')}/>
-          : <div className="status-placeholder"><div className="status-placeholder-text">已中止生成</div></div>)
-      )}
-      {task.status==='pending' && (collapsed
-        ? <div style={{padding:'8px 0',fontSize:12,color:'#999'}}>排队中...</div>
-        : <div className="status-placeholder">
-          <div className="status-placeholder-text">任务排队中，请稍候...</div>
-        </div>
-      )}
-      {task.status==='completed' && <OutputRow
-        items={currentOutput.items}
-        total={currentOutput.total}
-        type={task.type}
-        collapsed={collapsed}
-        onViewAll={()=>parent.postMessage({action:'openTab',title:'全部图片',url:'AI 创作/全部图片.html'},'*')}
-      />}
-    </div>
-
-    {/* 卡片底部：左侧操作按钮 + 右侧元信息 */}
-    <div className="card-bottom">
-      {(task.status==='completed' || task.status==='aborted') && <CardActions task={task} onOpenDetail={onOpenDetail}/>}
-      {task.status==='generating' && <GeneratingActions task={task} onOpenDetail={onOpenDetail}/>}
-      <div className="card-bottom-meta">
-        <span className={`c-tag c-tag-${task.status}`}>
-          {({pending:'等待中',generating:'生成中',completed:'已完成',failed:'已失败',aborted:'已中止'})[task.status]||task.status}
-          {task.status==='generating'&&<span className="pulse-dot"/>}
-        </span>
-        <span>{relativeTime(task.createdTime)}</span>
-      </div>
-    </div>
-  </div>;
-}
-
-// ═══ 项目筛选器 ═══
 const PROJECT_TREE = [
   { name:'休闲游戏', children:['消消乐','跑酷大冒险','解谜达人','塔防英雄'] },
   { name:'工具应用', children:[] },
   { name:'网赚激励', children:['走路赚金币'] },
   { name:'内容阅读', children:[] },
 ];
-function ProjectFilter({ value, onChange }) {
-  const [open, setOpen] = React.useState(false);
-  React.useEffect(()=>{
-    if (!open) return;
-    const close = (e) => { if (!e.target.closest('.project-filter')) setOpen(false); };
-    document.addEventListener('click', close);
-    return () => document.removeEventListener('click', close);
-  },[open]);
 
-  const label = value || '项目';
-  return <div className="project-filter">
-    <div className={`project-trigger ${open?'open':''}`} onClick={()=>setOpen(!open)}>
-      {label} <span className="arr">▾</span>
-    </div>
-    {open && <div className="project-panel show">
-      <div className="project-panel-title">选择目标项目</div>
-      {PROJECT_TREE.map(g => <div key={g.name} className="project-group">
-        <div className="project-group-head" onClick={()=>{onChange(value===g.name?undefined:g.name);if(!g.children.length)setOpen(false);}}>
-          <span className={`project-radio ${value===g.name?'selected':''}`}/>
-          {g.name}
-        </div>
-        {g.children.map(c => <div key={c} className={`project-child ${value===c?'selected':''}`} onClick={()=>{onChange(value===c?undefined:c);setOpen(false);}}>{c}</div>)}
-      </div>)}
-    </div>}
-  </div>;
-}
-
-// ═══ 视图切换 ═══
-function ViewToggle({ mode, onChange }) {
-  return <div className="view-toggle">
-    <button className={`vt-btn ${mode==='expanded'?'active':''}`} onClick={()=>onChange('expanded')} title="展开">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    </button>
-    <button className={`vt-btn ${mode==='collapsed'?'active':''}`} onClick={()=>onChange('collapsed')} title="紧凑">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-  </div>;
-}
-
-// ═══ 筛选栏 ═══
-function FilterBar({ viewMode, onViewChange, filters, setFilters, tasks, contentTab, onContentTabChange }) {
-  const models = React.useMemo(()=>{
-    const s = new Set(); (tasks||[]).forEach(t=>{ (t.input.models||[]).forEach(m=>s.add(m)); }); return [...s];
-  },[tasks]);
-
-  return <div className="filter-bar">
-    <div className="content-tabs">
-      {[{k:'chat',l:'对话'},{k:'image',l:'图像'},{k:'video',l:'视频'}].map(t=>
-        <button key={t.k} className={`ct-btn ${contentTab===t.k?'active':''}`} onClick={()=>onContentTabChange(t.k)}>{t.l}</button>
-      )}
-    </div>
-    <input className="filter-search" placeholder="搜索提示词..." value={filters.search} onChange={e=>setFilters(f=>({...f,search:e.target.value}))}/>
-    <Select size="small" placeholder="状态" allowClear style={{width:90}} value={filters.status} onChange={v=>setFilters(f=>({...f,status:v}))}>
-      <Select.Option value="generating">生成中</Select.Option>
-      <Select.Option value="completed">已成功</Select.Option>
-      <Select.Option value="failed">已失败</Select.Option>
-      <Select.Option value="aborted">已中止</Select.Option>
-    </Select>
-    <Select size="small" placeholder="日期范围" allowClear style={{width:110}} value={filters.dateRange} onChange={v=>setFilters(f=>({...f,dateRange:v}))}>
-      <Select.Option value="7">近 7 天</Select.Option>
-      <Select.Option value="30">近 30 天</Select.Option>
-      <Select.Option value="90">近 90 天</Select.Option>
-    </Select>
-    {models.length > 0 && <Select size="small" placeholder="模型" allowClear style={{width:120}} value={filters.model} onChange={v=>setFilters(f=>({...f,model:v}))}>
-      {models.map(m=><Select.Option key={m} value={m}>{MODELS_MAP[m]||m}</Select.Option>)}
-    </Select>}
-    <ProjectFilter value={filters.project} onChange={v=>setFilters(f=>({...f,project:v}))}/>
-    <div className="filter-spacer"/>
-    {contentTab !== 'chat' && <ViewToggle mode={viewMode} onChange={onViewChange}/>}
-  </div>;
-}
-
-// ═══ 详情弹窗 ═══
-function DetailModal({ task, open, onClose }) {
-  const [page, setPage] = React.useState(1);
-  const [activeModel, setActiveModel] = React.useState(null);
-  const PAGE_SIZE = 24;
-
-  React.useEffect(()=>{ if(task) { setPage(1); setActiveModel(task.input.models[0]); } },[task]);
-  if (!task) return null;
-
-  const isMulti = task.input.models.length > 1;
-  const currentOutput = getTaskOutput(task, activeModel);
-  const pageItems = currentOutput.items.slice((page-1)*PAGE_SIZE, page*PAGE_SIZE);
-  const sourceName = GEN_SOURCES[task.source] || task.source || '通用生成';
-
-  return <Modal open={open} onCancel={onClose} width={900} title={null} footer={
-    <Space>
-      <Button onClick={()=>message.success('已全部下载')}>全部下载</Button>
-      <Button onClick={()=>message.success('已批量入库')}>批量入库</Button>
-      <Button onClick={()=>message.info('再生成功能开发中')}>再次生成</Button>
-      <Button type="primary" onClick={onClose}>关闭</Button>
-    </Space>}>
-    <div style={{marginBottom:16}}>
-      <Space size={8} style={{marginBottom:8}}>
-        <span className="c-tag" style={{background:'#f5f5f5',color:'#666'}}>{sourceName}</span>
-        <span className={`c-tag c-tag-${task.status}`}>{task.status==='completed'?'已完成':task.status}</span>
-        <span style={{fontSize:12,color:'#999'}}>{task.createdTime}</span>
-      </Space>
-      <div style={{fontSize:16,fontWeight:600,color:'#1a1a1a'}}>{task.name}</div>
-    </div>
-    <div className="detail-input-section">
-      <div className="detail-label">输入信息</div>
-      <div className="detail-prompt">{task.input.prompt}</div>
-      <div className="detail-params">
-        {task.input.models.map(m=><span key={m} className="detail-param">模型: <strong>{MODELS_MAP[m]||m}</strong></span>)}
-        {task.input.ratio && <span className="detail-param">比例: <strong>{task.input.ratio}</strong></span>}
-        {task.input.res && <span className="detail-param">分辨率: <strong>{task.input.res}</strong></span>}
-        {task.input.dur && <span className="detail-param">时长: <strong>{task.input.dur}</strong></span>}
-        <span className="detail-param">数量: <strong>{task.input.count}</strong></span>
-      </div>
-      {task.input.refImages?.length > 0 && <div style={{display:'flex',gap:6,marginTop:8}}>
-        {task.input.refImages.map((r,i)=><img key={i} src={r.thumb} style={{width:60,height:60,borderRadius:6,objectFit:'cover',border:'1px solid #e8e8e8'}} alt=""/>)}
-      </div>}
-    </div>
-    {isMulti && <div className="model-tabs" style={{margin:'0 -24px',padding:'0 24px'}}>
-      {task.input.models.map(m => <button key={m} className={`model-tab ${m===activeModel?'active':''}`} onClick={()=>{setActiveModel(m);setPage(1);}}>
-        {MODELS_MAP[m]||m}<span className="model-tab-count">({getTaskOutput(task,m).total})</span>
-      </button>)}
-    </div>}
-    <div style={{marginTop:12}}>
-      <div className="detail-label">输出内容 ({currentOutput.total} {task.type==='video'?'个':'张'})</div>
-      <div className="detail-output-grid">
-        {pageItems.map((item,i)=>
-          item.type==='video'
-            ? <div key={i} style={{width:120,height:120}}><VideoThumb item={item} collapsed={false}/></div>
-            : <div key={i} className="detail-thumb-wrap" onClick={()=>window.__previewImage(item.url||item.thumb)}><img src={item.url||item.thumb} alt="" loading="lazy"/><div className="thumb-overlay" style={{alignItems:'flex-end',justifyContent:'flex-end',padding:4}}>
-                <button className="thumb-act" title="下载" onClick={e=>{e.stopPropagation();const d=new Date().toISOString().slice(0,10).replace(/-/g,'');const a=document.createElement('a');a.href=item.url||item.thumb;a.download=`我-${d}-${i+1}.png`;a.click();showToast('已开始下载');}}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </button>
-                <button className="thumb-act" title="入库" onClick={e=>{e.stopPropagation();showToast('已入库')}}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
-                </button>
-              </div></div>
-        )}
-      </div>
-      {currentOutput.total > PAGE_SIZE && <div style={{textAlign:'center',marginTop:16}}>
-        <Pagination current={page} pageSize={PAGE_SIZE} total={currentOutput.total} onChange={setPage} size="small" showSizeChanger={false}/>
-      </div>}
-    </div>
-  </Modal>;
-}
-
-// ═══ 对话侧边栏 ═══
 const INITIAL_CHATS = [
   { id:'c1', title:'产品描述文案生成', time:'2026-04-02 16:30', messageCount:12 },
   { id:'c2', title:'品牌故事创意', time:'2026-04-02 14:10', messageCount:8 },
   { id:'c3', title:'618营销文案批量生成', time:'2026-04-01 11:20', messageCount:24 },
 ];
-function ChatSidebar({ chats, activeChat, onSelect, onNew }) {
-  return <div className="chat-sidebar">
-    <div className="chat-sidebar-header">
-      <button className="chat-new-btn" onClick={onNew}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        新建对话
-      </button>
-    </div>
-    <div className="chat-list">
-      {chats.map(c => <div key={c.id} className={`chat-list-item ${activeChat===c.id?'active':''}`} onClick={()=>onSelect(c.id)}>
-        <div className="chat-list-title">{c.title}</div>
-        <div className="chat-list-meta">{c.messageCount} 条消息 · {relativeTime(c.time)}</div>
-      </div>)}
-    </div>
-  </div>;
+
+// ═══ State ═══
+const state = {
+  contentTab: 'image',
+  viewMode: 'expanded',
+  filters: { status:'', search:'', project:'', dateRange:'', model:'' },
+  tasks: INITIAL_TASKS,
+  chats: INITIAL_CHATS,
+  activeChat: 'c1',
+  detailTask: null,
+  detailPage: 1,
+  detailActiveModel: null,
+  cardModels: {},
+};
+INITIAL_TASKS.forEach(function(t){ state.cardModels[t.id] = t.input.models[0]; });
+
+// ═══ 初始化 DOM 骨架 ═══
+(function initRoot() {
+  document.getElementById('root').innerHTML =
+    '<div class="filter-bar" id="filterBar"></div>' +
+    '<div id="contentWrap" style="flex:1;display:flex;overflow:hidden">' +
+      '<div class="chat-sidebar" id="chatSidebar" style="display:none"></div>' +
+      '<div class="main-content" id="mainContent">' +
+        '<div class="task-scroll-area" id="taskScrollArea">' +
+          '<button class="scroll-bottom-btn" id="scrollBottomBtn" onclick="window.__scrollToBottom&&window.__scrollToBottom()">' +
+            '回到底部 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>' +
+          '</button>' +
+          '<div id="taskFeedWrap"></div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  var el = document.getElementById('taskScrollArea');
+  el.addEventListener('scroll', updateScrollBtn, { passive:true });
+})();
+
+window.__scrollToBottom = function() {
+  var el = document.getElementById('taskScrollArea');
+  if (el) el.scrollTo({ top: el.scrollHeight, behavior:'smooth' });
+};
+
+function updateScrollBtn() {
+  var el = document.getElementById('taskScrollArea');
+  var btn = document.getElementById('scrollBottomBtn');
+  if (!el || !btn) return;
+  var show = (el.scrollHeight - el.scrollTop - el.clientHeight) > 120;
+  btn.className = 'scroll-bottom-btn' + (show ? ' visible' : '');
 }
 
-// ═══ 根组件 ═══
-function UnifiedTaskPage() {
-  const [contentTab, setContentTab] = React.useState('image');
-  const [viewMode, setViewMode] = React.useState('expanded');
-  const [filters, setFilters] = React.useState({ status:undefined, search:'', project:undefined, dateRange:undefined, model:undefined });
-  const [tasks, setTasks] = React.useState(INITIAL_TASKS);
-  const [detailTask, setDetailTask] = React.useState(null);
-  const [showScrollBtn, setShowScrollBtn] = React.useState(false);
-  const scrollRef = React.useRef(null);
+// ═══ 总渲染 ═══
+function renderAll() { renderFilterBar(); renderContentArea(); }
 
-  // 对话状态
-  const [chats, setChats] = React.useState(INITIAL_CHATS);
-  const [activeChat, setActiveChat] = React.useState(INITIAL_CHATS[0]?.id);
-  const handleNewChat = () => {
-    const nc = { id:'c'+Date.now(), title:'新对话', time:new Date().toISOString().replace('T',' ').substring(0,16), messageCount:0 };
-    setChats(prev => [nc, ...prev]);
-    setActiveChat(nc.id);
-  };
+// ═══ FilterBar ═══
+function renderFilterBar() {
+  var f = state.filters, tab = state.contentTab, vm = state.viewMode;
+  var modelSet = {};
+  state.tasks.forEach(function(t){ (t.input.models||[]).forEach(function(m){ modelSet[m]=1; }); });
+  var models = Object.keys(modelSet);
 
-  // 通知 Vanilla JS 输入框切换模式
-  React.useEffect(()=>{
-    window.dispatchEvent(new CustomEvent('contentTabChanged', { detail: contentTab }));
-  },[contentTab]);
+  var tabBtns = [
+    {k:'chat',l:'文本'},{k:'image',l:'图像'},{k:'video',l:'视频'}
+  ].map(function(t){
+    return '<button class="ct-btn'+(tab===t.k?' active':'')+'" onclick="switchContentTab(\''+t.k+'\')">'+t.l+'</button>';
+  }).join('');
 
-  React.useEffect(()=>{
-    const onCreate = (e) => {
-      setTasks(prev => [...prev, { ...e.detail, _new: true }]);
-      setTimeout(()=>scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' }), 100);
-    };
-    const onUpdate = (e) => setTasks(prev => prev.map(t => t.id === e.detail.id ? { ...t, ...e.detail } : t));
-    window.addEventListener('taskCreated', onCreate);
-    window.addEventListener('taskUpdated', onUpdate);
-    return () => { window.removeEventListener('taskCreated', onCreate); window.removeEventListener('taskUpdated', onUpdate); };
-  },[]);
+  var statusSel = '<select class="filter-select" onchange="setFilter(\'status\',this.value)">'
+    +'<option value="" '+(f.status===''?'selected':'')+'>状态</option>'
+    +'<option value="generating" '+(f.status==='generating'?'selected':'')+'>生成中</option>'
+    +'<option value="completed" '+(f.status==='completed'?'selected':'')+'>已成功</option>'
+    +'<option value="failed" '+(f.status==='failed'?'selected':'')+'>已失败</option>'
+    +'<option value="aborted" '+(f.status==='aborted'?'selected':'')+'>已中止</option>'
+    +'</select>';
 
-  React.useEffect(()=>{
-    const el = scrollRef.current;
-    if (!el) return;
-    const onScroll = () => setShowScrollBtn(el.scrollHeight - el.scrollTop - el.clientHeight > 120);
-    el.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-    return () => el.removeEventListener('scroll', onScroll);
-  },[]);
+  var dateSel = '<select class="filter-select" onchange="setFilter(\'dateRange\',this.value)">'
+    +'<option value="" '+(f.dateRange===''?'selected':'')+'>日期范围</option>'
+    +'<option value="7" '+(f.dateRange==='7'?'selected':'')+'>近 7 天</option>'
+    +'<option value="30" '+(f.dateRange==='30'?'selected':'')+'>近 30 天</option>'
+    +'<option value="90" '+(f.dateRange==='90'?'selected':'')+'>近 90 天</option>'
+    +'</select>';
 
-  const scrollToBottom = () => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  window.__scrollToBottom = scrollToBottom;
+  var modelSel = models.length > 0
+    ? '<select class="filter-select" onchange="setFilter(\'model\',this.value)">'
+      +'<option value="" '+(f.model===''?'selected':'')+'>模型</option>'
+      +models.map(function(m){ return '<option value="'+m+'" '+(f.model===m?'selected':'')+'>'+(MODELS_MAP[m]||m)+'</option>'; }).join('')
+      +'</select>'
+    : '';
 
-  // 同步回到底部按钮到 DOM
-  React.useEffect(()=>{
-    const btn = document.getElementById('scrollBottomBtn');
-    if (btn) { btn.className = 'scroll-bottom-btn' + (showScrollBtn ? ' visible' : ''); }
-  },[showScrollBtn]);
+  var projTrigger = '<div class="project-filter" id="projectFilter">'
+    +'<div class="project-trigger" onclick="openProjModal()">'
+    +escHtml(f.project||'项目')+'</div>'
+    +'</div>';
 
-  const filteredTasks = React.useMemo(()=>{
-    return tasks.filter(t => {
-      if (contentTab === 'image' && t.type !== 'image') return false;
-      if (contentTab === 'video' && t.type !== 'video') return false;
-      if (filters.status && t.status !== filters.status) return false;
-      if (filters.search && !t.input.prompt.includes(filters.search) && !t.name.includes(filters.search)) return false;
-      if (filters.project && t.project !== filters.project) return false;
-      if (filters.model && !(t.input.models||[]).includes(filters.model)) return false;
-      if (filters.dateRange) {
-        const days = parseInt(filters.dateRange);
-        const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - days);
-        if (new Date(t.createdTime) < cutoff) return false;
-      }
-      return true;
-    }).sort((a,b) => new Date(a.createdTime) - new Date(b.createdTime));
-  },[tasks, filters, contentTab]);
+  var viewToggle = tab !== 'chat'
+    ? '<div class="view-toggle">'
+      +'<button class="vt-btn'+(vm==='expanded'?' active':'')+'" onclick="setViewMode(\'expanded\')" title="展开">'+icon(SVG.grid)+'</button>'
+      +'<button class="vt-btn'+(vm==='collapsed'?' active':'')+'" onclick="setViewMode(\'collapsed\')" title="紧凑">'+icon(SVG.list)+'</button>'
+      +'</div>'
+    : '';
 
-  return <>
-    <FilterBar viewMode={viewMode} onViewChange={setViewMode} filters={filters} setFilters={setFilters} tasks={tasks} contentTab={contentTab} onContentTabChange={setContentTab} />
-    <div className={contentTab==='chat' ? 'main-with-sidebar' : ''} style={{flex:1,display:'flex',flexDirection:contentTab==='chat'?'row':'column',overflow:'hidden'}}>
-      {contentTab==='chat' && <ChatSidebar chats={chats} activeChat={activeChat} onSelect={setActiveChat} onNew={handleNewChat}/>}
-      <div className="main-content" style={contentTab!=='chat'?{flex:1}:{}}>
-        {contentTab === 'chat'
-          ? <div className="task-scroll-area" ref={scrollRef} style={{flex:1}}>
-              <div style={{padding:'60px 20px',textAlign:'center',color:'#999'}}>
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" strokeWidth="1.5" style={{marginBottom:12}}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <div style={{fontSize:15,fontWeight:500,color:'#666',marginBottom:6}}>对话模式</div>
-                <div style={{fontSize:13}}>选择左侧会话或新建对话开始</div>
-              </div>
-            </div>
-          : <>
-            <div className="task-scroll-area" ref={scrollRef}>
-              {filteredTasks.length === 0
-                ? <div className="empty-state"><Empty description="暂无匹配的任务"/></div>
-                : <div className="task-feed">
-                    {filteredTasks.map(t=> <TaskCard key={t.id} task={t} viewMode={viewMode} onOpenDetail={setDetailTask}/>)}
-                  </div>
-              }
-            </div>
-          </>
-        }
-      </div>
-    </div>
-    <DetailModal task={detailTask} open={!!detailTask} onClose={()=>setDetailTask(null)} />
-  </>;
+  document.getElementById('filterBar').innerHTML =
+    '<div class="content-tabs">'+tabBtns+'</div>'
+    +'<input class="filter-search" placeholder="搜索提示词..." value="'+escHtml(f.search)+'" oninput="setFilter(\'search\',this.value)">'
+    +statusSel+dateSel+modelSel+projTrigger
+    +'<div class="filter-spacer"></div>'
+    +viewToggle;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<UnifiedTaskPage/>);
+function switchContentTab(tab) {
+  state.contentTab = tab;
+  window.dispatchEvent(new CustomEvent('contentTabChanged', { detail: tab }));
+  renderFilterBar();
+  renderContentArea();
+}
+
+function setViewMode(mode) {
+  state.viewMode = mode;
+  renderFilterBar();
+  renderTaskFeed();
+}
+
+function setFilter(key, value) {
+  state.filters[key] = value;
+  if (key !== 'search') renderFilterBar();
+  renderTaskFeed();
+}
+
+
+// ═══ ContentArea + Chat ═══
+function renderContentArea() {
+  var tab = state.contentTab;
+  var chatSidebar = document.getElementById('chatSidebar');
+  var contentWrap = document.getElementById('contentWrap');
+  if (tab === 'chat') {
+    chatSidebar.style.display = '';
+    contentWrap.style.flexDirection = 'row';
+    renderChatSidebar();
+    document.getElementById('taskFeedWrap').innerHTML =
+      '<div style="padding:60px 20px;text-align:center;color:#999">'
+      +'<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:12px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+      +'<div style="font-size:15px;font-weight:500;color:#666;margin-bottom:6px">文本模式</div>'
+      +'<div style="font-size:13px">选择左侧会话或新建对话开始</div></div>';
+  } else {
+    chatSidebar.style.display = 'none';
+    contentWrap.style.flexDirection = 'column';
+    renderTaskFeed();
+  }
+}
+
+function renderChatSidebar() {
+  document.getElementById('chatSidebar').innerHTML =
+    '<div class="chat-sidebar-header"><button class="chat-new-btn" onclick="newChat()">'
+    +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> 新建对话</button></div>'
+    +'<div class="chat-list">'
+    +state.chats.map(function(c){
+      return '<div class="chat-list-item'+(state.activeChat===c.id?' active':'')+'" onclick="selectChat(\''+c.id+'\')"><div class="chat-list-title">'+escHtml(c.title)+'</div>'
+        +'<div class="chat-list-meta">'+c.messageCount+' 条消息 · '+relativeTime(c.time)+'</div></div>';
+    }).join('')+'</div>';
+}
+
+function newChat() {
+  var nc = { id:'c'+Date.now(), title:'新对话', time:new Date().toISOString().replace('T',' ').substring(0,16), messageCount:0 };
+  state.chats = [nc].concat(state.chats);
+  state.activeChat = nc.id;
+  renderChatSidebar();
+}
+
+function selectChat(id) { state.activeChat = id; renderChatSidebar(); }
+
+// ═══ Task Feed ═══
+function getFilteredTasks() {
+  var f = state.filters, tab = state.contentTab;
+  return state.tasks.filter(function(t) {
+    if (tab === 'image' && t.type !== 'image') return false;
+    if (tab === 'video' && t.type !== 'video') return false;
+    if (f.status && t.status !== f.status) return false;
+    if (f.search && t.input.prompt.indexOf(f.search) < 0 && t.name.indexOf(f.search) < 0) return false;
+    if (f.project && t.project !== f.project) return false;
+    if (f.model && (t.input.models||[]).indexOf(f.model) < 0) return false;
+    if (f.dateRange) {
+      var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - parseInt(f.dateRange));
+      if (new Date(t.createdTime) < cutoff) return false;
+    }
+    return true;
+  }).sort(function(a,b){ return new Date(a.createdTime) - new Date(b.createdTime); });
+}
+
+function renderTaskFeed() {
+  var tasks = getFilteredTasks();
+  var wrap = document.getElementById('taskFeedWrap');
+  if (!wrap) return;
+  if (tasks.length === 0) {
+    wrap.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div style="margin-top:12px;font-size:13px;color:#999">暂无匹配的任务</div></div>';
+  } else {
+    wrap.innerHTML = '<div class="task-feed">'+tasks.map(renderTaskCard).join('')+'</div>';
+  }
+  updateScrollBtn();
+}
+
+function renderTaskCard(task) {
+  var isMulti = task.input.models.length > 1;
+  var activeModel = state.cardModels[task.id] || task.input.models[0];
+  var collapsed = state.viewMode === 'collapsed';
+  var currentOutput = getTaskOutput(task, activeModel);
+  var sourceName = GEN_SOURCES[task.source] || task.source || '通用生成';
+
+  var refThumbs = '';
+  if (task.input.refImages && task.input.refImages.length > 0) {
+    refThumbs = '<div class="card-ref-thumbs">'
+      + task.input.refImages.slice(0,3).map(function(ref){
+          var url = escHtml(ref.url||ref.thumb);
+          return '<div class="card-ref-thumb" data-preview-url="'+url+'" style="cursor:pointer" onclick="window.__previewImage(\''+url+'\')">'
+            +'<img src="'+escHtml(ref.thumb||ref.url)+'" alt=""></div>';
+        }).join('')
+      +'</div>';
+  }
+
+  var modelTabsHtml = '';
+  if (isMulti && task.status === 'completed') {
+    modelTabsHtml = '<div class="model-tabs">'
+      + task.input.models.map(function(m){
+          return '<button class="model-tab'+(m===activeModel?' active':'')+'" onclick="switchCardModel(\''+task.id+'\',\''+m+'\')">'+escHtml(MODELS_MAP[m]||m)+'<span class="model-tab-count">('+getTaskOutput(task,m).total+')</span></button>';
+        }).join('')
+      +'</div>';
+  }
+
+  var statusLabel = {pending:'等待中',generating:'生成中',completed:'已完成',failed:'已失败',aborted:'已中止'}[task.status]||task.status;
+  var pulseDot = task.status==='generating' ? '<span class="pulse-dot"></span>' : '';
+  var resMeta = task.type==='video' ? '<span class="card-meta-item">'+task.input.dur+'</span>' : '<span class="card-meta-item">'+(task.input.res||'')+'</span>';
+  var modelMeta = isMulti ? '多模型' : (MODELS_MAP[activeModel]||activeModel);
+
+  return '<div class="task-card'+(task._new?' new-highlight':'')+'"><div class="card-header">'
+    +'<span class="c-tag" style="background:#f5f5f5;color:#666">'+escHtml(sourceName)+'</span>'
+    +refThumbs
+    +'<span class="card-prompt">'+escHtml(task.input.prompt)+'</span>'
+    +'<div class="card-meta"><span class="card-meta-item">'+escHtml(modelMeta)+'</span><span class="card-meta-item">'+task.input.ratio+'</span>'+resMeta+(task.project?'<span class="card-meta-item">'+escHtml(task.project)+'</span>':'')+'</div>'
+    +'</div>'
+    +modelTabsHtml
+    +'<div class="card-output">'+renderOutputArea(task, currentOutput, collapsed)+'</div>'
+    +'<div class="card-bottom">'+renderCardActions(task)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+task.status+'">'+statusLabel+pulseDot+'</span><span>'+relativeTime(task.createdTime)+'</span></div></div>'
+    +'</div>';
+}
+
+function renderOutputArea(task, currentOutput, collapsed) {
+  var s = task.status;
+  if (s === 'generating') {
+    var n = collapsed ? 6 : 4;
+    return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+Array(n+1).join('<div class="skel-thumb"></div>')+'</div>';
+  }
+  if (s === 'failed') {
+    return collapsed
+      ? '<div style="padding:8px 0;font-size:12px;color:#dc2626">生成失败 <button class="card-act-btn" style="margin-left:8px;padding:2px 10px;font-size:11px" onclick="handleRetryById(\''+task.id+'\')">重试</button></div>'
+      : '<div class="status-placeholder"><div class="status-placeholder-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5">'+SVG.err+'</svg></div><div class="status-placeholder-text">生成失败，请重试</div><button class="card-act-btn" onclick="handleRetryById(\''+task.id+'\')">重试</button></div>';
+  }
+  if (s === 'aborted') {
+    if (currentOutput.items.length > 0) return renderOutputRow(task, currentOutput, collapsed);
+    return collapsed ? '<div style="padding:8px 0;font-size:12px;color:#d97706">已中止生成</div>' : '<div class="status-placeholder"><div class="status-placeholder-text">已中止生成</div></div>';
+  }
+  if (s === 'pending') {
+    return collapsed ? '<div style="padding:8px 0;font-size:12px;color:#999">排队中...</div>' : '<div class="status-placeholder"><div class="status-placeholder-text">任务排队中，请稍候...</div></div>';
+  }
+  if (s === 'completed') return renderOutputRow(task, currentOutput, collapsed);
+  return '';
+}
+
+function renderOutputRow(task, output, collapsed) {
+  var MAX = collapsed ? 8 : 4;
+  var showItems = output.items.slice(0, MAX);
+  var remaining = output.total - showItems.length;
+  var thumbs = showItems.map(function(item, i){
+    return item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
+  }).join('');
+  var viewAll = remaining > 0
+    ? '<div class="o-thumb view-all-card" onclick="parent.postMessage({action:\'openTab\',title:\'全部图片\',url:\'AI 创作/全部图片.html\'},\'*\')"><div class="view-all-num">+'+remaining+'</div><span>查看全部</span></div>'
+    : '';
+  return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+viewAll+'</div>';
+}
+
+// ═══ 缩略图 hover 操作栏（小图/大图共用菜单内容） ═══
+function thumbOverlayHtml(url, dlFn) {
+  if (!dlFn) dlFn = 'event.stopPropagation();showToast(\'已下载\')';
+  var storeDD = STORAGE_TARGETS.map(function(t){
+    return '<div class="storage-dd-item" onclick="event.stopPropagation();showToast(\'已入库到'+t+'\');this.closest(\'.storage-dropdown\').style.display=\'none\'">'+t+'</div>';
+  }).join('');
+  var editDD = '<div class="edit-menu-item" onclick="event.stopPropagation();showToast(\'已添加到文本创作\');this.closest(\'.edit-menu\').style.display=\'none\'">文本创作</div>'
+    +'<div class="edit-menu-item" onclick="event.stopPropagation();showToast(\'已添加到图像创作\');this.closest(\'.edit-menu\').style.display=\'none\'">图像创作</div>'
+    +'<div class="edit-menu-item" onclick="event.stopPropagation();showToast(\'已添加到视频创作\');this.closest(\'.edit-menu\').style.display=\'none\'">视频创作</div>'
+    +'<div class="edit-menu-item" style="position:relative">工作流 <span class="sub-arrow">▸</span>'
+    +'<div class="edit-submenu"><div class="edit-submenu-item" onclick="event.stopPropagation();showToast(\'已添加到图片衍生工作流\');this.closest(\'.edit-menu\').style.display=\'none\'">图片衍生</div></div></div>';
+  var storeIcon = '<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>';
+  return '<div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:6px">'
+    +'<button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button>'
+    +'<button class="thumb-act" title="入库" style="position:relative" onclick="event.stopPropagation();toggleThumbDD(this,\'store\')">'+storeIcon
+    +'<div class="storage-dropdown" style="bottom:calc(100% + 4px);right:0;left:auto;display:none" onclick="event.stopPropagation()">'+storeDD+'</div></button>'
+    +'<button class="thumb-act" title="编辑" style="position:relative" onclick="event.stopPropagation();toggleThumbDD(this,\'edit\')">'+icon(SVG.edit)
+    +'<div class="edit-menu" style="bottom:calc(100% + 4px);right:0;display:none" onclick="event.stopPropagation()">'+editDD+'</div></button>'
+    +'</div>';
+}
+
+function closeAllPvDD(btn) {
+  var bar = btn.closest('.img-preview-bar');
+  if (!bar) return;
+  bar.querySelectorAll('.img-preview-store-dd.show').forEach(function(el){ el.classList.remove('show'); });
+}
+
+function renderVideoThumb(item, collapsed) {
+  var g = VIDEO_GRADIENTS[(item.gradientIdx||0) % 5];
+  var dur = item.duration || '5s';
+  var ps = collapsed ? 10 : 14;
+  var url = escHtml(item.thumb||item.url);
+  return '<div class="o-thumb" data-preview-url="'+url+'" style="cursor:pointer">'
+    +'<div class="vid-thumb-inner" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'
+    +'<div class="vid-play"><svg width="'+ps+'" height="'+ps+'" viewBox="0 0 24 24" fill="#333"><polygon points="6 3 20 12 6 21"/></svg></div>'
+    +'<span class="vid-dur">'+dur+'</span></div>'
+    +thumbOverlayHtml(url)
+    +'</div>';
+}
+
+function renderImageThumb(item, index) {
+  var thumbUrl = escHtml(item.thumb||item.url);
+  var fullUrl = escHtml(item.url||item.thumb);
+  var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  var dlFn = 'event.stopPropagation();(function(u,i){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(i+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+fullUrl+'\','+index+')';
+  return '<div class="o-thumb" data-preview-url="'+fullUrl+'" style="cursor:pointer">'
+    +'<img src="'+thumbUrl+'" alt="" loading="lazy">'
+    +thumbOverlayHtml(fullUrl, dlFn)
+    +'</div>';
+}
+
+function renderCardActions(task) {
+  var id = task.id, s = task.status;
+  if (s === 'completed' || s === 'aborted') {
+    return '<div class="card-actions">'
+      +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+      +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
+      +'<button class="card-act-more" onclick="parent.postMessage({action:\'openTab\',title:\'全部图片\',url:\'AI 创作/全部图片.html\'},\'*\')">查看全部</button>'
+      +'</div>';
+  }
+  if (s === 'generating') {
+    return '<div class="card-actions">'
+      +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+      +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
+      +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+icon(SVG.stop)+' 停止生成</button>'
+      +'</div>';
+  }
+  return '';
+}
+
+function toggleThumbDD(btn, type) {
+  var dd = btn.querySelector(type==='store' ? '.storage-dropdown' : '.edit-menu');
+  var other = btn.closest('.thumb-overlay').querySelector(type==='store' ? '.edit-menu' : '.storage-dropdown');
+  if (other) other.style.display = 'none';
+  document.querySelectorAll('.thumb-overlay .storage-dropdown,.thumb-overlay .edit-menu').forEach(function(el){ if(el!==dd) el.style.display='none'; });
+  dd.style.display = dd.style.display === 'none' ? '' : 'none';
+}
+
+function toggleCardStorageDD(btn) {
+  var dd = btn.querySelector('.storage-dropdown');
+  document.querySelectorAll('.card-actions .storage-dropdown').forEach(function(el){ if(el!==dd) el.style.display='none'; });
+  dd.style.display = dd.style.display === 'none' ? '' : 'none';
+}
+
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.card-act-btn')) {
+    document.querySelectorAll('.card-actions .storage-dropdown').forEach(function(el){ el.style.display='none'; });
+  }
+  if (!e.target.closest('.thumb-act')) {
+    document.querySelectorAll('.thumb-overlay .storage-dropdown,.thumb-overlay .edit-menu').forEach(function(el){ el.style.display='none'; });
+  }
+});
+
+function switchCardModel(taskId, modelId) {
+  state.cardModels[taskId] = modelId;
+  renderTaskFeed();
+}
+
+function handleReEditById(id) { var t=getTaskById(id); if(t) window.__handleReEdit(t); }
+function handleRetryById(id) { var t=getTaskById(id); if(t) window.__handleRetry(t); }
+function handleStopById(id) { var t=getTaskById(id); if(t) window.__handleStop(t); }
+
+// ═══ DetailModal ═══
+function openDetailModal(taskId) {
+  var task = getTaskById(taskId); if (!task) return;
+  state.detailTask = task; state.detailPage = 1; state.detailActiveModel = task.input.models[0];
+  document.getElementById('detailModalTitle').textContent = task.name;
+  renderDetailModalBody();
+  document.getElementById('detailModalMask').classList.add('show');
+}
+
+function closeDetailModal() {
+  state.detailTask = null;
+  document.getElementById('detailModalMask').classList.remove('show');
+}
+
+function switchDetailModel(modelId) { state.detailActiveModel = modelId; state.detailPage = 1; renderDetailModalBody(); }
+function setDetailPage(page) { state.detailPage = page; renderDetailModalBody(); }
+
+function renderDetailModalBody() {
+  var task = state.detailTask; if (!task) return;
+  var page = state.detailPage, activeModel = state.detailActiveModel;
+  var isMulti = task.input.models.length > 1;
+  var currentOutput = getTaskOutput(task, activeModel);
+  var pageItems = currentOutput.items.slice((page-1)*DM_PAGE_SIZE, page*DM_PAGE_SIZE);
+  var totalPages = Math.ceil(currentOutput.total / DM_PAGE_SIZE);
+  var sourceName = GEN_SOURCES[task.source] || task.source || '通用生成';
+
+  var modelTabsHtml = isMulti ? '<div class="model-tabs" style="margin:0 -24px;padding:0 24px">'
+    +task.input.models.map(function(m){
+      return '<button class="model-tab'+(m===activeModel?' active':'')+'" onclick="switchDetailModel(\''+m+'\')">'+escHtml(MODELS_MAP[m]||m)+'<span class="model-tab-count">('+getTaskOutput(task,m).total+')</span></button>';
+    }).join('')+'</div>' : '';
+
+  var refImgsHtml = (task.input.refImages && task.input.refImages.length > 0)
+    ? '<div style="display:flex;gap:6px;margin-top:8px">'+task.input.refImages.map(function(r){ return '<img src="'+escHtml(r.thumb)+'" style="width:60px;height:60px;border-radius:6px;object-fit:cover;border:1px solid #e8e8e8" alt="">'; }).join('')+'</div>' : '';
+
+  var thumbGridHtml = pageItems.map(function(item, i) {
+    if (item.type === 'video') {
+      return '<div style="width:120px;height:120px">'+renderVideoThumb(item, false)+'</div>';
+    }
+    var url = escHtml(item.url||item.thumb);
+    var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+    var dlFn = 'event.stopPropagation();(function(u,n){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(n+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+url+'\','+i+')';
+    return '<div class="detail-thumb-wrap" onclick="window.__previewImage(\''+url+'\')"><img src="'+url+'" alt="" loading="lazy"><div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:4px"><button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button><button class="thumb-act" title="入库" onclick="event.stopPropagation();showToast(\'已入库\')">'+icon(SVG.store)+'</button></div></div>';
+  }).join('');
+
+  var paginationHtml = '';
+  if (totalPages > 1) {
+    var pgBtns = '';
+    for (var p=1; p<=totalPages; p++) { pgBtns += '<button class="dm-pg-btn'+(page===p?' active':'')+'" onclick="setDetailPage('+p+')">'+p+'</button>'; }
+    paginationHtml = '<div class="dm-pagination"><button class="dm-pg-btn" '+(page<=1?'disabled':'')+' onclick="setDetailPage('+(page-1)+')">‹</button>'+pgBtns+'<button class="dm-pg-btn" '+(page>=totalPages?'disabled':'')+' onclick="setDetailPage('+(page+1)+')">›</button></div>';
+  }
+
+  document.getElementById('detailModalBody').innerHTML =
+    '<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="c-tag" style="background:#f5f5f5;color:#666">'+escHtml(sourceName)+'</span><span class="c-tag c-tag-'+task.status+'">'+(task.status==='completed'?'已完成':task.status)+'</span><span style="font-size:12px;color:#999">'+task.createdTime+'</span></div><div style="font-size:16px;font-weight:600;color:#1a1a1a">'+escHtml(task.name)+'</div></div>'
+    +'<div class="detail-input-section"><div class="detail-label">输入信息</div><div class="detail-prompt">'+escHtml(task.input.prompt)+'</div>'
+    +'<div class="detail-params">'
+    +task.input.models.map(function(m){ return '<span class="detail-param">模型: <strong>'+escHtml(MODELS_MAP[m]||m)+'</strong></span>'; }).join('')
+    +(task.input.ratio?'<span class="detail-param">比例: <strong>'+task.input.ratio+'</strong></span>':'')
+    +(task.input.res?'<span class="detail-param">分辨率: <strong>'+task.input.res+'</strong></span>':'')
+    +(task.input.dur?'<span class="detail-param">时长: <strong>'+task.input.dur+'</strong></span>':'')
+    +'<span class="detail-param">数量: <strong>'+task.input.count+'</strong></span></div>'
+    +refImgsHtml+'</div>'
+    +modelTabsHtml
+    +'<div style="margin-top:12px"><div class="detail-label">输出内容 ('+currentOutput.total+' '+(task.type==='video'?'个':'张')+')</div><div class="detail-output-grid">'+thumbGridHtml+'</div>'+paginationHtml+'</div>';
+}
+
+// ═══ 任务事件 ═══
+window.addEventListener('taskCreated', function(e) {
+  var task = Object.assign({}, e.detail, {_new:true});
+  state.tasks = state.tasks.concat([task]);
+  state.cardModels[task.id] = task.input.models[0];
+  renderTaskFeed();
+  setTimeout(function(){ var el=document.getElementById('taskScrollArea'); if(el) el.scrollTop=el.scrollHeight; }, 100);
+});
+
+window.addEventListener('taskUpdated', function(e) {
+  state.tasks = state.tasks.map(function(t){ return t.id===e.detail.id ? Object.assign({},t,e.detail) : t; });
+  renderTaskFeed();
+});
+
+renderAll();
+setTimeout(function(){ var el=document.getElementById('taskScrollArea'); if(el) el.scrollTop=el.scrollHeight; }, 0);
 </script>
 
+<script src="../共享样式/project-picker.js"></script>
+
 <script>
-// ══════════════════════════════════════
-// 底部输入框 (Vanilla JS)
 // ══════════════════════════════════════
 const RATIO_SIZES = {'1:1':[16,16],'2:3':[11,16],'3:2':[16,11],'3:4':[12,16],'4:3':[16,12],'9:16':[9,16],'16:9':[16,9]};
 const MODELS_DATA = [
@@ -1128,7 +1180,7 @@ const sel = {
       </div>
     </div>
   </div>`;
-  renderInputOpts();
+  setTimeout(function(){ if (typeof renderInputOpts === 'function') renderInputOpts(); }, 0);
 })();
 
 function expandInputBox() {
@@ -1162,8 +1214,8 @@ window.addEventListener('contentTabChanged', function(e) {
   var placeholder = document.querySelector('.input-placeholder');
   curType = tab === 'video' ? 'video' : 'image';
   if (tab === 'chat') {
-    prompt.placeholder = '输入对话内容...';
-    if (placeholder) placeholder.textContent = '输入对话内容...';
+    prompt.placeholder = '输入文本内容...';
+    if (placeholder) placeholder.textContent = '输入文本内容...';
     if (uploadBlock) uploadBlock.style.display = 'none';
     if (optArea) optArea.style.display = 'none';
     genBtn.innerHTML = '<span>发送</span>';
@@ -1293,15 +1345,35 @@ window.__handleStop = function(task) {
   showToast('已停止生成');
 };
 
-window.__previewImage = function(url) {
+var _pvList = [], _pvIdx = 0;
+
+window.__previewImage = function(url, list, idx) {
   var mask = document.getElementById('imgPreviewMask');
   var img = document.getElementById('imgPreviewImg');
   if (!mask || !img || !url) return;
+  _pvList = list || [url];
+  _pvIdx = typeof idx === 'number' ? idx : 0;
   img.src = url;
   mask.classList.add('show');
+  pvUpdateNav();
 };
 
-// 用捕获阶段处理图片点击预览，先于 React/AntD 的任何 stopPropagation
+function pvNav(dir) {
+  var next = _pvIdx + dir;
+  if (next < 0 || next >= _pvList.length) return;
+  _pvIdx = next;
+  document.getElementById('imgPreviewImg').src = _pvList[_pvIdx];
+  pvUpdateNav();
+}
+
+function pvUpdateNav() {
+  var prev = document.getElementById('pvPrev');
+  var next = document.getElementById('pvNext');
+  if (prev) prev.disabled = _pvIdx <= 0;
+  if (next) next.disabled = _pvIdx >= _pvList.length - 1;
+}
+
+// 用捕获阶段处理图片点击预览
 document.addEventListener('click', function(e) {
   if (e.target.closest('button, .input-ref-del')) return;
   if (e.target.closest('#imgPreviewMask')) return;
@@ -1312,7 +1384,20 @@ document.addEventListener('click', function(e) {
     var img = container.querySelector('img');
     previewUrl = img && img.src;
   }
-  if (previewUrl) window.__previewImage(previewUrl);
+  if (!previewUrl) return;
+  // 收集同行所有图片
+  var row = container.closest('.output-row, .card-ref-thumbs, .detail-output-grid, .input-ref-strip');
+  var list = [], idx = 0;
+  if (row) {
+    var thumbs = row.querySelectorAll('.o-thumb[data-preview-url], .card-ref-thumb[data-preview-url], .detail-thumb-wrap');
+    thumbs.forEach(function(t, i) {
+      var u = t.dataset.previewUrl;
+      if (!u) { var im = t.querySelector('img'); u = im && im.src; }
+      if (u) { if (u === previewUrl) idx = list.length; list.push(u); }
+    });
+  }
+  if (list.length === 0) { list = [previewUrl]; idx = 0; }
+  window.__previewImage(previewUrl, list, idx);
 }, true);
 </script>
 
@@ -1407,8 +1492,8 @@ function doGenerate() {
   onInputChange();
   showToast('任务已提交');
   setTimeout(() => {
-    const cnt = newTask.input.count;
-    const items = Array.from({length:Math.min(cnt,12)}, (_,i) => ({
+    const cnt = 10;
+    const items = Array.from({length:cnt}, (_,i) => ({
       type: curType==='video'?'video':'image',
       thumb: `https://picsum.photos/seed/new${newTask.id}_${i}/200/200`,
       url: `https://picsum.photos/seed/new${newTask.id}_${i}/800/800`,
@@ -1420,10 +1505,17 @@ function doGenerate() {
   }, 3000);
 }
 
+let _tt;
 function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2000);
+  t.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => t.classList.remove('show'), 4000);
+}
+function hideToast() {
+  clearTimeout(_tt);
+  document.getElementById('toast').classList.remove('show');
 }
 
 // ══════════════════════════════════════

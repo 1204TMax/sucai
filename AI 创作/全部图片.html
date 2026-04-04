@@ -192,6 +192,59 @@
             gap: 8px;
         }
 
+        /* ── Model Filter Chips ── */
+        .model-chips {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .model-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            height: 26px;
+            padding: 0 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-family: inherit;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: all 0.15s;
+            white-space: nowrap;
+            font-weight: 400;
+        }
+
+        .model-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-bg);
+        }
+
+        .model-chip.active {
+            background: var(--primary-bg);
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .model-chip .chip-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.6;
+            flex-shrink: 0;
+        }
+
+        .model-chip.active .chip-dot { opacity: 1; }
+
+        .model-chip-label { color: var(--text-secondary); font-size: 12px; flex-shrink: 0; }
+
         /* ── Ratio Tabs (胶囊型) ── */
         /* [Ant Design navigation spec: 胶囊型 Tabs] */
         .ratio-tabs {
@@ -200,17 +253,17 @@
             border-radius: 20px;
             padding: 3px;
             gap: 2px;
-            margin-top: 12px;
+            margin-top: 10px;
         }
 
         .ratio-tab {
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 16px;
             border: none;
-            font-size: 13px;
+            font-size: 12px;
             font-family: inherit;
             color: var(--text-secondary);
             background: transparent;
@@ -227,7 +280,7 @@
             box-shadow: 0 1px 4px rgba(0,0,0,0.1);
         }
 
-        .tab-count { font-size: 11px; opacity: 0.7; }
+        .tab-count { font-size: 11px; opacity: 0.65; }
 
         /* ── Image Grid ── */
         .grid-row {
@@ -528,7 +581,7 @@
         .info-section {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
             min-width: 0;
             flex: 1;
         }
@@ -536,23 +589,22 @@
         .info-row {
             display: flex;
             align-items: flex-start;
-            gap: 8px;
+            gap: 12px;
             min-width: 0;
             line-height: 1.5715;
         }
 
         .info-label {
-            font-size: 12px;
-            color: var(--text-secondary);
+            font-size: 14px;
+            color: rgba(0,0,0,0.45);
             flex-shrink: 0;
-            width: 48px;
+            width: 56px;
             text-align: right;
-            padding-top: 1px;
         }
 
         .info-value {
-            font-size: 13px;
-            color: var(--text-primary);
+            font-size: 14px;
+            color: rgba(0,0,0,0.88);
             min-width: 0;
             flex: 1;
         }
@@ -567,33 +619,44 @@
         .type-badge {
             display: inline-flex;
             align-items: center;
-            padding: 1px 8px;
-            border-radius: 10px;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 4px;
             font-size: 12px;
             font-weight: 500;
             line-height: 20px;
+            border: 1px solid transparent;
         }
 
-        .type-badge.image { background: #e6f4ff; color: #1677ff; }
-        .type-badge.video { background: #f6ffed; color: #52c41a; }
+        .type-badge.image {
+            background: rgba(22,119,255,0.1);
+            border-color: rgba(22,119,255,0.2);
+            color: var(--primary);
+        }
+
+        .type-badge.video {
+            background: rgba(82,196,26,0.1);
+            border-color: rgba(82,196,26,0.2);
+            color: #52c41a;
+        }
 
         .ref-thumbs {
             display: flex;
-            gap: 4px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .ref-thumb {
             width: 36px;
             height: 36px;
-            border-radius: var(--radius-sm);
+            border-radius: 4px;
             cursor: pointer;
             flex-shrink: 0;
             transition: transform 0.15s, box-shadow 0.15s;
         }
 
         .ref-thumb:hover {
-            transform: scale(1.06);
+            transform: scale(1.08);
             box-shadow: var(--shadow-1);
         }
 
@@ -605,16 +668,65 @@
         }
 
         .setting-tag {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 0 8px;
             height: 22px;
             line-height: 20px;
-            border-radius: var(--radius-sm);
+            border-radius: 4px;
             font-size: 12px;
             background: rgba(0,0,0,0.04);
-            color: var(--text-secondary);
-            border: 1px solid rgba(0,0,0,0.08);
+            color: rgba(0,0,0,0.65);
+            border: 1px solid rgba(0,0,0,0.06);
         }
+        /* ── Archive Dropdown ── */
+        .archive-wrap {
+            position: relative;
+            display: inline-flex;
+        }
+
+        .archive-dropdown {
+            position: absolute;
+            bottom: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            border-radius: 8px;
+            box-shadow: var(--shadow-2);
+            padding: 4px;
+            min-width: 120px;
+            z-index: 20;
+            display: none;
+        }
+
+        .archive-dropdown.visible { display: block; }
+
+        .archive-dropdown.drop-down {
+            bottom: auto;
+            top: calc(100% + 4px);
+        }
+
+        .archive-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            padding: 8px 12px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.15s;
+            white-space: nowrap;
+        }
+
+        .archive-opt:hover {
+            background: rgba(0,0,0,0.04);
+        }
+
     </style>
 </head>
 <body>
@@ -644,10 +756,6 @@
                 </span>
             </div>
             <div class="info-row">
-                <span class="info-label">模型</span>
-                <span class="info-value" id="infoModel"></span>
-            </div>
-            <div class="info-row">
                 <span class="info-label">相关设置</span>
                 <span class="info-value">
                     <div class="settings-tags" id="infoSettings"></div>
@@ -670,7 +778,7 @@
             <div class="divider-v"></div>
 
             <!-- [Ant Design buttons: 次按钮] -->
-            <button class="btn" onclick="downloadAll()">
+            <button class="btn" id="dlAllBtn" onclick="downloadAll()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 下载全部
             </button>
@@ -680,17 +788,27 @@
             <!-- Batch action buttons -->
             <div class="batch-actions" id="batchBar" style="display:none;">
                 <span class="sel-count" id="selCount">已选 0 项</span>
+                <button class="btn" id="selAllBtn" onclick="selectAll()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    全选
+                </button>
                 <button class="btn" onclick="batchDownload()">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     下载
                 </button>
-                <button class="btn" onclick="batchArchive()">
-                    <svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>
-                    入库
-                </button>
+                <div class="archive-wrap">
+                    <button class="btn" onclick="toggleArchiveMenu(this)">
+                        <svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>
+                        入库
+                    </button>
+                    <div class="archive-dropdown drop-down"></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Model Filter Chips -->
+    <div class="model-chips" id="modelChips"></div>
 
     <!-- [Ant Design navigation: 胶囊型 Tabs] -->
     <div class="ratio-tabs" id="ratioTabs"></div>
@@ -753,7 +871,7 @@ const PAGE_INFO = {
     model:   'Flux Pro 1.1',
     settings: {
         ratios:   ['9:16', '16:9', '1:1'],
-        clarity:  '标准',   // image only；视频传 null
+        clarity:  '2K',     // image only；视频传 null
         duration: null,     // video only；图片传 null
     },
     project: '走路赚金币',  // 无项目时传 null
@@ -779,10 +897,7 @@ function renderInfo() {
         refRow.style.display = 'none';
     }
 
-    document.getElementById('infoModel').textContent = p.model;
-
     const tags = [];
-    (p.settings.ratios || []).forEach(r => tags.push(r));
     if (p.type === 'image' && p.settings.clarity)  tags.push('清晰度：' + p.settings.clarity);
     if (p.type === 'video' && p.settings.duration) tags.push('时长：'   + p.settings.duration);
     document.getElementById('infoSettings').innerHTML =
@@ -824,27 +939,28 @@ const COLORS = [
 ];
 
 let images = [
-    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001' },
-    { id:2,  ratio:'9:16',  ar:9/16,  color:COLORS[1],  name:'竖屏-002' },
-    { id:3,  ratio:'9:16',  ar:9/16,  color:COLORS[2],  name:'竖屏-003' },
-    { id:4,  ratio:'9:16',  ar:9/16,  color:COLORS[3],  name:'竖屏-004' },
-    { id:5,  ratio:'9:16',  ar:9/16,  color:COLORS[4],  name:'竖屏-005' },
-    { id:6,  ratio:'9:16',  ar:9/16,  color:COLORS[5],  name:'竖屏-006' },
-    { id:7,  ratio:'16:9',  ar:16/9,  color:COLORS[6],  name:'横屏-001' },
-    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002' },
-    { id:9,  ratio:'16:9',  ar:16/9,  color:COLORS[8],  name:'横屏-003' },
-    { id:10, ratio:'16:9',  ar:16/9,  color:COLORS[9],  name:'横屏-004' },
-    { id:11, ratio:'16:9',  ar:16/9,  color:COLORS[10], name:'横屏-005' },
-    { id:12, ratio:'16:9',  ar:16/9,  color:COLORS[11], name:'横屏-006' },
-    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001' },
-    { id:14, ratio:'1:1',   ar:1,     color:COLORS[13], name:'方图-002' },
-    { id:15, ratio:'1:1',   ar:1,     color:COLORS[14], name:'方图-003' },
-    { id:16, ratio:'1:1',   ar:1,     color:COLORS[15], name:'方图-004' },
+    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001', model:'Seedream 5.0' },
+    { id:2,  ratio:'9:16',  ar:9/16,  color:COLORS[1],  name:'竖屏-002', model:'Seedream 5.0' },
+    { id:3,  ratio:'9:16',  ar:9/16,  color:COLORS[2],  name:'竖屏-003', model:'Banana 2' },
+    { id:4,  ratio:'9:16',  ar:9/16,  color:COLORS[3],  name:'竖屏-004', model:'Banana 2' },
+    { id:5,  ratio:'9:16',  ar:9/16,  color:COLORS[4],  name:'竖屏-005', model:'Seedream 5.0' },
+    { id:6,  ratio:'9:16',  ar:9/16,  color:COLORS[5],  name:'竖屏-006', model:'Banana 2' },
+    { id:7,  ratio:'16:9',  ar:16/9,  color:COLORS[6],  name:'横屏-001', model:'Seedream 5.0' },
+    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002', model:'Seedream 5.0' },
+    { id:9,  ratio:'16:9',  ar:16/9,  color:COLORS[8],  name:'横屏-003', model:'Banana 2' },
+    { id:10, ratio:'16:9',  ar:16/9,  color:COLORS[9],  name:'横屏-004', model:'Banana 2' },
+    { id:11, ratio:'16:9',  ar:16/9,  color:COLORS[10], name:'横屏-005', model:'Seedream 5.0' },
+    { id:12, ratio:'16:9',  ar:16/9,  color:COLORS[11], name:'横屏-006', model:'Banana 2' },
+    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001', model:'Seedream 5.0' },
+    { id:14, ratio:'1:1',   ar:1,     color:COLORS[13], name:'方图-002', model:'Banana 2' },
+    { id:15, ratio:'1:1',   ar:1,     color:COLORS[14], name:'方图-003', model:'Seedream 5.0' },
+    { id:16, ratio:'1:1',   ar:1,     color:COLORS[15], name:'方图-004', model:'Banana 2' },
 ];
 
 // ═══════════════════════════════════════════════════
 // State
 // ═══════════════════════════════════════════════════
+let curModel  = 'all';
 let curRatio  = 'all';
 let density   = 'medium';          // sparse | medium | dense
 let batchMode = false;
@@ -893,13 +1009,46 @@ function justify(imgs, cw, th) {
 // Render
 // ═══════════════════════════════════════════════════
 function filtered() {
-    return curRatio === 'all' ? images : images.filter(i => i.ratio === curRatio);
+    return images.filter(i =>
+        (curModel === 'all' || i.model === curModel) &&
+        (curRatio === 'all' || i.ratio === curRatio)
+    );
+}
+
+function renderModelTabs() {
+    const el = document.getElementById('modelChips');
+    const models = [...new Set(images.map(i => i.model))];
+
+    // 只有一个模型时不显示
+    if (models.length <= 1) { el.style.display = 'none'; return; }
+
+    el.style.display = 'flex';
+    el.innerHTML = '';
+
+    // 「模型」标签
+    const label = document.createElement('span');
+    label.className = 'model-chip-label';
+    label.textContent = '模型';
+    el.appendChild(label);
+
+    const mk = (text, key) => {
+        const b = document.createElement('button');
+        b.className = 'model-chip' + (curModel === key ? ' active' : '');
+        b.innerHTML = `<span class="chip-dot"></span>${text}`;
+        b.onclick = () => { curModel = key; curRatio = 'all'; render(); };
+        el.appendChild(b);
+    };
+
+    mk('全部', 'all');
+    models.forEach(m => mk(m, m));
 }
 
 function renderTabs() {
     const el = document.getElementById('ratioTabs');
+    // 按当前模型过滤后，再统计各比例数量
+    const base = curModel === 'all' ? images : images.filter(i => i.model === curModel);
     const counts = {};
-    images.forEach(i => counts[i.ratio] = (counts[i.ratio] || 0) + 1);
+    base.forEach(i => counts[i.ratio] = (counts[i.ratio] || 0) + 1);
     const ratios = Object.keys(counts);
 
     // 只有一个比例时不显示 Tabs
@@ -916,7 +1065,7 @@ function renderTabs() {
         el.appendChild(b);
     };
 
-    mk(`全部 <span class="tab-count">(${images.length})</span>`, 'all');
+    mk(`全部 <span class="tab-count">(${base.length})</span>`, 'all');
     ratios.forEach(r => mk(`${r} <span class="tab-count">(${counts[r]})</span>`, r));
 }
 
@@ -965,9 +1114,15 @@ function mkCard(item) {
 
 function mkActions(item) {
     let h = '';
-    h += ibtn('预览', ico.eye,   `openPreview(find(${item.id}))`);
+    if (batchMode) {
+        h += ibtn('预览', ico.eye, `openPreview(find(${item.id}))`);
+    }
     h += ibtn('下载', ico.dl,    `dlItem(${item.id})`);
-    h += ibtn('入库', ico.inbox, `archiveItem(${item.id})`);
+    h += `<div class="archive-wrap">`;
+    h += `<button class="icon-btn" data-ib="1" onclick="event.stopPropagation();showArchiveForItem(${item.id},this)">
+        ${ico.inbox}<span class="tip">入库</span>
+    </button>`;
+    h += `<div class="archive-dropdown"></div></div>`;
     h += ibtn('编辑', ico.edit,  `editItem(${item.id})`);
     return h;
 }
@@ -995,16 +1150,31 @@ function toggleBatch() {
     selected.clear();
     const btn = document.getElementById('batchBtn');
     const bar = document.getElementById('batchBar');
+    const dlAll = document.getElementById('dlAllBtn');
     if (batchMode) {
         btn.textContent = '取消';
         btn.classList.add('btn-primary');
         bar.style.display = 'inline-flex';
+        dlAll.style.display = 'none';
         document.body.classList.add('batch-mode');
     } else {
         btn.textContent = '批量选择';
         btn.classList.remove('btn-primary');
         bar.style.display = 'none';
+        dlAll.style.display = '';
         document.body.classList.remove('batch-mode');
+    }
+    updateSelCount();
+    renderGrid();
+}
+
+function selectAll() {
+    const imgs = filtered();
+    const allSelected = imgs.every(i => selected.has(i.id));
+    if (allSelected) {
+        imgs.forEach(i => selected.delete(i.id));
+    } else {
+        imgs.forEach(i => selected.add(i.id));
     }
     updateSelCount();
     renderGrid();
@@ -1028,10 +1198,68 @@ function updateSelCount() {
 
 function downloadAll()   { alert('下载全部（' + filtered().length + ' 张）'); }
 function batchDownload()  { if (!selected.size) return alert('请先选择图像'); alert('下载已选 ' + selected.size + ' 张'); }
-function batchArchive()   { if (!selected.size) return alert('请先选择图像'); alert('入库已选 ' + selected.size + ' 张'); }
 function dlItem(id)       { alert('下载：' + find(id).name); }
-function archiveItem(id)  { alert('入库：' + find(id).name); }
 function editItem(id)     { alert('编辑：' + find(id).name); }
+
+// ═══════════════════════════════════════════════════
+// Archive Dropdown
+// ═══════════════════════════════════════════════════
+const ARCHIVE_TARGETS = ['素材库', '物料库', '原料库'];
+let _curArchiveCtx = null; // { type:'single'|'batch', id }
+
+function buildArchiveMenu(dropdown, ctx) {
+    dropdown.innerHTML = ARCHIVE_TARGETS.map(t =>
+        `<button class="archive-opt" onclick="doArchive('${t}')">${t}</button>`
+    ).join('');
+    _curArchiveCtx = ctx;
+}
+
+function toggleArchiveMenu(triggerBtn) {
+    const wrap = triggerBtn.closest('.archive-wrap');
+    const dropdown = wrap.querySelector('.archive-dropdown');
+    const wasVisible = dropdown.classList.contains('visible');
+
+    closeAllArchiveMenus();
+
+    if (!wasVisible) {
+        // 判断上下文
+        const isBatch = wrap.closest('#batchBar');
+        if (isBatch) {
+            if (!selected.size) { alert('请先选择图像'); return; }
+            buildArchiveMenu(dropdown, { type: 'batch' });
+        }
+        dropdown.classList.add('visible');
+    }
+}
+
+function showArchiveForItem(id, triggerBtn) {
+    closeAllArchiveMenus();
+    const wrap = triggerBtn.closest('.archive-wrap');
+    const dropdown = wrap.querySelector('.archive-dropdown');
+    buildArchiveMenu(dropdown, { type: 'single', id });
+    dropdown.classList.add('visible');
+}
+
+function closeAllArchiveMenus() {
+    document.querySelectorAll('.archive-dropdown.visible').forEach(d => d.classList.remove('visible'));
+}
+
+function doArchive(target) {
+    if (!_curArchiveCtx) return;
+    if (_curArchiveCtx.type === 'batch') {
+        alert(`已将 ${selected.size} 张图片入库到「${target}」`);
+    } else {
+        const img = find(_curArchiveCtx.id);
+        alert(`已将「${img ? img.name : '图片'}」入库到「${target}」`);
+    }
+    closeAllArchiveMenus();
+    _curArchiveCtx = null;
+}
+
+// 点击空白处关闭
+document.addEventListener('click', e => {
+    if (!e.target.closest('.archive-wrap')) closeAllArchiveMenus();
+});
 
 // ═══════════════════════════════════════════════════
 // Delete Confirm
@@ -1092,7 +1320,10 @@ function openPreview(item) {
 
     foot.innerHTML = `
         <button class="btn icon-only" title="下载" onclick="dlItem(${item.id})">${ico.dl}</button>
-        <button class="btn icon-only" title="入库" onclick="archiveItem(${item.id})">${ico.inbox}</button>
+        <div class="archive-wrap">
+            <button class="btn icon-only" title="入库" onclick="showArchiveForItem(${item.id},this)">${ico.inbox}</button>
+            <div class="archive-dropdown"></div>
+        </div>
         <button class="btn icon-only" title="编辑" onclick="editItem(${item.id})">${ico.edit}</button>
     `;
     mask.classList.add('visible');
@@ -1105,7 +1336,7 @@ function closePreview() {
 // ═══════════════════════════════════════════════════
 // Master render
 // ═══════════════════════════════════════════════════
-function render() { renderTabs(); renderGrid(); }
+function render() { renderModelTabs(); renderTabs(); renderGrid(); }
 
 let _rt;
 window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(renderGrid, 100); });

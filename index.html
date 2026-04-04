@@ -628,7 +628,8 @@
         function onSubmenuClick(item) {
             document.querySelectorAll('.submenu-item, .shortcut-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-            loadPage(item.textContent.trim(), item.dataset.page);
+            var label = item.querySelector('.menu-item-label');
+            loadPage(label ? label.textContent.trim() : item.textContent.trim(), item.dataset.page);
         }
 
         // ---------- 加载页面到 iframe ----------

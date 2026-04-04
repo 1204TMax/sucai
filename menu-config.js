@@ -30,9 +30,7 @@ const MENU_CONFIG = [
     shortcuts: {
       title: '常用功能',
       items: [
-        { name: '通用生成', page: 'AI 创作/通用生成.html', icon: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>' },
-        { name: '生成详情', page: 'AI 创作/生成详情.html', icon: '<path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>' },
-        { name: '全部图片', page: 'AI 创作/全部图片.html', icon: '<rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>' }
+        { name: '通用生成', page: 'AI 创作/通用生成.html', icon: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>' }
       ]
     }
   },
