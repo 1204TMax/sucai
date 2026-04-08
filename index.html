@@ -220,19 +220,93 @@
             top: 56px;
             bottom: 0;
             left: 0;
-            overflow-y: auto;
-            padding: 12px 0;
+            overflow: hidden;
+            padding: 12px 0 16px;
             display: flex;
             flex-direction: column;
         }
 
         .sidebar-top {
             flex: 1;
+            overflow-y: auto;
+            padding-bottom: 12px;
         }
 
         .sidebar-bottom {
-            padding-top: 8px;
-            margin-top: 8px;
+            flex-shrink: 0;
+            padding: 12px 12px 0;
+            margin-top: auto;
+            background: #fff;
+        }
+
+        .sidebar-bottom.hidden {
+            display: none;
+        }
+
+        .sidebar-banner {
+            position: relative;
+            padding: 12px 28px 12px 12px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #edf4ff 0%, #f7fbff 100%);
+            border: 1px solid #dbeafe;
+            box-shadow: 0 6px 16px rgba(22, 119, 255, 0.08);
+        }
+
+        .sidebar-banner-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 16px;
+            height: 16px;
+            border: none;
+            background: transparent;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+
+        .sidebar-banner-close:hover {
+            color: #8c8c8c;
+        }
+
+        .sidebar-banner-close svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .sidebar-banner-content {
+            display: block;
+            padding-right: 8px;
+        }
+
+        .sidebar-banner-text {
+            display: inline;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 500;
+            color: rgba(0, 0, 0, 0.88);
+        }
+
+        .sidebar-banner-action {
+            display: inline;
+            margin-left: 12px;
+            border: none;
+            background: transparent;
+            color: #1677ff;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 600;
+            padding: 0;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .sidebar-banner-action:hover {
+            color: #0958d9;
         }
 
         .submenu-section {
@@ -557,6 +631,11 @@
             }, 2200);
         }
 
+        function closeSidebarBanner() {
+            const banner = document.getElementById('sidebar-bottom-banner');
+            if (banner) banner.classList.add('hidden');
+        }
+
         // ---------- 初始化顶部一级菜单 ----------
         function renderMainMenu() {
             const container = document.getElementById('main-menu');
@@ -637,7 +716,26 @@
                 topDiv.appendChild(contentDiv);
             });
 
+            const bottomDiv = document.createElement('div');
+            bottomDiv.className = 'sidebar-bottom';
+            bottomDiv.id = 'sidebar-bottom-banner';
+            bottomDiv.innerHTML = `
+                <div class="sidebar-banner">
+                    <button class="sidebar-banner-close" onclick="closeSidebarBanner()" aria-label="关闭">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                    <div class="sidebar-banner-content">
+                        <div class="sidebar-banner-text">在钉钉获取任务完成通知</div>
+                        <button class="sidebar-banner-action">→ 去授权</button>
+                    </div>
+                </div>
+            `;
+
             sidebar.appendChild(topDiv);
+            sidebar.appendChild(bottomDiv);
         }
 
         // ---------- 切换一级菜单 ----------
