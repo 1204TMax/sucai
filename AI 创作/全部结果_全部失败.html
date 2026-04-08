@@ -136,6 +136,10 @@
 
         /* ── Row 1: Title ── */
         .card-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex-wrap: wrap;
             font-size: var(--text-lg);
             font-weight: 600;
             color: var(--text-hi);
@@ -144,6 +148,20 @@
             font-size: var(--text-sm);
             color: var(--text-muted);
             margin-top: 2px;
+        }
+
+        .status-tag {
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 999px;
+            background: #fff1f0;
+            border: 1px solid #ffccc7;
+            color: #ff4d4f;
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
         }
 
         .batch-actions {
@@ -691,6 +709,43 @@
             color: var(--text-hi);
         }
 
+        /* ── Failure Empty State ── */
+        .failure-state {
+            min-height: 520px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 96px 24px;
+        }
+
+        .failure-state-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .failure-title {
+            font-size: 24px;
+            line-height: 1.3333;
+            font-weight: 600;
+            color: #ff4d4f;
+        }
+
+        .failure-desc {
+            font-size: 14px;
+            line-height: 1.5715;
+            color: var(--text-muted);
+        }
+
+        .failure-actions {
+            margin-top: 8px;
+            display: flex;
+            justify-content: center;
+        }
+
     </style>
 </head>
 <body>
@@ -752,9 +807,17 @@
 </div>
 
 <!-- ══════════════════════════════════════════
-     Image Grid (Justified Layout)
+     Failure Empty State
 ══════════════════════════════════════════ -->
-<div id="grid"></div>
+<div class="card failure-state">
+    <div class="failure-state-inner">
+        <div class="failure-title">全部生成失败</div>
+        <div class="failure-desc" id="failureReason">此处显示具体失败原因，具体原因列表见文档。</div>
+        <div class="failure-actions">
+            <button class="b b-solid" onclick="retryTask()">重试</button>
+        </div>
+    </div>
+</div>
 
 <!-- ══════════════════════════════════════════
      Preview Modal
@@ -807,11 +870,12 @@ const PAGE_INFO = {
     ],
     model:   'Seedream 5.0',
     settings: {
-        ratios:   ['9:16', '16:9', '1:1'],
+        ratios:   ['9:16'],
         clarity:  '2K',     // image only；视频传 null
         duration: null,     // video only；图片传 null
     },
     project: '走路赚金币',  // 无项目时传 null
+    failureReason: '此处显示具体失败原因，具体原因列表见文档。'
 };
 
 function renderInfo() {
@@ -819,7 +883,7 @@ function renderInfo() {
     const totalCount = images.length;
 
     // Row 1: title + subtitle
-    document.getElementById('cardTitle').textContent = '生成结果 · ' + totalCount + ' 条';
+    document.getElementById('cardTitle').innerHTML = `已生成:${totalCount}条 <span class="status-tag">已失败</span>`;
     const parts = [];
     if (p.project) parts.push(p.project);
     parts.push(p.entry);
@@ -830,6 +894,7 @@ function renderInfo() {
 
     // Row 2: prompt
     document.getElementById('infoPrompt').textContent = p.prompt;
+    document.getElementById('failureReason').textContent = p.failureReason;
 
     // Row 2: refs (放到提示词前面，无标题)
     const refGroup = document.getElementById('refGroup');
@@ -843,6 +908,8 @@ function renderInfo() {
     } else {
         refGroup.style.display = 'none';
     }
+
+    document.getElementById('filterRow').style.display = 'none';
 }
 
 function openRefPreview(idx) {
@@ -862,33 +929,18 @@ function openRefPreview(idx) {
     mask.classList.add('visible');
 }
 
+function retryTask() {
+    alert('重试');
+}
+
 // ═══════════════════════════════════════════════════
-// Mock Data — 16 images, 3 ratio groups
+// Mock Data — 7 images, single ratio
 // ═══════════════════════════════════════════════════
 const COLORS = [
-    '#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD',
-    '#FF8C69','#6C5CE7','#00B894','#FD79A8','#FDCB6E','#74B9FF',
-    '#A29BFE','#55EFC4','#E17055','#81ECEC'
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8C69'
 ];
 
-let images = [
-    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001', model:'Seedream 5.0' },
-    { id:2,  ratio:'9:16',  ar:9/16,  color:COLORS[1],  name:'竖屏-002', model:'Seedream 5.0' },
-    { id:3,  ratio:'9:16',  ar:9/16,  color:COLORS[2],  name:'竖屏-003', model:'Banana 2' },
-    { id:4,  ratio:'9:16',  ar:9/16,  color:COLORS[3],  name:'竖屏-004', model:'Banana 2' },
-    { id:5,  ratio:'9:16',  ar:9/16,  color:COLORS[4],  name:'竖屏-005', model:'Seedream 5.0' },
-    { id:6,  ratio:'9:16',  ar:9/16,  color:COLORS[5],  name:'竖屏-006', model:'Banana 2' },
-    { id:7,  ratio:'16:9',  ar:16/9,  color:COLORS[6],  name:'横屏-001', model:'Seedream 5.0' },
-    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002', model:'Seedream 5.0' },
-    { id:9,  ratio:'16:9',  ar:16/9,  color:COLORS[8],  name:'横屏-003', model:'Banana 2' },
-    { id:10, ratio:'16:9',  ar:16/9,  color:COLORS[9],  name:'横屏-004', model:'Banana 2' },
-    { id:11, ratio:'16:9',  ar:16/9,  color:COLORS[10], name:'横屏-005', model:'Seedream 5.0' },
-    { id:12, ratio:'16:9',  ar:16/9,  color:COLORS[11], name:'横屏-006', model:'Banana 2' },
-    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001', model:'Seedream 5.0' },
-    { id:14, ratio:'1:1',   ar:1,     color:COLORS[13], name:'方图-002', model:'Banana 2' },
-    { id:15, ratio:'1:1',   ar:1,     color:COLORS[14], name:'方图-003', model:'Seedream 5.0' },
-    { id:16, ratio:'1:1',   ar:1,     color:COLORS[15], name:'方图-004', model:'Banana 2' },
-];
+let images = [];
 
 function previewUrlFor(item) {
     var w = item.ratio === '9:16' ? 900 : (item.ratio === '16:9' ? 1600 : 1200);
@@ -963,22 +1015,29 @@ function renderModelTabs() {
     const el = document.getElementById('modelChips');
     const models = [...new Set(images.map(i => i.model))];
 
-    // 只有一个模型时不显示
     const sep1 = document.getElementById('filterSep1');
-    if (models.length <= 1) { el.style.display = 'none'; sep1.style.display = 'none'; return; }
+    if (!models.length) { el.style.display = 'none'; sep1.style.display = 'none'; return; }
 
     el.style.display = 'flex';
     sep1.style.display = '';
     el.innerHTML = '';
 
-    const mk = (text, key) => {
+    const mk = (text, key, extraClass = '') => {
         const b = document.createElement('button');
-        b.className = 'chip' + (curModel === key ? ' on' : '');
+        b.className = 'chip' + (curModel === key ? ' on' : '') + (extraClass ? ' ' + extraClass : '');
         b.innerHTML = text;
-        b.onclick = () => { curModel = key; curRatio = 'all'; render(); };
+        if (!extraClass) b.onclick = () => { curModel = key; curRatio = 'all'; render(); };
+        else b.type = 'button';
         el.appendChild(b);
     };
 
+    if (models.length === 1) {
+        curModel = models[0];
+        mk(models[0], models[0], 'pill-single');
+        return;
+    }
+
+    if (curModel !== 'all' && !models.includes(curModel)) curModel = 'all';
     mk('全部模型', 'all');
     models.forEach(m => mk(m, m));
 }
@@ -1281,7 +1340,6 @@ let _rt;
 window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(renderGrid, 100); });
 
 renderInfo();
-render();
 </script>
 <script>
 function showToast(msg) { alert(msg); }
