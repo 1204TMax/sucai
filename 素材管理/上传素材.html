@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传素材</title>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Ant Design -->
+    <script src="https://unpkg.com/dayjs@1/dayjs.min.js"></script>
+    <script src="https://unpkg.com/antd@5/dist/antd.min.js"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/@ant-design/icons@5/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 遵守 usage.md 和 design-system.md 规范 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 8px; /* 遵守最新规定的 8px 外边距 */
+        }
+
+        .upload-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .upload-body {
+            display: flex;
+            align-items: stretch;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            flex: 6;
+            padding: 24px;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .right-panel {
+            flex: 4;
+            padding: 24px;
+            background: #fafbfc;
+        }
+
+        .upload-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #fff;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* 自定义素材卡片 */
+        .asset-item-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            background: #fff;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+        .asset-item-card:hover {
+            border-color: #4A9EFF;
+        }
+        .asset-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            background: #f0f0f0;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .asset-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .asset-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .asset-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .asset-title {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding-right: 24px; /* 给删除按钮留空间 */
+        }
+        .asset-title-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .asset-tags-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .del-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+        .del-btn:hover {
+            color: #ff4d4f;
+        }
+
+        /* 强制缩小拖拽上传区域高度 */
+        .compact-dragger .ant-upload.ant-upload-drag {
+            height: 120px !important;
+        }
+        .compact-dragger .ant-upload-btn {
+            padding: 0 !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { ConfigProvider, Upload, Button, Select, Input, Checkbox, Tooltip, Modal, Row, Col, Space, Divider, Tag, Typography, message, Tree } = antd;
+        const { InboxOutlined, CloseOutlined, EditOutlined, FolderOutlined, DownOutlined, UpOutlined, SearchOutlined, RobotOutlined, CheckOutlined } = icons;
+        const { Dragger } = Upload;
+        const { Text } = Typography;
+
+        // Mock 初始数据
+        const MOCK_FILES = [
+            { 
+                id: '1', 
+                name: 'Summer_Campaign_Video_v1_final.mp4', 
+                size: '53.4MB', 
+                res: '1080×1920', 
+                time: '00:41', 
+                type: 'video', 
+                thumb: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=400&q=80', 
+                tags: [{type:'分类', label:'大字报'}, {type:'内容', label:'赚钱'}] 
+            },
+            { 
+                id: '2', 
+                name: 'Product_Showcase_Main_Image.png', 
+                size: '1.2MB', 
+                res: '800×800', 
+                time: '图片', 
+                type: 'image', 
+                thumb: 'https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=400&q=80', 
+                tags: [{type:'分类', label:'海报'}, {type:'内容', label:'对比'}, {type:'内容', label:'情绪'}, {type:'内容', label:'自然'}] 
+            }
+        ];
+
+        const App = () => {
+            const [files, setFiles] = React.useState(MOCK_FILES);
+            const [selectedKeys, setSelectedKeys] = React.useState([]);
+            const [expandedPersonnel, setExpandedPersonnel] = React.useState(false);
+            
+            // 更换文件夹弹窗状态
+            const [isFolderModalOpen, setIsFolderModalOpen] = React.useState(false);
+            const [currentFolder, setCurrentFolder] = React.useState('测试');
+
+            // 标签弹窗状态
+            const [isTagModalOpen, setIsTagModalOpen] = React.useState(false);
+            const [editingFileId, setEditingFileId] = React.useState(null);
+
+            // AI打标 loading 状态
+            const [loadingAITags, setLoadingAITags] = React.useState({});
+
+            // 重命名状态
+            const [renamingFileId, setRenamingFileId] = React.useState(null);
+            const [renameValue, setRenameValue] = React.useState('');
+
+            const handleSelectAll = (e) => {
+                if (e.target.checked) {
+                    setSelectedKeys(files.map(f => f.id));
+                } else {
+                    setSelectedKeys([]);
+                }
+            };
+
+            const toggleSelect = (id) => {
+                if (selectedKeys.includes(id)) {
+                    setSelectedKeys(selectedKeys.filter(k => k !== id));
+                } else {
+                    setSelectedKeys([...selectedKeys, id]);
+                }
+            };
+
+            const handleDelete = (id) => {
+                setFiles(files.filter(f => f.id !== id));
+                setSelectedKeys(selectedKeys.filter(k => k !== id));
+                message.success('已移除素材');
+            };
+
+            const handleAITag = (id) => {
+                Modal.confirm({
+                    title: '提示',
+                    content: 'AI打标将覆盖当前标签，请确认。',
+                    okText: '确认',
+                    cancelText: '取消',
+                    onOk: () => {
+                        message.info('已开始上传，您可在上传任务中查看详情');
+                        // 设置当前素材为 loading 状态
+                        setLoadingAITags(prev => ({ ...prev, [id]: true }));
+                        
+                        // 模拟 3 秒后处理完成
+                        setTimeout(() => {
+                            setLoadingAITags(prev => ({ ...prev, [id]: false }));
+                            message.success('AI打标处理完成');
+                        }, 3000);
+                    }
+                });
+            };
+
+            // 人员配置项（调整为默认展示设计师和剪辑师）
+            const personnelFields = [
+                { label: '设计师', key: 'designer', defaultShow: true },
+                { label: '剪辑师', key: 'editor', defaultShow: true },
+                { label: '素材供应商', key: 'supplier', defaultShow: false },
+                { label: '优化供应商', key: 'optimizer', defaultShow: false },
+                { label: '编导', key: 'director', defaultShow: false },
+                { label: '策划', key: 'planner', defaultShow: false },
+                { label: '拍摄', key: 'camera', defaultShow: false },
+                { label: '演员', key: 'actor', defaultShow: false },
+            ];
+
+            // 文件夹树数据
+            const folderTreeData = [
+                { title: '我的素材', key: '我的素材' },
+                { title: '素材库', key: '素材库', children: [
+                    { title: '测试', key: '测试' },
+                    { title: '未分组素材', key: '未分组素材' }
+                ]}
+            ];
+
+            // 标签树数据
+            const mockTypeTagsTree = [
+                { title: '海报', key: 'poster', children: [{ title: '大字报', key: 'dazibao' }, { title: '节日海报', key: 'festival' }] },
+                { title: '视频', key: 'video', children: [{ title: '口播', key: 'koubo' }, { title: '情景剧', key: 'drama' }] }
+            ];
+            const mockContentTagsTree = [
+                { title: '主题', key: 'theme', children: [{ title: '赚钱', key: 'money' }, { title: '情绪', key: 'emotion' }] },
+                { title: '手法', key: 'method', children: [{ title: '对比', key: 'compare' }, { title: '自然', key: 'nature' }] }
+            ];
+
+            return (
+                <ConfigProvider theme={{ token: { colorPrimary: '#4A9EFF', borderRadius: 6 } }}>
+                    <div className="upload-container">
+                        <div className="upload-header">上传素材</div>
+                        
+                        <div className="upload-body">
+                            {/* ================= 左侧：上传与素材管理区 ================= */}
+                            <div className="left-panel">
+                                {/* 1. 上传位置 */}
+                                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <Text type="secondary">上传至：</Text>
+                                        <Tag icon={<FolderOutlined />} color="blue" style={{ fontSize: 13, padding: '4px 8px', margin: 0 }}>{currentFolder}</Tag>
+                                        <Button type="link" size="small" onClick={() => setIsFolderModalOpen(true)}>更换文件夹</Button>
+                                    </div>
+                                    <Text type="secondary" style={{ fontSize: 12 }}>单文件≤500MB，总大小≤4096MB</Text>
+                                </div>
+
+                                {/* 2. 选择素材（上传区）- 明确固定高度 */}
+                                <Dragger multiple action="#" showUploadList={false} style={{ marginBottom: 24, height: 100 }} className="compact-dragger">
+                                    <div style={{ padding: '0' }}>
+                                        <InboxOutlined style={{ color: '#4A9EFF', fontSize: 28, marginBottom: 8 }} />
+                                        <p className="ant-upload-text" style={{ fontSize: 14, fontWeight: 500, margin: '0 0 4px' }}>点击或将文件拖拽到这里上传</p>
+                                        <p className="ant-upload-hint" style={{ color: '#8c8c8c', margin: 0, fontSize: 12 }}>
+                                            支持格式：mp4, mov, avi, png, jpg, jpeg, gif
+                                        </p>
+                                    </div>
+                                </Dragger>
+
+                                {/* 3. 素材列表区控制条 */}
+                                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Checkbox 
+                                        checked={files.length > 0 && selectedKeys.length === files.length}
+                                        indeterminate={selectedKeys.length > 0 && selectedKeys.length < files.length}
+                                        onChange={handleSelectAll}
+                                    >
+                                        全选 (已选 {selectedKeys.length}/{files.length})
+                                    </Checkbox>
+                                    {selectedKeys.length > 0 && (
+                                        <Button type="primary" ghost size="small">批量设置标签</Button>
+                                    )}
+                                </div>
+
+                                {/* 素材列表卡片 */}
+                                <div className="asset-list">
+                                    {files.map(file => {
+                                        // 标签截断逻辑 (最多展示 2 个)
+                                        const showTags = file.tags.slice(0, 2);
+                                        const hiddenTags = file.tags.slice(2);
+                                        
+                                        return (
+                                            <div key={file.id} className="asset-item-card">
+                                                <Checkbox 
+                                                    checked={selectedKeys.includes(file.id)}
+                                                    onChange={() => toggleSelect(file.id)}
+                                                />
+                                                
+                                                {/* 缩略图区域 */}
+                                                <div className="asset-thumb">
+                                                    <img src={file.thumb} alt="thumb"/>
+                                                    <div className="asset-overlay">
+                                                        <span>{file.res}</span>
+                                                        <span>{file.time}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* 详情与标签区域 */}
+                                                <div className="asset-info">
+                                                    <div className="asset-title">
+                                                        {renamingFileId === file.id ? (
+                                                            <Space.Compact style={{ width: '100%' }}>
+                                                                <Input 
+                                                                    size="small" 
+                                                                    value={renameValue} 
+                                                                    onChange={(e) => setRenameValue(e.target.value)}
+                                                                    onPressEnter={() => {
+                                                                        if(renameValue.trim()) {
+                                                                            setFiles(files.map(f => f.id === file.id ? { ...f, name: renameValue.trim() } : f));
+                                                                        }
+                                                                        setRenamingFileId(null);
+                                                                    }}
+                                                                    autoFocus
+                                                                />
+                                                                <Button size="small" icon={<CheckOutlined />} onClick={() => {
+                                                                    if(renameValue.trim()) {
+                                                                        setFiles(files.map(f => f.id === file.id ? { ...f, name: renameValue.trim() } : f));
+                                                                    }
+                                                                    setRenamingFileId(null);
+                                                                }} />
+                                                                <Button size="small" icon={<CloseOutlined />} onClick={() => setRenamingFileId(null)} />
+                                                            </Space.Compact>
+                                                        ) : (
+                                                            <>
+                                                                <span className="asset-title-text" title={file.name}>{file.name}</span>
+                                                                <EditOutlined 
+                                                                    style={{ marginLeft: 8, color: '#8c8c8c', cursor: 'pointer' }} 
+                                                                    onClick={() => {
+                                                                        setRenamingFileId(file.id);
+                                                                        setRenameValue(file.name);
+                                                                    }}
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                    <div className="asset-tags-row">
+                                                        {showTags.map((t, idx) => (
+                                                            <Tag key={idx} color={t.type === '分类' ? 'blue' : 'default'} bordered={false}>
+                                                                {t.label}
+                                                            </Tag>
+                                                        ))}
+                                                        {hiddenTags.length > 0 && (
+                                                            <Tooltip title={
+                                                                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                                                                    {hiddenTags.map((t, i) => <Tag key={i} color={t.type === '分类' ? 'blue' : 'default'} bordered={false}>{t.label}</Tag>)}
+                                                                </div>
+                                                            } overlayInnerStyle={{ padding: 8 }}>
+                                                                <Tag style={{ cursor: 'pointer' }}>+{hiddenTags.length}</Tag>
+                                                            </Tooltip>
+                                                        )}
+                                                        <Button 
+                                                            type="dashed" 
+                                                            size="small" 
+                                                            icon={<EditOutlined />} 
+                                                            disabled={loadingAITags[file.id]}
+                                                            onClick={() => { setEditingFileId(file.id); setIsTagModalOpen(true); }}
+                                                        >
+                                                            编辑标签
+                                                        </Button>
+                                                        <Button 
+                                                            type="primary" 
+                                                            ghost 
+                                                            size="small" 
+                                                            icon={<RobotOutlined />} 
+                                                            loading={loadingAITags[file.id]}
+                                                            onClick={() => handleAITag(file.id)}
+                                                        >
+                                                            {loadingAITags[file.id] ? '打标中' : 'AI打标'}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* 删除按钮 */}
+                                                <CloseOutlined className="del-btn" onClick={() => handleDelete(file.id)} title="删除" />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* ================= 右侧：信息配置区 ================= */}
+                            <div className="right-panel">
+                                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 20 }}>信息配置</div>
+                                
+                                {/* 人员信息模块 (改为两列布局) */}
+                                <div style={{ background: '#fff', padding: 20, borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 20 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                                        <Text strong style={{ fontSize: 14 }}>人员信息</Text>
+                                        <Button type="link" size="small" onClick={() => setExpandedPersonnel(!expandedPersonnel)} style={{ padding: 0 }}>
+                                            {expandedPersonnel ? <><UpOutlined/> 收起更多</> : <><DownOutlined/> 展开更多</>}
+                                        </Button>
+                                    </div>
+                                    
+                                    <Row gutter={16}>
+                                        {personnelFields.filter(f => f.defaultShow || expandedPersonnel).map(field => (
+                                            <Col span={12} key={field.key} style={{ marginBottom: 16 }}>
+                                                <div style={{ marginBottom: 6, color: '#666', fontSize: 13 }}>{field.label}</div>
+                                                {/* mode="tags" + maxCount=1 允许下拉选择已有，也允许手动输入任意值 */}
+                                                <Select
+                                                    mode="tags"
+                                                    style={{ width: '100%' }}
+                                                    placeholder={`选择或输入`}
+                                                    maxCount={1}
+                                                    allowClear
+                                                    options={[
+                                                        { value: '张三', label: '张三' },
+                                                        { value: '李四', label: '李四' },
+                                                        { value: '王五', label: '王五' }
+                                                    ]}
+                                                />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
+
+                                {/* 备注模块 */}
+                                <div style={{ background: '#fff', padding: 20, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                                    <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 14 }}>备注</Text>
+                                    <Input.TextArea 
+                                        rows={4} 
+                                        placeholder="请输入备注信息（选填）"
+                                        style={{ resize: 'none' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ================= 底部：操作区 ================= */}
+                        <div className="upload-footer">
+                            <Button>取消</Button>
+                            <Button type="primary" onClick={() => message.success('上传成功')}>确认</Button>
+                        </div>
+                    </div>
+
+                    {/* ================= 更换文件夹弹窗 ================= */}
+                    <Modal
+                        title="选择文件夹"
+                        open={isFolderModalOpen}
+                        onCancel={() => setIsFolderModalOpen(false)}
+                        onOk={() => {
+                            setIsFolderModalOpen(false);
+                            message.success('已更换上传目录');
+                        }}
+                        width={400}
+                        centered
+                    >
+                        <Tree 
+                            treeData={folderTreeData} 
+                            defaultExpandAll 
+                            selectedKeys={[currentFolder]}
+                            onSelect={(keys) => {
+                                if (keys.length > 0) {
+                                    setCurrentFolder(keys[0]);
+                                }
+                            }}
+                            blockNode
+                        />
+                    </Modal>
+
+                    {/* ================= 标签编辑弹窗（大弹窗，使用树结构） ================= */}
+                    <Modal
+                        title="编辑标签"
+                        open={isTagModalOpen}
+                        onCancel={() => setIsTagModalOpen(false)}
+                        width={700}
+                        bodyStyle={{ minHeight: 400 }}
+                        okText="保存"
+                        cancelText="取消"
+                        centered
+                    >
+                        <Input prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />} placeholder="搜索标签名称" style={{ marginBottom: 20 }} />
+                        
+                        <div style={{ display: 'flex', gap: 20 }}>
+                            {/* 类型标签区（使用Tree单选） */}
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontWeight: 500, marginBottom: 12 }}>类型标签 <Text type="secondary" style={{fontWeight: 'normal'}}>(单选)</Text></div>
+                                <div style={{ border: '1px solid #e9ecef', borderRadius: 8, padding: 16, minHeight: 280, background: '#fafbfc' }}>
+                                    <Tree 
+                                        treeData={mockTypeTagsTree} 
+                                        defaultExpandAll 
+                                        defaultSelectedKeys={['dazibao']}
+                                        blockNode
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 内容标签区（使用Tree多选） */}
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontWeight: 500, marginBottom: 12 }}>内容标签 <Text type="secondary" style={{fontWeight: 'normal'}}>(多选)</Text></div>
+                                <div style={{ border: '1px solid #e9ecef', borderRadius: 8, padding: 16, minHeight: 280, background: '#fafbfc', display: 'flex', flexDirection: 'column' }}>
+                                    <div style={{ flex: 1 }}>
+                                        <Tree 
+                                            checkable
+                                            treeData={mockContentTagsTree} 
+                                            defaultExpandAll 
+                                            defaultCheckedKeys={['money', 'compare']}
+                                            blockNode
+                                        />
+                                    </div>
+                                    
+                                    <Divider style={{ margin: '16px 0 12px 0' }} />
+                                    
+                                    <div style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>系统自动识别标签 (可点击取消)：</div>
+                                    <Space wrap>
+                                        <Tag closable color="blue" bordered={false}>自动: 高管</Tag>
+                                        <Tag closable color="blue" bordered={false}>自动: 办公场景</Tag>
+                                    </Space>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal>
+                </ConfigProvider>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

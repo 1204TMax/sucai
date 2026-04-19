@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的任务 - 低保真</title>
+  <style>
+    :root {
+      --bg-page: #f5f7fa;
+      --bg-panel: #ffffff;
+      --bg-muted: #f0f0f0;
+      --bg-deep: #e6e6e6;
+      --text-main: #2f2f2f;
+      --text-secondary: #5f5f5f;
+      --text-muted: #8a8a8a;
+      --border: #d0d0d0;
+      --border-strong: #b8b8b8;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --space-1: 8px;
+      --space-2: 12px;
+      --space-3: 16px;
+      --space-4: 20px;
+      --space-5: 24px;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-page);
+      padding: 20px;
+      font-family: var(--font-main);
+      color: var(--text-main);
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .desc {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .mini-tag {
+      border: 1px solid var(--border-strong);
+      background: var(--bg-muted);
+      border-radius: var(--radius-sm);
+      padding: 2px 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .summary-item {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr 1.2fr auto;
+      gap: var(--space-2);
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .field input,
+    .field select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fff;
+      height: 32px;
+      padding: 0 10px;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .time-range {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .btn {
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-muted);
+      color: var(--text-main);
+      height: 32px;
+      padding: 0 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: var(--bg-deep);
+    }
+
+    .btn-primary {
+      background: #dcdcdc;
+      border-color: #b0b0b0;
+      font-weight: 600;
+    }
+
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .task-row {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #fafafa;
+      padding: var(--space-2);
+      display: grid;
+      grid-template-columns: auto 1.8fr 1fr 1fr auto;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .task-main {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .task-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-main);
+    }
+
+    .task-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .task-state,
+    .task-time {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .task-actions {
+      display: flex;
+      gap: var(--space-1);
+      align-items: center;
+    }
+
+    .task-actions .btn {
+      height: 28px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .selection-tip {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .bottom-btns {
+      display: flex;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .drawer {
+      display: none;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      background: #fcfcfc;
+      padding: var(--space-4);
+      gap: var(--space-3);
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      display: flex;
+    }
+
+    .drawer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .drawer-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .drawer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(200px, 1fr));
+      gap: var(--space-2);
+    }
+
+    .drawer-item {
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: var(--space-2);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .drawer-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .drawer-value {
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .modal {
+      display: none;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      background: #fdfdfd;
+      padding: var(--space-4);
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .modal.open {
+      display: flex;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .modal-text {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    @media (max-width: 900px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
+      }
+
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+
+      .task-row {
+        grid-template-columns: auto 1fr;
+      }
+
+      .task-state,
+      .task-time,
+      .task-actions {
+        grid-column: 2 / 3;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="panel">
+      <div class="title-row">
+        <div>
+          <h1>我的任务</h1>
+          <p class="desc">低保真原型：用于确认任务筛选、查看详情与停止任务流程。</p>
+        </div>
+        <span class="mini-tag">灰阶草图</span>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="summary-label">总任务</span>
+          <span class="summary-value" id="sumTotal">12</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">进行中</span>
+          <span class="summary-value" id="sumRunning">6</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">已完成</span>
+          <span class="summary-value" id="sumDone">4</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">已停止</span>
+          <span class="summary-value" id="sumStopped">2</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="filter-row">
+        <div class="field">
+          <label for="keyword">关键词</label>
+          <input id="keyword" type="text" placeholder="输入任务名 / 编号" />
+        </div>
+        <div class="field">
+          <label for="status">状态</label>
+          <select id="status">
+            <option>全部状态</option>
+            <option>进行中</option>
+            <option>已完成</option>
+            <option>已停止</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>时间</label>
+          <div class="time-range">
+            <input type="date" aria-label="开始日期" />
+            <span class="task-sub">到</span>
+            <input type="date" aria-label="结束日期" />
+          </div>
+        </div>
+        <button class="btn" type="button">筛选</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="task-list" id="taskList">
+        <article class="task-row" data-id="T-2310" data-title="批量打标-春季素材" data-owner="张三" data-state="进行中" data-time="2026-04-16 10:20" data-note="按素材类型批量打标，当前完成 62%">
+          <input type="checkbox" aria-label="选择任务 T-2310" />
+          <div class="task-main">
+            <p class="task-title">T-2310 批量打标-春季素材</p>
+            <p class="task-sub">执行人：张三</p>
+          </div>
+          <span class="task-state">进行中</span>
+          <span class="task-time">2026-04-16 10:20</span>
+          <div class="task-actions">
+            <button class="btn" type="button" data-action="detail">详情</button>
+            <button class="btn" type="button" data-action="stop">停止</button>
+          </div>
+        </article>
+
+        <article class="task-row" data-id="T-2308" data-title="封面审核-电商频道" data-owner="李四" data-state="已完成" data-time="2026-04-16 09:42" data-note="审核 32 张封面，问题项已回流">
+          <input type="checkbox" aria-label="选择任务 T-2308" />
+          <div class="task-main">
+            <p class="task-title">T-2308 封面审核-电商频道</p>
+            <p class="task-sub">执行人：李四</p>
+          </div>
+          <span class="task-state">已完成</span>
+          <span class="task-time">2026-04-16 09:42</span>
+          <div class="task-actions">
+            <button class="btn" type="button" data-action="detail">详情</button>
+            <button class="btn" type="button" data-action="stop">停止</button>
+          </div>
+        </article>
+
+        <article class="task-row" data-id="T-2307" data-title="版权检测-海外组" data-owner="王五" data-state="进行中" data-time="2026-04-16 09:10" data-note="敏感词与版权比对进行中，等待下一批输入">
+          <input type="checkbox" aria-label="选择任务 T-2307" />
+          <div class="task-main">
+            <p class="task-title">T-2307 版权检测-海外组</p>
+            <p class="task-sub">执行人：王五</p>
+          </div>
+          <span class="task-state">进行中</span>
+          <span class="task-time">2026-04-16 09:10</span>
+          <div class="task-actions">
+            <button class="btn" type="button" data-action="detail">详情</button>
+            <button class="btn" type="button" data-action="stop">停止</button>
+          </div>
+        </article>
+
+        <article class="task-row" data-id="T-2304" data-title="素材归档-历史库" data-owner="赵六" data-state="已停止" data-time="2026-04-15 18:05" data-note="手动停止：优先处理线上紧急任务">
+          <input type="checkbox" aria-label="选择任务 T-2304" />
+          <div class="task-main">
+            <p class="task-title">T-2304 素材归档-历史库</p>
+            <p class="task-sub">执行人：赵六</p>
+          </div>
+          <span class="task-state">已停止</span>
+          <span class="task-time">2026-04-15 18:05</span>
+          <div class="task-actions">
+            <button class="btn" type="button" data-action="detail">详情</button>
+            <button class="btn" type="button" data-action="stop">停止</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel bottom-actions">
+      <span class="selection-tip" id="selectionTip">已选择 0 个任务</span>
+      <div class="bottom-btns">
+        <button class="btn" type="button">批量完成</button>
+        <button class="btn btn-primary" type="button" id="stopSelectedBtn">停止选中任务</button>
+      </div>
+    </section>
+
+    <section class="drawer" id="taskDrawer" aria-live="polite">
+      <div class="drawer-head">
+        <h2 class="drawer-title">任务详情</h2>
+        <button class="btn" id="closeDrawerBtn" type="button">关闭</button>
+      </div>
+      <div class="drawer-grid">
+        <div class="drawer-item">
+          <span class="drawer-label">任务编号</span>
+          <span class="drawer-value" id="drawerId">-</span>
+        </div>
+        <div class="drawer-item">
+          <span class="drawer-label">任务名称</span>
+          <span class="drawer-value" id="drawerTitle">-</span>
+        </div>
+        <div class="drawer-item">
+          <span class="drawer-label">执行人</span>
+          <span class="drawer-value" id="drawerOwner">-</span>
+        </div>
+        <div class="drawer-item">
+          <span class="drawer-label">当前状态</span>
+          <span class="drawer-value" id="drawerState">-</span>
+        </div>
+        <div class="drawer-item">
+          <span class="drawer-label">更新时间</span>
+          <span class="drawer-value" id="drawerTime">-</span>
+        </div>
+        <div class="drawer-item">
+          <span class="drawer-label">备注</span>
+          <span class="drawer-value" id="drawerNote">-</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="modal" id="stopModal" aria-live="polite">
+      <h2 class="modal-title">停止任务确认</h2>
+      <p class="modal-text" id="stopModalText">确认停止当前任务吗？</p>
+      <div class="modal-actions">
+        <button class="btn" id="cancelStopBtn" type="button">取消</button>
+        <button class="btn btn-primary" id="confirmStopBtn" type="button">确认停止</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const taskList = document.getElementById('taskList');
+      const taskDrawer = document.getElementById('taskDrawer');
+      const stopModal = document.getElementById('stopModal');
+      const selectionTip = document.getElementById('selectionTip');
+      const stopSelectedBtn = document.getElementById('stopSelectedBtn');
+
+      const drawerFields = {
+        id: document.getElementById('drawerId'),
+        title: document.getElementById('drawerTitle'),
+        owner: document.getElementById('drawerOwner'),
+        state: document.getElementById('drawerState'),
+        time: document.getElementById('drawerTime'),
+        note: document.getElementById('drawerNote')
+      };
+
+      const stopModalText = document.getElementById('stopModalText');
+      const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+      const cancelStopBtn = document.getElementById('cancelStopBtn');
+      const confirmStopBtn = document.getElementById('confirmStopBtn');
+
+      let pendingStopTask = null;
+
+      function updateSelectedCount() {
+        const checkedCount = taskList.querySelectorAll('input[type="checkbox"]:checked').length;
+        selectionTip.textContent = `已选择 ${checkedCount} 个任务`;
+      }
+
+      function openDrawer(taskRow) {
+        drawerFields.id.textContent = taskRow.dataset.id;
+        drawerFields.title.textContent = taskRow.dataset.title;
+        drawerFields.owner.textContent = taskRow.dataset.owner;
+        drawerFields.state.textContent = taskRow.dataset.state;
+        drawerFields.time.textContent = taskRow.dataset.time;
+        drawerFields.note.textContent = taskRow.dataset.note;
+        taskDrawer.classList.add('open');
+      }
+
+      function closeDrawer() {
+        taskDrawer.classList.remove('open');
+      }
+
+      function openStopModal(taskRow) {
+        pendingStopTask = taskRow;
+        stopModalText.textContent = `确认停止任务「${taskRow.dataset.id} ${taskRow.dataset.title}」吗？`;
+        stopModal.classList.add('open');
+      }
+
+      function closeStopModal() {
+        pendingStopTask = null;
+        stopModal.classList.remove('open');
+      }
+
+      taskList.addEventListener('click', function (event) {
+        const actionButton = event.target.closest('button[data-action]');
+        if (!actionButton) return;
+
+        const taskRow = event.target.closest('.task-row');
+        if (!taskRow) return;
+
+        const action = actionButton.dataset.action;
+        if (action === 'detail') {
+          openDrawer(taskRow);
+        }
+
+        if (action === 'stop') {
+          openStopModal(taskRow);
+        }
+      });
+
+      taskList.addEventListener('change', function (event) {
+        if (event.target.matches('input[type="checkbox"]')) {
+          updateSelectedCount();
+        }
+      });
+
+      stopSelectedBtn.addEventListener('click', function () {
+        const selectedTask = taskList.querySelector('input[type="checkbox"]:checked');
+        if (!selectedTask) {
+          stopModalText.textContent = '请先选择至少 1 个任务，再执行停止操作。';
+          stopModal.classList.add('open');
+          pendingStopTask = null;
+          return;
+        }
+        const taskRow = selectedTask.closest('.task-row');
+        openStopModal(taskRow);
+      });
+
+      confirmStopBtn.addEventListener('click', function () {
+        if (pendingStopTask) {
+          pendingStopTask.dataset.state = '已停止';
+          const stateCell = pendingStopTask.querySelector('.task-state');
+          stateCell.textContent = '已停止';
+          pendingStopTask.dataset.note = '手动停止：来自任务列表确认弹窗';
+          if (taskDrawer.classList.contains('open') && drawerFields.id.textContent === pendingStopTask.dataset.id) {
+            drawerFields.state.textContent = '已停止';
+            drawerFields.note.textContent = pendingStopTask.dataset.note;
+          }
+        }
+        closeStopModal();
+      });
+
+      closeDrawerBtn.addEventListener('click', closeDrawer);
+      cancelStopBtn.addEventListener('click', closeStopModal);
+    })();
+  </script>
+</body>
+</html>

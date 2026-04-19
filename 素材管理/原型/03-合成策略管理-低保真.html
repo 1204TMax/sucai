@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>合成策略管理 - 低保真</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f5f7fa;
+      color: #2f2f2f;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      line-height: 1.4;
+      font-size: 14px;
+    }
+
+    #app {
+      max-width: 1280px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-radius: 6px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-block h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .title-block p {
+      margin: 0;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid #bdbdbd;
+      background: #f2f2f2;
+      color: #333;
+      border-radius: 4px;
+      padding: 7px 12px;
+      cursor: pointer;
+      transition: all .15s ease;
+      font-size: 13px;
+    }
+
+    button:hover {
+      background: #e7e7e7;
+      border-color: #9e9e9e;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+      background: #f7f7f7;
+    }
+
+    .btn-primary {
+      background: #d9d9d9;
+      border-color: #a6a6a6;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: #cfcfcf;
+    }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: minmax(200px, 1fr) minmax(140px, 180px) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: #666;
+    }
+
+    input, select, textarea {
+      border: 1px solid #c4c4c4;
+      border-radius: 4px;
+      padding: 8px;
+      font-size: 13px;
+      background: #fff;
+      color: #333;
+    }
+
+    textarea { min-height: 80px; resize: vertical; }
+
+    .content-layout {
+      display: flex;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .list-panel {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid #e2e2e2;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+      background: #fff;
+    }
+
+    th, td {
+      border-bottom: 1px solid #ececec;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f3f3f3;
+      color: #555;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    tbody tr:hover {
+      background: #fafafa;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #c6c6c6;
+      font-size: 12px;
+      background: #f5f5f5;
+      color: #4a4a4a;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .row-actions button {
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #767676;
+      padding: 26px 10px;
+      background: #fafafa;
+      border: 1px dashed #d6d6d6;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .pagination .left,
+    .pagination .right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer {
+      width: 0;
+      overflow: hidden;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: #fff;
+      transition: width .2s ease, padding .2s ease, border-color .2s ease;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .drawer.show {
+      width: 320px;
+      border-color: #d9d9d9;
+      padding: 12px;
+    }
+
+    .drawer-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .drawer h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .kv .k { color: #666; }
+
+    .muted {
+      color: #7b7b7b;
+      font-size: 12px;
+    }
+
+    .overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.26);
+      padding: 16px;
+      z-index: 5;
+    }
+
+    .overlay.show {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .modal {
+      width: min(680px, 100%);
+      background: #fff;
+      border: 1px solid #d3d3d3;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+      padding: 14px;
+    }
+
+    .modal.small { width: min(720px, 100%); }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .modal-head h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .modal-foot {
+      border-top: 1px solid #ebebeb;
+      padding-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .log-list {
+      border: 1px solid #e1e1e1;
+      border-radius: 4px;
+      max-height: 320px;
+      overflow: auto;
+      padding: 8px;
+      background: #f8f8f8;
+    }
+
+    .log-item {
+      border-bottom: 1px dashed #d3d3d3;
+      padding: 8px 2px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      color: #3f3f3f;
+    }
+
+    .log-item:last-child { border-bottom: none; }
+
+    @media (max-width: 980px) {
+      .content-layout { flex-direction: column; }
+      .drawer, .drawer.show { width: 100%; }
+      .filter-row { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      table { min-width: 760px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <section class="panel title-row">
+      <div class="title-block">
+        <h1>合成策略管理（低保真）</h1>
+        <p>用于管理素材合成策略、执行任务并查看执行日志。当前为灰阶原型，仅展示核心流程与最小交互。</p>
+      </div>
+      <div class="actions">
+        <button id="btnNew" class="btn-primary">新建策略</button>
+        <button id="btnRunAll">执行策略</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="filter-row">
+        <div class="field">
+          <label for="filterName">策略名称</label>
+          <input id="filterName" type="text" placeholder="请输入策略名称关键字" />
+        </div>
+        <div class="field">
+          <label for="filterStatus">状态</label>
+          <select id="filterStatus">
+            <option value="">全部</option>
+            <option value="启用">启用</option>
+            <option value="停用">停用</option>
+            <option value="草稿">草稿</option>
+          </select>
+        </div>
+        <div class="actions">
+          <button id="btnSearch" class="btn-primary">筛选</button>
+          <button id="btnReset">重置</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-layout">
+      <div class="panel list-panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 70px;">ID</th>
+                <th style="min-width: 180px;">策略名称</th>
+                <th style="width: 120px;">状态</th>
+                <th style="min-width: 220px;">规则说明</th>
+                <th style="width: 140px;">更新时间</th>
+                <th style="width: 260px;">操作</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div id="emptyState" class="empty" style="display:none;">暂无匹配策略，请调整筛选条件。</div>
+
+        <div class="pagination">
+          <div class="left">
+            <button id="btnPrev">上一页</button>
+            <button id="btnNext">下一页</button>
+            <span class="muted" id="pageInfo">第 1 页 / 共 1 页</span>
+          </div>
+          <div class="right">
+            <button id="btnLoadMore">加载更多</button>
+            <span class="muted" id="loadingHint"></span>
+          </div>
+        </div>
+      </div>
+
+      <aside id="detailDrawer" class="drawer">
+        <div class="drawer-head">
+          <h3>策略详情</h3>
+          <button id="btnCloseDrawer">关闭</button>
+        </div>
+        <div id="drawerContent" class="muted">请在列表中点击“详情”。</div>
+      </aside>
+    </section>
+
+    <div id="editOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="新建或编辑策略弹窗">
+      <div class="modal">
+        <div class="modal-head">
+          <h3 id="editTitle">新建策略</h3>
+          <button id="btnCloseEdit">关闭</button>
+        </div>
+        <div class="form-grid">
+          <div class="field">
+            <label for="formName">策略名称</label>
+            <input id="formName" type="text" placeholder="请输入策略名称" />
+          </div>
+          <div class="field">
+            <label for="formStatus">状态</label>
+            <select id="formStatus">
+              <option value="启用">启用</option>
+              <option value="停用">停用</option>
+              <option value="草稿">草稿</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="margin-bottom: 10px;">
+          <label for="formDesc">规则说明</label>
+          <textarea id="formDesc" placeholder="请输入规则说明（低保真可简化）"></textarea>
+        </div>
+        <div class="modal-foot">
+          <button id="btnCancelEdit">取消</button>
+          <button id="btnSaveEdit" class="btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="logOverlay" class="overlay" role="dialog" aria-modal="true" aria-label="执行日志弹窗">
+      <div class="modal small">
+        <div class="modal-head">
+          <h3>执行日志</h3>
+          <button id="btnCloseLog">关闭</button>
+        </div>
+        <div id="logList" class="log-list"></div>
+        <div class="modal-foot">
+          <button id="btnClearLog">清空日志</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const state = {
+        list: [
+          { id: 101, name: '口播短视频自动拼接', status: '启用', desc: '按镜头类型匹配片头、正文、片尾素材；缺失时回退默认模板。', updatedAt: '2026-04-14 16:32' },
+          { id: 102, name: '商品混剪策略A', status: '停用', desc: '优先使用高转化素材池；按品牌分组轮播，避免重复曝光。', updatedAt: '2026-04-13 09:58' },
+          { id: 103, name: '节日主题模板策略', status: '草稿', desc: '基于节日标签注入转场和文案占位，支持人工校对后发布。', updatedAt: '2026-04-10 11:05' },
+          { id: 104, name: '教育行业案例拼装', status: '启用', desc: '按学段拆分素材并排序，优先展示结果导向片段。', updatedAt: '2026-04-09 18:21' },
+          { id: 105, name: '品牌统一风格合成', status: '启用', desc: '统一字体/片尾规范，自动过滤不合规素材片段。', updatedAt: '2026-04-08 14:19' }
+        ],
+        logs: [
+          '[2026-04-16 09:30:12] INFO 开始执行策略 #101',
+          '[2026-04-16 09:30:14] INFO 已拉取素材 42 条',
+          '[2026-04-16 09:30:19] INFO 合成完成，用时 7s'
+        ],
+        filterName: '',
+        filterStatus: '',
+        page: 1,
+        pageSize: 4,
+        currentEditId: null
+      };
+
+      const el = {
+        tableBody: document.getElementById('tableBody'),
+        emptyState: document.getElementById('emptyState'),
+        filterName: document.getElementById('filterName'),
+        filterStatus: document.getElementById('filterStatus'),
+        btnSearch: document.getElementById('btnSearch'),
+        btnReset: document.getElementById('btnReset'),
+        btnNew: document.getElementById('btnNew'),
+        btnRunAll: document.getElementById('btnRunAll'),
+        btnPrev: document.getElementById('btnPrev'),
+        btnNext: document.getElementById('btnNext'),
+        pageInfo: document.getElementById('pageInfo'),
+        btnLoadMore: document.getElementById('btnLoadMore'),
+        loadingHint: document.getElementById('loadingHint'),
+
+        drawer: document.getElementById('detailDrawer'),
+        drawerContent: document.getElementById('drawerContent'),
+        btnCloseDrawer: document.getElementById('btnCloseDrawer'),
+
+        editOverlay: document.getElementById('editOverlay'),
+        editTitle: document.getElementById('editTitle'),
+        formName: document.getElementById('formName'),
+        formStatus: document.getElementById('formStatus'),
+        formDesc: document.getElementById('formDesc'),
+        btnCloseEdit: document.getElementById('btnCloseEdit'),
+        btnCancelEdit: document.getElementById('btnCancelEdit'),
+        btnSaveEdit: document.getElementById('btnSaveEdit'),
+
+        logOverlay: document.getElementById('logOverlay'),
+        logList: document.getElementById('logList'),
+        btnCloseLog: document.getElementById('btnCloseLog'),
+        btnClearLog: document.getElementById('btnClearLog')
+      };
+
+      function filteredList() {
+        return state.list.filter(item => {
+          const matchName = !state.filterName || item.name.includes(state.filterName);
+          const matchStatus = !state.filterStatus || item.status === state.filterStatus;
+          return matchName && matchStatus;
+        });
+      }
+
+      function renderTable() {
+        const list = filteredList();
+        const totalPages = Math.max(1, Math.ceil(list.length / state.pageSize));
+        if (state.page > totalPages) state.page = totalPages;
+        const start = (state.page - 1) * state.pageSize;
+        const pageList = list.slice(start, start + state.pageSize);
+
+        el.tableBody.innerHTML = pageList.map(item => `
+          <tr>
+            <td>${item.id}</td>
+            <td>${item.name}</td>
+            <td><span class="tag">${item.status}</span></td>
+            <td title="${item.desc}">${item.desc}</td>
+            <td>${item.updatedAt}</td>
+            <td>
+              <div class="row-actions">
+                <button data-action="detail" data-id="${item.id}">详情</button>
+                <button data-action="edit" data-id="${item.id}">编辑</button>
+                <button data-action="run" data-id="${item.id}">执行</button>
+                <button data-action="log" data-id="${item.id}">日志</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        el.emptyState.style.display = pageList.length ? 'none' : 'block';
+        el.pageInfo.textContent = `第 ${state.page} 页 / 共 ${totalPages} 页`;
+        el.btnPrev.disabled = state.page <= 1;
+        el.btnNext.disabled = state.page >= totalPages;
+      }
+
+      function renderLogs() {
+        el.logList.innerHTML = state.logs.length
+          ? state.logs.map(line => `<div class="log-item">${line}</div>`).join('')
+          : '<div class="muted">暂无日志记录。</div>';
+      }
+
+      function getById(id) {
+        return state.list.find(x => x.id === id);
+      }
+
+      function openDrawer(item) {
+        if (!item) return;
+        el.drawer.classList.add('show');
+        el.drawerContent.innerHTML = `
+          <div class="kv"><div class="k">策略ID</div><div>${item.id}</div></div>
+          <div class="kv"><div class="k">策略名称</div><div>${item.name}</div></div>
+          <div class="kv"><div class="k">状态</div><div>${item.status}</div></div>
+          <div class="kv"><div class="k">更新时间</div><div>${item.updatedAt}</div></div>
+          <div class="kv"><div class="k">规则说明</div><div>${item.desc}</div></div>
+          <div class="muted" style="margin-top:10px;">预览状态：当前为策略详情抽屉展示。</div>
+        `;
+      }
+
+      function closeDrawer() {
+        el.drawer.classList.remove('show');
+      }
+
+      function openEdit(item) {
+        state.currentEditId = item ? item.id : null;
+        el.editTitle.textContent = item ? '编辑策略' : '新建策略';
+        el.formName.value = item ? item.name : '';
+        el.formStatus.value = item ? item.status : '启用';
+        el.formDesc.value = item ? item.desc : '';
+        el.editOverlay.classList.add('show');
+      }
+
+      function closeEdit() {
+        el.editOverlay.classList.remove('show');
+      }
+
+      function saveEdit() {
+        const name = el.formName.value.trim();
+        const status = el.formStatus.value;
+        const desc = el.formDesc.value.trim();
+        if (!name) {
+          alert('请填写策略名称');
+          return;
+        }
+
+        const now = new Date();
+        const stamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+        if (state.currentEditId) {
+          const target = getById(state.currentEditId);
+          if (target) {
+            target.name = name;
+            target.status = status;
+            target.desc = desc || '（未填写规则说明）';
+            target.updatedAt = stamp;
+          }
+        } else {
+          const newId = Math.max.apply(null, state.list.map(x => x.id)) + 1;
+          state.list.unshift({
+            id: newId,
+            name,
+            status,
+            desc: desc || '（未填写规则说明）',
+            updatedAt: stamp
+          });
+          state.page = 1;
+        }
+
+        closeEdit();
+        renderTable();
+      }
+
+      function openLog(item) {
+        if (item) {
+          state.logs.unshift(`[${new Date().toLocaleString('zh-CN', { hour12: false })}] INFO 打开策略 #${item.id} 的执行日志`);
+        }
+        renderLogs();
+        el.logOverlay.classList.add('show');
+      }
+
+      function closeLog() {
+        el.logOverlay.classList.remove('show');
+      }
+
+      function executeItem(item) {
+        if (!item) return;
+        const ts = new Date().toLocaleString('zh-CN', { hour12: false });
+        state.logs.unshift(`[${ts}] INFO 手动执行策略 #${item.id}（${item.name}）`);
+        item.updatedAt = ts.replace(/\//g, '-');
+        renderTable();
+      }
+
+      el.btnSearch.addEventListener('click', function () {
+        state.filterName = el.filterName.value.trim();
+        state.filterStatus = el.filterStatus.value;
+        state.page = 1;
+        renderTable();
+      });
+
+      el.btnReset.addEventListener('click', function () {
+        el.filterName.value = '';
+        el.filterStatus.value = '';
+        state.filterName = '';
+        state.filterStatus = '';
+        state.page = 1;
+        renderTable();
+      });
+
+      el.btnNew.addEventListener('click', function () {
+        openEdit(null);
+      });
+
+      el.btnRunAll.addEventListener('click', function () {
+        el.btnRunAll.disabled = true;
+        const oldText = el.btnRunAll.textContent;
+        el.btnRunAll.textContent = '执行中...';
+        el.loadingHint.textContent = '加载状态：批量执行中';
+
+        setTimeout(function () {
+          const ts = new Date().toLocaleString('zh-CN', { hour12: false });
+          state.logs.unshift(`[${ts}] INFO 执行入口触发批量执行（低保真模拟）`);
+          el.btnRunAll.disabled = false;
+          el.btnRunAll.textContent = oldText;
+          el.loadingHint.textContent = '已完成';
+          setTimeout(function () { el.loadingHint.textContent = ''; }, 900);
+        }, 900);
+      });
+
+      el.btnPrev.addEventListener('click', function () {
+        if (state.page > 1) {
+          state.page -= 1;
+          renderTable();
+        }
+      });
+
+      el.btnNext.addEventListener('click', function () {
+        const totalPages = Math.max(1, Math.ceil(filteredList().length / state.pageSize));
+        if (state.page < totalPages) {
+          state.page += 1;
+          renderTable();
+        }
+      });
+
+      el.btnLoadMore.addEventListener('click', function () {
+        el.btnLoadMore.disabled = true;
+        el.loadingHint.textContent = '加载中...';
+        setTimeout(function () {
+          const nextId = Math.max.apply(null, state.list.map(x => x.id)) + 1;
+          state.list.push({
+            id: nextId,
+            name: `新增策略${nextId}`,
+            status: '草稿',
+            desc: '加载更多模拟条目，用于验证列表扩展状态。',
+            updatedAt: new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+          });
+          el.btnLoadMore.disabled = false;
+          el.loadingHint.textContent = '已加载 1 条';
+          setTimeout(function () { el.loadingHint.textContent = ''; }, 900);
+          renderTable();
+        }, 700);
+      });
+
+      el.tableBody.addEventListener('click', function (e) {
+        const target = e.target;
+        if (!(target instanceof HTMLElement)) return;
+        const action = target.getAttribute('data-action');
+        const id = Number(target.getAttribute('data-id'));
+        if (!action || !id) return;
+        const item = getById(id);
+
+        if (action === 'detail') openDrawer(item);
+        if (action === 'edit') openEdit(item);
+        if (action === 'run') executeItem(item);
+        if (action === 'log') openLog(item);
+      });
+
+      el.btnCloseDrawer.addEventListener('click', closeDrawer);
+
+      el.btnCloseEdit.addEventListener('click', closeEdit);
+      el.btnCancelEdit.addEventListener('click', closeEdit);
+      el.btnSaveEdit.addEventListener('click', saveEdit);
+
+      el.btnCloseLog.addEventListener('click', closeLog);
+      el.btnClearLog.addEventListener('click', function () {
+        state.logs = [];
+        renderLogs();
+      });
+
+      el.editOverlay.addEventListener('click', function (e) {
+        if (e.target === el.editOverlay) closeEdit();
+      });
+
+      el.logOverlay.addEventListener('click', function (e) {
+        if (e.target === el.logOverlay) closeLog();
+      });
+
+      renderTable();
+      renderLogs();
+    })();
+  </script>
+</body>
+</html>

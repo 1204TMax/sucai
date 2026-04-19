@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>合成策略配置 - 低保真</title>
+  <style>
+    :root {
+      --ant-primary-1: #E6F4FF;
+      --ant-primary-2: #BAE0FF;
+      --ant-primary-3: #91CAFF;
+      --ant-primary-4: #69B1FF;
+      --ant-primary-5: #4096FF;
+      --ant-primary-6: #1677FF;
+      --ant-primary-7: #0958D9;
+
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+
+      --ant-bg-base: #F5F5F5;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h1: 38px;
+      --ant-font-size-h2: 30px;
+      --ant-font-size-h3: 24px;
+      --ant-font-size-h4: 20px;
+      --ant-font-size-h5: 16px;
+      --ant-font-size-lg: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+
+      --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --ant-box-shadow-secondary: 0 4px 16px rgba(0,0,0,0.12);
+      --ant-box-shadow-popup: 0 8px 24px rgba(0,0,0,0.15);
+      --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
+
+      --page-max-width: 1280px;
+      --control-height: 32px;
+      --control-height-lg: 40px;
+      --side-width: 320px;
+      --segment-nav-width: 220px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: var(--ant-size-lg);
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-family: var(--ant-font-family);
+      font-size: var(--ant-font-size);
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: var(--page-max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .card {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: var(--ant-box-shadow);
+      overflow: hidden;
+    }
+
+    .card-head {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    .card-body {
+      padding: var(--ant-size-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: var(--ant-font-size-h2);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .page-title p,
+    .muted {
+      margin: 0;
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .breadcrumb a {
+      color: var(--ant-text-color-secondary);
+      text-decoration: none;
+    }
+
+    .actions,
+    .inline-actions,
+    .summary-row,
+    .segment-actions,
+    .tag-row,
+    .log-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+    }
+
+    button,
+    .ghost-input {
+      height: var(--control-height);
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      border: 1px solid var(--ant-border-color);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+    }
+
+    button {
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+    }
+
+    button:hover {
+      border-color: var(--ant-primary-5);
+      color: var(--ant-primary-6);
+    }
+
+    .btn-primary {
+      background: var(--ant-primary-6);
+      color: var(--ant-text-color-inverse);
+      border-color: var(--ant-primary-6);
+    }
+
+    .btn-primary:hover {
+      background: var(--ant-primary-5);
+      border-color: var(--ant-primary-5);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .btn-large {
+      height: var(--control-height-lg);
+      border-radius: var(--ant-border-radius-lg);
+      font-size: var(--ant-font-size-lg);
+    }
+
+    .btn-danger {
+      border-color: var(--ant-error-2);
+      color: var(--ant-error-6);
+      background: var(--ant-error-1);
+    }
+
+    .btn-danger:hover {
+      border-color: var(--ant-error-6);
+      color: var(--ant-error-6);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: var(--ant-size);
+    }
+
+    .summary-item {
+      padding: var(--ant-size);
+      border: 1px dashed var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .summary-item .label {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+    }
+
+    .summary-item .value {
+      font-size: var(--ant-font-size-h5);
+      color: var(--ant-text-color);
+      font-weight: 600;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--side-width);
+      gap: var(--ant-size);
+      align-items: start;
+    }
+
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--ant-size);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      min-width: 0;
+    }
+
+    .field label {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color);
+      background: var(--ant-bg-container);
+      padding: var(--ant-size-xs) var(--ant-size);
+      outline: none;
+    }
+
+    input,
+    select {
+      height: var(--control-height);
+    }
+
+    textarea {
+      min-height: calc(var(--ant-size-xxl) + var(--ant-size-xxl));
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--ant-text-color-quaternary);
+    }
+
+    .tag {
+      height: calc(var(--ant-size) + var(--ant-size-xs));
+      padding: 0 var(--ant-size-xs);
+      border-radius: var(--ant-border-radius-sm);
+      font-size: var(--ant-font-size-sm);
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      background: var(--ant-bg-tertiary);
+      color: var(--ant-text-color-secondary);
+    }
+
+    .tag-primary {
+      background: var(--ant-primary-1);
+      border-color: var(--ant-primary-2);
+      color: var(--ant-primary-6);
+    }
+
+    .tag-success {
+      background: var(--ant-success-1);
+      border-color: var(--ant-success-2);
+      color: var(--ant-success-6);
+    }
+
+    .tag-warning {
+      background: var(--ant-warning-1);
+      border-color: var(--ant-warning-2);
+      color: var(--ant-warning-6);
+    }
+
+    .tag-error {
+      background: var(--ant-error-1);
+      border-color: var(--ant-error-2);
+      color: var(--ant-error-6);
+    }
+
+    .alert {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-radius: var(--ant-border-radius);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--ant-size);
+      border: 1px solid var(--ant-primary-2);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+    }
+
+    .segment-layout {
+      display: grid;
+      grid-template-columns: var(--segment-nav-width) minmax(0, 1fr);
+      gap: var(--ant-size);
+      align-items: start;
+    }
+
+    .segment-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .segment-tab {
+      min-height: var(--control-height-lg);
+      height: auto;
+      padding: var(--ant-size-sm);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xxs);
+      text-align: left;
+    }
+
+    .segment-tab.active {
+      background: var(--ant-primary-1);
+      border-color: var(--ant-primary-4);
+      color: var(--ant-primary-7);
+    }
+
+    .segment-tab strong {
+      font-size: var(--ant-font-size);
+      font-weight: 600;
+    }
+
+    .segment-tab span {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+    }
+
+    .segment-tab.active span {
+      color: var(--ant-primary-6);
+    }
+
+    .segment-editor {
+      border: 1px dashed var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      padding: var(--ant-size);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      background: var(--ant-bg-secondary);
+    }
+
+    .placeholder-box {
+      min-height: calc(var(--control-height) + var(--ant-size));
+      border: 1px dashed var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      padding: var(--ant-size);
+      background: var(--ant-bg-container);
+      display: flex;
+      align-items: center;
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .sample-list,
+    .log-list,
+    .result-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .sample-item,
+    .log-item,
+    .result-item {
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius);
+      padding: var(--ant-size);
+      background: var(--ant-bg-container);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--ant-size);
+    }
+
+    .sample-item strong,
+    .result-item strong {
+      display: block;
+      margin-bottom: var(--ant-size-xxs);
+      font-size: var(--ant-font-size);
+    }
+
+    .sample-item p,
+    .result-item p,
+    .log-item p {
+      margin: 0;
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      position: sticky;
+      top: var(--ant-size-lg);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--ant-bg-container);
+    }
+
+    th,
+    td {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      font-weight: 600;
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    tr:hover td {
+      background: var(--ant-bg-secondary);
+    }
+
+    .section-note {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1100px) {
+      .summary-grid,
+      .field-grid,
+      .main-layout,
+      .segment-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .side-stack {
+        position: static;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: var(--ant-size);
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="card">
+      <div class="card-body">
+        <div class="page-head">
+          <div class="page-title">
+            <div class="breadcrumb">
+              <a href="./03-合成策略管理-低保真.html">合成策略管理</a>
+              <span>/</span>
+              <span>策略配置</span>
+            </div>
+            <h1>合成策略配置（低保真）</h1>
+            <p>用于配置素材合成规则、查看命中预览、执行策略并跟踪最近生成结果。当前仅表达结构与核心交互。</p>
+          </div>
+          <div class="actions">
+            <button id="btnBack">返回管理页</button>
+            <button id="btnSave">保存草稿</button>
+            <button id="btnEnable">启用策略</button>
+            <button id="btnPreview" class="btn-primary">执行预览</button>
+          </div>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="label">当前策略状态</span>
+            <span class="value" id="summaryStatus">草稿</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">分段数量</span>
+            <span class="value" id="summarySegmentCount">3 段</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">预估命中素材</span>
+            <span class="value" id="summaryHitCount">36 条</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">最近执行结果</span>
+            <span class="value" id="summaryRunState">未执行</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-layout">
+      <div class="content-stack" style="display:flex; flex-direction:column; gap: var(--ant-size);">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2 style="margin:0; font-size: var(--ant-font-size-h4);">基础信息区</h2>
+              <p class="section-note">用于填写策略名称、说明、数量与适用范围。</p>
+            </div>
+            <div class="tag-row">
+              <span class="tag tag-primary">表单区</span>
+              <span class="tag">最少必要字段</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="field-grid">
+              <div class="field">
+                <label for="strategyName">策略名称</label>
+                <input id="strategyName" type="text" value="商品混剪策略 A" />
+              </div>
+              <div class="field">
+                <label for="strategyStatus">状态</label>
+                <select id="strategyStatus">
+                  <option value="草稿">草稿</option>
+                  <option value="启用">启用</option>
+                  <option value="停用">停用</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="generateCount">生成数量</label>
+                <input id="generateCount" type="text" value="20 条" />
+              </div>
+              <div class="field">
+                <label for="scopeType">适用范围</label>
+                <select id="scopeType">
+                  <option>默认项目范围</option>
+                  <option>渠道定向范围</option>
+                  <option>用户定向范围</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="strategyDesc">策略说明</label>
+              <textarea id="strategyDesc" placeholder="仅保留策略说明占位，不展开真实业务细节。">按分段匹配片头、正文、片尾素材；正文优先命中商品展示类内容，支持用户与渠道定向过滤。</textarea>
+            </div>
+            <div class="alert">
+              <div>提示</div>
+              <div>当前页面建议使用“独立配置页”承载复杂合成规则，不再使用小弹窗编辑整套策略。</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2 style="margin:0; font-size: var(--ant-font-size-h4);">分段规则区</h2>
+              <p class="section-note">左侧选择分段，右侧编辑当前段的最小必要规则。</p>
+            </div>
+            <div class="segment-actions">
+              <button id="btnAddSegment">新增分段</button>
+              <button id="btnDeleteSegment" class="btn-danger">删除当前段</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="segment-layout">
+              <div id="segmentNav" class="segment-nav"></div>
+              <div class="segment-editor">
+                <div class="field-grid">
+                  <div class="field">
+                    <label for="segmentName">分段名称</label>
+                    <input id="segmentName" type="text" />
+                  </div>
+                  <div class="field">
+                    <label for="segmentCount">分段数量</label>
+                    <input id="segmentCount" type="text" />
+                  </div>
+                  <div class="field">
+                    <label for="segmentType">内容类型</label>
+                    <select id="segmentType">
+                      <option>单选占位</option>
+                      <option>图片</option>
+                      <option>视频</option>
+                      <option>图文</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="fallbackRule">补位方式</label>
+                    <select id="fallbackRule">
+                      <option>默认回退素材池</option>
+                      <option>不补位，直接跳过</option>
+                      <option>回退到公共模板</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <label>内容特征</label>
+                  <div class="placeholder-box" id="featureBox">内容特征占位（多选）：仅表达这是一个多选条件区，不展开具体字段。</div>
+                </div>
+                <div class="field">
+                  <label>定向条件</label>
+                  <div class="placeholder-box" id="targetBox">定向条件占位：用户 / 渠道 等条件在这里配置。</div>
+                </div>
+                <div class="field">
+                  <label for="segmentNote">分段说明</label>
+                  <textarea id="segmentNote" placeholder="说明当前分段的策略意图"></textarea>
+                </div>
+                <div>
+                  <h3 style="margin:0 0 var(--ant-size-xs); font-size: var(--ant-font-size-h5);">当前段预览</h3>
+                  <div class="sample-list" id="sampleList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2 style="margin:0; font-size: var(--ant-font-size-h4);">生成结果区</h2>
+              <p class="section-note">展示最近一次或最近几次执行产生的结果记录。</p>
+            </div>
+            <div class="tag-row">
+              <span class="tag">列表展示</span>
+              <span class="tag tag-success">可追踪结果</span>
+            </div>
+          </div>
+          <div class="card-body" style="padding:0;">
+            <div style="overflow:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="min-width: 120px;">结果 ID</th>
+                    <th style="min-width: 160px;">生成时间</th>
+                    <th style="min-width: 120px;">状态</th>
+                    <th style="min-width: 220px;">结果说明</th>
+                    <th style="min-width: 160px;">关联策略</th>
+                  </tr>
+                </thead>
+                <tbody id="resultTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-body footer-bar">
+            <p class="muted" id="footerHint">当前为低保真配置页：重点表达“基础信息 + 分段规则 + 预览 + 执行结果”的页面结构。</p>
+            <div class="actions">
+              <button id="btnSaveBottom">保存草稿</button>
+              <button id="btnRunNow" class="btn-primary btn-large">执行策略</button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="side-stack">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2 style="margin:0; font-size: var(--ant-font-size-h5);">预览区</h2>
+              <p class="section-note">用于快速确认命中范围与结构完整性。</p>
+            </div>
+            <span class="tag tag-primary">右侧侧栏</span>
+          </div>
+          <div class="card-body">
+            <div class="result-list">
+              <div class="result-item">
+                <div>
+                  <strong>策略结构</strong>
+                  <p id="previewStructure">3 段：片头 / 正文 / 片尾</p>
+                </div>
+                <span class="tag">结构预览</span>
+              </div>
+              <div class="result-item">
+                <div>
+                  <strong>命中预估</strong>
+                  <p id="previewHit">预估命中 36 条素材，可生成 20 条结果。</p>
+                </div>
+                <span class="tag tag-success">通过</span>
+              </div>
+              <div class="result-item">
+                <div>
+                  <strong>风险提示</strong>
+                  <p id="previewRisk">正文段规则较多，建议先做预览再执行。</p>
+                </div>
+                <span class="tag tag-warning">提醒</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2 style="margin:0; font-size: var(--ant-font-size-h5);">最近执行记录</h2>
+              <p class="section-note">只保留最小必要日志。</p>
+            </div>
+            <div class="log-actions">
+              <button id="btnClearLogs">清空</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="log-list" id="logList"></div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      const state = {
+        status: '草稿',
+        activeSegmentId: 1,
+        segments: [
+          {
+            id: 1,
+            name: '片头段',
+            count: '1 段',
+            type: '视频',
+            fallback: '默认回退素材池',
+            featureText: '内容特征占位：品牌露出、强钩子、开场吸引。',
+            targetText: '定向条件占位：默认项目范围。',
+            note: '用于快速建立主题与品牌识别。',
+            samples: [
+              { title: '命中样例 A', meta: '开场镜头 / 品牌露出 / 近 7 天有消耗' },
+              { title: '命中样例 B', meta: '人物开场 / 高点击率封面 / 默认池' }
+            ]
+          },
+          {
+            id: 2,
+            name: '正文段',
+            count: '3 段',
+            type: '视频',
+            fallback: '回退到公共模板',
+            featureText: '内容特征占位：商品展示、利益点表达、使用场景。',
+            targetText: '定向条件占位：渠道 = 巨量；用户 = 新客。',
+            note: '正文段承接主要卖点，是当前命中规模的核心来源。',
+            samples: [
+              { title: '命中样例 C', meta: '产品展示 / 利益点 / 巨量渠道' },
+              { title: '命中样例 D', meta: '场景化镜头 / 新客定向 / 商品说明' },
+              { title: '命中样例 E', meta: '对比镜头 / 高转化标签 / 近 30 天优质' }
+            ]
+          },
+          {
+            id: 3,
+            name: '片尾段',
+            count: '1 段',
+            type: '图文',
+            fallback: '不补位，直接跳过',
+            featureText: '内容特征占位：收口、行动召唤、统一片尾。',
+            targetText: '定向条件占位：公共可复用片尾。',
+            note: '用于统一片尾规范与转化指令。',
+            samples: [
+              { title: '命中样例 F', meta: '统一片尾 / CTA / 品牌口号' }
+            ]
+          }
+        ],
+        logs: [
+          '[2026-04-16 10:00] 策略已创建，状态为草稿。',
+          '[2026-04-16 10:08] 已补充分段规则，等待预览。'
+        ],
+        results: [
+          { id: 'R-20260416-001', time: '2026-04-16 09:40', status: '预览完成', desc: '预览命中 36 条素材，可生成 20 条结果。', strategy: '商品混剪策略 A' },
+          { id: 'R-20260415-012', time: '2026-04-15 18:20', status: '执行成功', desc: '已生成 18 条结果，片尾段命中不足 2 条。', strategy: '商品混剪策略 A' }
+        ]
+      };
+
+      const el = {
+        strategyStatus: document.getElementById('strategyStatus'),
+        segmentNav: document.getElementById('segmentNav'),
+        segmentName: document.getElementById('segmentName'),
+        segmentCount: document.getElementById('segmentCount'),
+        segmentType: document.getElementById('segmentType'),
+        fallbackRule: document.getElementById('fallbackRule'),
+        featureBox: document.getElementById('featureBox'),
+        targetBox: document.getElementById('targetBox'),
+        segmentNote: document.getElementById('segmentNote'),
+        sampleList: document.getElementById('sampleList'),
+        resultTableBody: document.getElementById('resultTableBody'),
+        logList: document.getElementById('logList'),
+        summaryStatus: document.getElementById('summaryStatus'),
+        summarySegmentCount: document.getElementById('summarySegmentCount'),
+        summaryHitCount: document.getElementById('summaryHitCount'),
+        summaryRunState: document.getElementById('summaryRunState'),
+        previewStructure: document.getElementById('previewStructure'),
+        previewHit: document.getElementById('previewHit'),
+        previewRisk: document.getElementById('previewRisk'),
+        footerHint: document.getElementById('footerHint'),
+        btnBack: document.getElementById('btnBack'),
+        btnSave: document.getElementById('btnSave'),
+        btnSaveBottom: document.getElementById('btnSaveBottom'),
+        btnEnable: document.getElementById('btnEnable'),
+        btnPreview: document.getElementById('btnPreview'),
+        btnRunNow: document.getElementById('btnRunNow'),
+        btnAddSegment: document.getElementById('btnAddSegment'),
+        btnDeleteSegment: document.getElementById('btnDeleteSegment'),
+        btnClearLogs: document.getElementById('btnClearLogs')
+      };
+
+      function getActiveSegment() {
+        return state.segments.find(function (item) {
+          return item.id === state.activeSegmentId;
+        });
+      }
+
+      function syncSummary() {
+        el.summaryStatus.textContent = state.status;
+        el.summarySegmentCount.textContent = state.segments.length + ' 段';
+        el.previewStructure.textContent = state.segments.map(function (item) {
+          return item.name;
+        }).join(' / ');
+      }
+
+      function renderSegmentNav() {
+        el.segmentNav.innerHTML = state.segments.map(function (item, index) {
+          const activeClass = item.id === state.activeSegmentId ? 'segment-tab active' : 'segment-tab';
+          return '<button class="' + activeClass + '" data-id="' + item.id + '">' +
+            '<strong>第 ' + (index + 1) + ' 段 · ' + item.name + '</strong>' +
+            '<span>' + item.count + ' / ' + item.type + '</span>' +
+          '</button>';
+        }).join('');
+      }
+
+      function renderSegmentDetail() {
+        const segment = getActiveSegment();
+        if (!segment) {
+          return;
+        }
+        el.segmentName.value = segment.name;
+        el.segmentCount.value = segment.count;
+        el.segmentType.value = segment.type;
+        el.fallbackRule.value = segment.fallback;
+        el.featureBox.textContent = segment.featureText;
+        el.targetBox.textContent = segment.targetText;
+        el.segmentNote.value = segment.note;
+        el.sampleList.innerHTML = segment.samples.map(function (sample) {
+          return '<div class="sample-item"><div><strong>' + sample.title + '</strong><p>' + sample.meta + '</p></div><span class="tag">样例</span></div>';
+        }).join('');
+      }
+
+      function renderLogs() {
+        el.logList.innerHTML = state.logs.length
+          ? state.logs.map(function (line, index) {
+              const tagClass = index === 0 ? 'tag tag-primary' : 'tag';
+              return '<div class="log-item"><div><p>' + line + '</p></div><span class="' + tagClass + '">日志</span></div>';
+            }).join('')
+          : '<div class="placeholder-box">暂无执行记录。</div>';
+      }
+
+      function getStatusTag(status) {
+        if (status.indexOf('成功') > -1) return 'tag tag-success';
+        if (status.indexOf('预览') > -1) return 'tag tag-primary';
+        if (status.indexOf('失败') > -1) return 'tag tag-error';
+        return 'tag tag-warning';
+      }
+
+      function renderResults() {
+        el.resultTableBody.innerHTML = state.results.map(function (item) {
+          return '<tr>' +
+            '<td>' + item.id + '</td>' +
+            '<td>' + item.time + '</td>' +
+            '<td><span class="' + getStatusTag(item.status) + '">' + item.status + '</span></td>' +
+            '<td>' + item.desc + '</td>' +
+            '<td>' + item.strategy + '</td>' +
+          '</tr>';
+        }).join('');
+      }
+
+      function persistCurrentSegment() {
+        const segment = getActiveSegment();
+        if (!segment) return;
+        segment.name = el.segmentName.value.trim() || segment.name;
+        segment.count = el.segmentCount.value.trim() || segment.count;
+        segment.type = el.segmentType.value;
+        segment.fallback = el.fallbackRule.value;
+        segment.note = el.segmentNote.value.trim() || segment.note;
+      }
+
+      function addLog(text) {
+        state.logs.unshift(text);
+        renderLogs();
+      }
+
+      function renderAll() {
+        syncSummary();
+        renderSegmentNav();
+        renderSegmentDetail();
+        renderLogs();
+        renderResults();
+      }
+
+      el.segmentNav.addEventListener('click', function (event) {
+        const target = event.target.closest('button[data-id]');
+        if (!target) return;
+        persistCurrentSegment();
+        state.activeSegmentId = Number(target.getAttribute('data-id'));
+        renderAll();
+      });
+
+      el.btnAddSegment.addEventListener('click', function () {
+        persistCurrentSegment();
+        const nextId = state.segments.length ? state.segments[state.segments.length - 1].id + 1 : 1;
+        state.segments.push({
+          id: nextId,
+          name: '新增分段',
+          count: '1 段',
+          type: '视频',
+          fallback: '默认回退素材池',
+          featureText: '内容特征占位：新分段待配置。',
+          targetText: '定向条件占位：新分段待配置。',
+          note: '请补充分段规则。',
+          samples: [
+            { title: '待配置样例', meta: '新增分段后，在这里查看命中示例。' }
+          ]
+        });
+        state.activeSegmentId = nextId;
+        addLog('[2026-04-16 10:12] 已新增一个分段，等待配置。');
+        renderAll();
+      });
+
+      el.btnDeleteSegment.addEventListener('click', function () {
+        if (state.segments.length <= 1) {
+          addLog('[2026-04-16 10:13] 至少保留一个分段，无法继续删除。');
+          return;
+        }
+        state.segments = state.segments.filter(function (item) {
+          return item.id !== state.activeSegmentId;
+        });
+        state.activeSegmentId = state.segments[0].id;
+        addLog('[2026-04-16 10:14] 已删除当前分段。');
+        renderAll();
+      });
+
+      el.btnSave.addEventListener('click', saveDraft);
+      el.btnSaveBottom.addEventListener('click', saveDraft);
+
+      function saveDraft() {
+        persistCurrentSegment();
+        state.status = el.strategyStatus.value;
+        el.footerHint.textContent = '草稿已保存：当前页面仅模拟保存反馈，用于验证页面结构与交互。';
+        addLog('[2026-04-16 10:16] 已保存草稿。');
+        renderAll();
+      }
+
+      el.btnEnable.addEventListener('click', function () {
+        el.strategyStatus.value = '启用';
+        state.status = '启用';
+        el.summaryRunState.textContent = '待执行';
+        addLog('[2026-04-16 10:18] 策略已切换为启用状态。');
+        renderAll();
+      });
+
+      el.btnPreview.addEventListener('click', function () {
+        persistCurrentSegment();
+        const hitCount = state.segments.length * 12;
+        el.summaryHitCount.textContent = hitCount + ' 条';
+        el.previewHit.textContent = '预估命中 ' + hitCount + ' 条素材，可生成 20 条结果。';
+        el.previewRisk.textContent = state.segments.length > 3
+          ? '当前分段较多，建议优先检查新增分段的命中情况。'
+          : '当前分段结构完整，可继续执行策略。';
+        el.summaryRunState.textContent = '预览完成';
+        state.results.unshift({
+          id: 'R-20260416-00' + (state.results.length + 1),
+          time: '2026-04-16 10:20',
+          status: '预览完成',
+          desc: '最新预览已完成，命中 ' + hitCount + ' 条素材。',
+          strategy: document.getElementById('strategyName').value || '当前策略'
+        });
+        addLog('[2026-04-16 10:20] 已执行预览并更新命中结果。');
+        renderAll();
+      });
+
+      el.btnRunNow.addEventListener('click', function () {
+        persistCurrentSegment();
+        el.summaryRunState.textContent = '执行成功';
+        state.results.unshift({
+          id: 'R-20260416-00' + (state.results.length + 1),
+          time: '2026-04-16 10:22',
+          status: '执行成功',
+          desc: '已按当前配置生成 20 条结果。',
+          strategy: document.getElementById('strategyName').value || '当前策略'
+        });
+        addLog('[2026-04-16 10:22] 已执行策略，结果生成成功。');
+        renderAll();
+      });
+
+      el.btnClearLogs.addEventListener('click', function () {
+        state.logs = [];
+        renderLogs();
+      });
+
+      el.strategyStatus.addEventListener('change', function () {
+        state.status = el.strategyStatus.value;
+        renderAll();
+      });
+
+      el.btnBack.addEventListener('click', function () {
+        window.location.href = './03-合成策略管理-低保真.html';
+      });
+
+      renderAll();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TopTou 素材库</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* ── 主色（Blue） ── */
+            --primary-1:  #E8F4FF;
+            --primary-2:  #C4E2FF;
+            --primary-3:  #96C8FF;
+            --primary-4:  #6DAFFF;
+            --primary-5:  #5AA4FF;
+            --primary-6:  #4A9EFF;
+            --primary-7:  #3580DB;
+
+            /* ── 灰阶 ── */
+            --gray-1:  #FCFCFD;
+            --gray-2:  #F8F9FA;
+            --gray-3:  #F1F3F5;
+            --gray-4:  #E9ECEF;
+            --gray-5:  #DEE2E6;
+            --gray-6:  #CED4DA;
+            --gray-7:  #ADB5BD;
+            --gray-8:  #868E96;
+            --gray-9:  #6C757D;
+            --gray-10: #5A6169;
+            --gray-11: #495057;
+            --gray-12: #212529;
+
+            /* ── 语义映射 ── */
+            --primary: var(--primary-6);
+            --primary-hover: var(--primary-5);
+            --primary-light: var(--primary-1);
+            --bg-dark: var(--gray-12);
+            --bg-dark-hover: var(--gray-11);
+            --bg-light: var(--gray-2);
+            --border: var(--gray-4);
+            --text-main: var(--gray-12);
+            --text-regular: var(--gray-11);
+            --text-muted: var(--gray-9);
+            --white: #ffffff;
+            --danger: #E5484D;
+            --warning: #FF9500;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--text-main);
+            padding: 20px;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #c0c4cc;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* ================= 左侧导航栏 ================= */
+        .sidebar {
+            width: 240px;
+            background-color: var(--bg-dark);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            overflow-y: auto;
+            color: #aeb9c2;
+            transition: width 0.3s;
+        }
+
+        .logo-area {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--white);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+
+        .logo-area i {
+            color: var(--primary);
+            margin-right: 12px;
+            font-size: 24px;
+        }
+
+        .menu-group {
+            padding: 20px 20px 8px 20px;
+            font-size: 12px;
+            color: #6a7682;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: #aeb9c2;
+            font-size: 14px;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item i.icon-left {
+            width: 24px;
+            font-size: 16px;
+            margin-right: 8px;
+            text-align: center;
+        }
+
+        .menu-item:hover {
+            background-color: var(--bg-dark-hover);
+            color: var(--white);
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        /* ================= 主体区域 ================= */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* ================= 顶部栏 ================= */
+        .header {
+            height: 60px;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            flex-shrink: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            outline: none;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 2px 6px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            border-color: #dcdfe6;
+            color: var(--text-regular);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        /* ================= 内容区 ================= */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        /* 操作面板（顶部） */
+        .top-ops-panel {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 0 20px 20px 20px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab-item {
+            padding: 16px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: var(--text-regular);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: -1px;
+        }
+
+        .tab-item:hover {
+            color: var(--primary);
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .form-control {
+            height: 36px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select.form-control {
+            width: 160px;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        input.form-control {
+            width: 280px;
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0px;
+        }
+
+        .action-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--text-regular);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        /* 底部主布局 (左树右网格) */
+        .main-layout {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        /* 左侧分类树 */
+        .sidebar-tree {
+            width: 220px;
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tree-header {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tree-node {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--text-regular);
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+            margin-bottom: 2px;
+        }
+
+        .tree-node i.caret {
+            margin-right: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            width: 12px;
+            text-align: center;
+        }
+
+        .tree-node:hover:not(.active) {
+            background-color: var(--bg-light);
+        }
+
+        .tree-node.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tree-node.active i.caret {
+            color: var(--primary);
+        }
+
+        .tree-children {
+            padding-left: 24px;
+        }
+
+        /* 右侧素材网格 */
+        .grid-panel {
+            flex: 1;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .grid-toolbar {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #fafbfc;
+        }
+
+        .breadcrumb {
+            font-size: 14px;
+            color: var(--text-regular);
+        }
+
+        .grid-options {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .view-switch {
+            display: flex;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .view-switch-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            outline: none;
+        }
+        .view-switch-btn.active {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        .view-switch-btn:first-child {
+            border-right: 1px solid #dcdfe6;
+        }
+
+        .card-container {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            align-content: start;
+        }
+
+        /* 素材卡片 */
+        .asset-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--white);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .asset-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: rgba(74, 158, 255, 0.5);
+        }
+
+        .card-preview {
+            position: relative;
+            height: 150px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .card-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .asset-card:hover .card-preview img {
+            transform: scale(1.05);
+        }
+
+        .preview-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px 8px 6px;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            color: var(--white);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .status-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            border: 2px solid var(--white);
+            z-index: 2;
+        }
+        .status-dot.error {
+            background-color: var(--danger);
+        }
+
+        .card-info {
+            padding: 14px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-tags {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 11px;
+            color: var(--text-regular);
+            background-color: var(--bg-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .card-actions {
+            margin-top: auto;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .asset-card:hover .card-actions {
+            opacity: 1;
+        }
+
+        .action-item {
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 15px;
+            transition: color 0.2s;
+        }
+
+        .action-item:hover {
+            color: var(--primary);
+        }
+
+        .action-item.danger:hover {
+            color: var(--danger);
+        }
+
+        /* 分页 */
+        .pagination {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
+            background-color: #fafbfc;
+        }
+
+        .page-info {
+            font-size: 13px;
+            color: var(--text-regular);
+        }
+
+        .page-ctrls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border: 1px solid #dcdfe6;
+            background: var(--white);
+            border-radius: 4px;
+            color: var(--text-regular);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .page-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        .page-btn:disabled {
+            background-color: var(--bg-light);
+            color: #c0c4cc;
+            cursor: not-allowed;
+            border-color: #ebeef5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 内容包裹区 -->
+    <div class="content-wrapper">
+            
+            <!-- 顶部操作区 -->
+            <div class="top-ops-panel">
+                <div class="tabs">
+                    <div class="tab-item active">素材管理</div>
+                    <div class="tab-item">帖子管理</div>
+                    <div class="tab-item">商品管理</div>
+                    <div class="tab-item">设计工具</div>
+                    <div class="tab-item">素材模板</div>
+                    <div class="tab-item">设计师信息</div>
+                </div>
+
+                <div class="filter-row">
+                    <select class="form-control">
+                        <option>字段搜索条件</option>
+                        <option>素材名称</option>
+                        <option>素材ID</option>
+                    </select>
+                    <input type="text" class="form-control" placeholder="请输入素材名称">
+                    <button class="btn btn-primary">查询</button>
+                    <button class="btn btn-outline">清空</button>
+                </div>
+
+                <div class="action-row">
+                    <div class="action-left">
+                        <button class="btn btn-primary">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> 上传素材 <i class="fa-solid fa-chevron-down" style="margin-left: 4px; font-size: 12px;"></i>
+                        </button>
+                        <button class="btn btn-outline">同步素材库</button>
+                    </div>
+                    <div class="action-right">
+                        <button class="icon-btn" title="新建文件夹"><i class="fa-solid fa-folder-plus"></i></button>
+                        <button class="icon-btn" title="上传素材到库"><i class="fa-solid fa-upload"></i></button>
+                        <button class="icon-btn" title="删除"><i class="fa-regular fa-trash-can"></i></button>
+                        <button class="icon-btn" title="全选"><i class="fa-solid fa-check-double"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下方布局：左树 + 右网格 -->
+            <div class="main-layout">
+                
+                <!-- 左侧筛选面板 -->
+                <div class="sidebar-tree">
+                    <div class="tree-header">素材分类</div>
+                    
+                    <div class="tree-node"><i class="fa-solid fa-caret-right caret"></i> 我的素材</div>
+                    <div class="tree-node"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> 测试</div>
+                    <div class="tree-node"><i class="fa-solid fa-caret-right caret"></i> 我的收藏</div>
+                    <div class="tree-node"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> 默认收藏夹</div>
+                    
+                    <div class="tree-node active"><i class="fa-solid fa-caret-down caret"></i> 素材库</div>
+                    <div class="tree-children">
+                        <div class="tree-node"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 123</div>
+                        <div class="tree-node"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 未分组素材</div>
+                        <div class="tree-node"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 测试</div>
+                    </div>
+                </div>
+
+                <!-- 右侧素材展示区 -->
+                <div class="grid-panel">
+                    
+                    <!-- 顶部控制栏 -->
+                    <div class="grid-toolbar">
+                        <div class="breadcrumb">全部素材 / 素材库 / 未分组素材</div>
+                        <div class="grid-options">
+                            <select class="form-control" style="width: auto; height: 32px;">
+                                <option>按创建时间从新到旧</option>
+                                <option>按创建时间从旧到新</option>
+                                <option>按名称 A-Z</option>
+                            </select>
+                            <div class="view-switch">
+                                <button class="view-switch-btn"><i class="fa-solid fa-list"></i></button>
+                                <button class="view-switch-btn active"><i class="fa-solid fa-border-all"></i></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 素材卡片列表 -->
+                    <div class="card-container">
+                        <!-- 卡片 1 (视频) -->
+                        <div class="asset-card">
+                            <div class="status-dot"></div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-solid fa-video" style="margin-right: 4px; font-size: 10px;"></i> 00:41</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1080×1920</span>
+                                        <span>53.4MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Summer_Campaign_Video_v1_final.mp4">Summer_Campaign_Video_v1_final.mp4</div>
+                                <div class="card-tags">
+                                    <span class="tag">mp4</span>
+                                    <span class="tag">ID: 89321</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-regular fa-eye action-item" title="预览"></i>
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑"></i>
+                                    <i class="fa-regular fa-trash-can action-item danger" title="删除"></i>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-ellipsis action-item" title="更多"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 2 (图片) -->
+                        <div class="asset-card">
+                            <div class="status-dot error"></div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-regular fa-image" style="margin-right: 4px; font-size: 10px;"></i> 图片</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">800×800</span>
+                                        <span>1.2MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Product_Showcase_Main.png">Product_Showcase_Main.png</div>
+                                <div class="card-tags">
+                                    <span class="tag">png</span>
+                                    <span class="tag">ID: 89322</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-regular fa-eye action-item" title="预览"></i>
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑"></i>
+                                    <i class="fa-regular fa-trash-can action-item danger" title="删除"></i>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-ellipsis action-item" title="更多"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 3 -->
+                        <div class="asset-card">
+                            <div class="status-dot"></div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1528297506728-9533d2ac3fa4?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-solid fa-video" style="margin-right: 4px; font-size: 10px;"></i> 00:15</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1080×1080</span>
+                                        <span>12.8MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Holiday_Sale_Ad_Square.mp4">Holiday_Sale_Ad_Square.mp4</div>
+                                <div class="card-tags">
+                                    <span class="tag">mp4</span>
+                                    <span class="tag">ID: 89323</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-regular fa-eye action-item" title="预览"></i>
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑"></i>
+                                    <i class="fa-regular fa-trash-can action-item danger" title="删除"></i>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-ellipsis action-item" title="更多"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 4 -->
+                        <div class="asset-card">
+                            <div class="status-dot"></div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-regular fa-image" style="margin-right: 4px; font-size: 10px;"></i> 图片</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1200×628</span>
+                                        <span>2.5MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Facebook_Newsfeed_Banner_v2.jpg">Facebook_Newsfeed_Banner_v2.jpg</div>
+                                <div class="card-tags">
+                                    <span class="tag">jpg</span>
+                                    <span class="tag">ID: 89324</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-regular fa-eye action-item" title="预览"></i>
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑"></i>
+                                    <i class="fa-regular fa-trash-can action-item danger" title="删除"></i>
+                                    <i class="fa-solid fa-star action-item" style="color:#e6a23c" title="收藏"></i>
+                                    <i class="fa-solid fa-ellipsis action-item" title="更多"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                         <!-- 卡片 5 -->
+                         <div class="asset-card">
+                            <div class="status-dot"></div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-regular fa-image" style="margin-right: 4px; font-size: 10px;"></i> 图片</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1080×1920</span>
+                                        <span>3.1MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Instagram_Story_Promo.png">Instagram_Story_Promo.png</div>
+                                <div class="card-tags">
+                                    <span class="tag">png</span>
+                                    <span class="tag">ID: 89325</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-regular fa-eye action-item" title="预览"></i>
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑"></i>
+                                    <i class="fa-regular fa-trash-can action-item danger" title="删除"></i>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-ellipsis action-item" title="更多"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 分页区 -->
+                    <div class="pagination">
+                        <select class="form-control" style="width: auto; height: 30px; font-size: 13px;">
+                            <option>30条/页</option>
+                            <option>50条/页</option>
+                            <option>100条/页</option>
+                        </select>
+                        <span class="page-info">共 142 条</span>
+                        <div class="page-ctrls">
+                            <button class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <span style="color: var(--text-muted); margin: 0 4px;">...</span>
+                            <button class="page-btn">5</button>
+                            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+</body>
+</html>

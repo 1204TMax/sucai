@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上传素材 - 量化投放系统</title>
+  <style>
+    :root {
+      --ant-primary-1: #E6F4FF;
+      --ant-primary-2: #BAE0FF;
+      --ant-primary-3: #91CAFF;
+      --ant-primary-4: #69B1FF;
+      --ant-primary-5: #4096FF;
+      --ant-primary-6: #1677FF;
+      --ant-primary-7: #0958D9;
+
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+
+      --ant-bg-base: #F5F5F5;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h1: 38px;
+      --ant-font-size-h2: 30px;
+      --ant-font-size-h3: 24px;
+      --ant-font-size-h4: 20px;
+      --ant-font-size-h5: 16px;
+      --ant-font-size-lg: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+
+      --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --ant-box-shadow-secondary: 0 4px 16px rgba(0,0,0,0.12);
+      --ant-box-shadow-popup: 0 8px 24px rgba(0,0,0,0.15);
+      --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
+
+      --cc-page-bg: var(--ant-bg-base);
+      --cc-upload-height: calc(var(--ant-size-xxl) + var(--ant-size-xxl) + var(--ant-size-xxl) + var(--ant-size-xxl) + var(--ant-size-xxl) + var(--ant-size-xxl) + var(--ant-size-xxl) + var(--ant-size-lg));
+      --cc-drawer-width: 46vw;
+      --cc-overlay-hidden: 0;
+      --cc-overlay-visible: 1;
+      --cc-panel-hidden: translateX(100%);
+      --cc-panel-visible: translateX(0);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: var(--ant-size-md);
+      background: var(--cc-page-bg);
+      font-family: var(--ant-font-family);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+    }
+
+    button,
+    input,
+    select {
+      font-family: inherit;
+    }
+
+    button {
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    .cc-dropzone:focus-visible,
+    .cc-radio-card:focus-visible {
+      outline: 2px solid var(--ant-primary-6);
+      outline-offset: 1px;
+    }
+
+    .cc-page {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-lg);
+      min-height: calc(100vh - var(--ant-size-xl));
+    }
+
+    .cc-demo-hero {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-xl);
+      box-shadow: var(--ant-box-shadow);
+      padding: var(--ant-size-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size-lg);
+    }
+
+    .cc-demo-hero-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      max-width: 640px;
+    }
+
+    .cc-demo-title {
+      margin: 0;
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.4;
+    }
+
+    .cc-demo-desc {
+      margin: 0;
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color-secondary);
+      line-height: 1.6;
+    }
+
+    .cc-demo-open-button,
+    .cc-button-primary,
+    .cc-button-default,
+    .cc-button-link,
+    .cc-close-button,
+    .cc-modal-close-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xs);
+      transition: all 0.2s ease;
+    }
+
+    .cc-demo-open-button,
+    .cc-button-primary,
+    .cc-button-default {
+      min-height: 40px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      font-size: var(--ant-font-size);
+      font-weight: 500;
+    }
+
+    .cc-demo-open-button,
+    .cc-button-primary {
+      background: var(--ant-success-6);
+      color: var(--ant-text-color-inverse);
+      box-shadow: none;
+    }
+
+    .cc-demo-open-button:hover,
+    .cc-button-primary:hover {
+      filter: brightness(0.96);
+    }
+
+    .cc-button-default {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color);
+      color: var(--ant-text-color);
+    }
+
+    .cc-button-default:hover {
+      border-color: var(--ant-primary-6);
+      color: var(--ant-primary-6);
+    }
+
+    .cc-button-link {
+      padding: 0;
+      color: var(--ant-success-6);
+      font-size: var(--ant-font-size);
+      font-weight: 500;
+    }
+
+    .cc-button-link:hover {
+      color: var(--ant-success-6);
+      text-decoration: underline;
+    }
+
+    .cc-demo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--ant-size);
+      flex: 1;
+    }
+
+    .cc-demo-card {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: var(--ant-box-shadow);
+      padding: var(--ant-size-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      min-height: 220px;
+    }
+
+    .cc-demo-card-title {
+      margin: 0;
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .cc-demo-card-line,
+    .cc-demo-card-chip {
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-secondary);
+    }
+
+    .cc-demo-card-line {
+      height: var(--ant-size);
+      width: 100%;
+    }
+
+    .cc-demo-card-line.cc-short {
+      width: 58%;
+    }
+
+    .cc-demo-chip-row {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+    }
+
+    .cc-demo-card-chip {
+      height: 32px;
+      width: 84px;
+    }
+
+    .cc-drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      opacity: var(--cc-overlay-hidden);
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 1000;
+    }
+
+    .cc-drawer-overlay.is-open {
+      opacity: var(--cc-overlay-visible);
+      pointer-events: auto;
+    }
+
+    .cc-drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: var(--cc-drawer-width);
+      max-width: calc(100vw - var(--ant-size));
+      height: 100vh;
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow-popup);
+      transform: var(--cc-panel-hidden);
+      transition: transform 0.24s ease;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cc-drawer-panel.is-open {
+      transform: var(--cc-panel-visible);
+    }
+
+    .cc-drawer-header {
+      padding: var(--ant-size-md) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      background: var(--ant-bg-container);
+    }
+
+    .cc-drawer-title {
+      margin: 0;
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .cc-close-button,
+    .cc-modal-close-button {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--ant-border-radius);
+      color: var(--ant-text-color-tertiary);
+    }
+
+    .cc-close-button:hover,
+    .cc-modal-close-button:hover {
+      background: var(--ant-bg-secondary);
+      color: var(--ant-text-color);
+    }
+
+    .cc-close-icon {
+      width: 16px;
+      height: 16px;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cc-close-icon::before,
+    .cc-close-icon::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 2px;
+      border-radius: var(--ant-border-radius-xs);
+      background: currentColor;
+    }
+
+    .cc-close-icon::before {
+      transform: rotate(45deg);
+    }
+
+    .cc-close-icon::after {
+      transform: rotate(-45deg);
+    }
+
+    .cc-drawer-body {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    .cc-drawer-layout {
+      display: flex;
+      align-items: stretch;
+      min-height: 100%;
+    }
+
+    .cc-left-pane,
+    .cc-right-pane {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-lg);
+      padding: var(--ant-size-lg);
+    }
+
+    .cc-left-pane {
+      flex: 0 0 60%;
+      background: var(--ant-bg-container);
+    }
+
+    .cc-right-pane {
+      flex: 0 0 40%;
+      background: var(--ant-bg-secondary);
+      border-left: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .cc-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .cc-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+    }
+
+    .cc-section-title {
+      margin: 0;
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+    }
+
+    .cc-required-mark {
+      color: var(--ant-error-6);
+      font-size: var(--ant-font-size);
+      line-height: 1;
+    }
+
+    .cc-folder-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-success-1);
+      border: 1px solid var(--ant-success-2);
+      color: var(--ant-text-color);
+      width: fit-content;
+    }
+
+    .cc-dropzone {
+      min-height: var(--cc-upload-height);
+      border: 1px dashed var(--ant-border-color);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-secondary);
+      padding: var(--ant-size-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .cc-dropzone:hover,
+    .cc-dropzone.is-dragover {
+      border-color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .cc-dropzone-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--ant-size);
+      text-align: center;
+    }
+
+    .cc-upload-icon-wrap {
+      width: var(--ant-size-xxl);
+      height: var(--ant-size-xxl);
+      border-radius: var(--ant-border-radius-xl);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cc-upload-main-text {
+      margin: 0;
+      font-size: var(--ant-font-size-lg);
+      font-weight: 500;
+      color: var(--ant-text-color);
+    }
+
+    .cc-upload-meta-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .cc-upload-hint {
+      margin: 0;
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.6;
+    }
+
+    .cc-file-input {
+      display: none;
+    }
+
+    .cc-file-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .cc-file-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      padding: var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-container);
+    }
+
+    .cc-file-main {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size);
+      min-width: 0;
+      flex: 1;
+    }
+
+    .cc-file-preview {
+      width: 96px;
+      height: 64px;
+      border-radius: var(--ant-border-radius);
+      overflow: hidden;
+      background: var(--ant-bg-secondary);
+      border: 1px solid var(--ant-border-color-secondary);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cc-file-preview img,
+    .cc-file-preview video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: var(--ant-bg-container);
+    }
+
+    .cc-file-preview-fallback {
+      padding: 0 var(--ant-size-xs);
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    .cc-file-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xxs);
+      min-width: 0;
+      flex: 1;
+    }
+
+    .cc-file-name {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 280px;
+    }
+
+    .cc-file-size {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .cc-file-remove {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      padding: 0;
+      min-height: auto;
+      flex-shrink: 0;
+    }
+
+    .cc-file-remove:hover {
+      color: var(--ant-error-6);
+    }
+
+    .cc-inline-alert {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-radius: var(--ant-border-radius);
+      border: 1px solid var(--ant-error-2);
+      background: var(--ant-error-1);
+      color: var(--ant-error-6);
+      font-size: var(--ant-font-size-sm);
+      line-height: 1.6;
+    }
+
+    .cc-config-title {
+      margin: 0;
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .cc-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .cc-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .cc-field-label,
+    .cc-field-head-label,
+    .cc-audit-row-label {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      font-weight: 500;
+    }
+
+    .cc-field-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+    }
+
+    .cc-select {
+      min-height: 40px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      border: 1px solid var(--ant-border-color);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      appearance: none;
+      background-image: linear-gradient(45deg, transparent 50%, var(--ant-text-color-tertiary) 50%), linear-gradient(135deg, var(--ant-text-color-tertiary) 50%, transparent 50%);
+      background-position: calc(100% - var(--ant-size)) calc(50% - 2px), calc(100% - var(--ant-size-xs)) calc(50% - 2px);
+      background-size: var(--ant-size-xs) var(--ant-size-xs), var(--ant-size-xs) var(--ant-size-xs);
+      background-repeat: no-repeat;
+    }
+
+    .cc-select:hover,
+    .cc-select:focus-visible,
+    .cc-text-input:hover,
+    .cc-text-input:focus-visible {
+      border-color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .cc-select-placeholder {
+      color: var(--ant-text-color-quaternary);
+    }
+
+    .cc-audit-card {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      padding: var(--ant-size-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .cc-audit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      padding-top: var(--ant-size);
+      border-top: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .cc-helper-copy {
+      margin: 0;
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      line-height: 1.6;
+    }
+
+    .cc-switch {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 9999px;
+      background: var(--ant-border-color);
+      flex-shrink: 0;
+    }
+
+    .cc-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .cc-switch-input {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .cc-switch-input:checked + .cc-switch-track {
+      background: var(--ant-success-6);
+    }
+
+    .cc-switch-input:checked + .cc-switch-track::after {
+      transform: translateX(20px);
+    }
+
+    .cc-switch-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 9999px;
+      background: var(--ant-border-color);
+      transition: background 0.2s ease;
+    }
+
+    .cc-switch-track::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow);
+      transition: transform 0.2s ease;
+    }
+
+    .cc-drawer-footer {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-top: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-container);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--ant-size);
+    }
+
+    .cc-modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.45);
+      opacity: var(--cc-overlay-hidden);
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 1100;
+      padding: var(--ant-size-lg);
+    }
+
+    .cc-modal-overlay.is-open {
+      opacity: var(--cc-overlay-visible);
+      pointer-events: auto;
+    }
+
+    .cc-modal {
+      width: 560px;
+      max-width: 100%;
+      border-radius: var(--ant-border-radius-xl);
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow-popup);
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - var(--ant-size-xxl));
+    }
+
+    .cc-modal-header {
+      padding: var(--ant-size-md) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+    }
+
+    .cc-modal-title {
+      margin: 0;
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .cc-modal-body {
+      padding: var(--ant-size-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      overflow: auto;
+    }
+
+    .cc-modal-footer {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-top: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--ant-size);
+      background: var(--ant-bg-container);
+    }
+
+    .cc-folder-radio-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .cc-radio-card {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--ant-size);
+      width: 100%;
+      padding: var(--ant-size);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .cc-radio-card:hover {
+      border-color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+    }
+
+    .cc-radio-input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: var(--ant-primary-6);
+      flex-shrink: 0;
+    }
+
+    .cc-radio-meta {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xxs);
+    }
+
+    .cc-radio-title {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      font-weight: 500;
+    }
+
+    .cc-radio-desc,
+    .cc-product-modal-copy {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .cc-text-input {
+      min-height: 40px;
+      padding: 0 var(--ant-size);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+    }
+
+    .cc-hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 1280px) {
+      .cc-demo-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .cc-drawer-panel {
+        width: min(720px, calc(100vw - var(--ant-size)));
+      }
+
+      .cc-drawer-layout {
+        flex-direction: column;
+      }
+
+      .cc-right-pane {
+        border-left: none;
+        border-top: 1px solid var(--ant-border-color-secondary);
+      }
+    }
+
+    @media (max-width: 960px) {
+      body {
+        padding: var(--ant-size);
+      }
+
+      .cc-demo-hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .cc-demo-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .cc-drawer-panel {
+        width: calc(100vw - var(--ant-size));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cc-page">
+    <section class="cc-demo-hero">
+      <div class="cc-demo-hero-meta">
+        <h1 class="cc-demo-title">上传素材 Drawer 独立演示页</h1>
+        <p class="cc-demo-desc">该页面默认展示右侧上传素材浮层，关闭后可再次打开，用于单独查看布局、交互与表单状态。</p>
+      </div>
+      <button class="cc-demo-open-button" id="openDrawerButton" type="button">打开上传素材</button>
+    </section>
+
+    <section class="cc-demo-grid" aria-hidden="true">
+      <article class="cc-demo-card">
+        <h2 class="cc-demo-card-title">素材筛选区</h2>
+        <div class="cc-demo-chip-row">
+          <span class="cc-demo-card-chip"></span>
+          <span class="cc-demo-card-chip"></span>
+          <span class="cc-demo-card-chip"></span>
+        </div>
+        <div class="cc-demo-card-line"></div>
+        <div class="cc-demo-card-line cc-short"></div>
+        <div class="cc-demo-card-line"></div>
+      </article>
+
+      <article class="cc-demo-card">
+        <h2 class="cc-demo-card-title">素材列表区</h2>
+        <div class="cc-demo-card-line"></div>
+        <div class="cc-demo-card-line"></div>
+        <div class="cc-demo-card-line"></div>
+        <div class="cc-demo-card-line cc-short"></div>
+      </article>
+
+      <article class="cc-demo-card">
+        <h2 class="cc-demo-card-title">批量操作区</h2>
+        <div class="cc-demo-chip-row">
+          <span class="cc-demo-card-chip"></span>
+          <span class="cc-demo-card-chip"></span>
+        </div>
+        <div class="cc-demo-card-line"></div>
+        <div class="cc-demo-card-line cc-short"></div>
+      </article>
+    </section>
+  </div>
+
+  <div class="cc-drawer-overlay is-open" id="drawerOverlay"></div>
+  <aside class="cc-drawer-panel is-open" id="drawerPanel" aria-labelledby="drawerTitle" aria-modal="true" role="dialog">
+    <div class="cc-drawer-header">
+      <h2 class="cc-drawer-title" id="drawerTitle">上传素材</h2>
+      <button class="cc-close-button" id="closeDrawerButton" type="button" aria-label="关闭上传素材弹窗">
+        <span class="cc-close-icon"></span>
+      </button>
+    </div>
+
+    <div class="cc-drawer-body">
+      <div class="cc-drawer-layout">
+        <div class="cc-left-pane">
+          <section class="cc-section">
+            <div class="cc-section-head">
+              <h3 class="cc-section-title">
+                <span>上传位置</span>
+                <span class="cc-required-mark">*</span>
+              </h3>
+              <button class="cc-button-link" id="changeFolderButton" type="button">更改文件夹</button>
+            </div>
+            <div class="cc-folder-pill" id="folderValue">测试 / 未分配素材</div>
+          </section>
+
+          <section class="cc-section">
+            <div class="cc-dropzone" id="dropzone" tabindex="0" role="button" aria-describedby="uploadHintText">
+              <input class="cc-file-input" id="fileInput" type="file" multiple accept=".mp4,.mov,.avi,.png,.jpg,.jpeg,.gif" />
+              <div class="cc-dropzone-content">
+                <div class="cc-upload-icon-wrap" aria-hidden="true">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 16V4"></path>
+                    <path d="M7.5 8.5 12 4l4.5 4.5"></path>
+                    <path d="M20 16.5v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-2"></path>
+                  </svg>
+                </div>
+                <p class="cc-upload-main-text" id="uploadSummaryText">点击或拖拽素材到此区域上传</p>
+                <div class="cc-upload-meta-group" id="uploadHintText">
+                  <p class="cc-upload-hint">支持格式：mp4, mov, avi, png, jpg, jpeg, gif</p>
+                  <p class="cc-upload-hint">单个素材大小最大 500M</p>
+                  <p class="cc-upload-hint">总大小上限 4096M</p>
+                </div>
+              </div>
+            </div>
+            <div class="cc-file-list cc-hidden" id="fileList"></div>
+            <div class="cc-inline-alert cc-hidden" id="uploadError"></div>
+          </section>
+        </div>
+
+        <div class="cc-right-pane">
+          <section class="cc-section">
+            <h3 class="cc-config-title">配置信息</h3>
+
+            <div class="cc-form">
+              <label class="cc-field" for="prioritySelect">
+                <span class="cc-field-label">优先级</span>
+                <select class="cc-select cc-select-placeholder" id="prioritySelect">
+                  <option value="" selected>请选择优先级</option>
+                  <option value="p0">高优先级</option>
+                  <option value="p1">中优先级</option>
+                  <option value="p2">低优先级</option>
+                </select>
+              </label>
+
+              <label class="cc-field" for="designerSelect">
+                <span class="cc-field-label">设计师</span>
+                <select class="cc-select cc-select-placeholder" id="designerSelect">
+                  <option value="" selected>请选择设计师</option>
+                  <option value="sherry">Sherry</option>
+                  <option value="lin">Lin</option>
+                  <option value="milo">Milo</option>
+                  <option value="yoyo">Yoyo</option>
+                </select>
+              </label>
+
+              <div class="cc-field">
+                <div class="cc-field-head">
+                  <label class="cc-field-head-label" for="productSelect">产品名称</label>
+                  <button class="cc-button-link" id="openProductModalButton" type="button">新增产品管理</button>
+                </div>
+                <select class="cc-select cc-select-placeholder" id="productSelect">
+                  <option value="" selected>请选择</option>
+                  <option value="gold-walk">走路赚金币</option>
+                  <option value="fishing-master">全民钓鱼</option>
+                  <option value="adventure-match">消消乐大冒险</option>
+                </select>
+              </div>
+
+              <div class="cc-audit-card">
+                <div>
+                  <h3 class="cc-section-title">素材审核</h3>
+                  <p class="cc-helper-copy">不开启审核将默认直接通过，用户上传的素材即刻可用。</p>
+                </div>
+                <div class="cc-audit-row">
+                  <div>
+                    <div class="cc-audit-row-label">开启审核</div>
+                    <p class="cc-helper-copy">开启后，必须通过审核才能使用。</p>
+                  </div>
+                  <label class="cc-switch" for="auditSwitch">
+                    <input class="cc-switch-input" id="auditSwitch" type="checkbox" />
+                    <span class="cc-switch-track"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <div class="cc-drawer-footer">
+      <button class="cc-button-default" id="cancelDrawerButton" type="button">取消</button>
+      <button class="cc-button-primary" id="submitButton" type="button">确认</button>
+    </div>
+  </aside>
+
+  <div class="cc-modal-overlay cc-hidden" id="folderModalOverlay">
+    <div class="cc-modal" role="dialog" aria-modal="true" aria-labelledby="folderModalTitle">
+      <div class="cc-modal-header">
+        <h3 class="cc-modal-title" id="folderModalTitle">选择上传目录</h3>
+        <button class="cc-modal-close-button" id="closeFolderModalButton" type="button" aria-label="关闭目录选择弹窗">
+          <span class="cc-close-icon"></span>
+        </button>
+      </div>
+      <div class="cc-modal-body">
+        <div class="cc-folder-radio-list" id="folderOptions"></div>
+      </div>
+      <div class="cc-modal-footer">
+        <button class="cc-button-default" id="cancelFolderButton" type="button">取消</button>
+        <button class="cc-button-primary" id="confirmFolderButton" type="button">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cc-modal-overlay cc-hidden" id="productModalOverlay">
+    <div class="cc-modal" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
+      <div class="cc-modal-header">
+        <h3 class="cc-modal-title" id="productModalTitle">新增产品管理</h3>
+        <button class="cc-modal-close-button" id="closeProductModalButton" type="button" aria-label="关闭新增产品弹窗">
+          <span class="cc-close-icon"></span>
+        </button>
+      </div>
+      <div class="cc-modal-body">
+        <p class="cc-product-modal-copy">新增产品后会自动回填到“产品名称”下拉框中。</p>
+        <label class="cc-field" for="productNameInput">
+          <span class="cc-field-label">产品名称</span>
+          <input class="cc-text-input" id="productNameInput" type="text" placeholder="请输入产品名称" />
+        </label>
+      </div>
+      <div class="cc-modal-footer">
+        <button class="cc-button-default" id="cancelProductButton" type="button">取消</button>
+        <button class="cc-button-primary" id="confirmProductButton" type="button">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var MAX_FILE_SIZE = 500 * 1024 * 1024;
+      var MAX_TOTAL_SIZE = 4096 * 1024 * 1024;
+
+      var folderOptions = [
+        {
+          value: '测试 / 未分配素材',
+          description: '默认接收新上传素材，便于后续整理'
+        },
+        {
+          value: '测试 / 已审核素材',
+          description: '适合已确认可直接投放的正式素材'
+        },
+        {
+          value: '品牌中心 / 重点视频素材',
+          description: '用于重点项目和核心投放素材归档'
+        },
+        {
+          value: '品牌中心 / 图片待审核',
+          description: '适合需审核后再投入使用的图片素材'
+        }
+      ];
+
+      var state = {
+        drawerOpen: true,
+        folderModalOpen: false,
+        productModalOpen: false,
+        currentFolder: folderOptions[0].value,
+        pendingFolder: folderOptions[0].value,
+        files: []
+      };
+
+      var previewUrlStore = new WeakMap();
+
+      var drawerOverlay = document.getElementById('drawerOverlay');
+      var drawerPanel = document.getElementById('drawerPanel');
+      var openDrawerButton = document.getElementById('openDrawerButton');
+      var closeDrawerButton = document.getElementById('closeDrawerButton');
+      var cancelDrawerButton = document.getElementById('cancelDrawerButton');
+      var changeFolderButton = document.getElementById('changeFolderButton');
+      var folderValue = document.getElementById('folderValue');
+      var dropzone = document.getElementById('dropzone');
+      var fileInput = document.getElementById('fileInput');
+      var uploadSummaryText = document.getElementById('uploadSummaryText');
+      var uploadError = document.getElementById('uploadError');
+      var fileList = document.getElementById('fileList');
+      var submitButton = document.getElementById('submitButton');
+      var prioritySelect = document.getElementById('prioritySelect');
+      var designerSelect = document.getElementById('designerSelect');
+      var productSelect = document.getElementById('productSelect');
+
+      var folderModalOverlay = document.getElementById('folderModalOverlay');
+      var closeFolderModalButton = document.getElementById('closeFolderModalButton');
+      var cancelFolderButton = document.getElementById('cancelFolderButton');
+      var confirmFolderButton = document.getElementById('confirmFolderButton');
+      var folderOptionsContainer = document.getElementById('folderOptions');
+
+      var productModalOverlay = document.getElementById('productModalOverlay');
+      var openProductModalButton = document.getElementById('openProductModalButton');
+      var closeProductModalButton = document.getElementById('closeProductModalButton');
+      var cancelProductButton = document.getElementById('cancelProductButton');
+      var confirmProductButton = document.getElementById('confirmProductButton');
+      var productNameInput = document.getElementById('productNameInput');
+
+      function formatSize(size) {
+        if (!size) {
+          return '0 MB';
+        }
+        var sizeInMB = size / 1024 / 1024;
+        if (sizeInMB >= 1024) {
+          return (sizeInMB / 1024).toFixed(2) + ' GB';
+        }
+        if (sizeInMB >= 100) {
+          return sizeInMB.toFixed(0) + ' MB';
+        }
+        return sizeInMB.toFixed(1) + ' MB';
+      }
+
+      function setSelectPlaceholderState(selectElement) {
+        if (!selectElement) {
+          return;
+        }
+        if (selectElement.value) {
+          selectElement.classList.remove('cc-select-placeholder');
+        } else {
+          selectElement.classList.add('cc-select-placeholder');
+        }
+      }
+
+      function renderDrawer() {
+        folderValue.textContent = state.currentFolder;
+        drawerOverlay.classList.toggle('is-open', state.drawerOpen);
+        drawerPanel.classList.toggle('is-open', state.drawerOpen);
+      }
+
+      function getPreviewUrl(file) {
+        if (!file) {
+          return '';
+        }
+        if (previewUrlStore.has(file)) {
+          return previewUrlStore.get(file);
+        }
+        var previewUrl = URL.createObjectURL(file);
+        previewUrlStore.set(file, previewUrl);
+        return previewUrl;
+      }
+
+      function revokePreviewUrl(file) {
+        if (!file || !previewUrlStore.has(file)) {
+          return;
+        }
+        URL.revokeObjectURL(previewUrlStore.get(file));
+        previewUrlStore.delete(file);
+      }
+
+      function buildPreviewHtml(file) {
+        var fileType = file.type || '';
+        var previewUrl = getPreviewUrl(file);
+
+        if (fileType.indexOf('image/') === 0) {
+          return '<img src="' + previewUrl + '" alt="' + escapeHtml(file.name) + ' 预览" />';
+        }
+
+        if (fileType.indexOf('video/') === 0) {
+          return '<video src="' + previewUrl + '" muted controls preload="metadata"></video>';
+        }
+
+        return '<div class="cc-file-preview-fallback">暂不支持预览</div>';
+      }
+
+      function renderUpload() {
+        if (!state.files.length) {
+          uploadSummaryText.textContent = '点击或拖拽素材到此区域上传';
+          fileList.classList.add('cc-hidden');
+          fileList.innerHTML = '';
+          return;
+        }
+
+        var totalSize = state.files.reduce(function (sum, file) {
+          return sum + file.size;
+        }, 0);
+
+        uploadSummaryText.textContent = '已选择 ' + state.files.length + ' 个素材，总大小 ' + formatSize(totalSize);
+        fileList.classList.remove('cc-hidden');
+        fileList.innerHTML = state.files.map(function (file, index) {
+          return '' +
+            '<div class="cc-file-item">' +
+              '<div class="cc-file-main">' +
+                '<div class="cc-file-preview">' + buildPreviewHtml(file) + '</div>' +
+                '<div class="cc-file-meta">' +
+                  '<div class="cc-file-name">' + escapeHtml(file.name) + '</div>' +
+                  '<div class="cc-file-size">' + formatSize(file.size) + '</div>' +
+                '</div>' +
+              '</div>' +
+              '<button class="cc-file-remove" type="button" data-file-index="' + index + '">移除</button>' +
+            '</div>';
+        }).join('');
+      }
+
+      function renderError(message) {
+        if (!message) {
+          uploadError.classList.add('cc-hidden');
+          uploadError.textContent = '';
+          return;
+        }
+        uploadError.classList.remove('cc-hidden');
+        uploadError.textContent = message;
+      }
+
+      function renderFolderOptions() {
+        folderOptionsContainer.innerHTML = folderOptions.map(function (folder, index) {
+          var checked = folder.value === state.pendingFolder;
+          return '' +
+            '<label class="cc-radio-card" for="folderOption' + index + '">' +
+              '<input class="cc-radio-input" id="folderOption' + index + '" type="radio" name="folderOption" value="' + escapeHtml(folder.value) + '" ' + (checked ? 'checked' : '') + ' />' +
+              '<span class="cc-radio-meta">' +
+                '<span class="cc-radio-title">' + escapeHtml(folder.value) + '</span>' +
+                '<span class="cc-radio-desc">' + escapeHtml(folder.description) + '</span>' +
+              '</span>' +
+            '</label>';
+        }).join('');
+      }
+
+      function openDrawer() {
+        state.drawerOpen = true;
+        renderDrawer();
+      }
+
+      function closeDrawer() {
+        state.drawerOpen = false;
+        renderDrawer();
+      }
+
+      function openFolderModal() {
+        state.pendingFolder = state.currentFolder;
+        renderFolderOptions();
+        folderModalOverlay.classList.remove('cc-hidden');
+        folderModalOverlay.classList.add('is-open');
+      }
+
+      function closeFolderModal() {
+        folderModalOverlay.classList.remove('is-open');
+        folderModalOverlay.classList.add('cc-hidden');
+      }
+
+      function openProductModal() {
+        productNameInput.value = '';
+        productModalOverlay.classList.remove('cc-hidden');
+        productModalOverlay.classList.add('is-open');
+      }
+
+      function closeProductModal() {
+        productModalOverlay.classList.remove('is-open');
+        productModalOverlay.classList.add('cc-hidden');
+      }
+
+      function escapeHtml(text) {
+        return String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function setFiles(nextFiles) {
+        var validFiles = [];
+        var totalSize = 0;
+        var errorMessage = '';
+
+        state.files.forEach(function (file) {
+          if (nextFiles.indexOf(file) === -1) {
+            revokePreviewUrl(file);
+          }
+        });
+
+        nextFiles.forEach(function (file) {
+          if (file.size > MAX_FILE_SIZE) {
+            errorMessage = file.name + ' 超过 500M，已忽略。';
+            revokePreviewUrl(file);
+            return;
+          }
+
+          if (totalSize + file.size > MAX_TOTAL_SIZE) {
+            errorMessage = '总大小超过 4096M，已自动忽略超出部分。';
+            revokePreviewUrl(file);
+            return;
+          }
+
+          validFiles.push(file);
+          totalSize += file.size;
+        });
+
+        state.files = validFiles;
+        renderUpload();
+        renderError(errorMessage);
+      }
+
+      function appendFiles(fileCollection) {
+        var mergedFiles = state.files.concat(Array.prototype.slice.call(fileCollection || []));
+        setFiles(mergedFiles);
+      }
+
+      function validateBeforeSubmit() {
+        if (!state.files.length) {
+          renderError('请先选择要上传的素材文件。');
+          return false;
+        }
+        renderError('');
+        return true;
+      }
+
+      openDrawerButton.addEventListener('click', openDrawer);
+      closeDrawerButton.addEventListener('click', closeDrawer);
+      cancelDrawerButton.addEventListener('click', closeDrawer);
+      drawerOverlay.addEventListener('click', closeDrawer);
+
+      changeFolderButton.addEventListener('click', openFolderModal);
+      closeFolderModalButton.addEventListener('click', closeFolderModal);
+      cancelFolderButton.addEventListener('click', closeFolderModal);
+      confirmFolderButton.addEventListener('click', function () {
+        state.currentFolder = state.pendingFolder;
+        folderValue.textContent = state.currentFolder;
+        closeFolderModal();
+      });
+      folderModalOverlay.addEventListener('click', function (event) {
+        if (event.target === folderModalOverlay) {
+          closeFolderModal();
+        }
+      });
+      folderOptionsContainer.addEventListener('change', function (event) {
+        if (event.target && event.target.name === 'folderOption') {
+          state.pendingFolder = event.target.value;
+        }
+      });
+
+      openProductModalButton.addEventListener('click', openProductModal);
+      closeProductModalButton.addEventListener('click', closeProductModal);
+      cancelProductButton.addEventListener('click', closeProductModal);
+      confirmProductButton.addEventListener('click', function () {
+        var nextName = productNameInput.value.trim();
+        if (!nextName) {
+          productNameInput.focus();
+          return;
+        }
+
+        var nextValue = nextName.toLowerCase().replace(/\s+/g, '-');
+        var option = document.createElement('option');
+        option.value = nextValue;
+        option.textContent = nextName;
+        productSelect.appendChild(option);
+        productSelect.value = nextValue;
+        setSelectPlaceholderState(productSelect);
+        closeProductModal();
+      });
+      productModalOverlay.addEventListener('click', function (event) {
+        if (event.target === productModalOverlay) {
+          closeProductModal();
+        }
+      });
+
+      dropzone.addEventListener('click', function () {
+        fileInput.click();
+      });
+      dropzone.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          fileInput.click();
+        }
+      });
+      fileInput.addEventListener('change', function (event) {
+        appendFiles(event.target.files);
+        fileInput.value = '';
+      });
+
+      ['dragenter', 'dragover'].forEach(function (eventName) {
+        dropzone.addEventListener(eventName, function (event) {
+          event.preventDefault();
+          dropzone.classList.add('is-dragover');
+        });
+      });
+
+      ['dragleave', 'dragend'].forEach(function (eventName) {
+        dropzone.addEventListener(eventName, function (event) {
+          event.preventDefault();
+          dropzone.classList.remove('is-dragover');
+        });
+      });
+
+      dropzone.addEventListener('drop', function (event) {
+        event.preventDefault();
+        dropzone.classList.remove('is-dragover');
+        appendFiles(event.dataTransfer.files);
+      });
+
+      fileList.addEventListener('click', function (event) {
+        var target = event.target;
+        if (!target || !target.dataset.fileIndex) {
+          return;
+        }
+        var fileIndex = Number(target.dataset.fileIndex);
+        var removedFile = state.files[fileIndex];
+        revokePreviewUrl(removedFile);
+        state.files = state.files.filter(function (_, index) {
+          return index !== fileIndex;
+        });
+        renderUpload();
+        if (!state.files.length) {
+          renderError('');
+        }
+      });
+
+      [prioritySelect, designerSelect, productSelect].forEach(function (selectElement) {
+        setSelectPlaceholderState(selectElement);
+        selectElement.addEventListener('change', function () {
+          setSelectPlaceholderState(selectElement);
+        });
+      });
+
+      submitButton.addEventListener('click', function () {
+        if (!validateBeforeSubmit()) {
+          return;
+        }
+        closeDrawer();
+      });
+
+      renderDrawer();
+      renderUpload();
+      renderFolderOptions();
+      renderError('');
+    })();
+  </script>
+</body>
+</html>

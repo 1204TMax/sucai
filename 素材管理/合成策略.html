@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合成策略 - 量化投放系统</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0057c2",
+                        "primary-container": "#006ef2",
+                        "on-primary": "#ffffff",
+                        "surface": "#f5f7fa",
+                        "on-surface": "#1a1c1c",
+                        "on-surface-variant": "#414755",
+                        "outline-variant": "#c1c6d7",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container-high": "#e8e8e8"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', 'PingFang SC', sans-serif; 
+            background-color: #f5f7fa;
+            padding: 8px;
+        }
+        /* 隐藏滚动条但保留功能 */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+    </style>
+</head>
+<body class="text-on-surface">
+    <main class="flex flex-col gap-2 w-full mx-auto">
+        <!-- 页面标题与操作区 -->
+        <section class="flex justify-between items-center bg-surface-container-lowest rounded-xl p-4 shadow-sm">
+            <div>
+                <h1 class="text-xl font-bold">合成策略</h1>
+                <p class="text-sm text-on-surface-variant mt-1">管理自动合成规则与策略</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="parent.postMessage({ action: 'openTab', title: '我的任务', url: '素材管理/我的任务.html' }, '*')" 
+                        class="flex items-center gap-2 px-4 py-2 border border-outline-variant/30 rounded-lg hover:bg-surface-container-low transition-colors text-sm font-medium">
+                    <span class="material-symbols-outlined text-[20px]">pending_actions</span>
+                    正在合成的任务
+                </button>
+                <button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-primary-container transition-all shadow-sm text-sm font-medium">
+                    <span class="material-symbols-outlined text-[20px]">add</span>
+                    新增策略
+                </button>
+            </div>
+        </section>
+
+        <!-- 筛选区域 -->
+        <section class="bg-surface-container-lowest rounded-xl p-4 flex flex-wrap items-end gap-4 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs text-on-surface-variant font-medium">系列</label>
+                    <select class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none">
+                        <option>请选择系列</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs text-on-surface-variant font-medium">产品</label>
+                    <select class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none">
+                        <option>请选择产品</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs text-on-surface-variant font-medium">状态</label>
+                    <select class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none">
+                        <option>全部状态</option>
+                    </select>
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs text-on-surface-variant font-medium">名称</label>
+                    <input class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none" placeholder="请输入名称" type="text"/>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button class="text-on-surface-variant hover:text-primary transition-colors text-sm font-medium px-4 py-2">清空</button>
+                <button class="bg-primary text-on-primary rounded-lg px-6 py-2 text-sm font-medium hover:opacity-90">搜索</button>
+            </div>
+        </section>
+
+        <!-- 工具栏 -->
+        <section class="bg-surface-container-lowest rounded-xl p-3 flex justify-between items-center shadow-sm">
+            <div class="flex items-center gap-4">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                    <input class="w-4 h-4 rounded border-outline-variant/40 text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
+                    <span class="text-sm text-on-surface group-hover:text-primary transition-colors">全选</span>
+                </label>
+                <div class="w-px h-4 bg-outline-variant/30 mx-2"></div>
+                <button class="text-sm text-on-surface hover:text-primary border border-outline-variant/20 px-3 py-1.5 rounded-lg transition-colors bg-white">暂停</button>
+                <button class="text-sm text-on-surface hover:text-primary border border-outline-variant/20 px-3 py-1.5 rounded-lg transition-colors bg-white">启动</button>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm text-on-surface-variant">排序</span>
+                <select class="bg-white border border-outline-variant/20 rounded-lg text-sm py-1.5 pl-3 pr-8 appearance-none focus:ring-1 focus:ring-primary min-w-[120px]">
+                    <option>默认排序</option>
+                    <option>消耗从高到低</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- 策略列表 -->
+        <section class="flex flex-col gap-3">
+            <!-- 策略卡片 1 -->
+            <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/10 group">
+                <div class="flex gap-4">
+                    <input class="w-4 h-4 mt-1 rounded border-outline-variant/40 text-primary focus:ring-primary" type="checkbox"/>
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">减脂</span>
+                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">巨量</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-on-surface">享瘦XXX素材合成策略</h3>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <div class="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                    <span class="text-[12px] font-medium">生效中</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[13px]">
+                                    <a class="text-primary hover:underline" href="#">编辑</a>
+                                    <span class="text-outline-variant/30">|</span>
+                                    <a class="text-primary hover:underline" href="#">详情</a>
+                                    <span class="text-outline-variant/30">|</span>
+                                    <a class="text-primary hover:underline" href="#">数据</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end pt-4 border-t border-slate-50">
+                            <div class="text-[12px] text-on-surface-variant flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px]">person</span>
+                                2026-4-18 唐大山
+                                <span class="text-slate-300">#20260418111111</span>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[11px] text-on-surface-variant">总消耗</span>
+                                    <span class="text-base font-bold text-on-surface">13,000<span class="text-[11px] font-normal ml-0.5">元</span></span>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[11px] text-on-surface-variant">总合成素材</span>
+                                    <span class="text-base font-bold text-on-surface">1,300<span class="text-[11px] font-normal ml-0.5">个</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 策略卡片 2 -->
+            <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/10 opacity-90">
+                <div class="flex gap-4">
+                    <input class="w-4 h-4 mt-1 rounded border-outline-variant/40 text-primary focus:ring-primary" type="checkbox"/>
+                    <div class="flex-1 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">增肌</span>
+                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">广点通</span>
+                                </div>
+                                <h3 class="text-lg font-bold text-on-surface">塑形系列视频合成策略</h3>
+                            </div>
+                            <div class="flex flex-col items-end gap-2">
+                                <div class="flex items-center gap-1.5 text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                    <span class="text-[12px] font-medium">已暂停</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-[13px]">
+                                    <a class="text-primary hover:underline" href="#">启动</a>
+                                    <span class="text-outline-variant/30">|</span>
+                                    <a class="text-primary hover:underline" href="#">编辑</a>
+                                    <span class="text-outline-variant/30">|</span>
+                                    <a class="text-primary hover:underline" href="#">数据</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end pt-4 border-t border-slate-50">
+                            <div class="text-[12px] text-on-surface-variant flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[16px]">person</span>
+                                2026-4-15 李小红
+                                <span class="text-slate-300">#20260415222222</span>
+                            </div>
+                            <div class="flex items-center gap-6">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[11px] text-on-surface-variant">总消耗</span>
+                                    <span class="text-base font-bold text-on-surface">8,500<span class="text-[11px] font-normal ml-0.5">元</span></span>
+                                </div>
+                                <div class="flex flex-col items-end">
+                                    <span class="text-[11px] text-on-surface-variant">总合成素材</span>
+                                    <span class="text-base font-bold text-on-surface">850<span class="text-[11px] font-normal ml-0.5">个</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 分页 -->
+        <div class="flex justify-end items-center mt-4 pb-4 text-sm gap-2">
+            <span class="text-on-surface-variant mr-4">共 100 条</span>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white hover:text-primary"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+            <button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary">1</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white">2</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white">3</button>
+            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white hover:text-primary"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+        </div>
+    </main>
+</body>
+</html>

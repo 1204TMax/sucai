@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>物料库-低保真</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 20px;
+      background: #f5f7fa;
+      font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #333;
+      line-height: 1.4;
+    }
+
+    .page {
+      position: relative;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .block {
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      margin-bottom: 12px;
+      padding: 12px;
+    }
+
+    .title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .title {
+      margin: 0 0 6px;
+      font-size: 20px;
+      color: #222;
+    }
+
+    .desc {
+      margin: 0;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .btn,
+    .input,
+    .select {
+      height: 32px;
+      border: 1px solid #bfbfbf;
+      background: #fff;
+      color: #333;
+      font-size: 13px;
+    }
+
+    .btn {
+      padding: 0 12px;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: #e8e8e8;
+      border-color: #a8a8a8;
+      font-weight: 600;
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 180px 180px auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      padding: 0 8px;
+    }
+
+    .batch {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .batch-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #555;
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      background: #fff;
+      border: 1px solid #d9d9d9;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #ededed;
+      padding: 10px 8px;
+      text-align: left;
+      font-size: 13px;
+      color: #444;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f0f0f0;
+      color: #333;
+      font-weight: 600;
+    }
+
+    tr:hover td {
+      background: #fafafa;
+    }
+
+    .tag {
+      display: inline-block;
+      border: 1px solid #c9c9c9;
+      background: #f5f5f5;
+      color: #555;
+      font-size: 12px;
+      padding: 2px 8px;
+    }
+
+    .link-btn {
+      border: none;
+      background: transparent;
+      color: #444;
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 0;
+      font-size: 13px;
+    }
+
+    .pagination {
+      background: #fff;
+      border: 1px solid #d9d9d9;
+      border-top: none;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-btn {
+      min-width: 30px;
+      height: 28px;
+      border: 1px solid #c9c9c9;
+      background: #fff;
+      cursor: pointer;
+      color: #444;
+      font-size: 12px;
+      padding: 0 8px;
+    }
+
+    .page-btn.active {
+      background: #e6e6e6;
+      border-color: #9f9f9f;
+      font-weight: 600;
+    }
+
+    .drawer {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 360px;
+      border: 1px solid #bfbfbf;
+      background: #fff;
+      display: none;
+      z-index: 10;
+      box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .drawer.open {
+      display: block;
+    }
+
+    .drawer-head,
+    .modal-head {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e2e2e2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .drawer-body {
+      padding: 12px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .detail-item {
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 78px 1fr;
+      gap: 8px;
+    }
+
+    .detail-label {
+      color: #777;
+    }
+
+    .close-btn {
+      border: 1px solid #c9c9c9;
+      background: #f5f5f5;
+      cursor: pointer;
+      width: 26px;
+      height: 26px;
+      line-height: 24px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .modal-mask {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.2);
+      display: none;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 80px;
+      z-index: 20;
+    }
+
+    .modal-mask.open {
+      display: flex;
+    }
+
+    .modal {
+      width: 520px;
+      border: 1px solid #bfbfbf;
+      background: #fff;
+    }
+
+    .modal-body {
+      padding: 14px 12px;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .upload-box {
+      border: 1px dashed #b5b5b5;
+      background: #fafafa;
+      padding: 24px;
+      text-align: center;
+      color: #666;
+    }
+
+    .modal-foot {
+      padding: 10px 12px;
+      border-top: 1px solid #e2e2e2;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @media (max-width: 1100px) {
+      .filters {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .drawer {
+        position: static;
+        width: 100%;
+        margin-top: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="pageRoot">
+    <div class="block">
+      <div class="title-row">
+        <div>
+          <h1 class="title">物料库（低保真）</h1>
+          <p class="desc">用于管理上传后的物料，支持筛选、批量操作与详情查看。</p>
+        </div>
+        <button class="btn primary" id="openUploadBtn" type="button">上传物料</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="filters">
+        <input class="input" type="text" placeholder="关键词：名称/ID" />
+        <select class="select">
+          <option>全部来源</option>
+          <option>手动上传</option>
+          <option>接口同步</option>
+        </select>
+        <select class="select">
+          <option>全部状态</option>
+          <option>待审核</option>
+          <option>已上线</option>
+          <option>已下线</option>
+        </select>
+        <button class="btn" type="button">查询</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="batch">
+        <div class="batch-left">
+          <label><input type="checkbox" /> 全选</label>
+          <span>已选 0 项</span>
+        </div>
+        <div>
+          <button class="btn" type="button">批量上线</button>
+          <button class="btn" type="button">批量下线</button>
+          <button class="btn" type="button">批量删除</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 52px;"><input type="checkbox" /></th>
+            <th>物料名称</th>
+            <th>来源</th>
+            <th>状态</th>
+            <th>更新时间</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>夏季活动主图-001</td>
+            <td>手动上传</td>
+            <td><span class="tag">已上线</span></td>
+            <td>2026-04-16 10:30</td>
+            <td><button class="link-btn detail-btn" type="button">查看详情</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>新品短视频-A12</td>
+            <td>接口同步</td>
+            <td><span class="tag">待审核</span></td>
+            <td>2026-04-15 17:42</td>
+            <td><button class="link-btn detail-btn" type="button">查看详情</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>商品详情长图-033</td>
+            <td>手动上传</td>
+            <td><span class="tag">已下线</span></td>
+            <td>2026-04-14 14:21</td>
+            <td><button class="link-btn detail-btn" type="button">查看详情</button></td>
+          </tr>
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>品牌素材包-春季</td>
+            <td>接口同步</td>
+            <td><span class="tag">已上线</span></td>
+            <td>2026-04-13 09:18</td>
+            <td><button class="link-btn detail-btn" type="button">查看详情</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pagination">
+      <div>共 128 条</div>
+      <div class="pager">
+        <button class="page-btn" type="button">上一页</button>
+        <button class="page-btn active" type="button">1</button>
+        <button class="page-btn" type="button">2</button>
+        <button class="page-btn" type="button">3</button>
+        <button class="page-btn" type="button">下一页</button>
+      </div>
+    </div>
+
+    <aside class="drawer" id="detailDrawer" aria-hidden="true">
+      <div class="drawer-head">
+        <span>物料详情</span>
+        <button class="close-btn" id="closeDrawerBtn" type="button">×</button>
+      </div>
+      <div class="drawer-body">
+        <div class="detail-item">
+          <div class="detail-label">名称</div>
+          <div id="detailName">夏季活动主图-001</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">物料ID</div>
+          <div>MTL-20260416-001</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">来源</div>
+          <div>手动上传</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">状态</div>
+          <div>已上线</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">说明</div>
+          <div>此处为低保真原型说明文本，仅用于占位展示。</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="modal-mask" id="uploadModalMask" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="上传物料">
+        <div class="modal-head">
+          <span>上传物料</span>
+          <button class="close-btn" id="closeUploadBtn" type="button">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <div>物料名称</div>
+            <input class="input" type="text" placeholder="请输入物料名称" />
+          </div>
+          <div class="form-row">
+            <div>物料来源</div>
+            <select class="select">
+              <option>手动上传</option>
+              <option>接口同步</option>
+            </select>
+          </div>
+          <div class="form-row" style="align-items: start;">
+            <div>上传文件</div>
+            <div class="upload-box">点击或拖拽文件到此处（占位）</div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn" id="cancelUploadBtn" type="button">取消</button>
+          <button class="btn primary" type="button">确认上传</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var openUploadBtn = document.getElementById('openUploadBtn');
+      var uploadModalMask = document.getElementById('uploadModalMask');
+      var closeUploadBtn = document.getElementById('closeUploadBtn');
+      var cancelUploadBtn = document.getElementById('cancelUploadBtn');
+      var detailDrawer = document.getElementById('detailDrawer');
+      var closeDrawerBtn = document.getElementById('closeDrawerBtn');
+      var detailBtns = document.querySelectorAll('.detail-btn');
+      var detailName = document.getElementById('detailName');
+
+      function openUploadModal() {
+        uploadModalMask.classList.add('open');
+        uploadModalMask.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeUploadModal() {
+        uploadModalMask.classList.remove('open');
+        uploadModalMask.setAttribute('aria-hidden', 'true');
+      }
+
+      function openDrawer(nameText) {
+        if (nameText) {
+          detailName.textContent = nameText;
+        }
+        detailDrawer.classList.add('open');
+        detailDrawer.setAttribute('aria-hidden', 'false');
+      }
+
+      function closeDrawer() {
+        detailDrawer.classList.remove('open');
+        detailDrawer.setAttribute('aria-hidden', 'true');
+      }
+
+      openUploadBtn.addEventListener('click', openUploadModal);
+      closeUploadBtn.addEventListener('click', closeUploadModal);
+      cancelUploadBtn.addEventListener('click', closeUploadModal);
+
+      uploadModalMask.addEventListener('click', function (event) {
+        if (event.target === uploadModalMask) {
+          closeUploadModal();
+        }
+      });
+
+      closeDrawerBtn.addEventListener('click', closeDrawer);
+
+      detailBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var row = btn.closest('tr');
+          var nameCell = row ? row.children[1] : null;
+          var nameText = nameCell ? nameCell.textContent.trim() : '';
+          openDrawer(nameText);
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
