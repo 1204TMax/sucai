@@ -4,222 +4,405 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>合成策略 - 量化投放系统</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#0057c2",
-                        "primary-container": "#006ef2",
-                        "on-primary": "#ffffff",
-                        "surface": "#f5f7fa",
-                        "on-surface": "#1a1c1c",
-                        "on-surface-variant": "#414755",
-                        "outline-variant": "#c1c6d7",
-                        "surface-container-low": "#f3f3f3",
-                        "surface-container-lowest": "#ffffff",
-                        "surface-bright": "#f9f9f9",
-                        "surface-container-high": "#e8e8e8"
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="../共享样式/components.css">
+    <link rel="stylesheet" href="../共享样式/confirm-modal.css">
     <style>
-        body { 
-            font-family: 'Inter', 'PingFang SC', sans-serif; 
-            background-color: #f5f7fa;
-            padding: 8px;
+        :root {
+            /* ── Design Tokens ── */
+            --primary-6: #4A9EFF;
+            --primary-7: #3580DB;
+            --primary-1: #E8F4FF;
+            --gray-1: #FCFCFD;
+            --gray-2: #F8F9FA;
+            --gray-3: #F1F3F5;
+            --gray-4: #E9ECEF;
+            --gray-6: #CED4DA;
+            --gray-9: #6C757D;
+            --gray-11: #495057;
+            --gray-12: #212529;
+
+            --bg-page: var(--gray-2);
+            --border-1: var(--gray-4);
+            --accent-solid: var(--primary-6);
+            --text-hi: var(--gray-12);
+            --text-lo: var(--gray-11);
+            --text-muted: var(--gray-9);
+
+            --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "PingFang SC", sans-serif;
+            --h-sm: 28px;
+            --h-md: 32px;
+            --r-md: 6px;
+            --r-lg: 8px;
+            --r-xl: 12px;
+            --ease: 120ms ease;
         }
-        /* 隐藏滚动条但保留功能 */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-page);
+            font-family: var(--font);
+            color: var(--text-hi);
+            padding: 8px;
+            font-size: 13px;
+        }
+
+        /* ══ 容器区块化 ══ */
+        .white-box {
+            background: #fff;
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-xl);
+            margin-bottom: 8px;
+        }
+
+        /* 区块 A: 标题 + 筛选 */
+        .header-section { padding: 16px 20px; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .page-title-area { display: flex; align-items: baseline; gap: 8px; }
+        .page-title { font-size: 16px; font-weight: 600; }
+        .page-count { font-size: 12px; color: var(--text-muted); }
+
+        .filter-row { display: flex; align-items: center; gap: 8px; }
+        .sel-compact {
+            height: var(--h-sm); background: var(--gray-3); border: none;
+            border-radius: 4px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none;
+        }
+        .search-compact {
+            height: var(--h-sm); border: 1px solid var(--border-1); border-radius: 4px;
+            padding: 0 8px; font-size: 12px; width: 180px; outline: none;
+        }
+
+        /* 区块 B: 操作条 + 列表 */
+        .content-section { padding: 8px; }
+        .content-toolbar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 12px; margin-bottom: 8px;
+        }
+
+        /* ══ 按钮体系修正 ══ */
+        .btn {
+            height: var(--h-sm); padding: 0 12px; border-radius: var(--r-md);
+            font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent;
+            display: inline-flex; align-items: center; 
+            justify-content: center; /* 确保文字居中，解决右侧空白问题 */
+            gap: 4px; transition: all var(--ease);
+            white-space: nowrap;
+        }
+        .btn-primary { background: var(--accent-solid); color: #fff; }
+        .btn-primary:hover { background: #3a8eef; }
+        .btn-ghost { background: #fff; border-color: var(--border-1); color: var(--gray-11); }
+        .btn-ghost:hover { background: var(--gray-3); border-color: var(--gray-6); }
+        .btn-black { background: transparent; border: 1px solid var(--gray-4); color: var(--gray-11); }
+        .btn-black:hover { background: var(--gray-3); color: var(--gray-12); }
+
+        /* 管理模式 */
+        .manage-controls { display: none; align-items: center; gap: 12px; }
+        .manage-active .manage-controls { display: flex; }
+        .manage-active .btn-select-trigger { display: none; }
+        .manage-active .cb-wrap { display: flex !important; }
+
+        .dropdown-rel { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: calc(100% + 4px); left: 0;
+            background: #fff; border: 1px solid var(--border-1);
+            border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 4px 0; z-index: 100; display: none; min-width: 100px;
+        }
+        .dropdown-menu.show { display: block; }
+        .dropdown-item {
+            padding: 8px 16px; font-size: 12px; color: var(--text-lo);
+            cursor: pointer; transition: background var(--ease);
+        }
+        .dropdown-item:hover { background: var(--gray-3); }
+
+        /* ══ 策略卡片重构 ══ */
+        .strategy-card {
+            background: #fff; border: 1px solid var(--border-1);
+            border-radius: var(--r-lg); padding: 16px 20px;
+            display: flex; align-items: center;
+            margin-bottom: 8px; transition: all var(--ease);
+        }
+        .strategy-card:hover { border-color: var(--primary-6); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+
+        /* 1. 左侧：身份识别 + 标签 */
+        .card-id-area { display: flex; gap: 12px; align-items: center; }
+        .cb-wrap { width: 14px; height: 14px; flex-shrink: 0; margin-top: 4px; display: none; align-items: center; }
+        
+        .id-main { min-width: 240px; }
+        .id-top { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+        .card-title { font-size: 15px; font-weight: 600; color: var(--text-hi); }
+        
+        .status-tag { font-size: 10px; padding: 2px 10px; border-radius: 100px; font-weight: 600; }
+        .status-active { background: #E6FFFB; color: #08979C; border: 1px solid #B5F5EC; }
+        .status-paused { background: #F5F5F5; color: #8C8C8C; border: 1px solid #D9D9D9; }
+
+        .id-tags { display: flex; gap: 6px; }
+        .tag-mini { padding: 1px 8px; background: var(--gray-3); color: var(--text-muted); border-radius: 4px; font-size: 11px; }
+
+        /* 2. 中间：指标区 */
+        .metrics-bar {
+            display: flex; align-items: center; gap: 24px;
+            padding: 0 24px; border-left: 1px solid var(--gray-4);
+            margin-left: 16px; min-width: 220px;
+        }
+        .metric-item { display: flex; flex-direction: column; gap: 2px; }
+        .metric-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        .metric-value { font-size: 16px; font-weight: 700; color: var(--text-hi); }
+
+        /* 3. 右侧：操作区 + 脚注元数据 */
+        .spacer { flex: 1; } 
+        .card-ops-area { width: 320px; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+        .op-btns { display: flex; align-items: center; gap: 8px; }
+        .card-footer-meta { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
     </style>
 </head>
-<body class="text-on-surface">
-    <main class="flex flex-col gap-2 w-full mx-auto">
-        <!-- 页面标题与操作区 -->
-        <section class="flex justify-between items-center bg-surface-container-lowest rounded-xl p-4 shadow-sm">
-            <div>
-                <h1 class="text-xl font-bold">合成策略</h1>
-                <p class="text-sm text-on-surface-variant mt-1">管理自动合成规则与策略</p>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="parent.postMessage({ action: 'openTab', title: '我的任务', url: '素材管理/我的任务.html' }, '*')" 
-                        class="flex items-center gap-2 px-4 py-2 border border-outline-variant/30 rounded-lg hover:bg-surface-container-low transition-colors text-sm font-medium">
-                    <span class="material-symbols-outlined text-[20px]">pending_actions</span>
-                    正在合成的任务
-                </button>
-                <button class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-primary-container transition-all shadow-sm text-sm font-medium">
-                    <span class="material-symbols-outlined text-[20px]">add</span>
-                    新增策略
-                </button>
-            </div>
-        </section>
-
-        <!-- 筛选区域 -->
-        <section class="bg-surface-container-lowest rounded-xl p-4 flex flex-wrap items-end gap-4 shadow-sm">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 flex-1">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs text-on-surface-variant font-medium">系列</label>
-                    <select class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none">
-                        <option>请选择系列</option>
-                    </select>
+<body>
+    <div class="page-container">
+        <!-- 区块 A -->
+        <div class="white-box header-section">
+            <header class="page-header">
+                <div class="page-title-area">
+                    <h1 class="page-title">合成策略</h1>
+                    <span class="page-count">共 48 条记录</span>
                 </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs text-on-surface-variant font-medium">产品</label>
-                    <select class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none">
-                        <option>请选择产品</option>
-                    </select>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-ghost" onclick="parent.postMessage({action:'openTab',title:'我的任务',url:'素材管理/我的任务.html'}, '*')">正在合成的任务</button>
+                    <button class="btn btn-primary" onclick="parent.postMessage({action:'openTab',title:'新建策略',url:'素材管理/新建策略.html'}, '*')">+ 新增策略</button>
                 </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs text-on-surface-variant font-medium">状态</label>
-                    <select class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none">
-                        <option>全部状态</option>
-                    </select>
+            </header>
+            <section class="filter-row">
+                <div class="sel-compact cursor-pointer flex items-center justify-between" style="min-width: 120px;" onclick="openProjModal()">
+                    <span id="projectPickerVal">全部项目</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 4px;"></i>
                 </div>
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs text-on-surface-variant font-medium">名称</label>
-                    <input class="w-full bg-surface-container-lowest border-outline-variant/20 rounded-lg text-sm py-2 px-3 focus:ring-1 focus:ring-primary outline-none" placeholder="请输入名称" type="text"/>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button class="text-on-surface-variant hover:text-primary transition-colors text-sm font-medium px-4 py-2">清空</button>
-                <button class="bg-primary text-on-primary rounded-lg px-6 py-2 text-sm font-medium hover:opacity-90">搜索</button>
-            </div>
-        </section>
-
-        <!-- 工具栏 -->
-        <section class="bg-surface-container-lowest rounded-xl p-3 flex justify-between items-center shadow-sm">
-            <div class="flex items-center gap-4">
-                <label class="flex items-center gap-2 cursor-pointer group">
-                    <input class="w-4 h-4 rounded border-outline-variant/40 text-primary focus:ring-primary cursor-pointer" type="checkbox"/>
-                    <span class="text-sm text-on-surface group-hover:text-primary transition-colors">全选</span>
-                </label>
-                <div class="w-px h-4 bg-outline-variant/30 mx-2"></div>
-                <button class="text-sm text-on-surface hover:text-primary border border-outline-variant/20 px-3 py-1.5 rounded-lg transition-colors bg-white">暂停</button>
-                <button class="text-sm text-on-surface hover:text-primary border border-outline-variant/20 px-3 py-1.5 rounded-lg transition-colors bg-white">启动</button>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="text-sm text-on-surface-variant">排序</span>
-                <select class="bg-white border border-outline-variant/20 rounded-lg text-sm py-1.5 pl-3 pr-8 appearance-none focus:ring-1 focus:ring-primary min-w-[120px]">
-                    <option>默认排序</option>
-                    <option>消耗从高到低</option>
-                </select>
-            </div>
-        </section>
-
-        <!-- 策略列表 -->
-        <section class="flex flex-col gap-3">
-            <!-- 策略卡片 1 -->
-            <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/10 group">
-                <div class="flex gap-4">
-                    <input class="w-4 h-4 mt-1 rounded border-outline-variant/40 text-primary focus:ring-primary" type="checkbox"/>
-                    <div class="flex-1 flex flex-col gap-4">
-                        <div class="flex justify-between items-start">
-                            <div class="flex flex-col gap-2">
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">减脂</span>
-                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">巨量</span>
-                                </div>
-                                <h3 class="text-lg font-bold text-on-surface">享瘦XXX素材合成策略</h3>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <div class="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                    <span class="text-[12px] font-medium">生效中</span>
-                                </div>
-                                <div class="flex items-center gap-2 text-[13px]">
-                                    <a class="text-primary hover:underline" href="#">编辑</a>
-                                    <span class="text-outline-variant/30">|</span>
-                                    <a class="text-primary hover:underline" href="#">详情</a>
-                                    <span class="text-outline-variant/30">|</span>
-                                    <a class="text-primary hover:underline" href="#">数据</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-end pt-4 border-t border-slate-50">
-                            <div class="text-[12px] text-on-surface-variant flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[16px]">person</span>
-                                2026-4-18 唐大山
-                                <span class="text-slate-300">#20260418111111</span>
-                            </div>
-                            <div class="flex items-center gap-6">
-                                <div class="flex flex-col items-end">
-                                    <span class="text-[11px] text-on-surface-variant">总消耗</span>
-                                    <span class="text-base font-bold text-on-surface">13,000<span class="text-[11px] font-normal ml-0.5">元</span></span>
-                                </div>
-                                <div class="flex flex-col items-end">
-                                    <span class="text-[11px] text-on-surface-variant">总合成素材</span>
-                                    <span class="text-base font-bold text-on-surface">1,300<span class="text-[11px] font-normal ml-0.5">个</span></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 策略卡片 2 -->
-            <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-primary/10 opacity-90">
-                <div class="flex gap-4">
-                    <input class="w-4 h-4 mt-1 rounded border-outline-variant/40 text-primary focus:ring-primary" type="checkbox"/>
-                    <div class="flex-1 flex flex-col gap-4">
-                        <div class="flex justify-between items-start">
-                            <div class="flex flex-col gap-2">
-                                <div class="flex flex-wrap gap-2">
-                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">增肌</span>
-                                    <span class="bg-slate-100 text-slate-600 text-[11px] px-2 py-0.5 rounded-full">广点通</span>
-                                </div>
-                                <h3 class="text-lg font-bold text-on-surface">塑形系列视频合成策略</h3>
-                            </div>
-                            <div class="flex flex-col items-end gap-2">
-                                <div class="flex items-center gap-1.5 text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-                                    <span class="text-[12px] font-medium">已暂停</span>
-                                </div>
-                                <div class="flex items-center gap-2 text-[13px]">
-                                    <a class="text-primary hover:underline" href="#">启动</a>
-                                    <span class="text-outline-variant/30">|</span>
-                                    <a class="text-primary hover:underline" href="#">编辑</a>
-                                    <span class="text-outline-variant/30">|</span>
-                                    <a class="text-primary hover:underline" href="#">数据</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-end pt-4 border-t border-slate-50">
-                            <div class="text-[12px] text-on-surface-variant flex items-center gap-2">
-                                <span class="material-symbols-outlined text-[16px]">person</span>
-                                2026-4-15 李小红
-                                <span class="text-slate-300">#20260415222222</span>
-                            </div>
-                            <div class="flex items-center gap-6">
-                                <div class="flex flex-col items-end">
-                                    <span class="text-[11px] text-on-surface-variant">总消耗</span>
-                                    <span class="text-base font-bold text-on-surface">8,500<span class="text-[11px] font-normal ml-0.5">元</span></span>
-                                </div>
-                                <div class="flex flex-col items-end">
-                                    <span class="text-[11px] text-on-surface-variant">总合成素材</span>
-                                    <span class="text-base font-bold text-on-surface">850<span class="text-[11px] font-normal ml-0.5">个</span></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 分页 -->
-        <div class="flex justify-end items-center mt-4 pb-4 text-sm gap-2">
-            <span class="text-on-surface-variant mr-4">共 100 条</span>
-            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white hover:text-primary"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
-            <button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-on-primary">1</button>
-            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white">2</button>
-            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white">3</button>
-            <button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant/20 bg-white hover:text-primary"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+                <select class="sel-compact"><option>全部状态</option></select>
+                <input type="text" class="search-compact" placeholder="策略名称 / ID">
+                <button class="btn btn-primary" style="margin-left: 4px; padding: 0 16px;">查询</button>
+                <button class="btn btn-ghost">重置</button>
+            </section>
         </div>
-    </main>
+
+        <!-- 区块 B -->
+        <div class="white-box content-section" id="contentBlock">
+            <div class="content-toolbar">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="btn btn-ghost btn-select-trigger" onclick="toggleManageMode(true)">选择</button>
+                    <div class="manage-controls">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 12px;">
+                            <input type="checkbox" id="selectAll"> 全选
+                        </label>
+                        <div class="dropdown-rel">
+                            <button class="btn btn-ghost" onclick="toggleBatchMenu(event)">批量操作 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></button>
+                            <div class="dropdown-menu" id="batchMenu">
+                                <div class="dropdown-item" onclick="handleBatch('暂停')">批量暂停</div>
+                                <div class="dropdown-item" onclick="handleBatch('启动')">批量启动</div>
+                                <div class="dropdown-item danger" onclick="handleBatch('删除')">批量删除</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-black" onclick="toggleManageMode(false)">退出选择</button>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 12px; color: var(--text-muted);">排序项</span>
+                    <select class="sel-compact" style="background:#fff; border:1px solid var(--gray-4); min-width:160px">
+                        <option>创建时间：由近及远</option>
+                        <option>合成数量：由多到少</option>
+                        <option>累计消耗：由高到低</option>
+                    </select>
+                </div>
+            </div>
+
+            <main>
+                <!-- 策略卡片 1 -->
+                <div class="strategy-card">
+                    <div class="card-id-area">
+                        <div class="cb-wrap"><input type="checkbox" class="row-checkbox"></div>
+                        <div class="id-main">
+                            <div class="id-top">
+                                <h3 class="card-title">享瘦XXX系列素材自动合成策略</h3>
+                                <span class="status-tag status-active">生效中</span>
+                            </div>
+                            <div class="id-tags">
+                                <span class="tag-mini">减脂</span>
+                                <span class="tag-mini">巨量</span>
+                                <span class="tag-mini">享瘦</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-bar">
+                        <div class="metric-item">
+                            <div class="metric-label">累计消耗</div>
+                            <div class="metric-value">13,000<span style="font-size:11px; font-weight:normal; margin-left:2px">元</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">合成素材</div>
+                            <div class="metric-value">1,300<span style="font-size:11px; font-weight:normal; margin-left:2px">个</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">最近三十天ROI</div>
+                            <div class="metric-value">1.85</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">最近三十天消耗</div>
+                            <div class="metric-value">4,500<span style="font-size:11px; font-weight:normal; margin-left:2px">元</span></div>
+                        </div>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <div class="card-ops-area">
+                        <div class="op-btns">
+                            <button class="btn btn-black" onclick="openConfirmModal({title: '确认删除', description: '确定要删除该策略吗？', confirmText: '删除', countdown: 5, onConfirm: function() { console.log('删除策略'); }})">删除</button>
+                            <button class="btn btn-black">编辑</button>
+                            <button class="btn btn-primary" style="width: 64px;">暂停</button>
+                        </div>
+                        <div class="card-footer-meta">
+                            <span>唐大山</span>
+                            <span style="color: var(--gray-5);">|</span>
+                            <span>2026-04-18 10:22</span>
+                            <span style="color: var(--gray-5);">|</span>
+                            <span style="color: var(--gray-9);">#20260418111111</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 策略卡片 2 -->
+                <div class="strategy-card">
+                    <div class="card-id-area">
+                        <div class="cb-wrap"><input type="checkbox" class="row-checkbox"></div>
+                        <div class="id-main">
+                            <div class="id-top">
+                                <h3 class="card-title">夏季增肌系列视频物料衍生策略</h3>
+                                <span class="status-tag status-paused">已暂停</span>
+                            </div>
+                            <div class="id-tags">
+                                <span class="tag-mini">增肌系列</span>
+                                <span class="tag-mini">增肌产品</span>
+                                <span class="tag-mini">广点通</span>
+                                <span class="tag-mini">视频</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="metrics-bar">
+                        <div class="metric-item">
+                            <div class="metric-label">累计消耗</div>
+                            <div class="metric-value">8,500<span style="font-size:11px; font-weight:normal; margin-left:2px">元</span></div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">合成素材</div>
+                            <div class="metric-value">850<span style="font-size:11px; font-weight:normal; margin-left:2px">个</span></div>
+                        </div>
+                    </div>
+
+                    <div class="spacer"></div>
+
+                    <div class="card-ops-area">
+                        <div class="op-btns">
+                            <button class="btn btn-black" onclick="openConfirmModal({title: '确认删除', description: '确定要删除该策略吗？', confirmText: '删除', onConfirm: function() { console.log('删除策略'); }})">删除</button>
+                            <button class="btn btn-black">编辑</button>
+                            <button class="btn btn-primary" style="width: 64px;">启动</button>
+                        </div>
+                        <div class="card-footer-meta">
+                            <span>李小红</span>
+                            <span style="color: var(--gray-5);">|</span>
+                            <span>2026-04-15 14:00</span>
+                            <span style="color: var(--gray-5);">|</span>
+                            <span style="color: var(--gray-9);">#20260415222222</span>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- 分页 -->
+            <footer style="display: flex; justify-content: flex-end; align-items: center; padding: 16px 8px; gap: 8px; font-size: 12px; color: var(--text-muted);">
+                <button class="btn btn-ghost" style="padding:0 8px; min-width:24px; height:24px;">&lt;</button>
+                <button class="btn btn-primary" style="padding:0 8px; min-width:24px; height:24px;">1</button>
+                <button class="btn btn-ghost" style="padding:0 8px; min-width:24px; height:24px;">2</button>
+                <button class="btn btn-ghost" style="padding:0 8px; min-width:24px; height:24px;">&gt;</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="../共享样式/confirm-modal.js"></script>
+    <script>
+        function toggleManageMode(active) {
+            const block = document.getElementById('contentBlock');
+            if (active) {
+                block.classList.add('manage-active');
+            } else {
+                block.classList.remove('manage-active');
+                document.getElementById('selectAll').checked = false;
+                document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+            }
+        }
+        function toggleBatchMenu(e) { e.stopPropagation(); document.getElementById('batchMenu').classList.toggle('show'); }
+        function handleBatch(action) {
+            const selectedCount = document.querySelectorAll('.row-checkbox:checked').length;
+            if (selectedCount === 0) { alert('请先选择要操作的策略'); return; }
+            openConfirmModal({
+                title: '确认' + action,
+                description: `确定要对选中的 ${selectedCount} 个策略执行批量${action}操作吗？`,
+                confirmText: '确认' + action,
+                onConfirm: function() { console.log('执行批量' + action); toggleManageMode(false); }
+            });
+        }
+        document.getElementById('selectAll')?.addEventListener('change', function(e) {
+            document.querySelectorAll('.row-checkbox').forEach(cb => { cb.checked = e.target.checked; });
+        });
+        document.addEventListener('click', function() { document.getElementById('batchMenu')?.classList.remove('show'); });
+    </script>
+    <!-- 项目选择弹窗 -->
+    <div class="cc-proj-modal-mask" id="ccProjModalMask" onclick="if(event.target===this)closeProjModal()">
+      <div class="cc-proj-modal">
+        <div class="cc-proj-modal-header">
+          <div class="cc-proj-modal-title">选择项目</div>
+          <div class="cc-proj-modal-close" onclick="closeProjModal()">✕</div>
+        </div>
+        <div class="cc-proj-modal-search">
+          <input id="ccProjSearchInput" placeholder="搜索品类或项目..." oninput="renderProjModalBody()">
+        </div>
+        <div class="cc-proj-modal-body">
+          <div class="cc-proj-modal-cats" id="ccProjCatList"></div>
+          <div class="cc-proj-modal-products" id="ccProjProdList"></div>
+          <div class="cc-proj-modal-selected" id="ccProjSelectedList"></div>
+        </div>
+        <div class="cc-proj-modal-footer">
+          <button onclick="closeProjModal()">取消</button>
+          <button class="proj-confirm" onclick="confirmProjSelect()">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <link rel="stylesheet" href="../共享样式/project-picker.css">
+    <script src="../共享样式/project-picker.js"></script>
+    <script>
+    var PROJECTS_DATA = [
+        { category: '休闲游戏', products: ['消消乐', '跑酷大冒险', '解谜达人', '塔防英雄'] },
+        { category: '工具应用', products: ['清理大师', 'WiFi管家', '天气预报Pro', '超级省电'] },
+        { category: '网赚激励', products: ['走路赚钱', '答题领红包', '视频刷宝', '阅读赚金币'] },
+        { category: '内容阅读', products: ['小说畅读', '漫画星球', '壁纸精选', '短剧热播'] },
+    ];
+    var PROJECT_TREE = PROJECTS_DATA.map(function(g) { return { name: g.category, children: g.products }; });
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    var selectedProjects = [];
+
+    setProjectPickerAdapter({
+        getValue: function() { return selectedProjects; },
+        setValue: function(value) { selectedProjects = value; },
+        refresh: function() {
+            var valEl = document.getElementById('projectPickerVal');
+            if (selectedProjects.length === 0) {
+                valEl.innerText = '全部项目';
+            } else {
+                valEl.innerText = selectedProjects.join(', ');
+            }
+        }
+    });
+    </script>
 </body>
 </html>

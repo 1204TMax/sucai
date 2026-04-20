@@ -2568,10 +2568,11 @@ function renderOpts() {
         }
 
         if (opt.type === 'project') {
-            pill.title = '选择您的目标产品或品类（单选），生成内容将结合该产品特点与目标人群进行优化';
+            pill.title = '选择您的目标产品或品类（多选），生成内容将结合这些产品特点进行优化';
         }
 
-        const clearBtn = (opt.type === 'project' && sel[curType].project)
+        const hasProject = Array.isArray(sel[curType].project) ? sel[curType].project.length > 0 : !!sel[curType].project;
+        const clearBtn = (opt.type === 'project' && hasProject)
             ? `<button class="pill-clear" onclick="event.stopPropagation();onProjectConfirm('')">✕</button>` : '';
 
         if (ddInner === null) {
@@ -2996,6 +2997,7 @@ syncToolboxFormatState();
     <div class="cc-proj-modal-body">
       <div class="cc-proj-modal-cats" id="ccProjCatList"></div>
       <div class="cc-proj-modal-products" id="ccProjProdList"></div>
+      <div class="cc-proj-modal-selected" id="ccProjSelectedList"></div>
     </div>
     <div class="cc-proj-modal-footer">
       <button onclick="closeProjModal()">取消</button>

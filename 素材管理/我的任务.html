@@ -4,99 +4,1396 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的任务 - 素材管理</title>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#0057c2",
-                        "surface": "#f5f7fa",
-                        "on-surface-variant": "#414755",
-                        "outline-variant": "#c1c6d7",
-                        "surface-container-lowest": "#ffffff"
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { 
-            font-family: 'Inter', 'PingFang SC', sans-serif; 
-            background-color: #f5f7fa;
+        :root {
+            --ant-primary-1: #E6F4FF;
+            --ant-primary-2: #BAE0FF;
+            --ant-primary-5: #4096FF;
+            --ant-primary-6: #1677FF;
+            --ant-primary-7: #0958D9;
+            --ant-success-1: #F6FFED;
+            --ant-success-2: #D9F7BE;
+            --ant-success-6: #52C41A;
+            --ant-warning-1: #FFFBE6;
+            --ant-warning-2: #FFF1B8;
+            --ant-warning-6: #FAAD14;
+            --ant-error-1: #FFF1F0;
+            --ant-error-2: #FFCCC7;
+            --ant-error-6: #F5222D;
+            --ant-text-color: #262626;
+            --ant-text-color-secondary: #595959;
+            --ant-text-color-tertiary: #8C8C8C;
+            --ant-text-color-quaternary: #BFBFBF;
+            --ant-text-color-inverse: #FFFFFF;
+            --ant-bg-base: #F5F5F5;
+            --ant-bg-container: #FFFFFF;
+            --ant-bg-secondary: rgba(0, 0, 0, 0.02);
+            --ant-bg-tertiary: rgba(0, 0, 0, 0.04);
+            --ant-border-color: #D9D9D9;
+            --ant-border-color-secondary: #F0F0F0;
+            --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --ant-font-size-lg: 16px;
+            --ant-font-size: 14px;
+            --ant-font-size-sm: 12px;
+            --ant-size-xxs: 4px;
+            --ant-size-xs: 8px;
+            --ant-size-sm: 12px;
+            --ant-size: 16px;
+            --ant-size-md: 20px;
+            --ant-size-lg: 24px;
+            --ant-size-xl: 32px;
+            --ant-size-xxl: 48px;
+            --ant-border-radius-sm: 4px;
+            --ant-border-radius: 6px;
+            --ant-border-radius-lg: 8px;
+            --ant-border-radius-xl: 16px;
+            --ant-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            --ant-box-shadow-focus: 0 0 0 2px rgba(22, 119, 255, 0.1);
+            --bg-page: #f5f7fa;
+            --bg-surface: var(--ant-bg-container);
+            --bg-subtle: var(--ant-bg-secondary);
+            --bg-hover: var(--ant-bg-tertiary);
+            --border-1: #f0f0f0;
+            --border-2: #d9d9d9;
+            --text-hi: #1a1a1a;
+            --text-lo: #595959;
+            --text-muted: #8c8c8c;
+            --text-ghost: #bfbfbf;
+            --accent-bg: var(--ant-primary-1);
+            --accent-border: var(--ant-primary-2);
+            --accent-solid: #1677ff;
+            --accent-solid-h: #4096ff;
+            --accent-text: var(--ant-primary-7);
+            --success: #52c41a;
+            --success-bg: #f6ffed;
+            --success-border: #b7eb8f;
+            --warning: #faad14;
+            --warning-bg: #fffbe6;
+            --warning-border: #ffe58f;
+            --error: #ff4d4f;
+            --error-bg: #fff1f0;
+            --error-border: #ffa39e;
+            --white: #ffffff;
+            --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --text-xs: 12px;
+            --text-sm: 12px;
+            --text-base: 13px;
+            --text-md: 14px;
+            --text-lg: 16px;
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-7: 32px;
+            --r-sm: 4px;
+            --r-md: 6px;
+            --r-lg: 8px;
+            --r-xl: 12px;
+            --r-full: 9999px;
+            --h-xs: 24px;
+            --h-sm: 28px;
+            --h-md: 32px;
+            --ease: 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-page);
+            color: var(--text-hi);
+            font-family: var(--font);
+            font-size: var(--text-base);
             padding: 8px;
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        .page {
+            max-width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .link-btn,
+        .text-btn {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            transition: all var(--ease);
+        }
+
+        .link-btn {
+            color: var(--accent-solid);
+            font-size: var(--text-sm);
+        }
+
+        .link-btn:hover,
+        .text-btn:hover {
+            color: var(--accent-solid-h);
+        }
+
+        .panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-1);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        .tabs {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-1);
+            background: #fff;
+        }
+
+        .tab {
+            height: 46px;
+            padding: 0 16px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            font-size: 14px;
+            color: var(--text-muted);
+            transition: all var(--ease);
+        }
+
+        .tab:hover {
+            color: var(--accent-solid);
+        }
+
+        .tab.on {
+            color: var(--accent-solid);
+            font-weight: 600;
+        }
+
+        .tab.on::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: var(--accent-solid);
+        }
+
+        .tab-count {
+            min-width: 20px;
+            padding: 0 6px;
+            height: 20px;
+            border-radius: 10px;
+            background: #f0f0f0;
+            color: #8c8c8c;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        .tab.on .tab-count {
+            background: var(--accent-bg);
+            color: var(--accent-solid);
+        }
+
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-1);
+            background: #fff;
+        }
+
+        .field,
+        .search {
+            height: 32px;
+            border: 1px solid var(--border-2);
+            border-radius: 6px;
+            background: #fff;
+            color: var(--text-hi);
+            transition: all var(--ease);
+        }
+
+        .field {
+            min-width: 140px;
+            padding: 0 12px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .field:hover,
+        .search:hover {
+            border-color: var(--accent-solid);
+        }
+
+        .field:focus,
+        .search-input:focus {
+            outline: none;
+        }
+
+        .field:focus,
+        .search:focus-within {
+            border-color: var(--accent-solid);
+            box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+        }
+
+        .search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 11px;
+            width: 240px;
+            flex: 0 0 240px;
+        }
+
+        .search-icon {
+            color: var(--text-ghost);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            border: none;
+            background: transparent;
+            color: var(--text-hi);
+            width: 100%;
+            font-size: 13px;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-ghost);
+        }
+
+        .toolbar-end {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .b {
+            height: 32px;
+            padding: 0 12px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all var(--ease);
+            font-size: 13px;
+        }
+
+        .b-solid {
+            background: var(--accent-solid);
+            color: #fff;
+        }
+
+        .b-solid:hover {
+            background: var(--accent-solid-h);
+        }
+
+        .b-soft {
+            background: #fff;
+            color: var(--text-hi);
+            border-color: var(--border-2);
+        }
+
+        .b-soft:hover {
+            border-color: var(--accent-solid);
+            color: var(--accent-solid);
+        }
+
+        .b-ghost {
+            background: transparent;
+            color: var(--text-lo);
+        }
+
+        .b-ghost:hover {
+            background: rgba(0,0,0,0.04);
+            color: var(--text-hi);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            background: #fff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-1);
+            vertical-align: middle;
+        }
+
+        th {
+            background: #fafafa;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover td {
+            background: #fafafa;
+        }
+
+        .row-package td {
+            background: #fff;
+        }
+
+        .row-child td {
+            background: #fafcff;
+        }
+
+        .name-cell {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .expand-btn {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border-2);
+            background: #fff;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--ease);
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .expand-btn:hover {
+            border-color: var(--accent-solid);
+            color: var(--accent-solid);
+        }
+
+        .item-main {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+        }
+
+        .item-title-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .item-title {
+            font-size: 13px;
+            color: var(--text-hi);
+            font-weight: 500;
+            line-height: 20px;
+        }
+
+        .meta-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .badge {
+            height: 18px;
+            padding: 0 6px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #8c8c8c;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .badge-accent {
+            background: #e6f4ff;
+            color: #1677ff;
+        }
+
+        .status-tag {
+            height: 22px;
+            padding: 0 8px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            border: 1px solid transparent;
+        }
+
+        .status-processing {
+            background: #e6f4ff;
+            border-color: #91caff;
+            color: #0958d9;
+        }
+
+        .status-success {
+            background: #f6ffed;
+            border-color: #b7eb8f;
+            color: #389e0d;
+        }
+
+        .status-warning {
+            background: #fffbe6;
+            border-color: #ffe58f;
+            color: #d48806;
+        }
+
+        .status-error {
+            background: #fff1f0;
+            border-color: #ffa39e;
+            color: #cf1322;
+        }
+
+        .progress-block {
+            width: 132px;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #f0f0f0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1677ff;
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.success { background: #52c41a; }
+        .progress-fill.warning { background: #faad14; }
+        .progress-fill.error { background: #ff4d4f; }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .text-btn {
+            color: #1677ff;
+            font-size: 13px;
+        }
+
+        .text-btn.danger {
+            color: #ff4d4f;
+        }
+
+        .text-btn:hover {
+            color: #4096ff;
+        }
+
+        .text-btn.danger:hover {
+            color: #ff7875;
+        }
+
+        /* 侧边弹窗 Drawer */
+        .drawer-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .drawer-mask.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 800px;
+            background: #fff;
+            z-index: 1001;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.7, 0.3, 0.1, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: -6px 0 16px -8px rgba(0,0,0,0.08), -9px 0 28px 0 rgba(0,0,0,0.05), -12px 0 48px 16px rgba(0,0,0,0.03);
+        }
+        .drawer.show {
+            transform: translateX(0);
+        }
+        .drawer-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .drawer-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.88);
+        }
+        .drawer-close {
+            cursor: pointer;
+            color: rgba(0,0,0,0.45);
+            font-size: 16px;
+            border: none;
+            background: none;
+            padding: 4px;
+            transition: color 0.3s;
+        }
+        .drawer-close:hover {
+            color: rgba(0,0,0,0.88);
+        }
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #f5f7fa;
+        }
+
+        /* 同质化精简布局 */
+        .sim-section-title {
+            font-size: 13px;
+            color: #8c8c8c;
+            margin-bottom: 12px;
+        }
+        .sim-current-box {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #f0f0f0;
+        }
+        .sim-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .sim-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 8px;
+            border: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .sim-item:hover {
+            border-color: #1677ff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .sim-item-thumb {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        .sim-item-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .sim-item-info {
+            font-size: 12px;
+            color: #262626;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sim-item-rate {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 77, 79, 0.9);
+            color: #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* 预览层 */
+        .preview-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+        }
+        .preview-mask.show { display: flex; }
+        .preview-content { max-width: 90%; max-height: 90%; }
+        .preview-content img { width: 100%; height: 100%; object-fit: contain; border-radius: 4px; }
+
+
+        @media (max-width: 1200px) {
+            .filter-bar {
+                padding: var(--space-3) var(--space-4);
+            }
         }
     </style>
 </head>
-<body class="text-[#1a1c1c]">
-    <main class="flex flex-col gap-2">
-        <!-- 头部 -->
-        <section class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex justify-between items-center">
-            <div>
-                <h1 class="text-xl font-bold">我的任务</h1>
-                <p class="text-sm text-on-surface-variant mt-1">查看合成任务的处理进度与结果</p>
+<body>
+    <div class="page">
+        <section class="panel">
+            <div class="tabs" id="taskTabs"></div>
+            <div class="filter-bar" id="filterBar"></div>
+            <div class="table-wrap">
+                <table>
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
             </div>
-            <button onclick="history.back()" class="text-sm text-primary hover:underline">返回策略管理</button>
         </section>
+    </div>
 
-        <!-- 任务列表 -->
-        <section class="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-slate-50 border-b border-slate-100 text-on-surface-variant font-medium">
-                    <tr>
-                        <th class="px-6 py-3">任务编号 / 名称</th>
-                        <th class="px-6 py-3">状态</th>
-                        <th class="px-6 py-3">进度</th>
-                        <th class="px-6 py-3">提交时间</th>
-                        <th class="px-6 py-3 text-right">操作</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-50">
-                    <tr class="hover:bg-slate-50/50">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-slate-800">#20260418111111</div>
-                            <div class="text-xs text-slate-400">享瘦XXX素材合成策略 - 自动触发</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center gap-1.5 text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full text-xs font-medium">
-                                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                                合成中
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="w-32 bg-slate-100 rounded-full h-1.5 mt-1">
-                                <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
-                            </div>
-                            <span class="text-[11px] text-slate-400 mt-1 inline-block">45/100</span>
-                        </td>
-                        <td class="px-6 py-4 text-slate-500">2026-04-18 10:30</td>
-                        <td class="px-6 py-4 text-right">
-                            <button class="text-primary hover:underline">取消任务</button>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-slate-50/50">
-                        <td class="px-6 py-4">
-                            <div class="font-bold text-slate-800">#20260418109988</div>
-                            <div class="text-xs text-slate-400">手动合成测试任务</div>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="inline-flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full text-xs font-medium">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                已完成
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            <span class="text-slate-400 text-xs">10/10</span>
-                        </td>
-                        <td class="px-6 py-4 text-slate-500">2026-04-18 09:15</td>
-                        <td class="px-6 py-4 text-right">
-                            <button class="text-primary hover:underline">查看结果</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-    </main>
+    <!-- 侧边弹窗：查看同质化内容 -->
+    <div class="drawer-mask" id="simDrawerMask" onclick="closeSimDrawer()"></div>
+    <div class="drawer" id="simDrawer">
+        <div class="drawer-header">
+            <span class="drawer-title">同质化内容分析</span>
+            <button class="drawer-close" onclick="closeSimDrawer()">✕</button>
+        </div>
+        <div class="drawer-body" id="simDrawerBody">
+            <!-- 由 JS 渲染内容 -->
+        </div>
+    </div>
+
+    <!-- 大图预览层 -->
+    <div class="preview-mask" id="assetPreviewMask" onclick="closeAssetPreview()">
+        <div class="preview-content">
+            <img id="assetPreviewImg" src="" alt="预览">
+        </div>
+    </div>
+
+    <script>
+        const VIEWS = {
+            upload: {
+                label: '上传',
+                filters: [
+                    { key: 'startDate', label: '开始时间', type: 'date' },
+                    { key: 'endDate', label: '结束时间', type: 'date' },
+                    { key: 'keyword', label: '文件名称', type: 'search', placeholder: '搜索文件名称 / 上传包' },
+                    { key: 'fileType', label: '文件类型', type: 'select', options: ['全部', '视频', '图片'] },
+                    { key: 'assetType', label: '文件属性', type: 'select', options: ['全部', '物料', '素材'] },
+                    { key: 'product', label: '所属系列/产品', type: 'select', options: ['全部', '享瘦系列 / 享瘦饮', '美白系列 / 雪光霜', '拉新系列 / 红包版'] }
+                ],
+                columns: ['文件名称', '文件类型', '文件属性', '文件大小', '上传目标文件夹', '所属系列 / 产品', '上传进度', '状态', '提交时间', '操作']
+            },
+            download: {
+                label: '下载',
+                filters: [
+                    { key: 'startDate', label: '开始时间', type: 'date' },
+                    { key: 'endDate', label: '结束时间', type: 'date' },
+                    { key: 'keyword', label: '文件名称', type: 'search', placeholder: '搜索文件名称 / 下载批次' },
+                    { key: 'fileType', label: '文件类型', type: 'select', options: ['全部', '视频', '图片'] },
+                    { key: 'assetType', label: '文件属性', type: 'select', options: ['全部', '物料', '素材'] },
+                    { key: 'product', label: '所属系列/产品', type: 'select', options: ['全部', '享瘦系列 / 享瘦饮', '美白系列 / 雪光霜', '拉新系列 / 红包版'] }
+                ],
+                columns: ['文件名称', '文件类型', '文件属性', '文件大小', '所属文件夹', '所属系列 / 产品', '下载进度', '状态', '提交时间', '操作']
+            },
+            synthesis: {
+                label: '视频合成',
+                filters: [
+                    { key: 'startDate', label: '开始时间', type: 'date' },
+                    { key: 'endDate', label: '结束时间', type: 'date' },
+                    { key: 'keyword', label: '任务/策略名称', type: 'search', placeholder: '搜索合成包 / 策略名称' },
+                    { key: 'status', label: '合成状态', type: 'select', options: ['全部', '排队中', '合成中', '部分失败', '已完成', '已终止'] },
+                    { key: 'ratio', label: '输出比例', type: 'select', options: ['全部', '9:16', '1:1', '16:9'] },
+                    { key: 'product', label: '所属系列/产品', type: 'select', options: ['全部', '享瘦系列 / 享瘦饮', '美白系列 / 雪光霜', '拉新系列 / 红包版'] }
+                ],
+                columns: ['合成包 / 策略', '输入物料 / 目标产出', '输出规格', '所属系列 / 产品', '合成进度', '状态', '提交时间', '操作']
+            }
+        };
+
+        const DATA = {
+            upload: [
+                {
+                    id: 'u-pack-1',
+                    kind: 'package',
+                    name: '五一投放素材上传包',
+                    createdAt: '2026-04-20 10:42',
+                    fileType: '批量',
+                    assetType: '混合',
+                    size: '4.8 GB',
+                    folder: '素材库 / 五一活动 / 待审核',
+                    product: '享瘦系列 / 享瘦饮',
+                    progress: 62,
+                    progressLabel: '8 / 13',
+                    status: '上传中',
+                    meta: ['13 个文件', '视频 9 · 图片 4'],
+                    children: [
+                        { id: 'u-1', kind: 'file', name: '五一主视频-剪映版.mp4', createdAt: '2026-04-20 10:42', fileType: '视频', assetType: '素材', size: '186 MB', folder: '素材库 / 五一活动 / 待审核', product: '享瘦系列 / 享瘦饮', progress: 78, progressLabel: '78%', status: '上传中', batchId: 'UP-20260420-001' },
+                        { id: 'u-2', kind: 'file', name: '对比前后口播封面.jpg', createdAt: '2026-04-20 10:45', fileType: '图片', assetType: '素材', size: '5.4 MB', folder: '素材库 / 五一活动 / 待审核', product: '享瘦系列 / 享瘦饮', progress: 100, progressLabel: '100%', status: '上传成功', batchId: 'UP-20260420-001' },
+                        { id: 'u-3', kind: 'file', name: '达人口播切片-03.mov', createdAt: '2026-04-20 10:48', fileType: '视频', assetType: '物料', size: '222 MB', folder: '物料库 / 达人口播 / 待归类', product: '享瘦系列 / 享瘦饮', progress: 34, progressLabel: '同质化检测中', status: '同质化检测中', batchId: 'UP-20260420-001' },
+                        { id: 'u-4', kind: 'file', name: '演员近景镜头-07.mp4', createdAt: '2026-04-20 10:50', fileType: '视频', assetType: '物料', size: '208 MB', folder: '物料库 / 达人口播 / 待归类', product: '享瘦系列 / 享瘦饮', progress: 100, progressLabel: '疑似重复 91%', status: '同质化过高', batchId: 'UP-20260420-001' }
+                    ]
+                },
+                {
+                    id: 'u-pack-2',
+                    kind: 'package',
+                    name: '渠道补量图包',
+                    createdAt: '2026-04-19 18:16',
+                    fileType: '批量',
+                    assetType: '素材',
+                    size: '812 MB',
+                    folder: '素材库 / 4月补量 / 已入库',
+                    product: '拉新系列 / 红包版',
+                    progress: 100,
+                    progressLabel: '24 / 24',
+                    status: '已完成',
+                    meta: ['24 个文件', '图片 24'],
+                    children: [
+                        { id: 'u-5', kind: 'file', name: '红包弹窗静态图-01.png', createdAt: '2026-04-19 18:16', fileType: '图片', assetType: '素材', size: '3.2 MB', folder: '素材库 / 4月补量 / 已入库', product: '拉新系列 / 红包版', progress: 100, progressLabel: '100%', status: '上传成功', batchId: 'UP-20260419-006' },
+                        { id: 'u-6', kind: 'file', name: '红包弹窗静态图-02.png', createdAt: '2026-04-19 18:17', fileType: '图片', assetType: '素材', size: '3.0 MB', folder: '素材库 / 4月补量 / 已入库', product: '拉新系列 / 红包版', progress: 100, progressLabel: '100%', status: '上传成功', batchId: 'UP-20260419-006' }
+                    ]
+                },
+                {
+                    id: 'u-7',
+                    kind: 'file',
+                    name: '雪光霜达人横版素材.mp4',
+                    createdAt: '2026-04-20 09:06',
+                    fileType: '视频',
+                    assetType: '素材',
+                    size: '128 MB',
+                    folder: '素材库 / 雪光霜 / 横版',
+                    product: '美白系列 / 雪光霜',
+                    progress: 100,
+                    progressLabel: '网络中断',
+                    status: '上传失败',
+                    batchId: 'UP-20260420-009'
+                }
+            ],
+            download: [
+                { id: 'd-1', name: '五一主视频-剪映版.mp4', createdAt: '2026-04-20 11:20', fileType: '视频', assetType: '素材', size: '186 MB', folder: '素材库 / 五一活动 / 已审核', product: '享瘦系列 / 享瘦饮', progress: 58, progressLabel: '58%', status: '下载中', batchId: 'DL-20260420-003' },
+                { id: 'd-2', name: '达人口播切片-03.mov', createdAt: '2026-04-20 10:12', fileType: '视频', assetType: '物料', size: '222 MB', folder: '物料库 / 达人口播 / 已入库', product: '享瘦系列 / 享瘦饮', progress: 100, progressLabel: '磁盘写入失败', status: '下载失败', batchId: 'DL-20260420-002' },
+                { id: 'd-3', name: '红包弹窗静态图-02.png', createdAt: '2026-04-19 16:50', fileType: '图片', assetType: '素材', size: '3.0 MB', folder: '素材库 / 4月补量 / 已入库', product: '拉新系列 / 红包版', progress: 100, progressLabel: '100%', status: '下载成功', batchId: 'DL-20260419-011' },
+                { id: 'd-4', name: '雪光霜对比图-A.jpg', createdAt: '2026-04-19 15:36', fileType: '图片', assetType: '素材', size: '5.2 MB', folder: '素材库 / 雪光霜 / 正式版', product: '美白系列 / 雪光霜', progress: 100, progressLabel: '100%', status: '下载成功', batchId: 'DL-20260419-010' }
+            ],
+            synthesis: [
+                {
+                    id: 's-pack-1',
+                    kind: 'package',
+                    name: '五一减脂口播混剪批次',
+                    strategyName: '五一减脂-达人口播 9:16',
+                    createdAt: '2026-04-20 09:30',
+                    product: '享瘦系列 / 享瘦饮',
+                    ratio: '9:16',
+                    outputSpec: '9:16 · 15s~25s · H.264',
+                    inputCount: 36,
+                    outputCount: 100,
+                    progress: 67,
+                    progressLabel: '67 / 100',
+                    status: '合成中',
+                    children: [
+                        { id: 's-1', kind: 'result', name: 'result-001.mp4', createdAt: '2026-04-20 09:31', product: '享瘦系列 / 享瘦饮', ratio: '9:16', outputSpec: '成片 18s', inputSummary: '口播 4 + 片头 1 + 片尾 1', progress: 100, progressLabel: '已生成', status: '合成成功', batchId: 'SYN-20260420-001' },
+                        { id: 's-2', kind: 'result', name: 'result-002.mp4', createdAt: '2026-04-20 09:32', product: '享瘦系列 / 享瘦饮', ratio: '9:16', outputSpec: '成片 21s', inputSummary: '口播 4 + 片头 1 + 片尾 1', progress: 100, progressLabel: '转码失败', status: '合成失败', batchId: 'SYN-20260420-001' },
+                        { id: 's-3', kind: 'result', name: 'result-003.mp4', createdAt: '2026-04-20 09:33', product: '享瘦系列 / 享瘦饮', ratio: '9:16', outputSpec: '成片 17s', inputSummary: '口播 4 + 片头 1 + 片尾 1', progress: 48, progressLabel: '合成中', status: '合成中', batchId: 'SYN-20260420-001' }
+                    ]
+                },
+                {
+                    id: 's-pack-2',
+                    kind: 'package',
+                    name: '雪光霜图文转视频测试批次',
+                    strategyName: '雪光霜-图文转视频 1:1',
+                    createdAt: '2026-04-19 14:10',
+                    product: '美白系列 / 雪光霜',
+                    ratio: '1:1',
+                    outputSpec: '1:1 · 12s~18s · H.264',
+                    inputCount: 12,
+                    outputCount: 20,
+                    progress: 85,
+                    progressLabel: '17 / 20',
+                    status: '部分失败',
+                    children: [
+                        { id: 's-4', kind: 'result', name: 'result-017.mp4', createdAt: '2026-04-19 14:30', product: '美白系列 / 雪光霜', ratio: '1:1', outputSpec: '成片 15s', inputSummary: '图文 5 + 口播 1', progress: 100, progressLabel: '已生成', status: '合成成功', batchId: 'SYN-20260419-004' },
+                        { id: 's-5', kind: 'result', name: 'result-018.mp4', createdAt: '2026-04-19 14:31', product: '美白系列 / 雪光霜', ratio: '1:1', outputSpec: '成片 14s', inputSummary: '图文 5 + 口播 1', progress: 100, progressLabel: '镜头缺失', status: '合成失败', batchId: 'SYN-20260419-004' }
+                    ]
+                },
+                {
+                    id: 's-pack-3',
+                    kind: 'package',
+                    name: '红包版素材补量批次',
+                    strategyName: '红包版-信息流横版 16:9',
+                    createdAt: '2026-04-18 17:40',
+                    product: '拉新系列 / 红包版',
+                    ratio: '16:9',
+                    outputSpec: '16:9 · 20s~30s · H.264',
+                    inputCount: 18,
+                    outputCount: 40,
+                    progress: 100,
+                    progressLabel: '40 / 40',
+                    status: '已完成',
+                    children: [
+                        { id: 's-6', kind: 'result', name: 'result-040.mp4', createdAt: '2026-04-18 18:12', product: '拉新系列 / 红包版', ratio: '16:9', outputSpec: '成片 26s', inputSummary: '横版镜头 6 + 字幕 1', progress: 100, progressLabel: '已生成', status: '合成成功', batchId: 'SYN-20260418-012' }
+                    ]
+                }
+            ]
+        };
+
+        const state = {
+            currentView: 'upload',
+            expanded: new Set(['u-pack-1', 's-pack-1']),
+            filters: {
+                upload: { startDate: '', endDate: '', keyword: '', fileType: '全部', assetType: '全部', product: '全部' },
+                download: { startDate: '', endDate: '', keyword: '', fileType: '全部', assetType: '全部', product: '全部' },
+                synthesis: { startDate: '', endDate: '', keyword: '', status: '全部', ratio: '全部', product: '全部' }
+            }
+        };
+
+        const tabsEl = document.getElementById('taskTabs');
+        const filterBarEl = document.getElementById('filterBar');
+        const headEl = document.getElementById('tableHead');
+        const bodyEl = document.getElementById('tableBody');
+
+        function getTopLevelCount(view) {
+            return DATA[view].length;
+        }
+
+        function getStatusTone(status) {
+            if (['上传成功', '下载成功', '已完成', '合成成功'].includes(status)) {
+                return 'status-success';
+            }
+            if (['上传失败', '下载失败', '合成失败', '已终止'].includes(status)) {
+                return 'status-error';
+            }
+            if (['同质化过高', '部分失败'].includes(status)) {
+                return 'status-warning';
+            }
+            if (['上传中', '下载中', '合成中', '同质化检测中', '排队中'].includes(status)) {
+                return 'status-processing';
+            }
+            return 'status-default';
+        }
+
+        function getProgressTone(status) {
+            if (['上传成功', '下载成功', '已完成', '合成成功'].includes(status)) {
+                return 'success';
+            }
+            if (['上传失败', '下载失败', '合成失败', '已终止'].includes(status)) {
+                return 'error';
+            }
+            if (['同质化过高', '部分失败'].includes(status)) {
+                return 'warning';
+            }
+            return '';
+        }
+
+        function getActions(view, item) {
+            if (view === 'upload') {
+                if (item.kind === 'package') {
+                    if (item.status === '上传中') {
+                        return ['暂停', '删除', state.expanded.has(item.id) ? '收起' : '展开'];
+                    }
+                    return [state.expanded.has(item.id) ? '收起' : '展开'];
+                }
+                if (item.status === '同质化检测中') {
+                    return ['暂停', '删除'];
+                }
+                if (item.status === '同质化过高') {
+                    return ['查看同质化内容', '继续上传', '删除'];
+                }
+                if (item.status === '上传中') {
+                    return ['暂停', '删除'];
+                }
+                if (item.status === '上传失败') {
+                    return ['重新开始', '删除'];
+                }
+                return ['查看详情'];
+            }
+            if (view === 'download') {
+                if (item.status === '下载中') {
+                    return ['暂停', '删除'];
+                }
+                if (item.status === '下载失败') {
+                    return ['重新下载', '删除'];
+                }
+                return ['查看', '打开所在文件夹'];
+            }
+            if (item.kind === 'result') {
+                if (item.status === '合成失败') {
+                    return ['重试', '查看日志'];
+                }
+                return ['查看详情'];
+            }
+            if (item.status === '排队中' || item.status === '合成中') {
+                return ['终止任务', state.expanded.has(item.id) ? '收起' : '展开'];
+            }
+            if (item.status === '部分失败') {
+                return ['重试失败项', '查看详情', state.expanded.has(item.id) ? '收起' : '展开'];
+            }
+            if (item.status === '已完成') {
+                return ['查看结果', '导出结果', state.expanded.has(item.id) ? '收起' : '展开'];
+            }
+            return ['查看详情', state.expanded.has(item.id) ? '收起' : '展开'];
+        }
+
+        function renderTabs() {
+            const tabsHtml = Object.entries(VIEWS).map(([key, view]) => `
+                <button class="tab ${state.currentView === key ? 'on' : ''}" type="button" data-view="${key}">
+                    <span>${view.label}</span>
+                    <span class="tab-count">${getTopLevelCount(key)}</span>
+                </button>
+            `).join('');
+
+            tabsEl.innerHTML = tabsHtml;
+        }
+        function renderFilters() {
+            const view = VIEWS[state.currentView];
+            const filters = state.filters[state.currentView];
+            filterBarEl.innerHTML = view.filters.map((filter) => {
+                if (filter.type === 'search') {
+                    return `
+                        <label class="search">
+                            <span class="search-icon">⌕</span>
+                            <input class="search-input" type="text" data-filter="${filter.key}" value="${filters[filter.key] || ''}" placeholder="${filter.placeholder}">
+                        </label>
+                    `;
+                }
+                if (filter.type === 'date') {
+                    return `<input class="field" type="date" data-filter="${filter.key}" value="${filters[filter.key] || ''}" aria-label="${filter.label}">`;
+                }
+                return `
+                    <select class="field" data-filter="${filter.key}" aria-label="${filter.label}">
+                        ${filter.options.map((option) => `<option value="${option}" ${filters[filter.key] === option ? 'selected' : ''}>${filter.label} · ${option}</option>`).join('')}
+                    </select>
+                `;
+            }).join('') + `
+                <div class="toolbar-end">
+                    <button class="b b-ghost" type="button" id="resetFilters">重置筛选</button>
+                </div>
+            `;
+        }
+
+        function matchDate(createdAt, startDate, endDate) {
+            const day = createdAt.slice(0, 10);
+            if (startDate && day < startDate) {
+                return false;
+            }
+            if (endDate && day > endDate) {
+                return false;
+            }
+            return true;
+        }
+
+        function matchKeyword(value, keyword) {
+            if (!keyword) {
+                return true;
+            }
+            return value.toLowerCase().includes(keyword.trim().toLowerCase());
+        }
+
+        function filterUploadDownload(items, view) {
+            const filters = state.filters[view];
+            return items.flatMap((item) => {
+                if (item.kind === 'package') {
+                    const matchedChildren = item.children.filter((child) => {
+                        return matchDate(child.createdAt, filters.startDate, filters.endDate)
+                            && matchKeyword(`${child.name} ${item.name}`, filters.keyword)
+                            && (filters.fileType === '全部' || child.fileType === filters.fileType)
+                            && (filters.assetType === '全部' || child.assetType === filters.assetType)
+                            && (filters.product === '全部' || child.product === filters.product);
+                    });
+                    const selfMatched = matchDate(item.createdAt, filters.startDate, filters.endDate)
+                        && matchKeyword(item.name, filters.keyword)
+                        && (filters.product === '全部' || item.product === filters.product)
+                        && filters.fileType === '全部'
+                        && filters.assetType === '全部';
+                    if (!matchedChildren.length && !selfMatched) {
+                        return [];
+                    }
+                    return [{ ...item, children: matchedChildren }];
+                }
+                if (!matchDate(item.createdAt, filters.startDate, filters.endDate)) {
+                    return [];
+                }
+                if (!matchKeyword(item.name, filters.keyword)) {
+                    return [];
+                }
+                if (filters.fileType !== '全部' && item.fileType !== filters.fileType) {
+                    return [];
+                }
+                if (filters.assetType !== '全部' && item.assetType !== filters.assetType) {
+                    return [];
+                }
+                if (filters.product !== '全部' && item.product !== filters.product) {
+                    return [];
+                }
+                return [item];
+            });
+        }
+
+        function filterSynthesis(items) {
+            const filters = state.filters.synthesis;
+            return items.filter((item) => {
+                if (!matchDate(item.createdAt, filters.startDate, filters.endDate)) {
+                    return false;
+                }
+                if (!matchKeyword(`${item.name} ${item.strategyName}`, filters.keyword)) {
+                    return false;
+                }
+                if (filters.status !== '全部' && item.status !== filters.status) {
+                    return false;
+                }
+                if (filters.ratio !== '全部' && item.ratio !== filters.ratio) {
+                    return false;
+                }
+                if (filters.product !== '全部' && item.product !== filters.product) {
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        function getFilteredItems() {
+            if (state.currentView === 'synthesis') {
+                return filterSynthesis(DATA.synthesis);
+            }
+            return filterUploadDownload(DATA[state.currentView], state.currentView);
+        }
+
+        function renderHead() {
+            headEl.innerHTML = `<tr>${VIEWS[state.currentView].columns.map((column) => `<th>${column}</th>`).join('')}</tr>`;
+        }
+
+        function renderNameCell(view, item, isChild) {
+            const badges = [];
+            if (item.kind === 'package') {
+                badges.push('<span class="badge badge-accent">任务包</span>');
+            }
+            if (view === 'upload' || view === 'download') {
+                if (item.fileType && item.fileType !== '批量') {
+                    badges.push(`<span class="badge">${item.fileType}</span>`);
+                }
+                if (item.assetType && item.assetType !== '混合') {
+                    badges.push(`<span class="badge">${item.assetType}</span>`);
+                }
+            }
+            if (view === 'synthesis' && item.kind === 'package') {
+                badges.push(`<span class="badge">目标 ${item.outputCount} 条</span>`);
+            }
+            const expand = item.kind === 'package'
+                ? `<button class="expand-btn ${state.expanded.has(item.id) ? 'is-open' : ''}" type="button" data-expand="${item.id}">${state.expanded.has(item.id) ? '－' : '＋'}</button>`
+                : `<span style="width:22px;flex-shrink:0;"></span>`;
+            const title = view === 'synthesis' && item.kind === 'package' ? item.name : item.name;
+            const meta = [];
+            if (item.kind === 'package' && item.meta) {
+                meta.push(...item.meta);
+            }
+            if (item.kind === 'package' && item.strategyName) {
+                meta.push(`策略：${item.strategyName}`);
+            }
+            if (item.batchId) {
+                meta.push(item.batchId);
+            }
+            if (item.kind === 'result') {
+                meta.push(item.inputSummary);
+            }
+            return `
+                <div class="name-cell">
+                    ${expand}
+                    <div class="item-main ${isChild ? 'child-item' : ''}">
+                        <div class="item-title-row">
+                            <span class="item-title">${title}</span>
+                            ${badges.join('')}
+                        </div>
+                        <div class="meta-row">
+                            ${meta.map((text) => `<span class="item-meta">${text}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProgress(item) {
+            return `
+                <div class="progress-block">
+                    <div class="progress-meta">
+                        <span class="muted">${item.progressLabel}</span>
+                        <span class="muted">${item.progress}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill ${getProgressTone(item.status)}" style="width:${item.progress}%;"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderActionCell(view, item) {
+            const actions = getActions(view, item);
+            return `
+                <div class="action-group action-cell">
+                    ${actions.map((action) => `<button class="text-btn ${action === '删除' || action === '终止任务' ? 'danger' : ''}" type="button" data-action="${action}" data-id="${item.id}">${action}</button>`).join('')}
+                </div>
+            `;
+        }
+
+        function renderUploadRow(item, isChild = false) {
+            return `
+                <tr class="${item.kind === 'package' ? 'row-package' : 'row-child'} ${isChild ? 'row-child' : ''}">
+                    <td>${renderNameCell('upload', item, isChild)}</td>
+                    <td><div class="cell-stack"><span>${item.fileType}</span></div></td>
+                    <td><div class="cell-stack"><span>${item.assetType}</span></div></td>
+                    <td><div class="cell-stack"><span>${item.size}</span></div></td>
+                    <td><div class="cell-stack"><span>${item.folder}</span></div></td>
+                    <td><div class="cell-stack"><span>${item.product}</span></div></td>
+                    <td>${renderProgress(item)}</td>
+                    <td><span class="status-tag ${getStatusTone(item.status)}">${item.status}</span></td>
+                    <td><span class="muted">${item.createdAt}</span></td>
+                    <td>${renderActionCell('upload', item)}</td>
+                </tr>
+            `;
+        }
+
+        function renderDownloadRow(item) {
+            return `
+                <tr>
+                    <td>${renderNameCell('download', item, false)}</td>
+                    <td><span>${item.fileType}</span></td>
+                    <td><span>${item.assetType}</span></td>
+                    <td><span>${item.size}</span></td>
+                    <td><span>${item.folder}</span></td>
+                    <td><span>${item.product}</span></td>
+                    <td>${renderProgress(item)}</td>
+                    <td><span class="status-tag ${getStatusTone(item.status)}">${item.status}</span></td>
+                    <td><span class="muted">${item.createdAt}</span></td>
+                    <td>${renderActionCell('download', item)}</td>
+                </tr>
+            `;
+        }
+
+        function renderSynthesisRow(item, isChild = false) {
+            const inputInfo = item.kind === 'package'
+                ? `${item.inputCount} 份物料 · 目标 ${item.outputCount} 条成片`
+                : item.inputSummary;
+            const outputSpec = item.kind === 'package' ? item.outputSpec : `${item.ratio} · ${item.outputSpec}`;
+            return `
+                <tr class="${item.kind === 'package' ? 'row-package' : 'row-child'} ${isChild ? 'row-child' : ''}">
+                    <td>${renderNameCell('synthesis', item, isChild)}</td>
+                    <td>
+                        <div class="cell-stack">
+                            <span>${inputInfo}</span>
+                            ${item.kind === 'package' ? `<div class="task-metrics"><span class="muted">策略：${item.strategyName}</span></div>` : ''}
+                        </div>
+                    </td>
+                    <td><div class="cell-stack"><span>${outputSpec}</span></div></td>
+                    <td><div class="cell-stack"><span>${item.product}</span></div></td>
+                    <td>${renderProgress(item)}</td>
+                    <td><span class="status-tag ${getStatusTone(item.status)}">${item.status}</span></td>
+                    <td><span class="muted">${item.createdAt}</span></td>
+                    <td>${renderActionCell('synthesis', item)}</td>
+                </tr>
+            `;
+        }
+
+        function renderRows(items) {
+            if (!items.length) {
+                bodyEl.innerHTML = `<tr><td class="empty" colspan="${VIEWS[state.currentView].columns.length}">当前筛选条件下暂无任务</td></tr>`;
+                return;
+            }
+            const rows = [];
+            items.forEach((item) => {
+                if (state.currentView === 'upload') {
+                    rows.push(renderUploadRow(item));
+                    if (item.kind === 'package' && state.expanded.has(item.id) && item.children.length) {
+                        item.children.forEach((child) => rows.push(renderUploadRow(child, true)));
+                    }
+                    return;
+                }
+                if (state.currentView === 'download') {
+                    rows.push(renderDownloadRow(item));
+                    return;
+                }
+                rows.push(renderSynthesisRow(item));
+                if (item.kind === 'package' && state.expanded.has(item.id)) {
+                    item.children.forEach((child) => rows.push(renderSynthesisRow(child, true)));
+                }
+            });
+            bodyEl.innerHTML = rows.join('');
+        }
+
+        function render() {
+            const items = getFilteredItems();
+            renderTabs();
+            renderFilters();
+            renderHead();
+            renderRows(items);
+        }
+
+        document.addEventListener('click', (event) => {
+            const tab = event.target.closest('[data-view]');
+            if (tab) {
+                state.currentView = tab.dataset.view;
+                render();
+                return;
+            }
+            const expandBtn = event.target.closest('[data-expand]');
+            if (expandBtn) {
+                const id = expandBtn.dataset.expand;
+                if (state.expanded.has(id)) {
+                    state.expanded.delete(id);
+                } else {
+                    state.expanded.add(id);
+                }
+                render();
+                return;
+            }
+            const resetBtn = event.target.closest('#resetFilters');
+            if (resetBtn) {
+                const defaults = {
+                    upload: { startDate: '', endDate: '', keyword: '', fileType: '全部', assetType: '全部', product: '全部' },
+                    download: { startDate: '', endDate: '', keyword: '', fileType: '全部', assetType: '全部', product: '全部' },
+                    synthesis: { startDate: '', endDate: '', keyword: '', status: '全部', ratio: '全部', product: '全部' }
+                };
+                state.filters[state.currentView] = { ...defaults[state.currentView] };
+                render();
+                return;
+            }
+            const actionBtn = event.target.closest('[data-action]');
+            if (actionBtn) {
+                const action = actionBtn.dataset.action;
+                const id = actionBtn.dataset.id;
+                const packageActions = ['展开', '收起'];
+                if (packageActions.includes(action)) {
+                    if (state.expanded.has(id)) {
+                        state.expanded.delete(id);
+                    } else {
+                        state.expanded.add(id);
+                    }
+                    render();
+                    return;
+                }
+                if (action === '查看同质化内容') {
+                    openSimDrawer(id);
+                    return;
+                }
+                window.alert(`演示页面：${action}（${id}）`);
+            }
+        });
+
+        // ── 同质化抽屉逻辑 (精简版) ──
+        function openSimDrawer(id) {
+            const drawer = document.getElementById('simDrawer');
+            const mask = document.getElementById('simDrawerMask');
+            const body = document.getElementById('simDrawerBody');
+            
+            // 找到当前点击的任务
+            const allItems = [...DATA.upload, ...DATA.download, ...DATA.synthesis].flatMap(item => item.children ? [item, ...item.children] : [item]);
+            const task = allItems.find(t => t.id === id);
+            const currentThumb = 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=800';
+            
+            // Mock 同质化列表数据 (>80%)
+            const SIMILAR_ITEMS = [
+                { name: '已入库素材_20240315_02.mp4', thumb: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400', rate: '91.4%' },
+                { name: '库存视频_A区_088.mp4', thumb: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=400', rate: '85.7%' },
+                { name: '测试素材_FB投放_v3.mp4', thumb: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400', rate: '82.1%' }
+            ];
+
+            body.innerHTML = `
+                <!-- 当前素材部分 -->
+                <div class="sim-section-title">当前检测素材</div>
+                <div class="sim-current-box">
+                    <div class="sim-item-thumb" onclick="showAssetPreview('${currentThumb}')">
+                        <img src="${currentThumb}" alt="">
+                    </div>
+                    <div class="sim-item-info" style="font-weight:500;">${task ? task.name : id}</div>
+                </div>
+
+                <!-- 同质化列表部分 -->
+                <div class="sim-section-title">同质化率 > 80% 的其他素材 (${SIMILAR_ITEMS.length})</div>
+                <div class="sim-grid">
+                    ${SIMILAR_ITEMS.map(item => `
+                        <div class="sim-item" onclick="showAssetPreview('${item.thumb}')">
+                            <div class="sim-item-rate">${item.rate}</div>
+                            <div class="sim-item-thumb"><img src="${item.thumb}" alt=""></div>
+                            <div class="sim-item-info" title="${item.name}">${item.name}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            mask.classList.add('show');
+            drawer.classList.add('show');
+        }
+
+        function closeSimDrawer() {
+            document.getElementById('simDrawer').classList.remove('show');
+            document.getElementById('simDrawerMask').classList.remove('show');
+        }
+
+        // ── 预览逻辑 ──
+        function showAssetPreview(src) {
+            document.getElementById('assetPreviewImg').src = src;
+            document.getElementById('assetPreviewMask').classList.add('show');
+        }
+        function closeAssetPreview() {
+            document.getElementById('assetPreviewMask').classList.remove('show');
+        }
+
+        document.addEventListener('input', (event) => {
+            const target = event.target.closest('[data-filter]');
+            if (!target) {
+                return;
+            }
+            state.filters[state.currentView][target.dataset.filter] = target.value;
+            renderRows(getFilteredItems());
+        });
+
+        document.addEventListener('change', (event) => {
+            const target = event.target.closest('[data-filter]');
+            if (!target) {
+                return;
+            }
+            state.filters[state.currentView][target.dataset.filter] = target.value;
+            renderRows(getFilteredItems());
+        });
+
+        render();
+    </script>
 </body>
 </html>

@@ -74,7 +74,33 @@ function openConfirmModal(options) {
   desc.style.display = opts.description ? 'block' : 'none';
 
   document.getElementById('ccConfirmCancelBtn').textContent = opts.cancelText || '取消';
-  document.getElementById('ccConfirmOkBtn').textContent = opts.confirmText || '确认';
+  
+  var okBtn = document.getElementById('ccConfirmOkBtn');
+  var originalText = opts.confirmText || '确认';
+  okBtn.textContent = originalText;
+  okBtn.disabled = false;
+
+  if (_ccConfirmState.timer) {
+    clearInterval(_ccConfirmState.timer);
+    _ccConfirmState.timer = null;
+  }
+
+  if (opts.countdown && opts.countdown > 0) {
+    okBtn.disabled = true;
+    var count = opts.countdown;
+    okBtn.textContent = originalText + ' (' + count + 's)';
+    _ccConfirmState.timer = setInterval(function() {
+      count--;
+      if (count <= 0) {
+        clearInterval(_ccConfirmState.timer);
+        _ccConfirmState.timer = null;
+        okBtn.disabled = false;
+        okBtn.textContent = originalText;
+      } else {
+        okBtn.textContent = originalText + ' (' + count + 's)';
+      }
+    }, 1000);
+  }
 
   document.getElementById('ccConfirmMask').classList.add('show');
 }
@@ -82,6 +108,10 @@ function openConfirmModal(options) {
 function closeConfirmModal() {
   var mask = document.getElementById('ccConfirmMask');
   if (mask) mask.classList.remove('show');
+  if (_ccConfirmState.timer) {
+    clearInterval(_ccConfirmState.timer);
+    _ccConfirmState.timer = null;
+  }
   _ccConfirmState.onConfirm = null;
   _ccConfirmState.onCancel = null;
   _ccConfirmState.maskClosable = true;

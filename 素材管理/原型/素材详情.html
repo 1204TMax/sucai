@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>素材详情 - 量化投放系统</title>
+  <style>
+    :root {
+      --ant-primary-1: #E6F4FF;
+      --ant-primary-2: #BAE0FF;
+      --ant-primary-3: #91CAFF;
+      --ant-primary-4: #69B1FF;
+      --ant-primary-5: #4096FF;
+      --ant-primary-6: #1677FF;
+      --ant-primary-7: #0958D9;
+
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+
+      --ant-bg-base: #F5F5F5;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h1: 38px;
+      --ant-font-size-h2: 30px;
+      --ant-font-size-h3: 24px;
+      --ant-font-size-h4: 20px;
+      --ant-font-size-h5: 16px;
+      --ant-font-size-lg: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+
+      --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --ant-box-shadow-secondary: 0 4px 16px rgba(0,0,0,0.12);
+      --ant-box-shadow-popup: 0 8px 24px rgba(0,0,0,0.15);
+      --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: var(--ant-font-family);
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      padding: var(--ant-size-xs);
+    }
+
+    button {
+      font: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .page {
+      width: 100%;
+      min-height: calc(100vh - var(--ant-size));
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+    }
+
+    .drawer-shell {
+      width: min(100%, 1480px);
+      min-height: calc(100vh - var(--ant-size));
+      background: var(--ant-bg-container);
+      border-radius: var(--ant-border-radius-xl);
+      box-shadow: var(--ant-box-shadow-popup);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .drawer-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--ant-bg-container);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      padding: var(--ant-size) var(--ant-size-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+    }
+
+    .header-title-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .drawer-title {
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.2;
+    }
+
+    .drawer-subtitle {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      font-size: var(--ant-font-size);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xs);
+      transition: all 0.2s ease;
+      border: 1px solid var(--ant-border-color);
+      color: var(--ant-text-color);
+      background: var(--ant-bg-container);
+    }
+
+    .btn:hover {
+      border-color: var(--ant-primary-5);
+      color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .btn-primary {
+      background: var(--ant-primary-6);
+      color: var(--ant-text-color-inverse);
+      border-color: var(--ant-primary-6);
+    }
+
+    .btn-primary:hover {
+      background: var(--ant-primary-5);
+      border-color: var(--ant-primary-5);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .drawer-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      padding: var(--ant-size);
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .section-card {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: var(--ant-box-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+      background: var(--ant-bg-container);
+    }
+
+    .section-title-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .section-title {
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.2;
+    }
+
+    .section-desc {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .section-content {
+      padding: var(--ant-size-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .hero-layout {
+      display: flex;
+      align-items: stretch;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    .preview-panel {
+      flex: 0 0 220px;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .preview-stage {
+      width: 100%;
+      min-height: 320px;
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: linear-gradient(180deg, var(--ant-bg-secondary), var(--ant-bg-tertiary));
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      padding: var(--ant-size);
+      text-align: center;
+    }
+
+    .preview-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--ant-border-radius-xl);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--ant-font-size-h3);
+      font-weight: 600;
+    }
+
+    .preview-title {
+      font-size: var(--ant-font-size-lg);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .preview-meta {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--ant-size-xxs);
+    }
+
+    .tag-row {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+    }
+
+    .tag-row.compact {
+      max-height: 56px;
+      overflow: hidden;
+    }
+
+    .tag {
+      min-height: 24px;
+      padding: 0 var(--ant-size-xs);
+      border-radius: var(--ant-border-radius-sm);
+      font-size: var(--ant-font-size-sm);
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .tag-primary {
+      background: var(--ant-primary-1);
+      border-color: var(--ant-primary-2);
+      color: var(--ant-primary-6);
+    }
+
+    .tag-success {
+      background: var(--ant-success-1);
+      border-color: var(--ant-success-2);
+      color: var(--ant-success-6);
+    }
+
+    .tag-warning {
+      background: var(--ant-warning-1);
+      border-color: var(--ant-warning-2);
+      color: var(--ant-warning-6);
+    }
+
+    .tag-error {
+      background: var(--ant-error-1);
+      border-color: var(--ant-error-2);
+      color: var(--ant-error-6);
+    }
+
+    .tag-default {
+      background: var(--ant-bg-tertiary);
+      border-color: var(--ant-border-color);
+      color: var(--ant-text-color-secondary);
+    }
+
+    .info-panel {
+      flex: 1 1 720px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .info-top {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    .title-main {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .asset-name {
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.4;
+    }
+
+    .asset-desc {
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color-secondary);
+      line-height: 1.6;
+    }
+
+    .title-side {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .info-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .info-item {
+      flex: 1 1 calc(50% - var(--ant-size));
+      min-width: 240px;
+      padding: var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-secondary);
+      border: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .info-label {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .info-value {
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color);
+      font-weight: 500;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .info-extra {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-secondary);
+      line-height: 1.5;
+    }
+
+    .collapse-region {
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .collapse-region.expanded {
+      display: flex;
+    }
+
+    .toggle-line {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+
+    .link-btn {
+      min-height: 24px;
+      color: var(--ant-primary-6);
+      font-size: var(--ant-font-size-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xxs);
+      transition: color 0.2s ease;
+    }
+
+    .link-btn:hover {
+      color: var(--ant-primary-7);
+    }
+
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .stat-card {
+      flex: 1 1 calc(25% - var(--ant-size));
+      min-width: 180px;
+      padding: var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-container);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-sm);
+    }
+
+    .stat-title {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .stat-value {
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.2;
+    }
+
+    .stat-trend {
+      font-size: var(--ant-font-size-sm);
+      line-height: 1.5;
+    }
+
+    .trend-up {
+      color: var(--ant-success-6);
+    }
+
+    .trend-flat {
+      color: var(--ant-warning-6);
+    }
+
+    .trend-down {
+      color: var(--ant-error-6);
+    }
+
+    .media-tabs {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      flex-wrap: wrap;
+    }
+
+    .media-tab {
+      min-height: 32px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      border: 1px solid var(--ant-border-color);
+      color: var(--ant-text-color-secondary);
+      background: var(--ant-bg-container);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .media-tab:hover {
+      border-color: var(--ant-primary-5);
+      color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+    }
+
+    .media-tab.active {
+      border-color: var(--ant-primary-2);
+      color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+    }
+
+    .media-panel {
+      display: none;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .media-panel.active {
+      display: flex;
+    }
+
+    .media-scroll {
+      max-height: 360px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+      padding-right: var(--ant-size-xs);
+    }
+
+    .metrics-grid {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .metric-box {
+      flex: 1 1 calc(33.333% - var(--ant-size));
+      min-width: 200px;
+      padding: var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .metric-box strong {
+      font-size: var(--ant-font-size-lg);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.3;
+    }
+
+    .metric-box span {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .detail-columns {
+      display: flex;
+      align-items: stretch;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    .detail-block {
+      flex: 1 1 calc(50% - var(--ant-size));
+      min-width: 280px;
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      background: var(--ant-bg-container);
+    }
+
+    .detail-block-head {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+      background: var(--ant-bg-secondary);
+    }
+
+    .detail-block-title {
+      font-size: var(--ant-font-size);
+      font-weight: 600;
+      color: var(--ant-text-color);
+    }
+
+    .detail-list {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .detail-row {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: var(--ant-size);
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-key {
+      flex: 0 0 108px;
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .detail-val {
+      flex: 1 1 auto;
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color);
+      text-align: right;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .timeline-item {
+      padding: var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size-xs);
+    }
+
+    .timeline-item strong {
+      font-size: var(--ant-font-size);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.5;
+    }
+
+    .timeline-item span {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-secondary);
+      line-height: 1.6;
+    }
+
+    .section-footer-note {
+      padding: 0 var(--ant-size-lg) var(--ant-size-lg);
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 1080px) {
+      .drawer-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .preview-panel,
+      .info-panel,
+      .info-item,
+      .stat-card,
+      .metric-box,
+      .detail-block {
+        flex-basis: 100%;
+      }
+
+      .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .detail-key,
+      .detail-val {
+        flex: 1 1 auto;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 0;
+      }
+
+      .page,
+      .drawer-shell {
+        min-height: 100vh;
+      }
+
+      .drawer-shell {
+        border-radius: 0;
+      }
+
+      .drawer-body,
+      .section-content,
+      .section-head,
+      .drawer-header,
+      .section-footer-note {
+        padding-left: var(--ant-size);
+        padding-right: var(--ant-size);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="drawer-shell">
+      <header class="drawer-header">
+        <div class="header-title-wrap">
+          <h1 class="drawer-title">素材详情</h1>
+          <p class="drawer-subtitle">独立原型页仅展示 Drawer 内容，保留右侧详情布局与信息分区逻辑。</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn" type="button" onclick="handleClose()">关闭</button>
+          <button class="btn btn-primary" type="button">编辑素材</button>
+        </div>
+      </header>
+
+      <div class="drawer-body">
+        <section class="section-card">
+          <div class="section-content">
+            <div class="hero-layout">
+              <aside class="preview-panel">
+                <div class="preview-stage">
+                  <div class="preview-icon">▶</div>
+                  <div class="preview-title">素材预览</div>
+                  <div class="preview-meta">
+                    <span>1080 × 1920 ｜ MP4 ｜ 00:21</span>
+                    <span>主版本已入库，可切换查看封面与片段</span>
+                  </div>
+                </div>
+                <div class="tag-row compact" id="assetTags">
+                  <span class="tag tag-primary">女装</span>
+                  <span class="tag tag-primary">春夏上新</span>
+                  <span class="tag tag-default">18-23岁</span>
+                  <span class="tag tag-default">信息流</span>
+                  <span class="tag tag-success">优质素材</span>
+                  <span class="tag tag-warning">在投</span>
+                  <span class="tag tag-default">真人口播</span>
+                  <span class="tag tag-default">短节奏</span>
+                  <span class="tag tag-default">强转化</span>
+                </div>
+                <div class="toggle-line">
+                  <button class="link-btn" type="button" id="tagToggle" onclick="toggleTags()">展开全部标签</button>
+                </div>
+              </aside>
+
+              <div class="info-panel">
+                <div class="info-top">
+                  <div class="title-bar">
+                    <div class="title-main">
+                      <div class="asset-name">女装上新口播短视频｜春夏轻运动系列</div>
+                      <div class="asset-desc">用于拉新投放的竖版成片素材，当前版本已在巨量与快手同步投放，保留了基础属性、状态、来源与协作信息。</div>
+                    </div>
+                    <div class="title-side">
+                      <span class="tag tag-success">原创</span>
+                      <span class="tag tag-primary">新素材</span>
+                      <span class="tag tag-warning">审核中</span>
+                    </div>
+                  </div>
+
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <div class="info-label">素材 ID</div>
+                      <div class="info-value">SC202604200031</div>
+                      <div class="info-extra">系统唯一标识，可用于检索与跨表关联</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">名称 / MD5</div>
+                      <div class="info-value">女装上新口播短视频_A版</div>
+                      <div class="info-extra">MD5：8a34f6ccbc1ad0a5e6c2921ad</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">素材类型 / 格式</div>
+                      <div class="info-value">视频 / MP4</div>
+                      <div class="info-extra">真绿：否 ｜ 音频码率：256 kbps</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">尺寸 / 宽高比 / 大小</div>
+                      <div class="info-value">1080 × 1920 / 9:16 / 42.8 MB</div>
+                      <div class="info-extra">时长：21 秒 ｜ 视频码率：11.6 Mbps</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">来源信息</div>
+                      <div class="info-value">素材来源：自投 ｜ 获取方式：拍摄剪辑</div>
+                      <div class="info-extra">来源批次：2026Q2 女装轻运动专项</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">管理信息</div>
+                      <div class="info-value">上传人：张宁 ｜ 负责人：林珂</div>
+                      <div class="info-extra">推广计划负责人：周玥</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="collapse-region" id="basicMore">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <div class="info-label">生产协作</div>
+                      <div class="info-value">编导：Yuki ｜ 设计：Mila ｜ 剪辑：Allen</div>
+                      <div class="info-extra">演员：安安 ｜ 配音：内部 TTS 精修</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">脚本关系</div>
+                      <div class="info-value">关联脚本：春夏轻运动上新口播 v2</div>
+                      <div class="info-extra">脚本框架：痛点切入 → 卖点演示 → 转化收口</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">版本与变体</div>
+                      <div class="info-value">版本关系：A / B / C 三个变体</div>
+                      <div class="info-extra">重复素材关系：与 SC202604190014 相似度 78%</div>
+                    </div>
+                    <div class="info-item">
+                      <div class="info-label">时间信息</div>
+                      <div class="info-value">上传时间：2026-04-20 09:12</div>
+                      <div class="info-extra">创建时间：2026-04-19 18:50 ｜ 修改时间：2026-04-20 11:40</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="toggle-line">
+                  <button class="link-btn" type="button" id="basicToggle" onclick="toggleBasicInfo()">展开更多基础信息</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div class="section-title-wrap">
+              <div class="section-title">数据总览</div>
+              <div class="section-desc">首屏优先展示投放判断最常用的指标，更多观察项按需展开。</div>
+            </div>
+            <button class="link-btn" type="button" id="statsToggle" onclick="toggleStats()">展开更多指标</button>
+          </div>
+          <div class="section-content">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-title">展示数</div>
+                <div class="stat-value">128,430</div>
+                <div class="stat-trend trend-up">较昨日 +12.4%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">点击率</div>
+                <div class="stat-value">3.86%</div>
+                <div class="stat-trend trend-up">高于库均值 0.72%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">完播率</div>
+                <div class="stat-value">24.11%</div>
+                <div class="stat-trend trend-flat">处于正常区间</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">在投计划数</div>
+                <div class="stat-value">18</div>
+                <div class="stat-trend trend-up">近 3 天持续增长</div>
+              </div>
+            </div>
+            <div class="collapse-region" id="statsMore">
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-title">首日消耗</div>
+                  <div class="stat-value">¥8,430</div>
+                  <div class="stat-trend trend-up">已超过 1k 规则阈值</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-title">ROI</div>
+                  <div class="stat-value">1.82</div>
+                  <div class="stat-trend trend-up">高于账户均值 0.19</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-title">媒体 CPA</div>
+                  <div class="stat-value">¥26.4</div>
+                  <div class="stat-trend trend-down">较目标成本高 4.1%</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-title">评论互动</div>
+                  <div class="stat-value">2,416</div>
+                  <div class="stat-trend trend-flat">正向反馈占比 68%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-card">
+          <div class="section-head">
+            <div class="section-title-wrap">
+              <div class="section-title">媒体信息</div>
+              <div class="section-desc">按平台查看审核、投放与互动信息，单平台内容较长时在区块内部滚动。</div>
+            </div>
+            <div class="media-tabs" role="tablist" aria-label="媒体平台切换">
+              <button class="media-tab active" type="button" data-target="panel-juliang" onclick="switchMediaTab(this)">巨量</button>
+              <button class="media-tab" type="button" data-target="panel-kuaishou" onclick="switchMediaTab(this)">快手</button>
+              <button class="media-tab" type="button" data-target="panel-tencent" onclick="switchMediaTab(this)">腾讯</button>
+            </div>
+          </div>
+          <div class="section-content">
+            <div class="media-panel active" id="panel-juliang">
+              <div class="media-scroll">
+                <div class="metrics-grid">
+                  <div class="metric-box"><strong>JL-AD-991283</strong><span>媒体素材 ID ｜ 审核状态：审核中</span></div>
+                  <div class="metric-box"><strong>计划 12 / 在投 7</strong><span>近 7 天新增计划 4 个</span></div>
+                  <div class="metric-box"><strong>同质化率 11.2%</strong><span>当前低于风险阈值，可持续放量</span></div>
+                </div>
+                <div class="detail-columns">
+                  <div class="detail-block">
+                    <div class="detail-block-head">
+                      <div class="detail-block-title">审核信息</div>
+                      <span class="tag tag-warning">处理中</span>
+                    </div>
+                    <div class="detail-list">
+                      <div class="detail-row"><div class="detail-key">广告账户</div><div class="detail-val">巨量广告-女装拉新一部</div></div>
+                      <div class="detail-row"><div class="detail-key">审核意见</div><div class="detail-val">口播卖点表达正常，待补充分镜封面说明</div></div>
+                      <div class="detail-row"><div class="detail-key">拒审建议</div><div class="detail-val">暂无，历史拒审率 2.1%</div></div>
+                      <div class="detail-row"><div class="detail-key">最近送审</div><div class="detail-val">2026-04-20 10:42</div></div>
+                    </div>
+                  </div>
+                  <div class="detail-block">
+                    <div class="detail-block-head">
+                      <div class="detail-block-title">投放表现</div>
+                      <span class="tag tag-success">表现稳定</span>
+                    </div>
+                    <div class="detail-list">
+                      <div class="detail-row"><div class="detail-key">点击率</div><div class="detail-val">4.22%</div></div>
+                      <div class="detail-row"><div class="detail-key">3s 播放率</div><div class="detail-val">78.6%</div></div>
+                      <div class="detail-row"><div class="detail-key">完播率</div><div class="detail-val">25.4%</div></div>
+                      <div class="detail-row"><div class="detail-key">媒体 CPA</div><div class="detail-val">¥24.7</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <strong>评论反馈</strong>
+                    <span>评论数 1,482 ｜ 点赞数 4,821 ｜ 高频关键词：显瘦、显高、好搭。</span>
+                  </div>
+                  <div class="timeline-item">
+                    <strong>最近操作记录</strong>
+                    <span>2026-04-20 11:40 周玥调整封面首帧；2026-04-20 09:12 张宁完成入库并同步巨量平台。</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="media-panel" id="panel-kuaishou">
+              <div class="media-scroll">
+                <div class="metrics-grid">
+                  <div class="metric-box"><strong>KS-MT-202641</strong><span>媒体素材 ID ｜ 审核状态：已通过</span></div>
+                  <div class="metric-box"><strong>计划 4 / 在投 3</strong><span>以拉新模型为主，定向偏年轻女性</span></div>
+                  <div class="metric-box"><strong>评论转化较强</strong><span>互动率明显高于同类素材</span></div>
+                </div>
+                <div class="detail-columns">
+                  <div class="detail-block">
+                    <div class="detail-block-head">
+                      <div class="detail-block-title">审核信息</div>
+                      <span class="tag tag-success">已通过</span>
+                    </div>
+                    <div class="detail-list">
+                      <div class="detail-row"><div class="detail-key">广告账户</div><div class="detail-val">磁力金牛-女装品牌投放</div></div>
+                      <div class="detail-row"><div class="detail-key">审核意见</div><div class="detail-val">内容完整，口播表达清晰，无违规点</div></div>
+                      <div class="detail-row"><div class="detail-key">最近送审</div><div class="detail-val">2026-04-19 20:06</div></div>
+                    </div>
+                  </div>
+                  <div class="detail-block">
+                    <div class="detail-block-head">
+                      <div class="detail-block-title">投放表现</div>
+                      <span class="tag tag-primary">放量观察</span>
+                    </div>
+                    <div class="detail-list">
+                      <div class="detail-row"><div class="detail-key">点击率</div><div class="detail-val">3.58%</div></div>
+                      <div class="detail-row"><div class="detail-key">完播率</div><div class="detail-val">27.8%</div></div>
+                      <div class="detail-row"><div class="detail-key">互动率</div><div class="detail-val">1.96%</div></div>
+                      <div class="detail-row"><div class="detail-key">出池率</div><div class="detail-val">66.2%</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <strong>评论反馈</strong>
+                    <span>评论数 623 ｜ 相关回复 198 ｜ 点赞数 1,104，用户更关注上身效果和颜色。</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="media-panel" id="panel-tencent">
+              <div class="media-scroll">
+                <div class="metrics-grid">
+                  <div class="metric-box"><strong>TX-AD-77325</strong><span>媒体素材 ID ｜ 审核状态：待处理</span></div>
+                  <div class="metric-box"><strong>计划 2 / 在投 0</strong><span>当前仍处冷启动阶段</span></div>
+                  <div class="metric-box"><strong>素材复用建议</strong><span>建议复制封面首帧后再送审</span></div>
+                </div>
+                <div class="detail-columns">
+                  <div class="detail-block">
+                    <div class="detail-block-head">
+                      <div class="detail-block-title">审核信息</div>
+                      <span class="tag tag-warning">待处理</span>
+                    </div>
+                    <div class="detail-list">
+                      <div class="detail-row"><div class="detail-key">广告账户</div><div class="detail-val">腾讯广告 3.0-成片测试户</div></div>
+                      <div class="detail-row"><div class="detail-key">审核意见</div><div class="detail-val">等待系统返回，暂无明确拒审理由</div></div>
+                      <div class="detail-row"><div class="detail-key">历史拒审率</div><div class="detail-val">4.6%</div></div>
+                    </div>
+                  </div>
+                  <div class="detail-block">
+                    <div class="detail-block-head">
+                      <div class="detail-block-title">投放表现</div>
+                      <span class="tag tag-default">暂无完整数据</span>
+                    </div>
+                    <div class="detail-list">
+                      <div class="detail-row"><div class="detail-key">点击率</div><div class="detail-val">--</div></div>
+                      <div class="detail-row"><div class="detail-key">完播率</div><div class="detail-val">--</div></div>
+                      <div class="detail-row"><div class="detail-key">媒体 CPA</div><div class="detail-val">--</div></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="timeline">
+                  <div class="timeline-item">
+                    <strong>平台建议</strong>
+                    <span>当前平台数据不足，建议在送审通过后先小预算试投，再决定是否纳入正式放量池。</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="section-footer-note">当单个平台信息继续增加时，优先在当前平台面板内滚动，不打乱整体页面节奏。</div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function handleClose() {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: 'closeCurrentTab' }, '*');
+        return;
+      }
+      window.history.back();
+    }
+
+    function toggleBasicInfo() {
+      const region = document.getElementById('basicMore');
+      const toggle = document.getElementById('basicToggle');
+      const expanded = region.classList.toggle('expanded');
+      toggle.textContent = expanded ? '收起更多基础信息' : '展开更多基础信息';
+    }
+
+    function toggleStats() {
+      const region = document.getElementById('statsMore');
+      const toggle = document.getElementById('statsToggle');
+      const expanded = region.classList.toggle('expanded');
+      toggle.textContent = expanded ? '收起更多指标' : '展开更多指标';
+    }
+
+    function toggleTags() {
+      const tags = document.getElementById('assetTags');
+      const toggle = document.getElementById('tagToggle');
+      const compact = tags.classList.toggle('compact');
+      toggle.textContent = compact ? '展开全部标签' : '收起标签';
+    }
+
+    function switchMediaTab(button) {
+      const targetId = button.getAttribute('data-target');
+      const buttons = document.querySelectorAll('.media-tab');
+      const panels = document.querySelectorAll('.media-panel');
+
+      buttons.forEach(function(item) {
+        item.classList.remove('active');
+      });
+      panels.forEach(function(panel) {
+        panel.classList.remove('active');
+      });
+
+      button.classList.add('active');
+      document.getElementById(targetId).classList.add('active');
+    }
+  </script>
+</body>
+</html>

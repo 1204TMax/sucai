@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传物料</title>
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Ant Design -->
+    <script src="https://unpkg.com/dayjs@1/dayjs.min.js"></script>
+    <script src="https://unpkg.com/antd@5/dist/antd.min.js"></script>
+    <!-- Icons -->
+    <script src="https://unpkg.com/@ant-design/icons@5/dist/index.umd.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 遵守 usage.md 和 design-system.md 规范 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 8px; /* 遵守最新规定的 8px 外边距 */
+        }
+
+        .upload-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .upload-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .upload-body {
+            display: flex;
+            align-items: stretch;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            flex: 6;
+            padding: 24px;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .right-panel {
+            flex: 4;
+            padding: 24px;
+            background: #fafbfc;
+        }
+
+        .upload-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background: #fff;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        /* 自定义物料卡片 */
+        .asset-item-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            background: #fff;
+            transition: border-color 0.2s;
+            position: relative;
+        }
+        .asset-item-card:hover {
+            border-color: #4A9EFF;
+        }
+        .asset-thumb {
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            background: #f0f0f0;
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+        .asset-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .asset-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .asset-info {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .asset-title {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            padding-right: 24px; /* 给删除按钮留空间 */
+        }
+        .asset-title-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .asset-tags-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .del-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+            font-size: 14px;
+        }
+        .del-btn:hover {
+            color: #ff4d4f;
+        }
+
+        /* 强制缩小拖拽上传区域高度 */
+        .compact-dragger .ant-upload.ant-upload-drag {
+            height: 120px !important;
+        }
+        .compact-dragger .ant-upload-btn {
+            padding: 0 !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: center;
+            height: 100% !important;
+        }
+
+        /* 树节点 hover 新增按钮样式 */
+        .tree-node-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .tree-node-wrapper .add-btn {
+            opacity: 0;
+            transition: opacity 0.2s;
+            color: #1677ff;
+            height: 20px;
+            width: 20px;
+            padding: 0;
+        }
+        .ant-tree-node-content-wrapper:hover .add-btn {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { ConfigProvider, Upload, Button, Select, Input, Checkbox, Tooltip, Modal, Row, Col, Space, Divider, Tag, Typography, message, Tree, Radio } = antd;
+        const { InboxOutlined, CloseOutlined, EditOutlined, FolderOutlined, DownOutlined, UpOutlined, SearchOutlined, RobotOutlined, CheckOutlined, PlusOutlined } = icons;
+        const { Dragger } = Upload;
+        const { Text } = Typography;
+
+        // Mock 初始数据
+        const MOCK_FILES = [
+            { 
+                id: '1', 
+                name: 'Summer_Campaign_Video_v1_final.mp4', 
+                size: '53.4MB', 
+                res: '1080×1920', 
+                time: '00:41', 
+                type: 'video', 
+                thumb: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=400&q=80', 
+                tags: { position: '视频开头', type: '大字报', content: ['赚钱', '职场'], target: ['白领', '一线城市'] }
+            },
+            { 
+                id: '2', 
+                name: 'Product_Showcase_Main_Image.png', 
+                size: '1.2MB', 
+                res: '800×800', 
+                time: '图片', 
+                type: 'image', 
+                thumb: 'https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=400&q=80', 
+                tags: { position: '视频结尾', type: '产品海报', content: ['赛博朋克', '动感', '极简', '治愈', '开心'], target: ['学生', '数码科技'] }
+            }
+        ];
+
+        const App = () => {
+            const [files, setFiles] = React.useState(MOCK_FILES);
+            const [selectedKeys, setSelectedKeys] = React.useState([]);
+            const [expandedPersonnel, setExpandedPersonnel] = React.useState(false);
+            
+            // 更换文件夹弹窗状态
+            const [isFolderModalOpen, setIsFolderModalOpen] = React.useState(false);
+            const [currentFolder, setCurrentFolder] = React.useState('测试');
+
+            // 标签弹窗状态
+            const [isTagModalOpen, setIsTagModalOpen] = React.useState(false);
+            const [editingFileId, setEditingFileId] = React.useState(null);
+
+            // AI打标 loading 状态
+            const [loadingAITags, setLoadingAITags] = React.useState({});
+
+            // 重命名状态
+            const [renamingFileId, setRenamingFileId] = React.useState(null);
+            const [renameValue, setRenameValue] = React.useState('');
+
+            const handleSelectAll = (e) => {
+                if (e.target.checked) {
+                    setSelectedKeys(files.map(f => f.id));
+                } else {
+                    setSelectedKeys([]);
+                }
+            };
+
+            const toggleSelect = (id) => {
+                if (selectedKeys.includes(id)) {
+                    setSelectedKeys(selectedKeys.filter(k => k !== id));
+                } else {
+                    setSelectedKeys([...selectedKeys, id]);
+                }
+            };
+
+            const handleDelete = (id) => {
+                setFiles(files.filter(f => f.id !== id));
+                setSelectedKeys(selectedKeys.filter(k => k !== id));
+                message.success('已移除物料');
+            };
+
+            const handleAITag = (id) => {
+                Modal.confirm({
+                    title: '提示',
+                    content: 'AI打标将覆盖当前标签，请确认。',
+                    okText: '确认',
+                    cancelText: '取消',
+                    onOk: () => {
+                        message.info('已开始上传，您可在上传任务中查看详情');
+                        // 设置当前物料为 loading 状态
+                        setLoadingAITags(prev => ({ ...prev, [id]: true }));
+                        
+                        // 模拟 3 秒后处理完成
+                        setTimeout(() => {
+                            setLoadingAITags(prev => ({ ...prev, [id]: false }));
+                            message.success('AI打标处理完成');
+                        }, 3000);
+                    }
+                });
+            };
+
+            // 人员配置项（调整为默认展示设计师和剪辑师）
+            const personnelFields = [
+                { label: '设计师', key: 'designer', defaultShow: true },
+                { label: '剪辑师', key: 'editor', defaultShow: true },
+                { label: '物料供应商', key: 'supplier', defaultShow: false },
+                { label: '优化供应商', key: 'optimizer', defaultShow: false },
+                { label: '编导', key: 'director', defaultShow: false },
+                { label: '策划', key: 'planner', defaultShow: false },
+                { label: '拍摄', key: 'camera', defaultShow: false },
+                { label: '演员', key: 'actor', defaultShow: false },
+            ];
+
+            // 文件夹树数据
+            const folderTreeData = [
+                { title: '我的物料', key: '我的物料' },
+                { title: '物料库', key: '物料库', children: [
+                    { title: '测试', key: '测试' },
+                    { title: '未分组物料', key: '未分组物料' }
+                ]}
+            ];
+
+            // 标签树数据（2级分类，20个类型节点）
+            const initialTypeTagsTree = [
+                {
+                    title: '视频', key: 'video', children: [
+                        { title: '口播', key: 'video_1' }, { title: '情景剧', key: 'video_2' },
+                        { title: '街采', key: 'video_3' }, { title: '探店', key: 'video_4' },
+                        { title: '开箱', key: 'video_5' }
+                    ]
+                },
+                {
+                    title: '海报', key: 'poster', children: [
+                        { title: '大字报', key: 'poster_1' }, { title: '节日海报', key: 'poster_2' },
+                        { title: '促销海报', key: 'poster_3' }, { title: '产品海报', key: 'poster_4' },
+                        { title: '招聘海报', key: 'poster_5' }
+                    ]
+                },
+                {
+                    title: '动效', key: 'animation', children: [
+                        { title: '转场特效', key: 'anim_1' }, { title: '粒子特效', key: 'anim_2' },
+                        { title: '光晕特效', key: 'anim_3' }, { title: '文字动画', key: 'anim_4' },
+                        { title: 'Logo演绎', key: 'anim_5' }
+                    ]
+                },
+                {
+                    title: '音频', key: 'audio', children: [
+                        { title: '背景音乐', key: 'audio_1' }, { title: '环境音效', key: 'audio_2' },
+                        { title: '旁白配音', key: 'audio_3' }, { title: '混音素材', key: 'audio_4' },
+                        { title: '搞怪音效', key: 'audio_5' }
+                    ]
+                }
+            ];
+
+            // 内容标签树数据（3级分类，共51个叶子节点）
+            const initialContentTagsTree = [
+                {
+                    title: '主题', key: 'theme', children: [
+                        {
+                            title: '商业', key: 'theme_biz', children: [
+                                { title: '赚钱', key: 'biz_1' }, { title: '创业', key: 'biz_2' }, { title: '职场', key: 'biz_3' },
+                                { title: '营销', key: 'biz_4' }, { title: '金融', key: 'biz_5' }, { title: '投资', key: 'biz_6' }
+                            ]
+                        },
+                        {
+                            title: '生活', key: 'theme_life', children: [
+                                { title: '日常', key: 'life_1' }, { title: '居家', key: 'life_2' }, { title: '旅行', key: 'life_3' },
+                                { title: '美食', key: 'life_4' }, { title: '萌宠', key: 'life_5' }, { title: '育儿', key: 'life_6' }
+                            ]
+                        },
+                        {
+                            title: '科技', key: 'theme_tech', children: [
+                                { title: '数码', key: 'tech_1' }, { title: 'AI人工智能', key: 'tech_2' }, 
+                                { title: '互联网', key: 'tech_3' }, { title: '极客', key: 'tech_4' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    title: '风格', key: 'style', children: [
+                        {
+                            title: '视觉', key: 'style_visual', children: [
+                                { title: '赛博朋克', key: 'vis_1' }, { title: '极简', key: 'vis_2' }, { title: '复古', key: 'vis_3' },
+                                { title: '国风', key: 'vis_4' }, { title: '插画', key: 'vis_5' }, { title: '3D建模', key: 'vis_6' },
+                                { title: '写实', key: 'vis_7' }
+                            ]
+                        },
+                        {
+                            title: '节奏', key: 'style_rhythm', children: [
+                                { title: '快闪', key: 'rhythm_1' }, { title: '舒缓', key: 'rhythm_2' }, { title: '动感', key: 'rhythm_3' },
+                                { title: '鬼畜', key: 'rhythm_4' }, { title: '卡点', key: 'rhythm_5' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    title: '场景', key: 'scene', children: [
+                        {
+                            title: '室内', key: 'scene_in', children: [
+                                { title: '办公室', key: 'in_1' }, { title: '卧室', key: 'in_2' }, { title: '厨房', key: 'in_3' },
+                                { title: '咖啡厅', key: 'in_4' }, { title: '会议室', key: 'in_5' }, { title: '健身房', key: 'in_6' }
+                            ]
+                        },
+                        {
+                            title: '室外', key: 'scene_out', children: [
+                                { title: '街道', key: 'out_1' }, { title: '公园', key: 'out_2' }, { title: '海滩', key: 'out_3' },
+                                { title: '森林', key: 'out_4' }, { title: '城市夜景', key: 'out_5' }, { title: '露营地', key: 'out_6' }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    title: '情绪', key: 'emotion', children: [
+                        {
+                            title: '积极', key: 'emo_pos', children: [
+                                { title: '开心', key: 'pos_1' }, { title: '治愈', key: 'pos_2' }, { title: '励志', key: 'pos_3' },
+                                { title: '搞笑', key: 'pos_4' }, { title: '惊喜', key: 'pos_5' }, { title: '热血', key: 'pos_6' }
+                            ]
+                        },
+                        {
+                            title: '负面', key: 'emo_neg', children: [
+                                { title: '焦虑', key: 'neg_1' }, { title: '悲伤', key: 'neg_2' }, { title: '愤怒', key: 'neg_3' },
+                                { title: '恐惧', key: 'neg_4' }, { title: '迷茫', key: 'neg_5' }
+                            ]
+                        }
+                    ]
+                }
+            ];
+
+            // 定向标签数据
+            const initialTargetTagsTree = [
+                {
+                    title: '人群', key: 'audience', children: [
+                        { title: '学生', key: 'aud_1' }, { title: '宝妈', key: 'aud_2' },
+                        { title: '白领', key: 'aud_3' }, { title: '中老年', key: 'aud_4' },
+                        { title: '二次元', key: 'aud_5' }
+                    ]
+                },
+                {
+                    title: '地域', key: 'geo', children: [
+                        { title: '一线城市', key: 'geo_1' }, { title: '下沉市场', key: 'geo_2' },
+                        { title: '江浙沪', key: 'geo_3' }, { title: '海外', key: 'geo_4' }
+                    ]
+                },
+                {
+                    title: '兴趣', key: 'interest', children: [
+                        { title: '美妆护肤', key: 'int_1' }, { title: '数码科技', key: 'int_2' },
+                        { title: '运动健身', key: 'int_3' }, { title: '游戏电竞', key: 'int_4' }
+                    ]
+                }
+            ];
+
+            const [typeTagsTree, setTypeTagsTree] = React.useState(initialTypeTagsTree);
+            const [contentTagsTree, setContentTagsTree] = React.useState(initialContentTagsTree);
+            const [targetTagsTree, setTargetTagsTree] = React.useState(initialTargetTagsTree);
+            const [selectedTypeKeys, setSelectedTypeKeys] = React.useState(['poster_1']);
+            const [position, setPosition] = React.useState(null); // 去除无限制后，默认设为无选中状态
+            const [checkedContentKeys, setCheckedContentKeys] = React.useState(['biz_1', 'vis_1']);
+            const [checkedTargetKeys, setCheckedTargetKeys] = React.useState(['aud_1', 'int_2']);
+
+            // AI 识别 loading 状态
+            const [loadingAI, setLoadingAI] = React.useState({ position: false, type: false, content: false, target: false });
+
+            const handleAI = (field, setter, mockValues) => {
+                setLoadingAI(prev => ({ ...prev, [field]: true }));
+                setTimeout(() => {
+                    setter(mockValues);
+                    setLoadingAI(prev => ({ ...prev, [field]: false }));
+                    message.success('AI 识别完成，已自动勾选');
+                }, 1500);
+            };
+
+            // 新增下级标签的弹窗状态
+            const [addTagModal, setAddTagModal] = React.useState({ open: false, parentKey: null, treeType: null });
+            const [newTagInput, setNewTagInput] = React.useState('');
+
+            const addNodeToTree = (tree, parentKey, newNode) => {
+                return tree.map(node => {
+                    if (node.key === parentKey) {
+                        return {
+                            ...node,
+                            children: node.children ? [...node.children, newNode] : [newNode]
+                        };
+                    }
+                    if (node.children) {
+                        return {
+                            ...node,
+                            children: addNodeToTree(node.children, parentKey, newNode)
+                        };
+                    }
+                    return node;
+                });
+            };
+
+            const handleConfirmAddTag = () => {
+                if (!newTagInput.trim()) return;
+                const newKey = 'new_' + Date.now();
+                const newNode = { title: newTagInput.trim(), key: newKey };
+                
+                if (addTagModal.treeType === 'type') {
+                    setTypeTagsTree(addNodeToTree(typeTagsTree, addTagModal.parentKey, newNode));
+                    setSelectedTypeKeys([newKey]); // 自动选中新建的类型标签
+                } else if (addTagModal.treeType === 'content') {
+                    setContentTagsTree(addNodeToTree(contentTagsTree, addTagModal.parentKey, newNode));
+                } else if (addTagModal.treeType === 'target') {
+                    setTargetTagsTree(addNodeToTree(targetTagsTree, addTagModal.parentKey, newNode));
+                }
+                
+                setAddTagModal({ open: false, parentKey: null, treeType: null });
+                setNewTagInput('');
+                message.success('已添加新标签');
+            };
+
+            const renderTreeNode = (nodeData, treeType) => {
+                return (
+                    <div className="tree-node-wrapper">
+                        <span>{nodeData.title}</span>
+                        {nodeData.children && (
+                            <Button 
+                                type="text" 
+                                icon={<PlusOutlined />} 
+                                className="add-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAddTagModal({ open: true, parentKey: nodeData.key, treeType });
+                                }}
+                            />
+                        )}
+                    </div>
+                );
+            };
+
+            const handleSaveTags = () => {
+                // 根据 key 找出真实的 label 文字
+                const findTitleByKey = (tree, key) => {
+                    for (const node of tree) {
+                        if (node.key === key) return node.title;
+                        if (node.children) {
+                            const childRes = findTitleByKey(node.children, key);
+                            if (childRes) return childRes;
+                        }
+                    }
+                    return null;
+                };
+
+                const typeTitle = selectedTypeKeys.length > 0 ? findTitleByKey(typeTagsTree, selectedTypeKeys[0]) : null;
+                
+                const contentTitles = checkedContentKeys.map(k => {
+                    let title = null;
+                    let isLeaf = true;
+                    const findNode = (tree) => {
+                        for (const node of tree) {
+                            if (node.key === k) {
+                                title = node.title;
+                                if (node.children && node.children.length > 0) isLeaf = false;
+                                return;
+                            }
+                            if (node.children) findNode(node.children);
+                        }
+                    };
+                    findNode(contentTagsTree);
+                    return isLeaf ? title : null;
+                }).filter(Boolean);
+
+                const targetTitles = checkedTargetKeys.map(k => {
+                    let title = null;
+                    let isLeaf = true;
+                    const findNode = (tree) => {
+                        for (const node of tree) {
+                            if (node.key === k) {
+                                title = node.title;
+                                if (node.children && node.children.length > 0) isLeaf = false;
+                                return;
+                            }
+                            if (node.children) findNode(node.children);
+                        }
+                    };
+                    findNode(targetTagsTree);
+                    return isLeaf ? title : null;
+                }).filter(Boolean);
+
+                const newTags = {
+                    position: position,
+                    type: typeTitle,
+                    content: contentTitles,
+                    target: targetTitles
+                };
+                
+                setFiles(files.map(f => f.id === editingFileId ? { ...f, tags: newTags } : f));
+                setIsTagModalOpen(false);
+                message.success('标签保存成功');
+            };
+
+            const editingFile = files.find(f => f.id === editingFileId);
+            const isImage = editingFile?.type === 'image';
+
+            return (
+                <ConfigProvider theme={{ token: { colorPrimary: '#4A9EFF', borderRadius: 6 } }}>
+                    <div className="upload-container">
+                        <div className="upload-header">上传物料</div>
+                        
+                        <div className="upload-body">
+                            {/* ================= 左侧：上传与物料管理区 ================= */}
+                            <div className="left-panel">
+                                {/* 1. 上传位置 */}
+                                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <Text type="secondary">上传至：</Text>
+                                        <Tag icon={<FolderOutlined />} color="blue" style={{ fontSize: 13, padding: '4px 8px', margin: 0 }}>{currentFolder}</Tag>
+                                        <Button type="link" size="small" onClick={() => setIsFolderModalOpen(true)}>更换文件夹</Button>
+                                    </div>
+                                    <Text type="secondary" style={{ fontSize: 12 }}>单文件≤500MB，总大小≤4096MB</Text>
+                                </div>
+
+                                {/* 2. 选择物料（上传区）- 明确固定高度 */}
+                                <Dragger multiple action="#" showUploadList={false} style={{ marginBottom: 24, height: 100 }} className="compact-dragger">
+                                    <div style={{ padding: '0' }}>
+                                        <InboxOutlined style={{ color: '#4A9EFF', fontSize: 28, marginBottom: 8 }} />
+                                        <p className="ant-upload-text" style={{ fontSize: 14, fontWeight: 500, margin: '0 0 4px' }}>点击或将文件拖拽到这里上传</p>
+                                        <p className="ant-upload-hint" style={{ color: '#8c8c8c', margin: 0, fontSize: 12 }}>
+                                            支持格式：mp4, mov, avi, png, jpg, jpeg, gif
+                                        </p>
+                                    </div>
+                                </Dragger>
+
+                                {/* 3. 物料列表区控制条 */}
+                                <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Checkbox 
+                                        checked={files.length > 0 && selectedKeys.length === files.length}
+                                        indeterminate={selectedKeys.length > 0 && selectedKeys.length < files.length}
+                                        onChange={handleSelectAll}
+                                    >
+                                        全选 (已选 {selectedKeys.length}/{files.length})
+                                    </Checkbox>
+                                    {selectedKeys.length > 0 && (
+                                        <Button type="primary" ghost size="small">批量设置标签</Button>
+                                    )}
+                                </div>
+
+                                {/* 物料列表卡片 */}
+                                <div className="asset-list">
+                                    {files.map(file => {
+                                        // 组合标签 (位置 -> 类型 -> 内容)
+                                        const allTags = [];
+                                        if (file.type !== 'image' && file.tags.position) allTags.push({ label: file.tags.position, color: 'purple' });
+                                        if (file.tags.type) allTags.push({ label: file.tags.type, color: 'blue' });
+                                        if (file.tags.content) {
+                                            file.tags.content.forEach(c => allTags.push({ label: c, color: 'default' }));
+                                        }
+                                        if (file.tags.target) {
+                                            file.tags.target.forEach(c => allTags.push({ label: c, color: 'orange' }));
+                                        }
+
+                                        // 标签截断逻辑 (最多展示 4 个)
+                                        const showTags = allTags.slice(0, 4);
+                                        const hiddenTags = allTags.slice(4);
+                                        
+                                        return (
+                                            <div key={file.id} className="asset-item-card">
+                                                <Checkbox 
+                                                    checked={selectedKeys.includes(file.id)}
+                                                    onChange={() => toggleSelect(file.id)}
+                                                />
+                                                
+                                                {/* 缩略图区域 */}
+                                                <div className="asset-thumb">
+                                                    <img src={file.thumb} alt="thumb"/>
+                                                    <div className="asset-overlay">
+                                                        <span>{file.res}</span>
+                                                        <span>{file.time}</span>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* 详情与标签区域 */}
+                                                <div className="asset-info">
+                                                    <div className="asset-title">
+                                                        {renamingFileId === file.id ? (
+                                                            <Space.Compact style={{ width: '100%' }}>
+                                                                <Input 
+                                                                    size="small" 
+                                                                    value={renameValue} 
+                                                                    onChange={(e) => setRenameValue(e.target.value)}
+                                                                    onPressEnter={() => {
+                                                                        if(renameValue.trim()) {
+                                                                            setFiles(files.map(f => f.id === file.id ? { ...f, name: renameValue.trim() } : f));
+                                                                        }
+                                                                        setRenamingFileId(null);
+                                                                    }}
+                                                                    autoFocus
+                                                                />
+                                                                <Button size="small" icon={<CheckOutlined />} onClick={() => {
+                                                                    if(renameValue.trim()) {
+                                                                        setFiles(files.map(f => f.id === file.id ? { ...f, name: renameValue.trim() } : f));
+                                                                    }
+                                                                    setRenamingFileId(null);
+                                                                }} />
+                                                                <Button size="small" icon={<CloseOutlined />} onClick={() => setRenamingFileId(null)} />
+                                                            </Space.Compact>
+                                                        ) : (
+                                                            <>
+                                                                <span className="asset-title-text" title={file.name}>{file.name}</span>
+                                                                <EditOutlined 
+                                                                    style={{ marginLeft: 8, color: '#8c8c8c', cursor: 'pointer' }} 
+                                                                    onClick={() => {
+                                                                        setRenamingFileId(file.id);
+                                                                        setRenameValue(file.name);
+                                                                    }}
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                    <div className="asset-tags-row">
+                                                        {showTags.map((t, idx) => (
+                                                            <Tag key={idx} color={t.color} bordered={false}>
+                                                                {t.label}
+                                                            </Tag>
+                                                        ))}
+                                                        {hiddenTags.length > 0 && (
+                                                            <Tooltip title={
+                                                                <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
+                                                                    {hiddenTags.map((t, i) => <Tag key={i} color={t.color} bordered={false}>{t.label}</Tag>)}
+                                                                </div>
+                                                            } overlayInnerStyle={{ padding: 8 }}>
+                                                                <Tag style={{ cursor: 'pointer' }}>+{hiddenTags.length}</Tag>
+                                                            </Tooltip>
+                                                        )}
+                                                        <Button 
+                                                            type="dashed" 
+                                                            size="small" 
+                                                            icon={<EditOutlined />} 
+                                                            disabled={loadingAITags[file.id]}
+                                                            onClick={() => { setEditingFileId(file.id); setIsTagModalOpen(true); }}
+                                                        >
+                                                            编辑标签
+                                                        </Button>
+                                                        <Button 
+                                                            type="primary" 
+                                                            ghost 
+                                                            size="small" 
+                                                            icon={<RobotOutlined />} 
+                                                            loading={loadingAITags[file.id]}
+                                                            onClick={() => handleAITag(file.id)}
+                                                        >
+                                                            {loadingAITags[file.id] ? '打标中' : 'AI打标'}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* 删除按钮 */}
+                                                <CloseOutlined className="del-btn" onClick={() => handleDelete(file.id)} title="删除" />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* ================= 右侧：信息配置区 ================= */}
+                            <div className="right-panel">
+                                <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 20 }}>信息配置</div>
+                                
+                                {/* 人员信息模块 (改为两列布局) */}
+                                <div style={{ background: '#fff', padding: 20, borderRadius: 8, border: '1px solid #e9ecef', marginBottom: 20 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+                                        <Text strong style={{ fontSize: 14 }}>人员信息</Text>
+                                        <Button type="link" size="small" onClick={() => setExpandedPersonnel(!expandedPersonnel)} style={{ padding: 0 }}>
+                                            {expandedPersonnel ? <><UpOutlined/> 收起更多</> : <><DownOutlined/> 展开更多</>}
+                                        </Button>
+                                    </div>
+                                    
+                                    <Row gutter={16}>
+                                        {personnelFields.filter(f => f.defaultShow || expandedPersonnel).map(field => (
+                                            <Col span={12} key={field.key} style={{ marginBottom: 16 }}>
+                                                <div style={{ marginBottom: 6, color: '#666', fontSize: 13 }}>{field.label}</div>
+                                                {/* mode="tags" + maxCount=1 允许下拉选择已有，也允许手动输入任意值 */}
+                                                <Select
+                                                    mode="tags"
+                                                    style={{ width: '100%' }}
+                                                    placeholder={`选择或输入`}
+                                                    maxCount={1}
+                                                    allowClear
+                                                    options={[
+                                                        { value: '张三', label: '张三' },
+                                                        { value: '李四', label: '李四' },
+                                                        { value: '王五', label: '王五' }
+                                                    ]}
+                                                />
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </div>
+
+                                {/* 备注模块 */}
+                                <div style={{ background: '#fff', padding: 20, borderRadius: 8, border: '1px solid #e9ecef' }}>
+                                    <Text strong style={{ display: 'block', marginBottom: 12, fontSize: 14 }}>备注</Text>
+                                    <Input.TextArea 
+                                        rows={4} 
+                                        placeholder="请输入备注信息（选填）"
+                                        style={{ resize: 'none' }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ================= 底部：操作区 ================= */}
+                        <div className="upload-footer">
+                            <Button>取消</Button>
+                            <Button type="primary" onClick={() => message.success('上传成功')}>确认</Button>
+                        </div>
+                    </div>
+
+                    {/* ================= 更换文件夹弹窗 ================= */}
+                    <Modal
+                        title="选择文件夹"
+                        open={isFolderModalOpen}
+                        onCancel={() => setIsFolderModalOpen(false)}
+                        onOk={() => {
+                            setIsFolderModalOpen(false);
+                            message.success('已更换上传目录');
+                        }}
+                        width={400}
+                        centered
+                    >
+                        <Tree 
+                            treeData={folderTreeData} 
+                            defaultExpandAll 
+                            selectedKeys={[currentFolder]}
+                            onSelect={(keys) => {
+                                if (keys.length > 0) {
+                                    setCurrentFolder(keys[0]);
+                                }
+                            }}
+                            blockNode
+                        />
+                    </Modal>
+
+                    {/* ================= 标签编辑弹窗（三栏顺序大弹窗） ================= */}
+                    <Modal
+                        title="编辑标签"
+                        open={isTagModalOpen}
+                        onCancel={() => setIsTagModalOpen(false)}
+                        width={1200}
+                        bodyStyle={{ minHeight: 450 }}
+                        okText="保存"
+                        cancelText="取消"
+                        onOk={handleSaveTags}
+                        centered
+                    >
+                        {/* 三栏并排的顺序排列设计 */}
+                        <div style={{ display: 'flex', gap: 16, paddingTop: 16 }}>
+                            
+                            {/* 1. 应用位置 (仅非图片显示) */}
+                            {!isImage && (
+                                <div style={{ flex: '0 0 220px', border: '1px solid #e9ecef', borderRadius: 8, height: 420, display: 'flex', flexDirection: 'column', background: '#fff', overflow: 'hidden' }}>
+                                    <div style={{ padding: '12px 16px', borderBottom: '1px solid #e9ecef', background: '#fafbfc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ fontWeight: 500, whiteSpace: 'nowrap' }}>1. 应用位置 <Text type="secondary" style={{fontWeight: 'normal', fontSize: 12, marginLeft: 4}}>(单选)</Text></div>
+                                        <Button type="link" size="small" icon={<RobotOutlined />} loading={loadingAI.position} onClick={() => handleAI('position', setPosition, '视频中间')}>AI识别</Button>
+                                    </div>
+                                    <div style={{ padding: '20px 16px' }}>
+                                        <Radio.Group 
+                                            value={position} 
+                                            onChange={(e) => setPosition(e.target.value)} 
+                                        >
+                                            <Space direction="vertical" size={16}>
+                                                <Radio value="视频开头">视频开头</Radio>
+                                                <Radio value="视频中间">视频中间</Radio>
+                                                <Radio value="视频结尾">视频结尾</Radio>
+                                            </Space>
+                                        </Radio.Group>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* 2. 类型标签 */}
+                            <div style={{ flex: 1, border: '1px solid #e9ecef', borderRadius: 8, height: 420, display: 'flex', flexDirection: 'column', background: '#fff', overflow: 'hidden' }}>
+                                <div style={{ padding: '12px 16px', borderBottom: '1px solid #e9ecef', background: '#fafbfc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <div style={{ fontWeight: 500 }}>{!isImage ? '2.' : '1.'} 类型标签 <Text type="secondary" style={{fontWeight: 'normal', fontSize: 12, marginLeft: 4}}>(单选)</Text></div>
+                                    <Button type="link" size="small" icon={<RobotOutlined />} loading={loadingAI.type} onClick={() => handleAI('type', setSelectedTypeKeys, ['video_2'])}>AI识别</Button>
+                                </div>
+                                <div style={{ padding: '12px 16px 0', background: '#fff' }}>
+                                    <Input prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />} placeholder="搜索类型..." size="small" />
+                                </div>
+                                <div style={{ padding: 16, overflowY: 'auto', flex: 1 }}>
+                                    <Tree 
+                                        treeData={typeTagsTree} 
+                                        defaultExpandAll 
+                                        selectedKeys={selectedTypeKeys}
+                                        onSelect={(keys) => { if(keys.length) setSelectedTypeKeys(keys); }}
+                                        blockNode
+                                        titleRender={(node) => renderTreeNode(node, 'type')}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* 3. 和 4. 内容标签 & 定向标签 (组合区块) */}
+                            <div style={{ flex: 3.5, border: '1px solid #e9ecef', borderRadius: 8, height: 420, display: 'flex', flexDirection: 'column', background: '#fff', overflow: 'hidden' }}>
+                                <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+                                    
+                                    {/* 左侧：内容标签树 */}
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #e9ecef' }}>
+                                        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e9ecef', background: '#fafbfc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ fontWeight: 500 }}>{!isImage ? '3.' : '2.'} 内容标签 <Text type="secondary" style={{fontWeight: 'normal', fontSize: 12, marginLeft: 4}}>(多选)</Text></div>
+                                            <Button type="link" size="small" icon={<RobotOutlined />} loading={loadingAI.content} onClick={() => handleAI('content', setCheckedContentKeys, ['biz_1', 'pos_2', 'in_1'])}>AI识别</Button>
+                                        </div>
+                                        <div style={{ padding: '12px 16px 0', background: '#fff' }}>
+                                            <Input prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />} placeholder="搜索内容..." size="small" />
+                                        </div>
+                                        <div style={{ padding: 16, overflowY: 'auto', flex: 1 }}>
+                                            <Tree 
+                                                checkable
+                                                treeData={contentTagsTree} 
+                                                defaultExpandAll 
+                                                checkedKeys={checkedContentKeys}
+                                                onCheck={(keys) => setCheckedContentKeys(keys)}
+                                                blockNode
+                                                titleRender={(node) => renderTreeNode(node, 'content')}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* 中间：定向标签树 */}
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderRight: '1px solid #e9ecef' }}>
+                                        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e9ecef', background: '#fafbfc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div style={{ fontWeight: 500 }}>{!isImage ? '4.' : '3.'} 定向标签 <Text type="secondary" style={{fontWeight: 'normal', fontSize: 12, marginLeft: 4}}>(多选)</Text></div>
+                                            <Button type="link" size="small" icon={<RobotOutlined />} loading={loadingAI.target} onClick={() => handleAI('target', setCheckedTargetKeys, ['aud_3', 'geo_1'])}>AI识别</Button>
+                                        </div>
+                                        <div style={{ padding: '12px 16px 0', background: '#fff' }}>
+                                            <Input prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />} placeholder="搜索定向..." size="small" />
+                                        </div>
+                                        <div style={{ padding: 16, overflowY: 'auto', flex: 1 }}>
+                                            <Tree 
+                                                checkable
+                                                treeData={targetTagsTree} 
+                                                defaultExpandAll 
+                                                checkedKeys={checkedTargetKeys}
+                                                onCheck={(keys) => setCheckedTargetKeys(keys)}
+                                                blockNode
+                                                titleRender={(node) => renderTreeNode(node, 'target')}
+                                            />
+                                        </div>
+                                    </div>
+                                    
+                                    {/* 右侧：统一的已选标签池 */}
+                                    <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', background: '#fafbfc' }}>
+                                        <div style={{ padding: '12px 16px', borderBottom: '1px solid #e9ecef', background: '#fafbfc' }}>
+                                            <div style={{ fontWeight: 500 }}>已选标签池</div>
+                                        </div>
+                                        <div style={{ padding: 16, overflowY: 'auto', flex: 1 }}>
+                                            {/* 已选内容标签 */}
+                                            <div style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>内容标签：</div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+                                                {checkedContentKeys.map(key => {
+                                                    let title = null;
+                                                    let isLeaf = true;
+                                                    const findNode = (tree) => {
+                                                        for (const node of tree) {
+                                                            if (node.key === key) {
+                                                                title = node.title;
+                                                                if (node.children && node.children.length > 0) isLeaf = false;
+                                                                return;
+                                                            }
+                                                            if (node.children) findNode(node.children);
+                                                        }
+                                                    };
+                                                    findNode(contentTagsTree);
+                                                    if (!title || !isLeaf) return null;
+                                                    return (
+                                                        <Tag 
+                                                            key={key} 
+                                                            closable 
+                                                            color="blue"
+                                                            bordered={false}
+                                                            onClose={() => setCheckedContentKeys(prev => prev.filter(k => k !== key))}
+                                                        >
+                                                            {title}
+                                                        </Tag>
+                                                    );
+                                                })}
+                                                {checkedContentKeys.length === 0 && <Text type="secondary" style={{ fontSize: 12 }}>暂无</Text>}
+                                            </div>
+
+                                            {/* 已选定向标签 */}
+                                            <div style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>定向标签：</div>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                                                {checkedTargetKeys.map(key => {
+                                                    let title = null;
+                                                    let isLeaf = true;
+                                                    const findNode = (tree) => {
+                                                        for (const node of tree) {
+                                                            if (node.key === key) {
+                                                                title = node.title;
+                                                                if (node.children && node.children.length > 0) isLeaf = false;
+                                                                return;
+                                                            }
+                                                            if (node.children) findNode(node.children);
+                                                        }
+                                                    };
+                                                    findNode(targetTagsTree);
+                                                    if (!title || !isLeaf) return null;
+                                                    return (
+                                                        <Tag 
+                                                            key={key} 
+                                                            closable 
+                                                            color="orange"
+                                                            bordered={false}
+                                                            onClose={() => setCheckedTargetKeys(prev => prev.filter(k => k !== key))}
+                                                        >
+                                                            {title}
+                                                        </Tag>
+                                                    );
+                                                })}
+                                                {checkedTargetKeys.length === 0 && <Text type="secondary" style={{ fontSize: 12 }}>暂无</Text>}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Modal>
+
+                    {/* ================= 新增树节点弹窗 ================= */}
+                    <Modal
+                        title="新增下级标签"
+                        open={addTagModal.open}
+                        onCancel={() => {
+                            setAddTagModal({ open: false, parentKey: null, treeType: null });
+                            setNewTagInput('');
+                        }}
+                        onOk={handleConfirmAddTag}
+                        width={400}
+                        centered
+                        destroyOnClose
+                    >
+                        <Input 
+                            autoFocus
+                            placeholder="请输入标签名称" 
+                            value={newTagInput} 
+                            onChange={(e) => setNewTagInput(e.target.value)} 
+                            onPressEnter={handleConfirmAddTag}
+                        />
+                    </Modal>
+                </ConfigProvider>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

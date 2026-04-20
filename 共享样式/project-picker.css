@@ -12,7 +12,8 @@
 .cc-proj-modal-mask { position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.45); display: none; align-items: center; justify-content: center; }
 .cc-proj-modal-mask.show { display: flex; }
 
-.cc-proj-modal { width: 560px; max-width: 92vw; height: 420px; max-height: 80vh; background: var(--bg-surface, #fff); border-radius: var(--r-xl, 12px); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+/* 宽度由 560px 增加到 820px，以容纳右侧已选面板 */
+.cc-proj-modal { width: 820px; max-width: 96vw; height: 500px; max-height: 85vh; background: var(--bg-surface, #fff); border-radius: var(--r-xl, 12px); display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 12px 32px rgba(0,0,0,0.15); }
 
 .cc-proj-modal-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4, 16px) var(--space-5, 20px); border-bottom: 1px solid var(--border-1, rgba(0,0,0,0.08)); flex-shrink: 0; }
 .cc-proj-modal-title { font-size: var(--text-md, 14px); font-weight: 600; color: var(--text-hi, #1f1f1f); }
@@ -24,22 +25,37 @@
 .cc-proj-modal-search input:focus { border-color: var(--accent-solid, #4A9EFF); background: var(--bg-surface, #fff); }
 
 .cc-proj-modal-body { flex: 1; display: flex; overflow: hidden; }
-.cc-proj-modal-cats { width: 160px; border-right: 1px solid var(--border-1, rgba(0,0,0,0.08)); overflow-y: auto; padding: var(--space-2, 8px); flex-shrink: 0; }
-.cc-proj-cat-item { display: flex; align-items: center; gap: var(--space-2, 8px); padding: var(--space-2, 8px) var(--space-3, 12px); border-radius: var(--r-lg, 8px); cursor: pointer; font-size: var(--text-base, 13px); color: var(--text-lo, #333); transition: background var(--ease, 120ms ease); margin-bottom: 2px; }
-.cc-proj-cat-item:hover { background: var(--bg-subtle, #f5f5f5); }
-.cc-proj-cat-item.active { background: var(--accent-bg, #E8F4FF); color: var(--accent-text, #3580DB); }
-.cc-proj-cat-item.checked { background: var(--accent-bg, #E8F4FF); color: var(--accent-text, #3580DB); font-weight: 500; }
 
-.cc-proj-cat-radio { width: 16px; height: 16px; border-radius: 9999px; border: 1.5px solid var(--border-2, rgba(0,0,0,0.15)); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: border-color var(--ease, 120ms ease); }
-.cc-proj-cat-radio.selected { border-color: var(--accent-solid, #4A9EFF); }
-.cc-proj-cat-radio.selected::after { content: ''; width: 8px; height: 8px; border-radius: 9999px; background: var(--accent-solid, #4A9EFF); }
+/* 左侧：品类 */
+.cc-proj-modal-cats { width: 180px; border-right: 1px solid var(--border-1, rgba(0,0,0,0.08)); overflow-y: auto; padding: var(--space-2, 8px); flex-shrink: 0; background: var(--bg-page, #fafafa); }
+.cc-proj-cat-item { display: flex; align-items: center; gap: var(--space-2, 8px); padding: var(--space-2, 8px) var(--space-3, 12px); border-radius: var(--r-lg, 8px); cursor: pointer; font-size: var(--text-base, 13px); color: var(--text-lo, #333); transition: all var(--ease, 120ms ease); margin-bottom: 2px; }
+.cc-proj-cat-item:hover { background: var(--bg-subtle, #f0f0f0); }
+.cc-proj-cat-item.active { background: var(--bg-surface, #fff); box-shadow: 0 1px 4px rgba(0,0,0,0.05); color: var(--accent-solid, #4A9EFF); font-weight: 500; }
 
-.cc-proj-modal-products { flex: 1; overflow-y: auto; padding: var(--space-2, 8px) var(--space-3, 12px); }
+/* 中间：产品列表 */
+.cc-proj-modal-products { flex: 1; overflow-y: auto; padding: var(--space-2, 8px) var(--space-3, 12px); border-right: 1px solid var(--border-1, rgba(0,0,0,0.08)); }
 .cc-proj-prod-item { display: flex; align-items: center; gap: var(--space-2, 8px); padding: var(--space-2, 8px) var(--space-3, 12px); border-radius: var(--r-lg, 8px); cursor: pointer; font-size: var(--text-base, 13px); color: var(--text-lo, #333); transition: background var(--ease, 120ms ease); margin-bottom: 2px; }
 .cc-proj-prod-item:hover { background: var(--bg-subtle, #f5f5f5); }
 .cc-proj-prod-item.selected { background: var(--accent-bg, #E8F4FF); color: var(--accent-text, #3580DB); font-weight: 500; }
-.cc-proj-prod-logo { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: var(--bg-subtle, #f5f5f5); }
+.cc-proj-prod-logo { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; flex-shrink: 0; background: var(--bg-subtle, #f5f5f5); }
 .cc-proj-prod-name { min-width: 0; flex: 1; }
+
+/* 多选框样式 */
+.cc-proj-checkbox { width: 16px; height: 16px; border: 1.5px solid var(--border-2, rgba(0,0,0,0.15)); border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all var(--ease, 120ms ease); background: #fff; }
+.cc-proj-prod-item.selected .cc-proj-checkbox,
+.cc-proj-cat-item.checked .cc-proj-checkbox { background: var(--accent-solid, #4A9EFF); border-color: var(--accent-solid, #4A9EFF); }
+.cc-proj-prod-item.selected .cc-proj-checkbox::after,
+.cc-proj-cat-item.checked .cc-proj-checkbox::after { content: '✓'; color: #fff; font-size: 11px; font-weight: bold; }
+
+/* 右侧：已选面板 */
+.cc-proj-modal-selected { width: 220px; flex-shrink: 0; overflow-y: auto; padding: var(--space-3, 12px); background: var(--bg-page, #fafafa); }
+.cc-proj-selected-header { font-size: 12px; font-weight: 600; color: var(--text-muted, #888); margin-bottom: var(--space-3, 12px); display: flex; justify-content: space-between; align-items: center; }
+.cc-proj-selected-count { color: var(--accent-solid, #4A9EFF); }
+.cc-proj-selected-list { display: flex; flex-direction: column; gap: 6px; }
+.cc-proj-selected-tag { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: #fff; border: 1px solid var(--border-1, rgba(0,0,0,0.08)); border-radius: 6px; font-size: 12px; color: var(--text-lo, #333); transition: all 120ms ease; }
+.cc-proj-selected-tag:hover { border-color: #ff4d4f; }
+.cc-proj-selected-tag .remove { margin-left: auto; cursor: pointer; color: var(--text-muted, #ccc); font-size: 14px; }
+.cc-proj-selected-tag .remove:hover { color: #ff4d4f; }
 
 .cc-proj-modal-footer { padding: var(--space-3, 12px) var(--space-5, 20px); border-top: 1px solid var(--border-1, rgba(0,0,0,0.08)); display: flex; justify-content: flex-end; gap: var(--space-2, 8px); flex-shrink: 0; }
 .cc-proj-modal-footer button { padding: 8px 16px; border-radius: var(--r-md, 6px); border: 1px solid var(--border-1, rgba(0,0,0,0.08)); background: var(--bg-surface, #fff); font-size: var(--text-base, 13px); color: var(--text-lo, #333); cursor: pointer; transition: all var(--ease, 120ms ease); }

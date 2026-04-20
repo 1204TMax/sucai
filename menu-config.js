@@ -84,16 +84,6 @@ const MENU_CONFIG = [
         name: '我的任务',
         page: '素材管理/我的任务.html',
         icon: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>'
-      },
-      {
-        name: '手动合成',
-        page: '共享样式/该需求暂未完成.html',
-        icon: '<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>'
-      },
-      {
-        name: '自动合成',
-        page: '共享样式/该需求暂未完成.html',
-        icon: '<polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>'
       }
     ]
   },

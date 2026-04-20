@@ -552,6 +552,7 @@
     <div class="cc-proj-modal-body">
       <div class="cc-proj-modal-cats" id="ccProjCatList"></div>
       <div class="cc-proj-modal-products" id="ccProjProdList"></div>
+      <div class="cc-proj-modal-selected" id="ccProjSelectedList"></div>
     </div>
     <div class="cc-proj-modal-footer">
       <button onclick="closeProjModal()">取消</button>
@@ -1042,7 +1043,7 @@ function getFilteredTasks() {
     if (tab === 'video' && t.type !== 'video') return false;
     if (f.status && t.status !== f.status) return false;
     if (f.search && t.input.prompt.indexOf(f.search) < 0 && t.name.indexOf(f.search) < 0) return false;
-    if (f.project && t.project !== f.project) return false;
+    if (f.project && (Array.isArray(f.project) ? f.project.length > 0 && f.project.indexOf(t.project) < 0 : t.project !== f.project)) return false;
     if (f.model && (t.input.models||[]).indexOf(f.model) < 0) return false;
     if (f.dateRange && f.dateRange !== 'custom') {
       var cutoff = new Date(); cutoff.setDate(cutoff.getDate() - parseInt(f.dateRange));

@@ -3,93 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>物料库</title>
-    <!-- React & ReactDOM -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Ant Design -->
-    <script src="https://unpkg.com/dayjs@1/dayjs.min.js"></script>
-    <script src="https://unpkg.com/antd@5/dist/antd.min.js"></script>
-    <!-- Icons -->
-    <script src="https://unpkg.com/@ant-design/icons@5/dist/index.umd.js"></script>
+    <title>TopTou 物料库</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet" href="../共享样式/image-preview.css">
+    <script src="../共享样式/image-preview.js"></script>
+    <link rel="stylesheet" href="../共享样式/components.css">
+    <script src="../共享样式/components.js"></script>
+    <link rel="stylesheet" href="../共享样式/confirm-modal.css">
+    <script src="../共享样式/confirm-modal.js"></script>
+    <script>
+        window.toggleFilterGrid = function() {
+            const filterGrid = document.getElementById('advSearchGrid');
+            const toggleGridBtn = document.getElementById('toggleFilterGridBtn');
+            if (!filterGrid || !toggleGridBtn) {
+                return;
+            }
+            const isExpanded = filterGrid.classList.toggle('expanded');
+            toggleGridBtn.innerHTML = `${isExpanded ? '收起' : '展开'} <i class="fa-solid ${isExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}" style="font-size: 12px; margin-left: 4px;"></i>`;
+        };
+
+    </script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f5f7fa;
+        :root {
+            /* ── 主色（Blue） ── */
+            --primary-1:  #E8F4FF;
+            --primary-2:  #C4E2FF;
+            --primary-3:  #96C8FF;
+            --primary-4:  #6DAFFF;
+            --primary-5:  #5AA4FF;
+            --primary-6:  #4A9EFF;
+            --primary-7:  #3580DB;
+
+            /* ── 灰阶 ── */
+            --gray-1:  #FCFCFD;
+            --gray-2:  #F8F9FA;
+            --gray-3:  #F1F3F5;
+            --gray-4:  #E9ECEF;
+            --gray-5:  #DEE2E6;
+            --gray-6:  #CED4DA;
+            --gray-7:  #ADB5BD;
+            --gray-8:  #868E96;
+            --gray-9:  #6C757D;
+            --gray-10: #5A6169;
+            --gray-11: #495057;
+            --gray-12: #212529;
+
+            /* ── 语义映射 ── */
+            --primary: var(--primary-6);
+            --primary-hover: var(--primary-5);
+            --primary-light: var(--primary-1);
+            --bg-dark: var(--gray-12);
+            --bg-dark-hover: var(--gray-11);
+            --bg-light: var(--gray-2);
+            --border: var(--gray-4);
+            --text-main: var(--gray-12);
+            --text-regular: var(--gray-11);
+            --text-muted: var(--gray-9);
+            --white: #ffffff;
+            --danger: #E5484D;
+            --warning: #FF9500;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f5f7fa;
+            color: var(--text-main);
             padding: 8px;
         }
 
+        /* 滚动条美化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #c0c4cc;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        /* ================= 内容区 ================= */
         .content-wrapper {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .top-panel {
-            background-color: #fff;
+        /* 操作面板（顶部） */
+        .top-ops-panel {
+            background-color: var(--white);
             border-radius: 8px;
-            padding: 0 20px 20px 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            padding: 0 16px 16px 16px;
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
         }
 
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 12px;
+        }
+
+        .tab-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: var(--text-regular);
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin-bottom: -1px;
+        }
+
+        .tab-item:hover {
+            color: var(--primary);
+        }
+
+        .tab-item.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+
+        .form-control {
+            height: 28px;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            padding: 0 10px;
+            font-size: 13px;
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select.form-control {
+            width: 160px;
+            background-color: var(--white);
+            cursor: pointer;
+        }
+
+        input.form-control {
+            width: 280px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            outline: none;
+            height: 28px;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            box-shadow: 0 2px 6px rgba(74, 158, 255, 0.3);
+        }
+
+        .btn-outline {
+            background-color: var(--white);
+            border-color: #dcdfe6;
+            color: var(--text-regular);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-left {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 0px;
+        }
+
+        .action-right {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dcdfe6;
+            border-radius: 6px;
+            background: var(--white);
+            color: var(--text-regular);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            background-color: var(--primary-light);
+        }
+
+        /* 底部主布局 (左树右网格) */
         .main-layout {
             display: flex;
             gap: 8px;
             align-items: flex-start;
         }
 
-        .left-sidebar {
+        /* 左侧分类树 */
+        .sidebar-tree {
             width: 220px;
-            background-color: #fff;
+            background-color: var(--white);
             border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            padding: 12px;
+            box-shadow: var(--shadow-sm);
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
 
-        .right-panel {
+        .tree-header {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tree-node {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-regular);
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+            margin-bottom: 2px;
+        }
+
+        .tree-node i.caret {
+            margin-right: 8px;
+            font-size: 12px;
+            color: var(--text-muted);
+            width: 12px;
+            text-align: center;
+        }
+
+        .tree-node:hover:not(.active) {
+            background-color: var(--bg-light);
+        }
+
+        .tree-node.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tree-node.active i.caret {
+            color: var(--primary);
+        }
+
+        .tree-children {
+            padding-left: 16px;
+        }
+
+        /* 右侧物料网格 */
+        .grid-panel {
             flex: 1;
-            background-color: #fff;
+            background-color: var(--white);
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
         }
 
         .grid-toolbar {
-            padding: 16px 20px;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 10px 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             background-color: #fafbfc;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
         }
 
-        /* 覆盖 antd tabs 默认底部 margin */
-        .ant-tabs-nav {
-            margin-bottom: 20px !important;
+        .breadcrumb {
+            font-size: 13px;
+            color: var(--text-regular);
         }
 
-        /* 自定义卡片样式（保留原版设计以保证样式一致） */
+        .grid-options {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
         .card-container {
-            padding: 20px;
+            padding: 12px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            align-content: start;
         }
 
+        /* 物料卡片 */
         .asset-card {
-            border: 1px solid #e9ecef;
+            border: 1px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
-            background: #fff;
+            background: var(--white);
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative;
             display: flex;
@@ -98,7 +365,7 @@
 
         .asset-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: var(--shadow-md);
             border-color: rgba(74, 158, 255, 0.5);
         }
 
@@ -127,25 +394,27 @@
             right: 0;
             padding: 12px 8px 6px;
             background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-            color: #fff;
+            color: var(--white);
             font-size: 12px;
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
         }
 
-        .status-dot {
+        .status-tag {
             position: absolute;
             top: 10px;
             right: 10px;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #4A9EFF;
-            border: 2px solid #fff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--white);
             z-index: 2;
         }
-        .status-dot.error { background-color: #E5484D; }
+        .status-tag.untouched { background-color: var(--gray-8); }
+        .status-tag.no-cost { background-color: var(--warning); }
+        .status-tag.cost { background-color: var(--primary); }
 
         .card-info {
             padding: 14px;
@@ -155,34 +424,40 @@
         }
 
         .card-title {
-            font-size: 14px;
+            font-size: 12px;
             font-weight: 500;
-            color: #212529;
+            color: var(--text-main);
             margin-bottom: 8px;
-            white-space: nowrap;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: normal;
+            word-break: break-all;
         }
 
         .card-tags {
             display: flex;
             gap: 8px;
             margin-bottom: 12px;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            overflow: hidden;
         }
 
         .tag {
-            font-size: 11px;
-            color: #495057;
-            background-color: #F8F9FA;
+            font-size: 12px;
+            color: var(--text-regular);
+            background-color: var(--bg-light);
             padding: 2px 6px;
             border-radius: 4px;
-            border: 1px solid #E9ECEF;
+            border: 1px solid var(--border);
+            white-space: nowrap;
         }
 
         .card-actions {
             margin-top: auto;
-            border-top: 1px solid #E9ECEF;
+            border-top: 1px solid var(--border);
             padding-top: 10px;
             display: flex;
             justify-content: space-between;
@@ -190,168 +465,2062 @@
             transition: opacity 0.2s;
         }
 
-        .asset-card:hover .card-actions { opacity: 1; }
-        .action-item { color: #6C757D; cursor: pointer; font-size: 15px; transition: color 0.2s; }
-        .action-item:hover { color: #4A9EFF; }
-        .action-item.danger:hover { color: #E5484D; }
+        .asset-card:hover .card-actions {
+            opacity: 1;
+        }
 
-        .pagination-bar {
+        .action-item {
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+
+        .action-item:hover {
+            color: var(--primary);
+        }
+
+        .action-item.danger:hover {
+            color: var(--danger);
+        }
+
+        /* 分页 */
+        .pagination {
             padding: 12px 20px;
-            border-top: 1px solid #e9ecef;
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
             background-color: #fafbfc;
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
         }
+
+        .page-info {
+            font-size: 12px;
+            color: var(--text-regular);
+        }
+
+        .page-ctrls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border: 1px solid #dcdfe6;
+            background: var(--white);
+            border-radius: 4px;
+            color: var(--text-regular);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .page-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        .page-btn:disabled {
+            background-color: var(--bg-light);
+            color: #c0c4cc;
+            cursor: not-allowed;
+            border-color: #ebeef5;
+        }
+
+    
+        /* 高级搜索面板 */
+        .flat-filter-area {
+            background: var(--white);
+            margin-bottom: 16px;
+        }
+        .adv-search-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px 24px;
+            align-items: start;
+        }
+        .adv-search-grid .filter-advanced {
+            display: none;
+        }
+        .adv-search-grid.expanded .adv-form-group.filter-advanced {
+            display: flex;
+        }
+        .adv-search-grid.expanded .data-filter-group.filter-advanced {
+            display: grid;
+        }
+
+        .adv-form-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--white);
+            overflow: visible;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .adv-form-group:hover {
+            border-color: var(--primary-4);
+        }
+        .adv-form-group:focus-within,
+        .adv-form-group.dropdown-open {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.12);
+        }
+
+        .adv-form-label {
+            width: 96px;
+            min-height: 42px;
+            background-color: var(--gray-2);
+            border-right: 1px solid var(--border);
+            padding: 0 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 8px 0 0 8px;
+        }
+
+        .adv-form-control,
+        .adv-inline-control {
+            flex: 1;
+            min-width: 0;
+            min-height: 42px;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 0 16px;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+        .adv-form-control::placeholder {
+            color: var(--gray-7);
+        }
+
+        .adv-inline-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            width: 100%;
+            cursor: pointer;
+            text-align: left;
+        }
+        .adv-control-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: var(--text-main);
+        }
+        .adv-control-placeholder {
+            color: var(--gray-7);
+        }
+        .adv-control-arrow {
+            color: var(--gray-7);
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: transform 0.2s ease;
+        }
+        .adv-form-group.dropdown-open .adv-control-arrow {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 96px;
+            right: 0;
+            display: none;
+            flex-direction: column;
+            max-height: 240px;
+            overflow-y: auto;
+            padding: 8px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            z-index: 1200;
+        }
+        .filter-dropdown-menu.show {
+            display: flex;
+        }
+        .filter-dropdown-option {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 40px;
+            padding: 0 16px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+        }
+        .filter-dropdown-option:hover,
+        .filter-dropdown-option.is-active {
+            background: var(--primary-1);
+            color: var(--primary);
+        }
+
+        .adv-search-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-green {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        .btn-green:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+            color: var(--white);
+        }
+
+        .adv-date-group {
+            grid-column: span 1;
+        }
+        .adv-date-trigger {
+            justify-content: flex-start;
+        }
+        .date-icon {
+            color: var(--gray-7);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .date-range-values {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+        }
+        .date-input-borderless {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 96px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-main);
+            text-align: center;
+            cursor: pointer;
+            pointer-events: none;
+        }
+        .date-input-borderless::placeholder {
+            color: var(--gray-7);
+        }
+        .date-separator {
+            color: var(--gray-7);
+        }
+
+        .mock-calendar-popup {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            display: none;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            z-index: 1200;
+            border: 1px solid var(--border);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        #dateFilterGroup .mock-calendar-popup {
+            width: max-content;
+        }
+        .mock-calendar-popup.show {
+            display: flex;
+        }
+        .calendar-sidebar {
+            width: 110px;
+            border-right: 1px solid var(--border);
+            padding: 12px 0;
+            background: var(--white);
+            border-radius: 12px 0 0 12px;
+        }
+        .sidebar-item {
+            padding: 8px 20px;
+            font-size: 13px;
+            color: var(--text-regular);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .sidebar-item:hover {
+            color: var(--primary);
+            background: var(--primary-1);
+        }
+        .calendar-body {
+            display: flex;
+            padding: 16px;
+            gap: 24px;
+        }
+        .calendar-pane {
+            width: 240px;
+        }
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .calendar-header-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-regular);
+            font-size: 12px;
+            padding: 4px;
+        }
+        .calendar-header-btn:hover {
+            color: var(--primary);
+        }
+        .calendar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            gap: 4px 0;
+        }
+        .calendar-th {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 8px;
+        }
+        .calendar-td {
+            font-size: 12px;
+            color: var(--text-regular);
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            border-radius: 6px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+        .calendar-td:hover {
+            color: var(--primary);
+            background: var(--primary-1);
+        }
+        .calendar-td.off-month {
+            color: var(--gray-6);
+        }
+        .calendar-td.today {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        .calendar-td.selected {
+            background: var(--primary);
+            color: var(--white);
+        }
+        .calendar-td.in-range {
+            background: var(--primary-1);
+        }
+
+        .data-filter-group {
+            grid-column: span 3;
+            display: grid;
+            grid-template-columns: 96px minmax(0, 1fr) minmax(0, 1fr);
+            align-items: center;
+            gap: 16px;
+        }
+        .data-filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+        .data-filter-input-group {
+            display: flex;
+            align-items: center;
+            min-height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .data-filter-input-group:hover {
+            border-color: var(--primary-4);
+        }
+        .data-filter-input-group:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.12);
+        }
+        .data-filter-addon,
+        .data-filter-select {
+            min-height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
+            background-color: var(--gray-2);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            border-right: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .data-filter-select {
+            min-width: 68px;
+            border-top: none;
+            border-bottom: none;
+            border-left: none;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ADB5BD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            cursor: pointer;
+            justify-content: flex-start;
+            padding-right: 32px;
+        }
+        .data-filter-input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            padding: 0 16px;
+            font-size: 13px;
+            color: var(--text-main);
+            outline: none;
+            background: transparent;
+        }
+
+        .tree-node {
+            position: relative;
+            justify-content: space-between;
+        }
+        .tree-node-left {
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .tree-node-actions {
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+        .tree-node:hover .tree-node-actions {
+            display: flex;
+        }
+        .tree-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 2px;
+            border-radius: 2px;
+        }
+        .tree-action-btn:hover {
+            color: var(--primary);
+            background: var(--bg-light);
+        }
+        
+        .tree-dropdown-menu {
+            position: absolute;
+            right: -100px;
+            top: 20px;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            min-width: 120px;
+        }
+        .tree-dropdown-menu.show {
+            display: flex;
+        }
+        .tree-dropdown-item {
+            padding: 8px 12px;
+            font-size: 12px;
+            color: var(--text-main);
+            cursor: pointer;
+        }
+        .tree-dropdown-item:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+        .tree-dropdown-item.danger:hover {
+            color: var(--danger);
+        }
+
+        /* 模态框 */
+        .custom-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .custom-modal-overlay.show { display: flex; }
+        .custom-modal {
+            background: var(--white);
+            border-radius: 8px;
+            width: 400px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        .custom-modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .custom-modal-body {
+            padding: 20px;
+            font-size: 14px;
+        }
+        .custom-modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .card-action-dropdown {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .card-action-dropdown .tree-dropdown-menu {
+            bottom: 100%;
+            top: auto;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+            margin-bottom: 8px;
+            padding: 4px 0;
+            min-width: 130px;
+            text-align: center;
+            cursor: default;
+        }
+        .card-action-dropdown .tree-dropdown-menu::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--white) transparent transparent transparent;
+        }
+
+        .tag-modal-layout {
+            flex: 1;
+            display: flex;
+            padding: 0;
+            overflow: hidden;
+        }
+        .tag-modal-tree-pane {
+            flex: 1;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .tag-modal-search {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        .tag-modal-tree {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .tag-tree-node {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            min-height: 36px;
+            padding: 0 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1;
+        }
+        .tag-tree-node span {
+            flex: 0 0 auto;
+        }
+        .tag-tree-node:hover {
+            background: var(--bg-light);
+        }
+        .tag-tree-node .caret {
+            width: 12px;
+            margin-right: 0;
+            color: var(--text-muted);
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .tag-tree-children {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding-left: 28px;
+        }
+        .tag-tree-check {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 8px;
+            min-height: 36px;
+            padding: 0 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1;
+        }
+        .tag-tree-check span {
+            flex: 0 0 auto;
+        }
+        .tag-tree-check:hover {
+            background: var(--bg-light);
+        }
+        .tag-modal-selected-pane {
+            width: 200px;
+            background: #fafbfc;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .tag-modal-selected-header {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tag-modal-selected-list {
+            flex: 1;
+            padding: 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+    
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { ConfigProvider, Tabs, Select, Input, Button, Space, Tree, Pagination, Breadcrumb, Segmented } = antd;
-        const { CloudUploadOutlined, FolderAddOutlined, UploadOutlined, DeleteOutlined, CheckSquareOutlined, AppstoreOutlined, BarsOutlined, DownOutlined, SearchOutlined } = icons;
+    <!-- 内容包裹区 -->
+    <div class="content-wrapper">
+            
+            <!-- 顶部操作区 -->
+            <div class="top-ops-panel">
+                <div class="tabs">
+                    <div class="tab-item active">正式</div>
+                    <div class="tab-item">待优化</div>
+                    <div class="tab-item">回收站</div>
+                </div>
 
-        const App = () => {
-            const tabsItems = [
-                { key: '1', label: '物料管理' },
-                { key: '2', label: '帖子管理' },
-                { key: '3', label: '商品管理' },
-                { key: '4', label: '设计工具' },
-                { key: '5', label: '物料模板' },
-                { key: '6', label: '设计师信息' },
-            ];
-
-            const treeData = [
-                { title: '我的物料', key: '0-0' },
-                { title: '我的收藏', key: '0-1' },
-                { 
-                    title: '物料库', 
-                    key: '0-2',
-                    children: [
-                        { title: '123', key: '0-2-0' },
-                        { title: '未分组物料', key: '0-2-1' },
-                        { title: '测试', key: '0-2-2' },
-                    ]
-                }
-            ];
-
-            const assets = [
-                { id: 1, type: 'video', title: 'Summer_Campaign_Video_v1_final.mp4', tags: ['mp4', 'ID: 89321'], time: '00:41', size: '1080×1920', sizeMB: '53.4MB', img: 'https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=400&q=80', error: false },
-                { id: 2, type: 'image', title: 'Product_Showcase_Main.png', tags: ['png', 'ID: 89322'], time: '图片', size: '800×800', sizeMB: '1.2MB', img: 'https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=400&q=80', error: true },
-                { id: 3, type: 'video', title: 'Holiday_Sale_Ad_Square.mp4', tags: ['mp4', 'ID: 89323'], time: '00:15', size: '1080×1080', sizeMB: '12.8MB', img: 'https://images.unsplash.com/photo-1528297506728-9533d2ac3fa4?auto=format&fit=crop&w=400&q=80', error: false },
-                { id: 4, type: 'image', title: 'Facebook_Newsfeed_Banner_v2.jpg', tags: ['jpg', 'ID: 89324'], time: '图片', size: '1200×628', sizeMB: '2.5MB', img: 'https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?auto=format&fit=crop&w=400&q=80', error: false },
-                { id: 5, type: 'image', title: 'Instagram_Story_Promo.png', tags: ['png', 'ID: 89325'], time: '图片', size: '1080×1920', sizeMB: '3.1MB', img: 'https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&w=400&q=80', error: false },
-            ];
-
-            return (
-                <ConfigProvider theme={{ token: { colorPrimary: '#4A9EFF', borderRadius: 6 } }}>
-                    <div className="content-wrapper">
-                        {/* 顶部操作区 */}
-                        <div className="top-panel">
-                            <Tabs defaultActiveKey="1" items={tabsItems} />
-                            
-                            <div style={{ display: 'flex', gap: 12, marginBottom: 20, alignItems: 'center' }}>
-                                <Select defaultValue="字段搜索条件" style={{ width: 160 }} options={[{ value: '字段搜索条件', label: '字段搜索条件' }, { value: '物料名称', label: '物料名称' }]} />
-                                <Input placeholder="请输入物料名称" style={{ width: 280 }} />
-                                <Button type="primary">查询</Button>
-                                <Button>清空</Button>
+                <div class="flat-filter-area">
+                    <div class="adv-search-grid" id="advSearchGrid">
+                        <div class="adv-form-group">
+                            <div class="adv-form-label">物料名称</div>
+                            <input type="text" class="adv-form-control" placeholder="请输入物料名称">
+                        </div>
+                        <div class="adv-form-group" id="mediaFilterGroup">
+                            <div class="adv-form-label">媒体</div>
+                            <button type="button" class="adv-inline-control" id="mediaFilterBtn" onclick="toggleFilterDropdown(event, 'mediaFilterGroup', 'mediaDropdown')">
+                                <span class="adv-control-text adv-control-placeholder">请选择已同步媒体</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="mediaDropdown" onclick="event.stopPropagation()">
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('mediaFilterBtn', '请选择已同步媒体', '头条', this)">头条</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('mediaFilterBtn', '请选择已同步媒体', '广点通', this)">广点通</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('mediaFilterBtn', '请选择已同步媒体', '快手', this)">快手</button>
                             </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Space size={12}>
-                                    <Button type="primary" icon={<CloudUploadOutlined />}>上传物料 <DownOutlined style={{fontSize: 10}}/></Button>
-                                    <Button>同步物料库</Button>
-                                </Space>
-                                <Space size={8}>
-                                    <Button icon={<FolderAddOutlined />} title="新建文件夹" />
-                                    <Button icon={<UploadOutlined />} title="上传物料到库" />
-                                    <Button icon={<DeleteOutlined />} title="删除" />
-                                    <Button icon={<CheckSquareOutlined />} title="全选" />
-                                </Space>
+                        </div>
+                        <div class="adv-form-group" id="statusFilterGroup">
+                            <div class="adv-form-label">状态</div>
+                            <button type="button" class="adv-inline-control" id="statusFilterBtn" onclick="toggleFilterDropdown(event, 'statusFilterGroup', 'statusDropdown')">
+                                <span class="adv-control-text adv-control-placeholder">请选择</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="statusDropdown" onclick="event.stopPropagation()">
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '未使用', this)">未使用</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '已投放', this)">已投放</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '无消耗', this)">无消耗</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '有消耗', this)">有消耗</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '待审核', this)">待审核</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '审核通过', this)">审核通过</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('statusFilterBtn', '请选择', '审核失败', this)">审核失败</button>
+                            </div>
+                        </div>
+                        <div class="adv-form-group" id="typeFilterGroup">
+                            <div class="adv-form-label">物料类型</div>
+                            <button type="button" class="adv-inline-control" id="typeFilterBtn" onclick="toggleFilterDropdown(event, 'typeFilterGroup', 'typeDropdown')">
+                                <span class="adv-control-text adv-control-placeholder">请选择</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="typeDropdown" onclick="event.stopPropagation()">
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('typeFilterBtn', '请选择', '图片', this)">图片</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('typeFilterBtn', '请选择', '视频', this)">视频</button>
                             </div>
                         </div>
 
-                        {/* 下方布局 */}
-                        <div className="main-layout">
-                            {/* 左侧树 */}
-                            <div className="left-sidebar">
-                                <div style={{ fontSize: 15, fontWeight: 600, paddingBottom: 12, borderBottom: '1px solid #f0f0f0', marginBottom: 12 }}>物料分类</div>
-                                <Tree 
-                                    defaultExpandedKeys={['0-2']} 
-                                    defaultSelectedKeys={['0-2']}
-                                    treeData={treeData} 
-                                    blockNode
-                                />
+                        <div class="adv-form-group">
+                            <div class="adv-form-label">项目</div>
+                            <button type="button" id="projectPickerBtn" class="adv-inline-control" onclick="openProjModal()">
+                                <span id="projectPickerVal" class="adv-control-text">全部项目</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                        </div>
+                        <div class="adv-form-group" id="designerFilterGroup">
+                            <div class="adv-form-label">设计师</div>
+                            <button type="button" class="adv-inline-control" id="designerFilterBtn" onclick="toggleFilterDropdown(event, 'designerFilterGroup', 'designerDropdown')">
+                                <span class="adv-control-text adv-control-placeholder">请搜索或选择</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="designerDropdown" onclick="event.stopPropagation()">
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('designerFilterBtn', '请搜索或选择', '设计师A', this)">设计师A</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('designerFilterBtn', '请搜索或选择', '设计师B', this)">设计师B</button>
                             </div>
+                        </div>
+                        <div class="adv-form-group">
+                            <div class="adv-form-label">类型标签</div>
+                            <button type="button" class="adv-inline-control" id="typeTagFilterBtn">
+                                <span id="typeTagFilterDisplay" style="flex:1; display:flex; gap:4px; overflow:hidden; align-items:center; min-width:0;">
+                                    <span class="adv-control-placeholder">请选择类型标签</span>
+                                </span>
+                                <i class="fa-solid fa-circle-xmark" id="typeTagFilterClear" style="color:var(--gray-5); display:none;" onclick="event.stopPropagation(); clearTypeTagFilter()"></i>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                        </div>
+                        <div class="adv-form-group">
+                            <div class="adv-form-label">内容标签</div>
+                            <button type="button" class="adv-inline-control" id="contentTagFilterBtn">
+                                <span id="contentTagFilterDisplay" style="flex:1; display:flex; gap:4px; overflow:hidden; align-items:center; min-width:0;">
+                                    <span class="adv-control-placeholder">请选择内容标签</span>
+                                </span>
+                                <i class="fa-solid fa-circle-xmark" id="contentTagFilterClear" style="color:var(--gray-5); display:none;" onclick="event.stopPropagation(); clearContentTagFilter()"></i>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                        </div>
 
-                            {/* 右侧网格 */}
-                            <div className="right-panel">
-                                <div className="grid-toolbar">
-                                    <Breadcrumb items={[{ title: '全部物料' }, { title: '物料库' }, { title: '未分组物料' }]} />
-                                    <Space size={16}>
-                                        <Select defaultValue="按创建时间从新到旧" style={{ width: 180 }} options={[{ value: '按创建时间从新到旧', label: '按创建时间从新到旧' }]} />
-                                        <Segmented options={[
-                                            { value: 'list', icon: <BarsOutlined /> },
-                                            { value: 'grid', icon: <AppstoreOutlined /> },
-                                        ]} defaultValue="grid" />
-                                    </Space>
+                        <div class="adv-form-group filter-advanced" id="optimizerFilterGroup">
+                            <div class="adv-form-label">优化师</div>
+                            <button type="button" class="adv-inline-control" id="optimizerFilterBtn" onclick="toggleFilterDropdown(event, 'optimizerFilterGroup', 'optimizerDropdown')">
+                                <span class="adv-control-text adv-control-placeholder">请搜索或选择</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="optimizerDropdown" onclick="event.stopPropagation()">
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('optimizerFilterBtn', '请搜索或选择', '优化师A', this)">优化师A</button>
+                                <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('optimizerFilterBtn', '请搜索或选择', '优化师B', this)">优化师B</button>
+                            </div>
+                        </div>
+                        <div class="adv-form-group adv-date-group filter-advanced" id="dateFilterGroup">
+                            <div class="adv-form-label">创建时间</div>
+                            <button type="button" class="adv-inline-control adv-date-trigger" id="advDateRangeBtn" onclick="toggleDateRange(event)">
+                                <i class="fa-regular fa-calendar date-icon"></i>
+                                <span class="date-range-values">
+                                    <input type="text" class="date-input-borderless" placeholder="开始日期" value="2026-04-14" readonly>
+                                    <span class="date-separator">~</span>
+                                    <input type="text" class="date-input-borderless" placeholder="结束日期" value="2026-04-19" readonly>
+                                </span>
+                            </button>
+                            <div class="mock-calendar-popup" id="mockCalendarPopup" onclick="event.stopPropagation()">
+                                <div class="calendar-sidebar">
+                                    <div class="sidebar-item">今天</div>
+                                    <div class="sidebar-item">昨天</div>
+                                    <div class="sidebar-item" style="color: var(--primary); background: var(--primary-1);">近7天</div>
+                                    <div class="sidebar-item">近30天</div>
+                                    <div class="sidebar-item">本月</div>
+                                    <div class="sidebar-item">上一个月</div>
                                 </div>
-
-                                <div className="card-container">
-                                    {assets.map(item => (
-                                        <div className="asset-card" key={item.id}>
-                                            <div className={`status-dot ${item.error ? 'error' : ''}`}></div>
-                                            <div className="card-preview">
-                                                <img src={item.img} alt="thumbnail" />
-                                                <div className="preview-overlay">
-                                                    <span>
-                                                        {item.type === 'video' ? <i className="fa-solid fa-video" style={{marginRight:4, fontSize:10}}></i> : <i className="fa-regular fa-image" style={{marginRight:4, fontSize:10}}></i>} 
-                                                        {item.time}
-                                                    </span>
-                                                    <div>
-                                                        <span style={{marginRight: 8}}>{item.size}</span>
-                                                        <span>{item.sizeMB}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="card-info">
-                                                <div className="card-title" title={item.title}>{item.title}</div>
-                                                <div className="card-tags">
-                                                    {item.tags.map(tag => <span className="tag" key={tag}>{tag}</span>)}
-                                                </div>
-                                                <div className="card-actions">
-                                                    <i className="fa-regular fa-eye action-item" title="预览"></i>
-                                                    <i className="fa-solid fa-download action-item" title="下载"></i>
-                                                    <i className="fa-solid fa-pen action-item" title="编辑"></i>
-                                                    <i className="fa-regular fa-trash-can action-item danger" title="删除"></i>
-                                                    <i className="fa-regular fa-star action-item" title="收藏"></i>
-                                                    <i className="fa-solid fa-ellipsis action-item" title="更多"></i>
-                                                </div>
-                                            </div>
+                                <div class="calendar-body">
+                                    <div class="calendar-pane">
+                                        <div class="calendar-header">
+                                            <div><button class="calendar-header-btn"><i class="fa-solid fa-angles-left"></i></button><button class="calendar-header-btn"><i class="fa-solid fa-angle-left"></i></button></div>
+                                            <div class="calendar-title">2026 年 4 月</div>
+                                            <div style="opacity: 0; pointer-events: none;"><button class="calendar-header-btn"><i class="fa-solid fa-angle-right"></i></button><button class="calendar-header-btn"><i class="fa-solid fa-angles-right"></i></button></div>
                                         </div>
-                                    ))}
+                                        <div class="calendar-grid">
+                                            <div class="calendar-th">日</div><div class="calendar-th">一</div><div class="calendar-th">二</div><div class="calendar-th">三</div><div class="calendar-th">四</div><div class="calendar-th">五</div><div class="calendar-th">六</div>
+                                            <div class="calendar-td off-month">29</div><div class="calendar-td off-month">30</div><div class="calendar-td off-month">31</div><div class="calendar-td">1</div><div class="calendar-td">2</div><div class="calendar-td">3</div><div class="calendar-td">4</div>
+                                            <div class="calendar-td">5</div><div class="calendar-td">6</div><div class="calendar-td">7</div><div class="calendar-td">8</div><div class="calendar-td">9</div><div class="calendar-td">10</div><div class="calendar-td">11</div>
+                                            <div class="calendar-td">12</div><div class="calendar-td">13</div><div class="calendar-td selected">14</div><div class="calendar-td in-range">15</div><div class="calendar-td in-range">16</div><div class="calendar-td in-range">17</div><div class="calendar-td in-range">18</div>
+                                            <div class="calendar-td selected">19</div><div class="calendar-td off-month in-range">20</div><div class="calendar-td off-month in-range">21</div><div class="calendar-td off-month in-range">22</div><div class="calendar-td off-month in-range">23</div><div class="calendar-td off-month in-range">24</div><div class="calendar-td off-month in-range">25</div>
+                                            <div class="calendar-td off-month in-range">26</div><div class="calendar-td off-month in-range">27</div><div class="calendar-td off-month in-range">28</div><div class="calendar-td off-month in-range">29</div><div class="calendar-td off-month in-range">30</div><div class="calendar-td off-month in-range">1</div><div class="calendar-td off-month in-range">2</div>
+                                            <div class="calendar-td off-month in-range">3</div><div class="calendar-td off-month in-range">4</div><div class="calendar-td off-month in-range">5</div><div class="calendar-td off-month in-range">6</div><div class="calendar-td off-month in-range">7</div><div class="calendar-td off-month in-range">8</div><div class="calendar-td off-month in-range">9</div>
+                                        </div>
+                                    </div>
+                                    <div class="calendar-pane">
+                                        <div class="calendar-header">
+                                            <div style="opacity: 0; pointer-events: none;"><button class="calendar-header-btn"><i class="fa-solid fa-angles-left"></i></button><button class="calendar-header-btn"><i class="fa-solid fa-angle-left"></i></button></div>
+                                            <div class="calendar-title">2026 年 5 月</div>
+                                            <div><button class="calendar-header-btn"><i class="fa-solid fa-angle-right"></i></button><button class="calendar-header-btn"><i class="fa-solid fa-angles-right"></i></button></div>
+                                        </div>
+                                        <div class="calendar-grid">
+                                            <div class="calendar-th">日</div><div class="calendar-th">一</div><div class="calendar-th">二</div><div class="calendar-th">三</div><div class="calendar-th">四</div><div class="calendar-th">五</div><div class="calendar-th">六</div>
+                                            <div class="calendar-td off-month in-range">26</div><div class="calendar-td off-month in-range">27</div><div class="calendar-td off-month in-range">28</div><div class="calendar-td off-month in-range">29</div><div class="calendar-td off-month in-range">30</div><div class="calendar-td off-month in-range">1</div><div class="calendar-td off-month in-range">2</div>
+                                            <div class="calendar-td off-month in-range">3</div><div class="calendar-td off-month in-range">4</div><div class="calendar-td off-month in-range">5</div><div class="calendar-td off-month in-range">6</div><div class="calendar-td off-month in-range">7</div><div class="calendar-td off-month in-range">8</div><div class="calendar-td off-month in-range">9</div>
+                                            <div class="calendar-td off-month in-range">10</div><div class="calendar-td off-month in-range">11</div><div class="calendar-td off-month in-range">12</div><div class="calendar-td off-month in-range">13</div><div class="calendar-td off-month in-range">14</div><div class="calendar-td off-month in-range">15</div><div class="calendar-td off-month in-range">16</div>
+                                            <div class="calendar-td off-month in-range">17</div><div class="calendar-td off-month in-range">18</div><div class="calendar-td off-month in-range">19</div><div class="calendar-td off-month in-range">20</div><div class="calendar-td off-month in-range">21</div><div class="calendar-td off-month in-range">22</div><div class="calendar-td off-month in-range">23</div>
+                                            <div class="calendar-td off-month in-range">24</div><div class="calendar-td off-month in-range">25</div><div class="calendar-td off-month in-range">26</div><div class="calendar-td off-month in-range">27</div><div class="calendar-td off-month in-range">28</div><div class="calendar-td off-month in-range">29</div><div class="calendar-td off-month in-range">30</div>
+                                            <div class="calendar-td off-month in-range">31</div><div class="calendar-td off-month in-range">1</div><div class="calendar-td off-month in-range">2</div><div class="calendar-td off-month in-range">3</div><div class="calendar-td off-month in-range">4</div><div class="calendar-td off-month in-range">5</div><div class="calendar-td off-month in-range">6</div>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div className="pagination-bar">
-                                    <Pagination 
-                                        total={142} 
-                                        showSizeChanger 
-                                        showTotal={(total) => `共 ${total} 条`} 
-                                        defaultPageSize={30}
-                                        defaultCurrent={1}
-                                    />
-                                </div>
+                            </div>
+                        </div>
+                        <div class="data-filter-group filter-advanced">
+                            <div class="data-filter-label">使用数据：</div>
+                            <div class="data-filter-input-group">
+                                <div class="data-filter-addon">消耗</div>
+                                <select class="data-filter-select">
+                                    <option>>=</option>
+                                    <option><=</option>
+                                    <option>=</option>
+                                </select>
+                                <input type="number" class="data-filter-input" placeholder="">
+                            </div>
+                            <div class="data-filter-input-group">
+                                <div class="data-filter-addon">ROI</div>
+                                <select class="data-filter-select">
+                                    <option>>=</option>
+                                    <option><=</option>
+                                    <option>=</option>
+                                </select>
+                                <input type="number" class="data-filter-input" placeholder="">
                             </div>
                         </div>
                     </div>
-                </ConfigProvider>
-            );
-        };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+                    <div class="adv-search-actions">
+                        <button class="btn btn-outline" style="border: none; color: var(--primary); background: transparent;" id="toggleFilterGridBtn" onclick="window.toggleFilterGrid()">展开 <i class="fa-solid fa-chevron-down" style="font-size: 12px; margin-left: 4px;"></i></button>
+                        <button class="btn btn-outline">清空</button>
+                        <button class="btn btn-green">查询</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下方布局：左树 + 右网格 -->
+            <div class="main-layout">
+                
+                <!-- 左侧筛选面板 -->
+                <div class="sidebar-tree">
+                    <div class="tree-header">物料分类</div>
+
+                    <div style="margin-bottom: 12px; position: relative;">
+                        <input type="text" class="form-control" style="width: 100%; padding-left: 28px;" placeholder="搜索文件夹">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 10px; color: var(--text-muted); font-size: 12px;"></i>
+                    </div>
+
+                    <!-- 根目录：置顶 -->
+                    <div class="tree-node root-node" data-path="置顶/">
+        <div class="tree-node-left"><i class="fa-solid fa-caret-right caret"></i> 置顶</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" title="新建文件夹" onclick="openNewFolderModal('置顶/')"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </div>
+                    <div class="tree-children" style="display: none;">
+                        <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 重要物料</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('重要物料/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                        <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 常用模板</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('常用模板/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                    </div>
+
+                    <!-- 根目录：收藏 -->
+                    <div class="tree-node root-node" data-path="收藏/">
+        <div class="tree-node-left"><i class="fa-solid fa-caret-down caret"></i> 收藏</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" title="新建文件夹" onclick="openNewFolderModal('收藏/')"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </div>
+                    <div class="tree-children">
+                        <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 默认收藏夹</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('默认收藏夹/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                    </div>
+
+                    <!-- 根目录：全部 -->                    <div class="tree-node root-node" data-path="全部/">
+        <div class="tree-node-left"><i class="fa-solid fa-caret-down caret"></i> 全部</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" title="新建文件夹" onclick="openNewFolderModal('全部/')"><i class="fa-solid fa-plus"></i></button>
+        </div>
+    </div>
+                    <div class="tree-children">
+                        
+                        <!-- 文件夹A (第1层文件夹) -->
+                        <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-caret-down caret"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 文件夹A</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('文件夹A/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                        <div class="tree-children">
+                            
+                            <!-- 文件夹A1 (第2层文件夹) -->
+                            <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-caret-down caret"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 文件夹A1</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('文件夹A1/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                            <div class="tree-children">
+                                
+                                <!-- 文件夹A11 (第3层文件夹，最底层) -->
+                                <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 文件夹A11</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('文件夹A11/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                                
+                            </div>
+                            
+                            <!-- 同层级文件夹A2 -->
+                            <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 文件夹A2</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('文件夹A2/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                        </div>
+
+                        <!-- 其他平级文件夹 -->
+                        <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 文件夹B</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('文件夹B/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                        <div class="tree-node">
+        <div class="tree-node-left"><i class="fa-solid fa-minus caret" style="opacity: 0;"></i> <i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i> 未分组物料</div>
+        <div class="tree-node-actions">
+            <button class="tree-action-btn" onclick="toggleFolderMenu(event)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+            <div class="tree-dropdown-menu">
+                <div class="tree-dropdown-item" onclick="openNewFolderModal('未分组物料/')">新建文件夹</div>
+                <div class="tree-dropdown-item">置顶</div>
+                <div class="tree-dropdown-item danger">删除文件夹及其物料</div>
+            </div>
+        </div>
+    </div>
+                    </div>
+                </div>
+
+                <!-- 右侧物料展示区 -->
+                <div class="grid-panel">
+                    
+                    <!-- 顶部控制栏 -->
+                    <div class="grid-toolbar">
+                        <div class="breadcrumb">全部物料 / 物料库 / 未分组物料</div>
+                        <div class="grid-options">
+                                                        <div id="multiSelectActions" style="display: none; align-items: center; gap: 8px;">
+                                <button class="btn btn-outline" id="toggleAllCheckboxesBtn" style="height: 28px; padding: 0 12px; font-size: 12px;" onclick="toggleAllCheckboxes()">取消全选</button>
+                                <button class="btn btn-outline" style="height: 28px; padding: 0 12px; font-size: 12px;" onclick="openMoveModalMulti()">移动</button>
+                                <button class="btn btn-outline" style="height: 28px; padding: 0 12px; font-size: 12px;">收藏</button>
+                                <button class="btn btn-outline" style="height: 28px; padding: 0 12px; font-size: 12px;">转移到待优化库</button>
+                                <button class="btn btn-outline" style="height: 28px; padding: 0 12px; font-size: 12px; color: var(--danger); border-color: #fbc4c4; background-color: #fef0f0;" onclick="handleBatchDelete()">删除</button>
+                                <button class="btn btn-primary" style="height: 28px; padding: 0 12px; font-size: 12px;" onclick="exitMultiSelect()">取消多选</button>
+                            </div>
+                            <button class="btn btn-outline" id="selectAllBtn" style="height: 28px; padding: 0 12px; font-size: 12px;" onclick="enterMultiSelect()">选择</button>
+                            <select class="form-control" style="width: auto; height: 28px;">
+                                <option>按创建时间从新到旧</option>
+                                <option>按创建时间从旧到新</option>
+                                <option>按名称 A-Z</option>
+                            </select>
+                            <button class="btn btn-primary" style="height: 28px; padding: 0 12px; font-size: 12px;" onclick="parent.postMessage({ action: 'openTab', title: '上传物料', url: '素材管理/上传物料.html' }, '*')">
+                                <i class="fa-solid fa-upload" style="margin-right: 4px;"></i>上传物料
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 物料卡片列表 -->
+                    <div class="card-container">
+                        <!-- 卡片 1 (视频) -->
+                        <div class="asset-card" onclick="openAssetDetail()" style="cursor:pointer;">
+                            <div class="status-tag untouched">未投放</div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-solid fa-video" style="margin-right: 4px; font-size: 10px;"></i> 00:41</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1080×1920</span>
+                                        <span>53.4MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Summer_Campaign_Video_v1_final.mp4">Summer_Campaign_Video_v1_final.mp4</div>
+                                <div class="card-tags">
+                                    <span class="tag">类型标签1</span>
+                                    <span class="tag">内容标签1</span>
+                                    <span class="tag">内容标签2</span>
+                                    <span class="tag">很长的标签名字啊啊</span>
+                                    <span class="tag">内容标签3</span>
+                                    <span class="tag">测试超长标签</span>
+                                    <span class="tag">节日活动</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑" onclick="event.stopPropagation(); openAssetDetail()"></i>
+                                    <div class="card-action-dropdown" onmouseenter="this.querySelector('.tree-dropdown-menu').classList.add('show')" onmouseleave="this.querySelector('.tree-dropdown-menu').classList.remove('show')">
+                                        <i class="fa-solid fa-box-archive action-item" title="入库"></i>
+                                        <div class="tree-dropdown-menu">
+                                            <div class="tree-dropdown-item" onclick="event.stopPropagation(); handleImport(this, '待优化')">入库到待优化</div>
+                                            <div class="tree-dropdown-item danger" onclick="event.stopPropagation(); handleImport(this, '回收站')">入库到回收站</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-folder-tree action-item" title="移动" onclick="event.stopPropagation(); openMoveModalSingle(this)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 2 (图片) -->
+                        <div class="asset-card" onclick="openAssetDetail()" style="cursor:pointer;">
+                            <div class="status-tag no-cost">无消耗</div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-regular fa-image" style="margin-right: 4px; font-size: 10px;"></i> 图片</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">800×800</span>
+                                        <span>1.2MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Product_Showcase_Main.png">Product_Showcase_Main.png</div>
+                                <div class="card-tags">
+                                    <span class="tag">类型标签1</span>
+                                    <span class="tag">内容标签1</span>
+                                    <span class="tag">内容标签2</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑" onclick="event.stopPropagation(); openAssetDetail()"></i>
+                                    <div class="card-action-dropdown" onmouseenter="this.querySelector('.tree-dropdown-menu').classList.add('show')" onmouseleave="this.querySelector('.tree-dropdown-menu').classList.remove('show')">
+                                        <i class="fa-solid fa-box-archive action-item" title="入库"></i>
+                                        <div class="tree-dropdown-menu">
+                                            <div class="tree-dropdown-item" onclick="event.stopPropagation(); handleImport(this, '待优化')">入库到待优化</div>
+                                            <div class="tree-dropdown-item danger" onclick="event.stopPropagation(); handleImport(this, '回收站')">入库到回收站</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-folder-tree action-item" title="移动" onclick="event.stopPropagation(); openMoveModalSingle(this)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 3 -->
+                        <div class="asset-card" onclick="openAssetDetail()" style="cursor:pointer;">
+                            <div class="status-tag cost">有消耗</div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1528297506728-9533d2ac3fa4?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-solid fa-video" style="margin-right: 4px; font-size: 10px;"></i> 00:15</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1080×1080</span>
+                                        <span>12.8MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Holiday_Sale_Ad_Square.mp4">Holiday_Sale_Ad_Square.mp4</div>
+                                <div class="card-tags">
+                                    <span class="tag">类型标签1</span>
+                                    <span class="tag">内容标签1</span>
+                                    <span class="tag">内容标签2</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑" onclick="event.stopPropagation(); openAssetDetail()"></i>
+                                    <div class="card-action-dropdown" onmouseenter="this.querySelector('.tree-dropdown-menu').classList.add('show')" onmouseleave="this.querySelector('.tree-dropdown-menu').classList.remove('show')">
+                                        <i class="fa-solid fa-box-archive action-item" title="入库"></i>
+                                        <div class="tree-dropdown-menu">
+                                            <div class="tree-dropdown-item" onclick="event.stopPropagation(); handleImport(this, '待优化')">入库到待优化</div>
+                                            <div class="tree-dropdown-item danger" onclick="event.stopPropagation(); handleImport(this, '回收站')">入库到回收站</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-folder-tree action-item" title="移动" onclick="event.stopPropagation(); openMoveModalSingle(this)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 卡片 4 -->
+                        <div class="asset-card" onclick="openAssetDetail()" style="cursor:pointer;">
+                            <div class="status-tag untouched">未投放</div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-regular fa-image" style="margin-right: 4px; font-size: 10px;"></i> 图片</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1200×628</span>
+                                        <span>2.5MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Facebook_Newsfeed_Banner_v2.jpg">Facebook_Newsfeed_Banner_v2.jpg</div>
+                                <div class="card-tags">
+                                    <span class="tag">类型标签1</span>
+                                    <span class="tag">内容标签1</span>
+                                    <span class="tag">内容标签2</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑" onclick="event.stopPropagation(); openAssetDetail()"></i>
+                                    <div class="card-action-dropdown" onmouseenter="this.querySelector('.tree-dropdown-menu').classList.add('show')" onmouseleave="this.querySelector('.tree-dropdown-menu').classList.remove('show')">
+                                        <i class="fa-solid fa-box-archive action-item" title="入库"></i>
+                                        <div class="tree-dropdown-menu">
+                                            <div class="tree-dropdown-item" onclick="event.stopPropagation(); handleImport(this, '待优化')">入库到待优化</div>
+                                            <div class="tree-dropdown-item danger" onclick="event.stopPropagation(); handleImport(this, '回收站')">入库到回收站</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-folder-tree action-item" title="移动" onclick="event.stopPropagation(); openMoveModalSingle(this)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                         <!-- 卡片 5 -->
+                         <div class="asset-card" onclick="openAssetDetail()" style="cursor:pointer;">
+                            <div class="status-tag cost">有消耗</div>
+                            <div class="card-preview">
+                                <img src="https://images.unsplash.com/photo-1533750349088-cd871a92f312?auto=format&fit=crop&w=400&q=80" alt="thumbnail">
+                                <div class="preview-overlay">
+                                    <span><i class="fa-regular fa-image" style="margin-right: 4px; font-size: 10px;"></i> 图片</span>
+                                    <div>
+                                        <span style="margin-right: 8px;">1080×1920</span>
+                                        <span>3.1MB</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-title" title="Instagram_Story_Promo.png">Instagram_Story_Promo.png</div>
+                                <div class="card-tags">
+                                    <span class="tag">类型标签1</span>
+                                    <span class="tag">内容标签1</span>
+                                    <span class="tag">内容标签2</span>
+                                </div>
+                                <div class="card-actions">
+                                    <i class="fa-solid fa-download action-item" title="下载"></i>
+                                    <i class="fa-solid fa-pen action-item" title="编辑" onclick="event.stopPropagation(); openAssetDetail()"></i>
+                                    <div class="card-action-dropdown" onmouseenter="this.querySelector('.tree-dropdown-menu').classList.add('show')" onmouseleave="this.querySelector('.tree-dropdown-menu').classList.remove('show')">
+                                        <i class="fa-solid fa-box-archive action-item" title="入库"></i>
+                                        <div class="tree-dropdown-menu">
+                                            <div class="tree-dropdown-item" onclick="event.stopPropagation(); handleImport(this, '待优化')">入库到待优化</div>
+                                            <div class="tree-dropdown-item danger" onclick="event.stopPropagation(); handleImport(this, '回收站')">入库到回收站</div>
+                                        </div>
+                                    </div>
+                                    <i class="fa-regular fa-star action-item" title="收藏"></i>
+                                    <i class="fa-solid fa-folder-tree action-item" title="移动" onclick="event.stopPropagation(); openMoveModalSingle(this)"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 分页区 -->
+                    <div class="pagination">
+                        <select class="form-control" style="width: auto; height: 28px; font-size: 12px;">
+                            <option>30条/页</option>
+                            <option>50条/页</option>
+                            <option>100条/页</option>
+                        </select>
+                        <span class="page-info">共 142 条</span>
+                        <div class="page-ctrls">
+                            <button class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <span style="color: var(--text-muted); margin: 0 4px;">...</span>
+                            <button class="page-btn">5</button>
+                            <button class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    <script>
+        
+        let _cardTooltip = null;
+        function showCardTooltip(e, text) {
+            if (!_cardTooltip) {
+                _cardTooltip = document.createElement('div');
+                _cardTooltip.className = 'card-custom-tooltip';
+                document.body.appendChild(_cardTooltip);
+                
+                const style = document.createElement('style');
+                style.innerHTML = `
+                    .card-custom-tooltip {
+                        position: fixed;
+                        background: rgba(0, 0, 0, 0.85);
+                        color: #fff;
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        z-index: 10000;
+                        pointer-events: none;
+                        white-space: nowrap;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                        opacity: 0;
+                        transition: opacity 0.15s, transform 0.15s;
+                        transform: translateY(4px);
+                    }
+                    .card-custom-tooltip.show {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            _cardTooltip.textContent = text;
+            _cardTooltip.classList.add('show');
+            
+            const rect = e.currentTarget.getBoundingClientRect();
+            // Estimate width since it might not be rendered fully yet
+            // Wait for next frame to get accurate width
+            requestAnimationFrame(() => {
+                let top = rect.top - _cardTooltip.offsetHeight - 8;
+                let left = rect.left + (rect.width / 2) - (_cardTooltip.offsetWidth / 2);
+                
+                if (top < 0) top = rect.bottom + 8;
+                if (left < 8) left = 8;
+                
+                _cardTooltip.style.top = top + 'px';
+                _cardTooltip.style.left = left + 'px';
+            });
+        }
+        
+        function hideCardTooltip() {
+            if (_cardTooltip) _cardTooltip.classList.remove('show');
+        }
+
+        function updateCardTags() {
+            document.querySelectorAll('.card-tags').forEach(container => {
+                const tags = Array.from(container.querySelectorAll('.tag:not(.plus-tag)'));
+                const plusTag = container.querySelector('.plus-tag');
+                if (plusTag) plusTag.remove();
+                
+                tags.forEach(t => t.style.display = '');
+
+                const containerWidth = container.clientWidth;
+                if (containerWidth === 0) return;
+                
+                let currentWidth = 0;
+                const gap = 8;
+                let visibleCount = 0;
+                
+                for (let i = 0; i < tags.length; i++) {
+                    const tagWidth = tags[i].offsetWidth;
+                    const reserve = (i === tags.length - 1) ? 0 : 36; // space for +X tag
+                    if (currentWidth + tagWidth + (i > 0 ? gap : 0) > containerWidth - reserve) { 
+                        break;
+                    }
+                    currentWidth += tagWidth + (i > 0 ? gap : 0);
+                    visibleCount++;
+                }
+
+                if (visibleCount < tags.length && visibleCount > 0) {
+                    for (let i = visibleCount; i < tags.length; i++) {
+                        tags[i].style.display = 'none';
+                    }
+                    const remaining = tags.length - visibleCount;
+                    const pt = document.createElement('span');
+                    pt.className = 'tag plus-tag';
+                    pt.textContent = '+' + remaining;
+                    pt.style.backgroundColor = 'var(--gray-4)';
+                    pt.style.color = 'var(--gray-10)';
+                    pt.style.fontWeight = '500';
+                    container.appendChild(pt);
+                    
+                    const fullText = tags.map(t => t.textContent).join(', ');
+                    container.removeAttribute('title');
+                    container.onmouseenter = (e) => showCardTooltip(e, fullText);
+                    container.onmouseleave = () => hideCardTooltip();
+                    container.style.cursor = 'pointer';
+                } else if (visibleCount === 0 && tags.length > 0) {
+                    tags.forEach(t => t.style.display = 'none');
+                    const pt = document.createElement('span');
+                    pt.className = 'tag plus-tag';
+                    pt.textContent = '+' + tags.length;
+                    pt.style.backgroundColor = 'var(--gray-4)';
+                    pt.style.color = 'var(--gray-10)';
+                    pt.style.fontWeight = '500';
+                    container.appendChild(pt);
+                    
+                    const fullText = tags.map(t => t.textContent).join(', ');
+                    container.removeAttribute('title');
+                    container.onmouseenter = (e) => showCardTooltip(e, fullText);
+                    container.onmouseleave = () => hideCardTooltip();
+                    container.style.cursor = 'pointer';
+                } else {
+                    container.removeAttribute('title');
+                    container.onmouseenter = null;
+                    container.onmouseleave = null;
+                    container.style.cursor = '';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof initImagePreview === "function") initImagePreview();
+            // Wait briefly for fonts to load
+            setTimeout(updateCardTags, 50);
+            
+            // Observe container size changes
+            const observer = new ResizeObserver(() => {
+                requestAnimationFrame(updateCardTags);
+            });
+            document.querySelectorAll('.card-tags').forEach(el => observer.observe(el.parentElement));
+        });
+    </script>
+
+    <!-- 类型标签弹窗 -->
+    <div class="custom-modal-overlay" id="typeTagSelectModal">
+        <div class="custom-modal" style="width: 500px; height: 420px; display: flex; flex-direction: column;">
+            <div class="custom-modal-header" style="flex-shrink:0;">选择类型标签</div>
+            <div class="custom-modal-body tag-modal-layout">
+                <div class="tag-modal-tree-pane">
+                    <div class="tag-modal-search">
+                        <input type="text" class="form-control" placeholder="搜索类型标签" style="width: 100%; height: 30px; font-size: 13px;">
+                    </div>
+                    <div class="tag-modal-tree">
+                        <div class="tag-tree-node"><i class="fa-solid fa-caret-down caret"></i><span>物料类型</span></div>
+                        <div class="tag-tree-children">
+                            <div class="tag-tree-node"><i class="fa-solid fa-caret-down caret"></i><span>视频物料</span></div>
+                            <div class="tag-tree-children">
+                                <label class="tag-tree-check">
+                                    <input type="radio" name="typeTagRadio" value="横版视频" onchange="toggleTypeTag(this)">
+                                    <span>横版视频</span>
+                                </label>
+                                <label class="tag-tree-check">
+                                    <input type="radio" name="typeTagRadio" value="竖版视频" onchange="toggleTypeTag(this)">
+                                    <span>竖版视频</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="tag-tree-node"><i class="fa-solid fa-caret-down caret"></i><span>图片物料</span></div>
+                        <div class="tag-tree-children">
+                            <label class="tag-tree-check">
+                                <input type="radio" name="typeTagRadio" value="主图" onchange="toggleTypeTag(this)">
+                                <span>主图</span>
+                            </label>
+                            <label class="tag-tree-check">
+                                <input type="radio" name="typeTagRadio" value="封面图" onchange="toggleTypeTag(this)">
+                                <span>封面图</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="tag-modal-selected-pane">
+                    <div class="tag-modal-selected-header">
+                        <span style="font-size: 13px; color: var(--text-main);">已选 (<span id="selectedTypeTagCount">0</span>)</span>
+                        <span style="font-size: 12px; color: var(--primary); cursor: pointer;" onclick="clearTypeModalTag()">清空</span>
+                    </div>
+                    <div id="modalSelectedTypeTag" class="tag-modal-selected-list"></div>
+                </div>
+            </div>
+            <div class="custom-modal-footer" style="flex-shrink:0;">
+                <button class="btn btn-outline" onclick="closeTypeTagModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmTypeTagSelection()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 内容标签弹窗 -->
+    <div class="custom-modal-overlay" id="contentTagSelectModal">
+        <div class="custom-modal" style="width: 500px; height: 420px; display: flex; flex-direction: column;">
+            <div class="custom-modal-header" style="flex-shrink:0;">选择内容标签</div>
+            <div class="custom-modal-body tag-modal-layout">
+                <div class="tag-modal-tree-pane">
+                    <div class="tag-modal-search">
+                        <input type="text" class="form-control" placeholder="搜索内容标签" style="width: 100%; height: 30px; font-size: 13px;">
+                    </div>
+                    <div class="tag-modal-tree">
+                        <div class="tag-tree-node"><i class="fa-solid fa-caret-down caret"></i><span>类别 A</span></div>
+                        <div class="tag-tree-children">
+                            <div class="tag-tree-node"><i class="fa-solid fa-caret-down caret"></i><span>分类 A1</span></div>
+                            <div class="tag-tree-children">
+                                <label class="tag-tree-check">
+                                    <input type="checkbox" value="节日活动" onchange="toggleContentTag(this)">
+                                    <span>节日活动</span>
+                                </label>
+                                <label class="tag-tree-check">
+                                    <input type="checkbox" value="促销打折" onchange="toggleContentTag(this)">
+                                    <span>促销打折</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="tag-tree-node"><i class="fa-solid fa-caret-down caret"></i><span>类别 B</span></div>
+                        <div class="tag-tree-children">
+                            <label class="tag-tree-check">
+                                <input type="checkbox" value="类型标签1" onchange="toggleContentTag(this)">
+                                <span>类型标签1</span>
+                            </label>
+                            <label class="tag-tree-check">
+                                <input type="checkbox" value="内容标签2" onchange="toggleContentTag(this)">
+                                <span>内容标签2</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="tag-modal-selected-pane">
+                    <div class="tag-modal-selected-header">
+                        <span style="font-size: 13px; color: var(--text-main);">已选 (<span id="selectedContentTagCount">0</span>)</span>
+                        <span style="font-size: 12px; color: var(--primary); cursor: pointer;" onclick="clearContentModalTags()">清空</span>
+                    </div>
+                    <div id="modalSelectedContentTags" class="tag-modal-selected-list"></div>
+                </div>
+            </div>
+            <div class="custom-modal-footer" style="flex-shrink:0;">
+                <button class="btn btn-outline" onclick="closeContentTagModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmContentTagSelection()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动文件夹弹窗 -->
+    <div class="custom-modal-overlay" id="moveFolderModal">
+        <div class="custom-modal">
+            <div class="custom-modal-header">移动到文件夹</div>
+            <div class="custom-modal-body">
+                <div class="tree-list" style="border: 1px solid var(--border); border-radius: 4px; padding: 8px; max-height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px;">
+                    <div class="tree-dropdown-item" onclick="selectMoveTarget(this, '置顶')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>置顶</div>
+                    <div class="tree-dropdown-item" style="padding-left: 24px;" onclick="selectMoveTarget(this, '置顶/重要物料')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>重要物料</div>
+                    <div class="tree-dropdown-item" style="padding-left: 24px;" onclick="selectMoveTarget(this, '置顶/常用模板')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>常用模板</div>
+                    <div class="tree-dropdown-item" onclick="selectMoveTarget(this, '收藏')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>收藏</div>
+                    <div class="tree-dropdown-item" style="padding-left: 24px;" onclick="selectMoveTarget(this, '收藏/默认收藏夹')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>默认收藏夹</div>
+                    <div class="tree-dropdown-item" onclick="selectMoveTarget(this, '全部')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>全部</div>
+                    <div class="tree-dropdown-item" style="padding-left: 24px;" onclick="selectMoveTarget(this, '全部/文件夹A')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>文件夹A</div>
+                    <div class="tree-dropdown-item" style="padding-left: 24px;" onclick="selectMoveTarget(this, '全部/文件夹B')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>文件夹B</div>
+                    <div class="tree-dropdown-item" style="padding-left: 24px;" onclick="selectMoveTarget(this, '全部/未分组物料')"><i class="fa-regular fa-folder" style="color: #e6a23c; margin-right: 8px;"></i>未分组物料</div>
+                </div>
+                <div style="margin-top: 12px; font-size: 13px; color: var(--text-muted);">
+                    已选择: <span id="selectedMoveTarget" style="color: var(--primary); font-weight: 500;">未选择</span>
+                </div>
+            </div>
+            <div class="custom-modal-footer">
+                <button class="btn btn-outline" onclick="closeMoveModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmMove()">确定转移</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新建文件夹弹窗 -->
+    <div class="custom-modal-overlay" id="newFolderModal">
+        <div class="custom-modal">
+            <div class="custom-modal-header">新建文件夹</div>
+            <div class="custom-modal-body">
+                <div style="margin-bottom: 12px; color: var(--text-muted); font-size: 13px;">当前目录: <span id="newFolderParentPath" style="color: var(--text-main); font-weight: 500;"></span></div>
+                <input type="text" class="form-control" style="width: 100%;" placeholder="请输入新文件夹名称" id="newFolderNameInput">
+            </div>
+            <div class="custom-modal-footer">
+                <button class="btn btn-outline" onclick="closeNewFolderModal()">取消</button>
+                <button class="btn btn-primary" onclick="closeNewFolderModal()">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ensure filter button is clickable by putting it above normal z-index
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleGridBtn = document.getElementById('toggleFilterGridBtn');
+            if (toggleGridBtn) {
+                toggleGridBtn.style.position = 'relative';
+                toggleGridBtn.style.zIndex = '50';
+            }
+        });
+
+        // 文件夹操作菜单
+        function toggleFolderMenu(e) {
+            e.stopPropagation();
+            // hide all others
+            document.querySelectorAll('.tree-dropdown-menu').forEach(m => {
+                if (m !== e.currentTarget.nextElementSibling) m.classList.remove('show');
+            });
+            const menu = e.currentTarget.nextElementSibling;
+            if (menu) menu.classList.toggle('show');
+        }
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.tree-dropdown-menu').forEach(m => m.classList.remove('show'));
+        });
+
+        // 新建文件夹弹窗逻辑
+        function openNewFolderModal(path) {
+            const modal = document.getElementById('newFolderModal');
+            document.getElementById('newFolderParentPath').textContent = path;
+            document.getElementById('newFolderNameInput').value = '';
+            if (modal) modal.classList.add('show');
+        }
+        function closeNewFolderModal() {
+            const modal = document.getElementById('newFolderModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        // 多选逻辑
+        let isMultiSelectMode = false;
+
+        function toggleAllCheckboxes() {
+            const btn = document.getElementById('toggleAllCheckboxesBtn');
+            const checkboxes = document.querySelectorAll('.card-checkbox');
+            let allSelected = true;
+            checkboxes.forEach(cb => {
+                if (!cb.classList.contains('selected')) allSelected = false;
+            });
+
+            if (allSelected) {
+                // Currently all selected, so deselect all
+                checkboxes.forEach(cb => {
+                    if (cb.classList.contains('selected')) cb.click();
+                });
+                btn.textContent = '全选';
+            } else {
+                // Currently some/none selected, so select all
+                checkboxes.forEach(cb => {
+                    if (!cb.classList.contains('selected')) cb.click();
+                });
+                btn.textContent = '取消全选';
+            }
+        }
+
+        function enterMultiSelect() {
+            isMultiSelectMode = true;
+            document.getElementById('selectAllBtn').style.display = 'none';
+            document.getElementById('multiSelectActions').style.display = 'flex';
+            document.getElementById('toggleAllCheckboxesBtn').textContent = '全选';
+
+            // Add checkboxes to cards if not present
+            document.querySelectorAll('.asset-card').forEach(card => {
+                card.style.border = '2px solid transparent';
+                if (!card.querySelector('.card-checkbox')) {
+                    const cb = document.createElement('div');
+                    cb.className = 'card-checkbox';
+                    cb.innerHTML = '<i class="fa-solid fa-check" style="color: white; font-size: 10px; display: none;"></i>';
+                    Object.assign(cb.style, {
+                        position: 'absolute', top: '10px', left: '10px', width: '18px', height: '18px',
+                        border: '2px solid white', borderRadius: '4px', zIndex: '10', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.3)'
+                    });
+
+                    cb.onclick = (e) => {
+                        e.stopPropagation();
+                        cb.classList.toggle('selected');
+                        if (cb.classList.contains('selected')) {
+                            cb.style.backgroundColor = 'var(--primary)';
+                            cb.style.borderColor = 'var(--primary)';
+                            cb.querySelector('i').style.display = 'block';
+                            card.style.borderColor = 'var(--primary)';
+                        } else {
+                            cb.style.backgroundColor = 'rgba(0,0,0,0.3)';
+                            cb.style.borderColor = 'white';
+                            cb.querySelector('i').style.display = 'none';
+                            card.style.borderColor = 'transparent';
+                        }
+                    };
+                    card.appendChild(cb);
+                } else {
+                    card.querySelector('.card-checkbox').style.display = 'flex';
+                }
+            });
+        }
+        function exitMultiSelect() {
+            isMultiSelectMode = false;
+            document.getElementById('selectAllBtn').style.display = 'inline-flex';
+            document.getElementById('multiSelectActions').style.display = 'none';
+            
+            document.querySelectorAll('.asset-card').forEach(card => {
+                card.style.border = '';
+                const cb = card.querySelector('.card-checkbox');
+                if (cb) {
+                    cb.classList.remove('selected');
+                    cb.style.display = 'none';
+                    cb.style.backgroundColor = 'rgba(0,0,0,0.3)';
+                    cb.style.borderColor = 'white';
+                    cb.querySelector('i').style.display = 'none';
+                }
+            });
+        }
+        // 删除二次确认逻辑
+        function handleDeleteCard(btn) {
+            openConfirmModal({
+                title: '确认删除',
+                description: '删除后无法恢复，确定要删除该物料吗？',
+                confirmText: '删除',
+                onConfirm: () => {
+                    const card = btn.closest('.asset-card');
+                    if (card) card.remove();
+                    // 在正式环境中可以在此调用接口进行删除
+                }
+            });
+        }
+
+        function handleBatchDelete() {
+            const selected = document.querySelectorAll('.card-checkbox.selected');
+            if (selected.length === 0) {
+                alert('请先选择要删除的物料');
+                return;
+            }
+            openConfirmModal({
+                title: '确认批量删除',
+                description: `确定要删除选中的 ${selected.length} 个物料吗？删除后无法恢复。`,
+                confirmText: '删除',
+                onConfirm: () => {
+                    selected.forEach(cb => {
+                        const card = cb.closest('.asset-card');
+                        if (card) card.remove();
+                    });
+                    exitMultiSelect();
+                    // 在正式环境中可以在此调用接口进行批量删除
+                }
+            });
+        }
+        // 入库操作处理
+        function handleImport(btn, targetName) {
+            openConfirmModal({
+                title: '确认入库',
+                description: `确定要将该物料入库到【${targetName}】吗？`,
+                confirmText: '确定',
+                onConfirm: () => {
+                    const card = btn.closest('.asset-card');
+                    if (card) card.remove();
+                    // 在正式环境中可以在此调用接口进行入库操作
+                }
+            });
+        }
+
+        function openAssetDetail() {
+            parent.postMessage({ action: 'openTab', title: '物料详情', url: '素材管理/物料详情.html' }, '*');
+        }
+        // 移动文件夹逻辑
+        let moveTargetStr = '';
+        let currentMoveType = 'single'; // 'single' or 'multi'
+        let currentMoveCard = null;
+
+        function openMoveModalSingle(btn) {
+            currentMoveType = 'single';
+            currentMoveCard = btn.closest('.asset-card');
+            showMoveModal();
+        }
+
+        function openMoveModalMulti() {
+            const selected = document.querySelectorAll('.card-checkbox.selected');
+            if (selected.length === 0) {
+                alert('请先选择要移动的物料');
+                return;
+            }
+            currentMoveType = 'multi';
+            showMoveModal();
+        }
+
+        function showMoveModal() {
+            const modal = document.getElementById('moveFolderModal');
+            moveTargetStr = '';
+            document.getElementById('selectedMoveTarget').textContent = '未选择';
+            document.querySelectorAll('#moveFolderModal .tree-dropdown-item').forEach(el => el.style.backgroundColor = '');
+            if (modal) modal.classList.add('show');
+        }
+
+        function closeMoveModal() {
+            const modal = document.getElementById('moveFolderModal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function selectMoveTarget(el, target) {
+            document.querySelectorAll('#moveFolderModal .tree-dropdown-item').forEach(item => item.style.backgroundColor = '');
+            el.style.backgroundColor = 'var(--primary-light)';
+            moveTargetStr = target;
+            document.getElementById('selectedMoveTarget').textContent = target;
+        }
+
+        function confirmMove() {
+            if (!moveTargetStr) {
+                alert('请选择目标文件夹');
+                return;
+            }
+            if (currentMoveType === 'single' && currentMoveCard) {
+                currentMoveCard.remove();
+            } else if (currentMoveType === 'multi') {
+                const selected = document.querySelectorAll('.card-checkbox.selected');
+                selected.forEach(cb => {
+                    const card = cb.closest('.asset-card');
+                    if (card) card.remove();
+                });
+                exitMultiSelect();
+            }
+            closeMoveModal();
+        }
+        function closeFilterDropdowns() {
+            document.querySelectorAll('.filter-dropdown-menu.show').forEach(menu => menu.classList.remove('show'));
+            document.querySelectorAll('.adv-form-group.dropdown-open').forEach(group => group.classList.remove('dropdown-open'));
+        }
+
+        function toggleFilterDropdown(event, groupId, dropdownId) {
+            event.stopPropagation();
+            const group = document.getElementById(groupId);
+            const dropdown = document.getElementById(dropdownId);
+            if (!group || !dropdown) {
+                return;
+            }
+            const willOpen = !dropdown.classList.contains('show');
+            closeFilterDropdowns();
+            document.getElementById('mockCalendarPopup')?.classList.remove('show');
+            document.getElementById('dateFilterGroup')?.classList.remove('dropdown-open');
+            if (willOpen) {
+                dropdown.classList.add('show');
+                group.classList.add('dropdown-open');
+            }
+        }
+
+        function selectFilterOption(triggerId, placeholder, value, optionEl) {
+            const trigger = document.getElementById(triggerId);
+            if (!trigger) {
+                return;
+            }
+            const textEl = trigger.querySelector('.adv-control-text');
+            if (textEl) {
+                textEl.textContent = value;
+                textEl.classList.toggle('adv-control-placeholder', value === placeholder);
+            }
+            const menu = optionEl.closest('.filter-dropdown-menu');
+            if (menu) {
+                menu.querySelectorAll('.filter-dropdown-option').forEach(option => option.classList.remove('is-active'));
+            }
+            optionEl.classList.add('is-active');
+            closeFilterDropdowns();
+        }
+
+        function toggleDateRange(event) {
+            event.stopPropagation();
+            const popup = document.getElementById('mockCalendarPopup');
+            const group = document.getElementById('dateFilterGroup');
+            if (!popup || !group) {
+                return;
+            }
+            const willOpen = !popup.classList.contains('show');
+            closeFilterDropdowns();
+            popup.classList.toggle('show', willOpen);
+            group.classList.toggle('dropdown-open', willOpen);
+        }
+
+        document.addEventListener('click', () => {
+            closeFilterDropdowns();
+            document.getElementById('mockCalendarPopup')?.classList.remove('show');
+            document.getElementById('dateFilterGroup')?.classList.remove('dropdown-open');
+        });
+
+        // 标签筛选逻辑
+        let selectedTypeTag = '';
+        let selectedContentTags = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const typeBtn = document.getElementById('typeTagFilterBtn');
+            if (typeBtn) {
+                typeBtn.addEventListener('click', (e) => {
+                    if (e.target.id === 'typeTagFilterClear') return;
+                    openTypeTagModal();
+                });
+            }
+            const contentBtn = document.getElementById('contentTagFilterBtn');
+            if (contentBtn) {
+                contentBtn.addEventListener('click', (e) => {
+                    if (e.target.id === 'contentTagFilterClear') return;
+                    openContentTagModal();
+                });
+            }
+        });
+
+        function openTypeTagModal() {
+            document.querySelectorAll('#typeTagSelectModal input[type="radio"]').forEach(radio => {
+                radio.checked = radio.value === selectedTypeTag;
+            });
+            renderTypeModalSelectedTag();
+            document.getElementById('typeTagSelectModal').classList.add('show');
+        }
+
+        function closeTypeTagModal() {
+            document.getElementById('typeTagSelectModal').classList.remove('show');
+        }
+
+        function toggleTypeTag(radio) {
+            selectedTypeTag = radio.checked ? radio.value : '';
+            renderTypeModalSelectedTag();
+        }
+
+        function clearTypeModalTag() {
+            selectedTypeTag = '';
+            document.querySelectorAll('#typeTagSelectModal input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            renderTypeModalSelectedTag();
+        }
+
+        function renderTypeModalSelectedTag() {
+            const container = document.getElementById('modalSelectedTypeTag');
+            document.getElementById('selectedTypeTagCount').textContent = selectedTypeTag ? '1' : '0';
+            container.innerHTML = '';
+            if (!selectedTypeTag) return;
+            const el = document.createElement('div');
+            el.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: var(--white); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 12px; color: var(--text-main);';
+            el.innerHTML = `<span>${selectedTypeTag}</span> <i class="fa-solid fa-xmark" style="color: var(--gray-7); cursor: pointer;" onclick="clearTypeModalTag()"></i>`;
+            container.appendChild(el);
+        }
+
+        function confirmTypeTagSelection() {
+            closeTypeTagModal();
+            renderTypeTagFilterDisplay();
+        }
+
+        function clearTypeTagFilter() {
+            selectedTypeTag = '';
+            document.querySelectorAll('#typeTagSelectModal input[type="radio"]').forEach(radio => {
+                radio.checked = false;
+            });
+            renderTypeTagFilterDisplay();
+            if(_cardTooltip) _cardTooltip.classList.remove('show');
+        }
+
+        function renderTypeTagFilterDisplay() {
+            const display = document.getElementById('typeTagFilterDisplay');
+            const clearBtn = document.getElementById('typeTagFilterClear');
+            const container = document.getElementById('typeTagFilterBtn');
+            if (!selectedTypeTag) {
+                display.innerHTML = '<span class="adv-control-placeholder">请选择类型标签</span>';
+                clearBtn.style.display = 'none';
+                container.onmouseenter = null;
+                container.onmouseleave = null;
+                return;
+            }
+            clearBtn.style.display = 'block';
+            display.innerHTML = `<div class="tag" style="background:var(--primary-light); color:var(--primary); border:none; line-height: 20px; font-size:11px; padding:0 4px; white-space:nowrap;">${selectedTypeTag}</div>`;
+            container.onmouseenter = (e) => showCardTooltip(e, selectedTypeTag);
+            container.onmouseleave = () => hideCardTooltip();
+        }
+
+        function openContentTagModal() {
+            document.querySelectorAll('#contentTagSelectModal input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectedContentTags.includes(cb.value);
+            });
+            renderContentModalSelectedTags();
+            document.getElementById('contentTagSelectModal').classList.add('show');
+        }
+
+        function closeContentTagModal() {
+            document.getElementById('contentTagSelectModal').classList.remove('show');
+        }
+
+        function toggleContentTag(cb) {
+            if (cb.checked) {
+                if (!selectedContentTags.includes(cb.value)) selectedContentTags.push(cb.value);
+            } else {
+                selectedContentTags = selectedContentTags.filter(t => t !== cb.value);
+            }
+            renderContentModalSelectedTags();
+        }
+
+        function removeContentTag(val) {
+            selectedContentTags = selectedContentTags.filter(t => t !== val);
+            document.querySelectorAll('#contentTagSelectModal input[type="checkbox"]').forEach(cb => {
+                if (cb.value === val) cb.checked = false;
+            });
+            renderContentModalSelectedTags();
+        }
+
+        function clearContentModalTags() {
+            selectedContentTags = [];
+            document.querySelectorAll('#contentTagSelectModal input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            renderContentModalSelectedTags();
+        }
+
+        function renderContentModalSelectedTags() {
+            const container = document.getElementById('modalSelectedContentTags');
+            document.getElementById('selectedContentTagCount').textContent = selectedContentTags.length;
+            container.innerHTML = '';
+            selectedContentTags.forEach(t => {
+                const el = document.createElement('div');
+                el.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: var(--white); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 12px; color: var(--text-main);';
+                el.innerHTML = `<span>${t}</span> <i class="fa-solid fa-xmark" style="color: var(--gray-7); cursor: pointer;" onclick="removeContentTag('${t}')"></i>`;
+                container.appendChild(el);
+            });
+        }
+
+        function confirmContentTagSelection() {
+            closeContentTagModal();
+            renderContentTagFilterDisplay();
+        }
+
+        function clearContentTagFilter() {
+            selectedContentTags = [];
+            document.querySelectorAll('#contentTagSelectModal input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            renderContentTagFilterDisplay();
+            if(_cardTooltip) _cardTooltip.classList.remove('show');
+        }
+
+        function renderContentTagFilterDisplay() {
+            const display = document.getElementById('contentTagFilterDisplay');
+            const clearBtn = document.getElementById('contentTagFilterClear');
+            const container = document.getElementById('contentTagFilterBtn');
+            if (selectedContentTags.length === 0) {
+                display.innerHTML = '<span class="adv-control-placeholder">请选择内容标签</span>';
+                clearBtn.style.display = 'none';
+                container.onmouseenter = null;
+                container.onmouseleave = null;
+                return;
+            }
+            clearBtn.style.display = 'block';
+            const firstTag = `<div class="tag" style="background:var(--primary-light); color:var(--primary); border:none; line-height: 20px; font-size:11px; padding:0 4px; white-space:nowrap;">${selectedContentTags[0]}</div>`;
+            const plusTag = selectedContentTags.length > 1 ? `<div class="tag" style="background:var(--gray-4); color:var(--gray-10); border:none; font-weight:500; line-height: 20px; font-size:11px; padding:0 4px;">+${selectedContentTags.length - 1}</div>` : '';
+            display.innerHTML = firstTag + plusTag;
+            const fullText = selectedContentTags.join(', ');
+            container.onmouseenter = (e) => showCardTooltip(e, fullText);
+            container.onmouseleave = () => hideCardTooltip();
+        }
+    </script>
+    <!-- 项目选择弹窗 -->
+    <div class="cc-proj-modal-mask" id="ccProjModalMask" onclick="if(event.target===this)closeProjModal()">
+      <div class="cc-proj-modal">
+        <div class="cc-proj-modal-header">
+          <div class="cc-proj-modal-title">选择项目</div>
+          <div class="cc-proj-modal-close" onclick="closeProjModal()">✕</div>
+        </div>
+        <div class="cc-proj-modal-search">
+          <input id="ccProjSearchInput" placeholder="搜索品类或项目..." oninput="renderProjModalBody()">
+        </div>
+        <div class="cc-proj-modal-body">
+          <div class="cc-proj-modal-cats" id="ccProjCatList"></div>
+          <div class="cc-proj-modal-products" id="ccProjProdList"></div>
+          <div class="cc-proj-modal-selected" id="ccProjSelectedList"></div>
+        </div>
+        <div class="cc-proj-modal-footer">
+          <button onclick="closeProjModal()">取消</button>
+          <button class="proj-confirm" onclick="confirmProjSelect()">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <link rel="stylesheet" href="../共享样式/project-picker.css">
+    <script src="../共享样式/project-picker.js"></script>
+    <script>
+    var PROJECTS_DATA = [
+        { category: '休闲游戏', products: ['消消乐', '跑酷大冒险', '解谜达人', '塔防英雄'] },
+        { category: '工具应用', products: ['清理大师', 'WiFi管家', '天气预报Pro', '超级省电'] },
+        { category: '网赚激励', products: ['走路赚钱', '答题领红包', '视频刷宝', '阅读赚金币'] },
+        { category: '内容阅读', products: ['小说畅读', '漫画星球', '壁纸精选', '短剧热播'] },
+    ];
+    var PROJECT_TREE = PROJECTS_DATA.map(function(g) { return { name: g.category, children: g.products }; });
+
+    function escHtml(s) {
+        return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    var selectedProjects = [];
+
+    setProjectPickerAdapter({
+        getValue: function() { return selectedProjects; },
+        setValue: function(value) { selectedProjects = value; },
+        refresh: function() {
+            var valEl = document.getElementById('projectPickerVal');
+            if (selectedProjects.length === 0) {
+                valEl.innerText = '全部项目';
+            } else {
+                valEl.innerText = selectedProjects.join(', ');
+            }
+        }
+    });
     </script>
 </body>
 </html>
