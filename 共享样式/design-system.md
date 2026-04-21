@@ -610,6 +610,65 @@
 
 ---
 
+### 2.10 指标展示（Metrics）
+
+用于卡片或概览栏中的关键数据展示（如 ROI、累计消耗）。
+
+**CSS：**
+```css
+.metrics-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  padding: 0 var(--space-6);
+  border-left: 1px solid var(--border-1);
+}
+
+.metric-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0);
+}
+
+.metric-label {
+  font-size: var(--text-xxs);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-value {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--text-hi);
+  display: flex;
+  align-items: baseline;
+}
+
+.metric-unit {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+```
+
+**HTML：**
+```html
+<div class="metrics-bar">
+  <div class="metric-item">
+    <div class="metric-label">最近三十天ROI</div>
+    <div class="metric-value">1.85</div>
+  </div>
+  <div class="metric-item">
+    <div class="metric-label">累计消耗</div>
+    <div class="metric-value">13,000<span class="metric-unit">元</span></div>
+  </div>
+</div>
+```
+
+---
+
 ## 3. 布局模式
 
 ### 3.1 页面容器

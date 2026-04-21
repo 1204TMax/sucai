@@ -293,13 +293,21 @@
                             <div class="metric-label">合成素材</div>
                             <div class="metric-value">850<span style="font-size:11px; font-weight:normal; margin-left:2px">个</span></div>
                         </div>
+                        <div class="metric-item">
+                            <div class="metric-label">最近三十天ROI</div>
+                            <div class="metric-value">2.10</div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-label">最近三十天消耗</div>
+                            <div class="metric-value">3,200<span style="font-size:11px; font-weight:normal; margin-left:2px">元</span></div>
+                        </div>
                     </div>
 
                     <div class="spacer"></div>
 
                     <div class="card-ops-area">
                         <div class="op-btns">
-                            <button class="btn btn-black" onclick="openConfirmModal({title: '确认删除', description: '确定要删除该策略吗？', confirmText: '删除', onConfirm: function() { console.log('删除策略'); }})">删除</button>
+                            <button class="btn btn-black" onclick="openConfirmModal({title: '确认删除', description: '确定要删除该策略吗？', confirmText: '删除', countdown: 5, onConfirm: function() { console.log('删除策略'); }})">删除</button>
                             <button class="btn btn-black">编辑</button>
                             <button class="btn btn-primary" style="width: 64px;">启动</button>
                         </div>

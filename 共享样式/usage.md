@@ -64,6 +64,7 @@ openConfirmModal({
   description: '确认后将执行当前操作。',
   cancelText: '取消',
   confirmText: '确认',
+  countdown: 5, // [可选] 确认按钮倒计时秒数，倒计时期间按钮禁用
   onConfirm: function () {
     // 用户确认后的逻辑
   }
