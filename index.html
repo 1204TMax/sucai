@@ -737,6 +737,8 @@
             if (!openTabs.has(tabName)) {
                 openTabs.set(tabName, { name: tabName, src: src });
                 addTab(tabName);
+            } else {
+                openTabs.set(tabName, { name: tabName, src: src });
             }
             activateTab(tabName);
         }

@@ -4,6 +4,17 @@
 
 ---
 
+## 部署说明
+
+本项目当前使用 **GitHub Pages** 部署，不是 Vercel。
+
+- **线上地址**：`https://1204tmax.github.io/sucai/`
+- **部署来源**：GitHub Pages → `main` 分支 → `/` 根目录
+- **部署方式**：代码推送到 `main` 后，GitHub Pages 会自动构建；如未自动更新，可手动触发 Pages build
+- **注意事项**：仓库根目录已添加 `.nojekyll`，避免 GitHub Pages 将页面中的 JSX / 花括号语法误判为 Jekyll 模板导致构建失败
+
+---
+
 ## 项目长什么样？
 
 ```
