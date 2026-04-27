@@ -720,6 +720,25 @@ const img = s => ({ type:'image', thumb:`https://picsum.photos/seed/${s}/200/200
 const DEMO_VIDEO_URL = '../icon/步数1-1.mp4';
 const vid = (s,i,d) => ({ type:'video', thumb:`https://picsum.photos/seed/${s}/800/800`, url:DEMO_VIDEO_URL, gradientIdx:i||0, duration:d||'5s' });
 
+// 兼容兜底：共享预览脚本偶发未成功挂载时，避免主任务流直接渲染中断。
+if (typeof thumbOverlayHtml !== 'function') {
+  window.thumbOverlayHtml = function(url, downloadAction) {
+    if (arguments.length === 1) {
+      downloadAction = url;
+      url = '';
+    }
+    if (!downloadAction) downloadAction = "event.stopPropagation();showToast('已下载')";
+    var dlIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
+    var storeIcon = '<svg width="14" height="14" viewBox="0 0 1024 1024" fill="currentColor"><path d="M102.4 69.12h819.2l102.4 204.8v716.8h-51.2H0v-716.8l102.4-204.8z m819.2 302.08H102.4v512h819.2v-512z m-22.016-107.52l-50.176-93.184H174.08l-50.176 93.184h775.68z"/><path d="M558.592 632.32h114.688l-153.088 153.088-152.576-153.088h114.688V479.232h76.288v153.088z"/></svg>';
+    var editIcon = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    return '<div class="thumb-overlay">'
+      + '<button class="thumb-act" title="下载" onclick="' + downloadAction + '">' + dlIcon + '</button>'
+      + '<button class="thumb-act" title="入库" onclick="event.stopPropagation();showToast(\'已入库\')">' + storeIcon + '</button>'
+      + '<button class="thumb-act" title="编辑" onclick="event.stopPropagation();showToast(\'编辑功能开发中\')">' + editIcon + '</button>'
+      + '</div>';
+  };
+}
+
 // ═══ Mock 数据 ═══
 const INITIAL_TASKS = [
   { id:'wf-1', name:'美妆爆款短视频自动化生产', type:'workflow', taskType:'workflow_run', resultType:'mixed', status:'pending_review', createdTime:'2026-04-20 14:00', creator:'我',
@@ -922,7 +941,6 @@ function positionTaskFloatingPanel() {
   var filterBar = document.getElementById('filterBar');
   var feed = document.querySelector('.task-feed-shell');
   if (!panel || !filterBar || state.contentTab === 'chat' || panel.style.display === 'none') {
-    if (panel) { panel.style.top = '0px'; panel.style.left = '0px'; }
     return;
   }
   var filterRect = filterBar.getBoundingClientRect();
@@ -931,17 +949,19 @@ function positionTaskFloatingPanel() {
     var feedRect = feed.getBoundingClientRect();
     leftPos = Math.max(feedRect.left - panel.offsetWidth - 20, 12);
   } else {
-    // Fallback if feed doesn't exist (e.g. empty state)
-    leftPos = 12;
+    // 居中或靠左显示
+    leftPos = 24;
   }
-  panel.style.top = (filterRect.bottom + 12) + 'px';
+  // 核心修复：如果 filterRect.bottom 为 0，说明 filterBar 还没完全准备好，使用 top 偏移兜底
+  var topPos = filterRect.bottom > 0 ? (filterRect.bottom + 12) : 102;
+  panel.style.top = topPos + 'px';
   panel.style.left = leftPos + 'px';
 }
 
 function scheduleTaskFloatingPanelPosition() {
   requestAnimationFrame(function() {
     positionTaskFloatingPanel();
-    requestAnimationFrame(positionTaskFloatingPanel);
+    setTimeout(positionTaskFloatingPanel, 50); // 二次确认
   });
 }
 
@@ -961,6 +981,8 @@ function renderAll() {
   }
   renderFilterBar();
   renderContentArea();
+  // 渲染后立即更新面板位置
+  scheduleTaskFloatingPanelPosition();
 }
 
 // ═══ FilterBar ═══
@@ -1221,10 +1243,20 @@ function renderTaskFeed() {
   if (tasks.length === 0) {
     wrap.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div style="margin-top:12px;font-size:13px;color:#999">暂无匹配的任务</div></div>';
   } else {
-    wrap.innerHTML = '<div class="task-feed-shell"><div class="task-feed">'+tasks.map(renderTaskCard).join('')+'</div></div>';
+    var cardsHtml = tasks.map(function(task) {
+      try {
+        return renderTaskCard(task);
+      } catch (err) {
+        console.error('renderTaskCard failed:', task && task.id, err);
+        return '<div class="task-card"><div class="card-header"><div class="card-prompt-wrap"><span class="card-prompt">任务渲染失败</span></div><div class="card-meta"><span class="card-meta-item">ID: ' + escHtml(task && task.id || '-') + '</span></div></div><div class="card-output"><div class="status-placeholder"><div class="status-placeholder-text">该任务渲染异常，已跳过，不影响其他任务显示</div></div></div></div>';
+      }
+    }).join('');
+    wrap.innerHTML = '<div class="task-feed-shell"><div class="task-feed">'+cardsHtml+'</div></div>';
   }
   scheduleTaskFloatingPanelPosition();
   updateScrollBtn();
+  // 渲染后滚动到底部
+  if (window.__scrollToBottom) window.__scrollToBottom();
 }
 
 function renderTaskCard(task) {
@@ -1426,6 +1458,17 @@ function approveReviewItem(itemId) {
   showToast('已通过');
 }
 
+function revokeReviewItem(itemId) {
+  const task = getReviewRouteTask();
+  if (!task) return;
+  const item = (task.output.items || []).find(it => it.itemId === itemId);
+  if (!item) return;
+  item.reviewStatus = 'pending';
+  updateWorkflowStatusAfterReview(task);
+  renderReviewPage();
+  showToast('已撤回至待审');
+}
+
 function rejectReviewItem(itemId) {
   const task = getReviewRouteTask();
   if (!task) return;
@@ -1462,10 +1505,7 @@ function renderReviewPage() {
   const queue = getWorkflowReviewQueue(task);
   const reviewTaskId = state.reviewContext.reviewTaskId || (queue && queue.reviewTaskId);
   
-  // 1. Data Processing
   const allItems = (task.output.items || []).filter(item => item.reviewTaskId === reviewTaskId || item.sourceNodeId === reviewTaskId);
-  
-  // Local Filter State (default to 'all' if not set)
   if (!state.reviewFilter) state.reviewFilter = 'all';
   
   const displayItems = allItems.filter(it => {
@@ -1478,61 +1518,46 @@ function renderReviewPage() {
   const pendingCount = allItems.filter(it => it.reviewStatus === 'pending' || !it.reviewStatus).length;
   const approvedCount = allItems.filter(it => it.reviewStatus === 'approved').length;
   const rejectedCount = allItems.filter(it => it.reviewStatus === 'rejected').length;
-  const generatingCount = task.workflowRun.summary.total - allItems.length;
+  // Use downstreamRunning for generating count to match workflow logic
+  const generatingCount = (task.workflowRun && task.workflowRun.summary) ? task.workflowRun.summary.downstreamRunning : 0;
 
-  // 2. Tabs (Nodes)
+  // Tabs
   const reviewNodes = (task.workflowRun.nodes || []).filter(n => n.processorType === 'control.review');
   let tabsHtml = reviewNodes.map((node, i) => {
     const isCurrent = (node.reviewTaskId === reviewTaskId) || (node.nodeId === reviewTaskId) || (!reviewTaskId && i === 0);
     const isDone = node.status === 'completed';
     const statusText = isDone ? '完成审查' : (node.status === 'pending_review' ? '审查中' : '未开始');
-    
-    const bg = isCurrent ? 'var(--primary-6)' : (isDone ? '#fff' : '#fff');
+    const bg = isCurrent ? 'var(--primary-6)' : '#fff';
     const color = isCurrent ? '#fff' : 'var(--text-hi)';
     const borderColor = isCurrent ? 'var(--primary-6)' : 'var(--border-2)';
-    const badgeStyle = isDone ? 'background:#e6f4ea; color:#10b981; border:1px solid #a7f3d0;' : (isCurrent ? 'background:rgba(255,255,255,0.2); color:#fff;' : 'background:var(--gray-3); color:var(--text-lo);');
 
     return `
-      <div style="position: relative; padding: 4px 16px; background: ${bg}; color: ${color}; cursor: pointer; border: 1px solid ${borderColor}; border-radius: 4px; display: flex; flex-direction: column; justify-content: center; height: 38px; min-width: 120px;" onclick="state.reviewContext.reviewTaskId='${node.reviewTaskId || node.nodeId}'; renderReviewPage();">
+      <div style="position: relative; padding: 4px 16px; background: ${bg}; color: ${color}; cursor: pointer; border: 1px solid ${borderColor}; border-radius: 4px; display: flex; flex-direction: column; justify-content: center; height: 38px; min-width: 120px; box-shadow: ${isCurrent?'0 2px 8px rgba(74,158,255,0.3)':'none'};" onclick="state.reviewContext.reviewTaskId='${node.reviewTaskId || node.nodeId}'; renderReviewPage();">
         <div style="font-size: 13px; font-weight: 600;">${node.title || '审查节点'}</div>
         <div style="font-size: 10px; margin-top: 1px; opacity: 0.9;">${statusText}</div>
-        ${isDone ? `<div style="position:absolute; top:-6px; right:-6px; background:#10b981; color:#fff; border-radius:50%; width:14px; height:14px; display:flex; align-items:center; justify-content:center; font-size:9px;">✓</div>` : ''}
+        ${isDone ? `<div style="position:absolute; top:-6px; right:-6px; background:#10b981; color:#fff; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:10px; border:2px solid #fff;">✓</div>` : ''}
       </div>
     `;
   }).join('');
 
-  // 3. Status Filter Bar
-  const filterTabs = [
-    { k: 'all', l: '全部', c: allItems.length },
-    { k: 'pending', l: '待审', c: pendingCount },
-    { k: 'approved', l: '已通过', c: approvedCount },
-    { k: 'rejected', l: '已拒绝', c: rejectedCount }
-  ].map(f => `
-    <div style="padding: 4px 12px; font-size: 12px; cursor: pointer; border-radius: 100px; ${state.reviewFilter === f.k ? 'background:var(--primary-1); color:var(--primary-6); font-weight:600;' : 'color:var(--text-lo);'}" onclick="state.reviewFilter='${f.k}'; renderReviewPage();">
-      ${f.l} <span style="opacity:0.6; font-weight:normal; margin-left:2px;">${f.c}</span>
-    </div>
-  `).join('');
-
-  // 4. Grid Content
+  // Grid
   const focusIdx = state.reviewFocusIndex || 0;
   let gridHtml = displayItems.map((it, idx) => {
     let actionsOverlay = '';
-    const isFocused = idx === focusIdx && state.reviewFilter === 'all';
-    const focusStyle = isFocused ? 'outline: 2px solid var(--primary-6); outline-offset: 2px;' : '';
+    const isFocused = idx === focusIdx;
+    const focusStyle = isFocused ? 'outline: 2px solid var(--primary-6); outline-offset: 2px; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1;' : '';
     
-    // Status badges on top right
     let statusBadge = '';
-    if (it.reviewStatus === 'approved') statusBadge = '<div style="background:#10b981; color:#fff; padding:2px 6px; border-radius:0 0 0 4px; font-size:10px;">已通过</div>';
-    else if (it.reviewStatus === 'rejected') statusBadge = '<div style="background:#ef4444; color:#fff; padding:2px 6px; border-radius:0 0 0 4px; font-size:10px;">已拒绝</div>';
+    if (it.reviewStatus === 'approved') statusBadge = '<div style="background:#10b981; color:#fff; padding:2px 8px; border-radius:0 0 0 4px; font-size:10px; font-weight:600;">已通过</div>';
+    else if (it.reviewStatus === 'rejected') statusBadge = '<div style="background:#ef4444; color:#fff; padding:2px 8px; border-radius:0 0 0 4px; font-size:10px; font-weight:600;">已拒绝</div>';
 
-    // Hover actions including Download
     const downloadAction = `event.stopPropagation(); const a=document.createElement('a'); a.href='${it.url}'; a.download='asset.png'; a.click();`;
     
     if (it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') {
       actionsOverlay = `
         <div class="review-actions-hover" style="position: absolute; bottom: 0; left: 0; right: 0; height: 32px; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; border-top: 1px solid var(--border-1); opacity:0; transition:opacity 0.2s;">
           <button class="thumb-act" title="下载" onclick="${downloadAction}">${CC_PREVIEW_ICONS.download}</button>
-          <button style="font-size:11px; color:var(--primary-6); background:none; border:none; cursor:pointer;" onclick="event.stopPropagation(); it.reviewStatus='pending'; renderReviewPage();">撤回重审</button>
+          <button style="font-size:11px; color:var(--primary-6); background:none; border:none; cursor:pointer; font-weight:500;" onclick="event.stopPropagation(); revokeReviewItem('${it.itemId}');">撤回重审</button>
         </div>
       `;
     } else {
@@ -1554,13 +1579,13 @@ function renderReviewPage() {
     const prompt = it.prompt || (task.input && task.input.prompt) || '暂无描述';
 
     return `
-      <div class="review-grid-card" style="position: relative; width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid var(--border-2); border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; ${focusStyle}" 
-           onclick="window.__previewMedia({type:'image', url:'${it.url}'}, ${JSON.stringify(allItems.map(i=>({type:'image', url:i.url})))}, ${idx})"
+      <div class="review-grid-card" style="position: relative; width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid var(--border-2); border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; ${focusStyle}" 
+           onclick="window.__previewMedia({type:'image', url:'${it.url}'}, ${JSON.stringify(displayItems.map(i=>({type:'image', url:i.url})))}, ${idx})"
            onmouseenter="this.querySelector('.review-prompt-tooltip').style.opacity='1'; this.querySelector('.review-actions-hover').style.opacity='1'; state.reviewFocusIndex=${idx};"
            onmouseleave="this.querySelector('.review-prompt-tooltip').style.opacity='0'; this.querySelector('.review-actions-hover').style.opacity='0';">
         ${it.url ? `<img src="${it.url}" style="width: 100%; height: 100%; object-fit: cover;">` : ''}
         <div style="position: absolute; top: 0; right: 0;">${statusBadge}</div>
-        <div class="review-prompt-tooltip" style="position: absolute; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: #fff; font-size: 10px; padding: 4px 8px; opacity: 0; transition: opacity 0.2s; pointer-events: none; max-height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
+        <div class="review-prompt-tooltip" style="position: absolute; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 10px; padding: 6px 10px; opacity: 0; transition: opacity 0.2s; pointer-events: none; max-height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;">
           ${prompt}
         </div>
         ${actionsOverlay}
@@ -1569,7 +1594,7 @@ function renderReviewPage() {
   }).join('');
 
   if (generatingCount > 0 && state.reviewFilter === 'all') {
-    for (let i = 0; i < Math.min(6, generatingCount); i++) {
+    for (let i = 0; i < Math.min(8, generatingCount); i++) {
       gridHtml += `
         <div style="position: relative; width: 100%; aspect-ratio: 1; background: var(--gray-2); border: 1px solid var(--border-2); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
           <svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-6)" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -1578,36 +1603,43 @@ function renderReviewPage() {
     }
   }
 
-  // 5. Layout Assembly
+  const filterTabs = [
+    { k: 'all', l: '全部', c: allItems.length },
+    { k: 'pending', l: '待审', c: pendingCount },
+    { k: 'approved', l: '已通过', c: approvedCount },
+    { k: 'rejected', l: '已拒绝', c: rejectedCount }
+  ].map(f => `
+    <div style="padding: 4px 12px; font-size: 12px; cursor: pointer; border-radius: 100px; transition: all 0.2s; ${state.reviewFilter === f.k ? 'background:var(--primary-6); color:#fff; font-weight:600;' : 'color:var(--text-lo);'}" onclick="state.reviewFilter='${f.k}'; state.reviewFocusIndex=0; renderReviewPage();">
+      ${f.l} <span style="opacity:0.8; font-weight:normal; margin-left:2px;">${f.c}</span>
+    </div>
+  `).join('');
+
   root.innerHTML = `
     <div style="height:100%; display:flex; flex-direction:column; background: var(--bg-page); padding: 8px; overflow: hidden;" id="reviewPageContainer">
-      <!-- Header -->
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 4px;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <div style="width: 4px; height: 16px; background: var(--primary-6); border-radius: 2px;"></div>
-          <div style="font-size: 15px; font-weight: 600; color: var(--text-hi);">工作流审查：${task.name}</div>
+          <div style="font-size: 15px; font-weight: 600; color: var(--text-hi);">审查台：${task.name}</div>
         </div>
         <button class="card-act-btn" style="height: 32px; padding: 6px 12px; font-size: 13px; background:#fff; border: 1px solid var(--border-2); border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="backToTaskListView()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          返回列表
+          返回任务列表
         </button>
       </div>
       
-      <!-- Nodes / Tabs -->
       <div style="display: flex; gap: 12px; margin-bottom: 16px; padding: 0 4px;">
         ${tabsHtml}
       </div>
 
-      <!-- Toolbar & Stats -->
-      <div style="background:#fff; border-radius:8px; border:1px solid var(--border-1); padding: 12px; margin: 0 4px 12px 4px;">
+      <div style="background:#fff; border-radius:8px; border:1px solid var(--border-1); padding: 12px; margin: 0 4px 12px 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div style="display: flex; gap: 16px; align-items: center;">
-            <div style="display: flex; background: var(--gray-2); padding: 2px; border-radius: 100px;">
+            <div style="display: flex; background: var(--gray-2); padding: 2px; border-radius: 100px; border: 1px solid var(--border-1);">
               ${filterTabs}
             </div>
             <div style="width: 1px; height: 16px; background: var(--border-2);"></div>
             <div style="font-size: 12px; color: var(--text-lo);">
-              实时进度：生成中 <b style="color:var(--primary-6)">${generatingCount}</b> | 
+              实时：正在生成 <b style="color:var(--primary-6)">${generatingCount}</b> | 
               待审 <b style="color:#f59e0b">${pendingCount}</b> | 
               已审 <b style="color:#10b981">${approvedCount + rejectedCount}</b>
             </div>
@@ -1619,69 +1651,20 @@ function renderReviewPage() {
         </div>
       </div>
 
-      <!-- Grid Scroll Area -->
-      <div style="flex: 1; overflow-y: auto; padding: 0 4px;">
-        ${displayItems.length === 0 && generatingCount === 0 ? `
+      <div style="flex: 1; overflow-y: auto; padding: 0 4px;" id="reviewGridScroll">
+        ${displayItems.length === 0 && (state.reviewFilter !== 'all' || generatingCount === 0) ? `
           <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:300px; color: var(--text-ghost);">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <div style="font-size: 14px; margin-top: 16px;">暂无满足条件的审查项</div>
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.5;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <div style="font-size: 14px; margin-top: 16px; font-weight:500;">当前没有待审查项</div>
           </div>
         ` : `
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding-bottom: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding-bottom: 32px;">
             ${gridHtml}
           </div>
         `}
       </div>
     </div>
   `;
-
-  // Feature 5: Keyboard Shortcuts (ensure once)
-  if (!window.__reviewKeysBound) {
-    window.__reviewKeysBound = true;
-    document.addEventListener('keydown', function(e) {
-      if (state.pageMode !== 'review') return;
-      const task = getReviewRouteTask();
-      if (!task) return;
-      const reviewTaskId = state.reviewContext.reviewTaskId || getWorkflowReviewQueue(task).reviewTaskId;
-      const allItems = (task.output.items || []).filter(item => item.reviewTaskId === reviewTaskId || item.sourceNodeId === reviewTaskId);
-      const displayItems = allItems.filter(it => {
-        if (state.reviewFilter === 'pending') return it.reviewStatus === 'pending' || !it.reviewStatus;
-        if (state.reviewFilter === 'approved') return it.reviewStatus === 'approved';
-        if (state.reviewFilter === 'rejected') return it.reviewStatus === 'rejected';
-        return true;
-      });
-      if (displayItems.length === 0) return;
-
-      const idx = state.reviewFocusIndex || 0;
-      const grid = document.querySelector('#reviewPageContainer div[style*="display: grid"]');
-      const cols = grid ? Math.floor(grid.offsetWidth / 192) : 1;
-
-      if (e.key === 'ArrowRight') {
-        state.reviewFocusIndex = Math.min(displayItems.length - 1, idx + 1);
-        renderReviewPage();
-      } else if (e.key === 'ArrowLeft') {
-        state.reviewFocusIndex = Math.max(0, idx - 1);
-        renderReviewPage();
-      } else if (e.key === 'ArrowDown') {
-        state.reviewFocusIndex = Math.min(displayItems.length - 1, idx + cols);
-        renderReviewPage();
-      } else if (e.key === 'ArrowUp') {
-        state.reviewFocusIndex = Math.max(0, idx - cols);
-        renderReviewPage();
-      } else if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        const item = displayItems[idx];
-        if (item && (item.reviewStatus === 'pending' || !item.reviewStatus)) {
-          approveReviewItem(item.itemId);
-        } else if (item) {
-          window.__previewMedia({type:'image', url:item.url}, displayItems.map(i=>({type:'image', url:i.url})), idx);
-        }
-      } else if (e.key === 'Backspace' || e.key === 'Delete') {
-        const item = displayItems[idx];
-        if (item) rejectReviewItem(item.itemId);
-      }
-    });
-  }
 }
 
 function handleAutoApprove() {
@@ -1993,11 +1976,6 @@ window.addEventListener('taskUpdated', function(e) {
   renderTaskFeed();
 });
 
-renderAll();
-// 页面加载后默认滚动到底部
-setTimeout(function(){
-  if (window.__scrollToBottom) window.__scrollToBottom();
-}, 100);
 </script>
 
 <script src="../共享样式/project-picker.js"></script>
@@ -2596,6 +2574,16 @@ function closeAssetPreview() { document.getElementById('assetPreviewMask').class
     }
   } catch(e) {}
 })();
+
+renderAll();
+// 页面加载后默认滚动到底部
+setTimeout(function(){
+  if (window.__scrollToBottom) {
+    window.__scrollToBottom();
+    // 再次确认，防止内容异步渲染导致高度变化
+    setTimeout(window.__scrollToBottom, 300);
+  }
+}, 100);
 </script>
 
 </body>
