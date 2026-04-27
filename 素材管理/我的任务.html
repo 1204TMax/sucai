@@ -713,6 +713,16 @@
 
     <script>
         const VIEWS = {
+            todo: {
+                label: '待操作',
+                filters: [
+                    { key: 'startDate', label: '开始时间', type: 'date' },
+                    { key: 'endDate', label: '结束时间', type: 'date' },
+                    { key: 'keyword', label: '任务/文件名称', type: 'search', placeholder: '搜索任务名称 / 文件名称' },
+                    { key: 'source', label: '任务来源', type: 'select', options: ['全部', '上传', '视频合成'] }
+                ],
+                columns: ['任务/文件名称', '来源类型', '所属系列 / 产品', '进度', '状态', '提交时间', '操作']
+            },
             upload: {
                 label: '上传',
                 filters: [
@@ -872,14 +882,31 @@
                     children: [
                         { id: 's-6', kind: 'result', name: 'result-040.mp4', createdAt: '2026-04-18 18:12', product: '拉新系列 / 红包版', ratio: '16:9', outputSpec: '成片 26s', inputSummary: '横版镜头 6 + 字幕 1', progress: 100, progressLabel: '已生成', status: '合成成功', batchId: 'SYN-20260418-012' }
                     ]
+                },
+                {
+                    id: 's-pack-4',
+                    kind: 'package',
+                    name: '暑期大促合成包 (待审核)',
+                    strategyName: '暑期预热-竖版混剪 9:16',
+                    createdAt: '2026-04-20 15:30',
+                    product: '享瘦系列 / 享瘦饮',
+                    ratio: '9:16',
+                    outputSpec: '9:16 · 15s~30s · H.264',
+                    inputCount: 24,
+                    outputCount: 50,
+                    progress: 0,
+                    progressLabel: '0 / 50',
+                    status: '待审核',
+                    children: []
                 }
             ]
         };
 
         const state = {
-            currentView: 'upload',
+            currentView: 'todo',
             expanded: new Set(['u-pack-1', 's-pack-1']),
             filters: {
+                todo: { startDate: '', endDate: '', keyword: '', source: '全部' },
                 upload: { startDate: '', endDate: '', keyword: '', fileType: '全部', assetType: '全部', product: '全部' },
                 download: { startDate: '', endDate: '', keyword: '', fileType: '全部', assetType: '全部', product: '全部' },
                 synthesis: { startDate: '', endDate: '', keyword: '', status: '全部', ratio: '全部', product: '全部' }
@@ -892,7 +919,43 @@
         const bodyEl = document.getElementById('tableBody');
 
         function getTopLevelCount(view) {
+            if (view === 'todo') {
+                return getFilteredItemsForTodo().length;
+            }
             return DATA[view].length;
+        }
+
+        function getFilteredItemsForTodo() {
+            const filters = state.filters.todo;
+            const uploadItems = DATA.upload.flatMap(item => {
+                const todoChildren = (item.children || []).filter(c => ['上传失败', '同质化过高'].includes(c.status));
+                if (['上传失败', '同质化过高'].includes(item.status)) {
+                    return [{ ...item, _from: '上传', children: todoChildren }];
+                }
+                if (todoChildren.length > 0) {
+                    return [{ ...item, _from: '上传', children: todoChildren }];
+                }
+                return [];
+            });
+            const synthesisItems = DATA.synthesis.flatMap(item => {
+                const todoChildren = (item.children || []).filter(c => ['合成失败'].includes(c.status));
+                if (['合成失败', '待审核'].includes(item.status)) {
+                    return [{ ...item, _from: '视频合成', children: todoChildren }];
+                }
+                if (todoChildren.length > 0) {
+                    return [{ ...item, _from: '视频合成', children: todoChildren }];
+                }
+                return [];
+            });
+            
+            let all = [...uploadItems, ...synthesisItems];
+            
+            return all.filter(item => {
+                if (!matchDate(item.createdAt, filters.startDate, filters.endDate)) return false;
+                if (!matchKeyword(item.name, filters.keyword)) return false;
+                if (filters.source !== '全部' && item._from !== filters.source) return false;
+                return true;
+            });
         }
 
         function getStatusTone(status) {
@@ -902,7 +965,7 @@
             if (['上传失败', '下载失败', '合成失败', '已终止'].includes(status)) {
                 return 'status-error';
             }
-            if (['同质化过高', '部分失败'].includes(status)) {
+            if (['同质化过高', '部分失败', '待审核'].includes(status)) {
                 return 'status-warning';
             }
             if (['上传中', '下载中', '合成中', '同质化检测中', '排队中'].includes(status)) {
@@ -1091,6 +1154,9 @@
         }
 
         function getFilteredItems() {
+            if (state.currentView === 'todo') {
+                return getFilteredItemsForTodo();
+            }
             if (state.currentView === 'synthesis') {
                 return filterSynthesis(DATA.synthesis);
             }
@@ -1106,7 +1172,7 @@
             if (item.kind === 'package') {
                 badges.push('<span class="badge badge-accent">任务包</span>');
             }
-            if (view === 'upload' || view === 'download') {
+            if (view === 'upload' || view === 'download' || (view === 'todo' && item._from === '上传')) {
                 if (item.fileType && item.fileType !== '批量') {
                     badges.push(`<span class="badge">${item.fileType}</span>`);
                 }
@@ -1114,13 +1180,13 @@
                     badges.push(`<span class="badge">${item.assetType}</span>`);
                 }
             }
-            if (view === 'synthesis' && item.kind === 'package') {
+            if ((view === 'synthesis' || (view === 'todo' && item._from === '视频合成')) && item.kind === 'package') {
                 badges.push(`<span class="badge">目标 ${item.outputCount} 条</span>`);
             }
             const expand = item.kind === 'package'
                 ? `<button class="expand-btn ${state.expanded.has(item.id) ? 'is-open' : ''}" type="button" data-expand="${item.id}">${state.expanded.has(item.id) ? '－' : '＋'}</button>`
                 : `<span style="width:22px;flex-shrink:0;"></span>`;
-            const title = view === 'synthesis' && item.kind === 'package' ? item.name : item.name;
+            const title = item.name;
             const meta = [];
             if (item.kind === 'package' && item.meta) {
                 meta.push(...item.meta);
@@ -1165,7 +1231,11 @@
         }
 
         function renderActionCell(view, item) {
-            const actions = getActions(view, item);
+            let actualView = view;
+            if (view === 'todo') {
+                actualView = item._from === '上传' ? 'upload' : 'synthesis';
+            }
+            const actions = getActions(actualView, item);
             return `
                 <div class="action-group action-cell">
                     ${actions.map((action) => `<button class="text-btn ${action === '删除' || action === '终止任务' ? 'danger' : ''}" type="button" data-action="${action}" data-id="${item.id}">${action}</button>`).join('')}
@@ -1186,6 +1256,20 @@
                     <td><span class="status-tag ${getStatusTone(item.status)}">${item.status}</span></td>
                     <td><span class="muted">${item.createdAt}</span></td>
                     <td>${renderActionCell('upload', item)}</td>
+                </tr>
+            `;
+        }
+
+        function renderTodoRow(item, isChild = false) {
+            return `
+                <tr class="${item.kind === 'package' ? 'row-package' : 'row-child'} ${isChild ? 'row-child' : ''}">
+                    <td>${renderNameCell('todo', item, isChild)}</td>
+                    <td><div class="cell-stack"><span>${item._from}</span></div></td>
+                    <td><div class="cell-stack"><span>${item.product}</span></div></td>
+                    <td>${renderProgress(item)}</td>
+                    <td><span class="status-tag ${getStatusTone(item.status)}">${item.status}</span></td>
+                    <td><span class="muted">${item.createdAt}</span></td>
+                    <td>${renderActionCell('todo', item)}</td>
                 </tr>
             `;
         }
@@ -1238,6 +1322,13 @@
             }
             const rows = [];
             items.forEach((item) => {
+                if (state.currentView === 'todo') {
+                    rows.push(renderTodoRow(item));
+                    if (item.kind === 'package' && state.expanded.has(item.id) && item.children && item.children.length) {
+                        item.children.forEach((child) => rows.push(renderTodoRow({ ...child, _from: item._from }, true)));
+                    }
+                    return;
+                }
                 if (state.currentView === 'upload') {
                     rows.push(renderUploadRow(item));
                     if (item.kind === 'package' && state.expanded.has(item.id) && item.children.length) {

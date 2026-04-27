@@ -1160,6 +1160,26 @@
                             <div class="adv-form-label">素材名称</div>
                             <input type="text" class="adv-form-control" placeholder="请输入素材名称">
                         </div>
+                        <div class="adv-form-group" id="viewRangeFilterGroup">
+                            <div class="adv-form-label">查看范围</div>
+                            <button type="button" class="adv-inline-control" id="viewRangeFilterBtn" onclick="toggleFilterDropdown(event, 'viewRangeFilterGroup', 'viewRangeDropdown')">
+                                <span class="adv-control-text">自己</span>
+                                <i class="fa-solid fa-chevron-down adv-control-arrow"></i>
+                            </button>
+                            <div class="filter-dropdown-menu" id="viewRangeDropdown" onclick="event.stopPropagation()">
+                                <div style="padding: 8px; border-bottom: 1px solid var(--border); margin-bottom: 4px;">
+                                    <input type="text" class="form-control" style="width: 100%; height: 28px;" placeholder="搜索姓名..." oninput="filterDropdownOptions('viewRangeDropdown', this.value)">
+                                </div>
+                                <div class="dropdown-options-container" style="max-height: 180px; overflow-y: auto;">
+                                    <button type="button" class="filter-dropdown-option is-active" onclick="selectFilterOption('viewRangeFilterBtn', '请选择', '自己', this)">自己</button>
+                                    <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('viewRangeFilterBtn', '请选择', '张三', this)">张三</button>
+                                    <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('viewRangeFilterBtn', '请选择', '李四', this)">李四</button>
+                                    <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('viewRangeFilterBtn', '请选择', '王五', this)">王五</button>
+                                    <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('viewRangeFilterBtn', '请选择', '赵六', this)">赵六</button>
+                                    <button type="button" class="filter-dropdown-option" onclick="selectFilterOption('viewRangeFilterBtn', '请选择', '钱七', this)">钱七</button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="adv-form-group" id="mediaFilterGroup">
                             <div class="adv-form-label">媒体</div>
                             <button type="button" class="adv-inline-control" id="mediaFilterBtn" onclick="toggleFilterDropdown(event, 'mediaFilterGroup', 'mediaDropdown')">
@@ -2259,7 +2279,29 @@
             if (willOpen) {
                 dropdown.classList.add('show');
                 group.classList.add('dropdown-open');
+
+                // 如果下拉菜单中有搜索框，则清空并聚焦
+                const searchInput = dropdown.querySelector('input[type="text"]');
+                if (searchInput) {
+                    searchInput.value = '';
+                    filterDropdownOptions(dropdownId, '');
+                    setTimeout(() => searchInput.focus(), 50);
+                }
             }
+        }
+
+        function filterDropdownOptions(dropdownId, searchText) {
+            const dropdown = document.getElementById(dropdownId);
+            if (!dropdown) return;
+            const options = dropdown.querySelectorAll('.filter-dropdown-option');
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase();
+                if (text.includes(searchText.toLowerCase())) {
+                    option.style.display = 'flex';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
         }
 
         function selectFilterOption(triggerId, placeholder, value, optionEl) {

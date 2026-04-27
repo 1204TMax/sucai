@@ -709,6 +709,62 @@
             color: var(--text-hi);
         }
 
+        /* ── Copywriting List (GEN-08) ── */
+        .copy-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+            padding: var(--space-2) 0;
+        }
+
+        .copy-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-md);
+            padding: var(--space-4);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+            transition: all var(--ease);
+            position: relative;
+        }
+
+        .copy-item:hover {
+            border-color: var(--accent-border);
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .copy-item-num {
+            font-family: monospace;
+            font-size: var(--text-base);
+            color: var(--text-muted);
+            padding-top: 2px;
+            width: 32px;
+            flex-shrink: 0;
+        }
+
+        .copy-item-content {
+            font-size: var(--text-base);
+            color: var(--text-hi);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .copy-item-actions {
+            display: flex;
+            gap: var(--space-1);
+            opacity: 0;
+            transition: opacity var(--ease);
+            flex-shrink: 0;
+        }
+
+        .copy-item:hover .copy-item-actions {
+            opacity: 1;
+        }
+
     </style>
 </head>
 <body>
@@ -816,20 +872,17 @@
 // Page Info (single model)
 // ═══════════════════════════════════════════════════
 const PAGE_INFO = {
-    entry:   '通用生成',          // '通用生成' 或 '工作流：xxx'
-    type:    'image',             // 'image' | 'video'
-    prompt:  '在阳光明媚的草地上奔跑的金毛寻回犬，毛发蓬松，背景虚化，高清写实风格，自然光照',
+    entry:   '文案裂变：爆款重写',  
+    type:    'chat',              // 切换为文案模式
+    prompt:  '帮我重写一下这组护肤品的爆款文案，要求针对小红书平台，字数100字左右，多用表情包',
     refs:    [
         { color: '#FF6B6B', name: '参考图 1' },
-        { color: '#4ECDC4', name: '参考图 2' },
     ],
-    model:   'Seedream 5.0',
+    model:   'GPT-5.4 mini',
     settings: {
-        ratios:   ['9:16', '16:9', '1:1'],
-        clarity:  '2K',     // image only；视频传 null
-        duration: null,     // video only；图片传 null
+        count: '6条',
     },
-    project: '走路赚金币',  // 无项目时传 null
+    project: '护肤品推广',
 };
 
 function renderInfo() {
@@ -890,22 +943,12 @@ const COLORS = [
 ];
 
 let images = [
-    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001', model:'Seedream 5.0' },
-    { id:2,  ratio:'9:16',  ar:9/16,  color:COLORS[1],  name:'竖屏-002', model:'Seedream 5.0' },
-    { id:3,  ratio:'9:16',  ar:9/16,  color:COLORS[2],  name:'竖屏-003', model:'Banana 2' },
-    { id:4,  ratio:'9:16',  ar:9/16,  color:COLORS[3],  name:'竖屏-004', model:'Banana 2' },
-    { id:5,  ratio:'9:16',  ar:9/16,  color:COLORS[4],  name:'竖屏-005', model:'Seedream 5.0' },
-    { id:6,  ratio:'9:16',  ar:9/16,  color:COLORS[5],  name:'竖屏-006', model:'Banana 2' },
-    { id:7,  ratio:'16:9',  ar:16/9,  color:COLORS[6],  name:'横屏-001', model:'Seedream 5.0' },
-    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002', model:'Seedream 5.0' },
-    { id:9,  ratio:'16:9',  ar:16/9,  color:COLORS[8],  name:'横屏-003', model:'Banana 2' },
-    { id:10, ratio:'16:9',  ar:16/9,  color:COLORS[9],  name:'横屏-004', model:'Banana 2' },
-    { id:11, ratio:'16:9',  ar:16/9,  color:COLORS[10], name:'横屏-005', model:'Seedream 5.0' },
-    { id:12, ratio:'16:9',  ar:16/9,  color:COLORS[11], name:'横屏-006', model:'Banana 2' },
-    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001', model:'Seedream 5.0' },
-    { id:14, ratio:'1:1',   ar:1,     color:COLORS[13], name:'方图-002', model:'Banana 2' },
-    { id:15, ratio:'1:1',   ar:1,     color:COLORS[14], name:'方图-003', model:'Seedream 5.0' },
-    { id:16, ratio:'1:1',   ar:1,     color:COLORS[15], name:'方图-004', model:'Banana 2' },
+    { id:1, content: '✨ 拯救熬夜大黄皮！这款精华液真的绝了 😭 每次用完皮肤都像打了光一样透亮，而且质地超清爽不粘腻 🧊 \n#护肤分享 #好物推荐', model:'GPT-5.4 mini' },
+    { id:2, content: '谁懂啊姐妹们！真的被这款精华液惊艳到了 🌸 坚持用了两周，细纹真的变淡了好多。敏感肌也可以闭眼入 🛡️ \n#有效护肤 #测评', model:'GPT-5.4 mini' },
+    { id:3, content: '国货之光！这款护肤品必须有名字 🏆 肤感一流，吸收超快，完全不输大牌。性价比高到流泪 💸 \n#国货推荐 #精华', model:'GPT-5.4 mini' },
+    { id:4, content: '晨间护肤 10 分钟，拥有水光肌 ✨ 这款精华液是我的早八救星，消肿提亮一气呵成 ☕ \n#早八人 #护肤打卡', model:'GPT-5.4 mini' },
+    { id:5, content: '精致女孩的必修课：选对精华液 💡 这款产品主打修护，屏障受损的姐妹一定要试试，真的会回购一万年 ♾️ \n#护肤干货 #修护', model:'GPT-5.4 mini' },
+    { id:6, content: '今日份护肤小确幸 🌿 味道淡淡的很治愈，用完感觉皮肤在呼吸，这就是我想要的素颜感吧 ☁️ \n#素颜感 #精华推荐', model:'GPT-5.4 mini' },
 ];
 
 function previewUrlFor(item) {
@@ -1055,6 +1098,12 @@ function renderGrid() {
     const list = filtered();
     container.innerHTML = '';
 
+    // GEN-08: 文案列表模式
+    if (PAGE_INFO.type === 'chat') {
+        renderCopyList(container, list);
+        return;
+    }
+
     const models = curModel === 'all' ? [...new Set(list.map(i => i.model))] : [curModel];
     models.forEach(model => {
         const items = list.filter(i => i.model === model);
@@ -1069,6 +1118,39 @@ function renderGrid() {
         `;
         renderRows(group, items, cw);
         container.appendChild(group);
+    });
+}
+
+function renderCopyList(container, list) {
+    const wrap = document.createElement('div');
+    wrap.className = 'copy-list';
+    
+    list.forEach((item, index) => {
+        const el = document.createElement('div');
+        el.className = 'copy-item';
+        const text = item.content || item.name;
+        el.innerHTML = `
+            <div class="copy-item-num">${String(index + 1).padStart(2, '0')}</div>
+            <div class="copy-item-content">${text}</div>
+            <div class="copy-item-actions">
+                <button class="b b-ghost b-icon" title="编辑" onclick="editItem(${item.id})">${ico.edit}</button>
+                <div class="archive-wrap">
+                    <button class="b b-ghost b-icon" title="入库" onclick="showArchiveForItem(${item.id}, this)">
+                        ${ico.inbox}
+                    </button>
+                    <div class="archive-dropdown"></div>
+                </div>
+                <button class="b b-soft" onclick="copyToClipboard('${text.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')">复制</button>
+            </div>
+        `;
+        wrap.appendChild(el);
+    });
+    container.appendChild(wrap);
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('文案已复制到剪贴板');
     });
 }
 

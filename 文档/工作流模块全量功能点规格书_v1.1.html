@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>工作流全量功能点规格书 v1.1 - 量化投放系统</title>
+    <style>
+        :root { --primary: #1677ff; --bg: #f0f2f5; --text: #000; --border: #d9d9d9; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); padding: 40px; color: #333; line-height: 1.6; }
+        .spec-container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 5px; font-size: 28px; }
+        .version { font-size: 14px; color: #999; margin-bottom: 30px; }
+        .mod-section { margin-bottom: 40px; }
+        .mod-title { background: #f5f5f5; padding: 10px 15px; border-left: 5px solid var(--primary); font-weight: bold; font-size: 18px; margin-bottom: 20px; }
+        .func-item { margin-bottom: 15px; padding: 12px; border: 1px solid #f0f0f0; border-radius: 6px; transition: background 0.2s; }
+        .func-item:hover { background: #fafafa; border-color: var(--primary); }
+        .func-id { background: var(--primary); color: #fff; font-weight: bold; font-family: monospace; padding: 2px 8px; border-radius: 4px; margin-right: 12px; font-size: 13px; }
+        .func-desc { font-size: 15px; font-weight: 600; }
+        .func-detail { font-size: 14px; color: #666; margin-top: 8px; padding-left: 65px; }
+        .tag { font-size: 11px; padding: 2px 6px; border-radius: 10px; background: #e6f7ff; color: #1890ff; margin-left: 8px; border: 1px solid #91d5ff; }
+    </style>
+</head>
+<body>
+    <div class="spec-container">
+        <h1>工作流全量功能点规格书</h1>
+        <div class="version">版本号：v1.1 | 状态：已编号，待开发</div>
+
+        <!-- 模块 1 -->
+        <div class="mod-section">
+            <div class="mod-title">一、通用生成页 (GEN 系列)</div>
+            
+            <div class="func-item">
+                <span class="func-id">GEN-01</span>
+                <span class="func-desc">Tab 标签重命名</span>
+                <div class="func-detail">将顶部“文本”分类正式更名为“文案”。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">GEN-02</span>
+                <span class="func-desc">文案多模态参考输入</span>
+                <div class="func-detail">在文案模式下，支持上传/关联“参考图”或“参考文档”作为生成输入。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">GEN-03</span>
+                <span class="func-desc">裂变数量调节组件</span>
+                <div class="func-detail">新增生产数量(Fission Count)组件，默认1，支持 1-100 批量设置。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">GEN-04</span>
+                <span class="func-desc">广场三段式布局</span>
+                <div class="func-detail">下半部分区域拆分为：置顶、我的创建、公共广场。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">GEN-05</span>
+                <span class="func-desc">工作流动态过滤逻辑</span>
+                <div class="func-detail">点击顶层 Tab 时，下方广场列表需实时展示对应类型的工作流。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">GEN-06</span>
+                <span class="func-desc">工作流标准卡片 UI</span>
+                <div class="func-detail">包含封面图、标题、作者、时间。交互包含：悬停置顶、点击运行。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">GEN-07</span>
+                <span class="func-desc">新增工作流全局入口</span>
+                <div class="func-detail">广场区域右上角设置显著的「+ 新增工作流」按钮。</div>
+            </div>
+        </div>
+
+        <!-- 模块 2 -->
+        <div class="mod-section">
+            <div class="mod-title">二、工作流编辑器 (EDT 系列)</div>
+            
+            <div class="func-item">
+                <span class="func-id">EDT-01</span>
+                <span class="func-desc">创建向导/元数据配置</span>
+                <div class="func-detail">支持工作流名称、所属分类、封面图的初始配置。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">EDT-02</span>
+                <span class="func-desc">画布布局：线性流结构</span>
+                <div class="func-detail">初期采用垂直线性节点排列，支持节点的增删改。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">EDT-03</span>
+                <span class="func-desc">全量节点预设实现</span>
+                <div class="func-detail">包含：开始、识图、文案、图像、视频、人工审查、结束节点。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">EDT-04</span>
+                <span class="func-desc">变量引用/映射机制</span>
+                <div class="func-detail">支持节点间参数传递，语法格式：<code>{{NodeID.Variable}}</code>。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">EDT-05</span>
+                <span class="func-desc">节点参数配置抽屉</span>
+                <div class="func-detail">点击节点弹出右侧侧边栏，编辑该节点的模型及业务参数。</div>
+            </div>
+        </div>
+
+        <!-- 模块 3 -->
+        <div class="mod-section">
+            <div class="mod-title">三、任务与审查 (TSK 系列)</div>
+            
+            <div class="func-item">
+                <span class="func-id">TSK-01</span>
+                <span class="func-desc">动态参数启动面板</span>
+                <div class="func-detail">点击运行后，根据开始节点定义自动生成输入表单。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">TSK-02</span>
+                <span class="func-desc">工作流聚合任务卡片</span>
+                <div class="func-detail">列表只展示一条工作流主记录，支持展开查看子项。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">TSK-03</span>
+                <span class="func-desc">流式进度监控条</span>
+                <div class="func-detail">实时动态条：已生/待审/通过/失败比例展示。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">TSK-04</span>
+                <span class="func-desc">边生边审交互系统</span>
+                <div class="func-detail">支持在生成中实时审查，支持批量通过、放行、抛弃。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">TSK-05</span>
+                <span class="func-desc">单项阻塞放行逻辑</span>
+                <div class="func-detail">用户通过单个 Item 需立即触发该 Item 的下游环节。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">TSK-06</span>
+                <span class="func-desc">节点活跃微动画</span>
+                <div class="func-detail">卡片展示当前正在运行或积压的节点状态。</div>
+            </div>
+        </div>
+
+        <!-- 模块 4 -->
+        <div class="mod-section">
+            <div class="mod-title">四、原料库 (RAW 系列)</div>
+            
+            <div class="func-item">
+                <span class="func-id">RAW-01</span>
+                <span class="func-desc">导航菜单入口</span>
+                <div class="func-detail">左侧菜单新增独立分类“原料库”。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">RAW-02</span>
+                <span class="func-desc">网格化原料管理 UI</span>
+                <div class="func-detail">复用素材库所有网格展示及筛选能力。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">RAW-03</span>
+                <span class="func-desc">资产溯源元数据写入</span>
+                <div class="func-detail">入库产物需包含其所属工作流与任务的 ID。</div>
+            </div>
+
+            <div class="func-item">
+                <span class="func-id">RAW-04</span>
+                <span class="func-desc">详情页一键反查</span>
+                <div class="func-detail">在详情抽屉支持点击链接跳转回原始生成任务。</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

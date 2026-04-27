@@ -14,7 +14,7 @@
                          "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
             font-size: 14px;
             line-height: 1.5715;
-            background: #fff;
+            background: #f5f7fa;
             min-height: 100vh;
             padding: 102px 24px 40px;
         }
@@ -948,37 +948,79 @@
         .task-detail-grid-wrap { flex: 1; overflow-y: auto; padding: 16px; }
 
         /* ── 工作流 ── */
-        .workflow-wrap { width: 100%; max-width: 860px; margin-top: 64px; transform: translateX(min(-300px, calc(50vw - 50% - 300px))); }
-        @media (max-width: 1200px) { .workflow-wrap { transform: none; } }
-        .wf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
-        .wf-title { font-size: 15px; font-weight: 600; color: #1a1a1a; }
-        .wf-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+        .workflow-wrap { width: 100%; max-width: 1120px; margin-top: 48px; }
+        .wf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+        .wf-section { margin-bottom: 32px; }
+        .wf-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .wf-section-title { font-size: 12px; color: #999; font-weight: 500; text-transform: none; letter-spacing: normal; }
+        .wf-more-link { font-size: 12px; color: #1677ff; cursor: pointer; transition: opacity 0.2s; }
+        .wf-more-link:hover { opacity: 0.8; }
+        
+        .wf-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 1280px) { .wf-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 800px) { .wf-grid { grid-template-columns: 1fr; } }
+
         .wf-card {
-            width: 264px; background: #fff; border-radius: 14px;
-            border: 1px solid rgba(0,0,0,0.07); overflow: hidden; cursor: pointer;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            background: #fff; border-radius: 12px;
+            border: 1px solid rgba(0,0,0,0.06); padding: 16px;
+            display: flex; flex-direction: column; gap: 12px;
+            position: relative; transition: all 0.2s; cursor: pointer;
         }
         .wf-card:hover {
-            border-color: rgba(22,119,255,0.35);
-            box-shadow: 0 6px 24px rgba(22,119,255,0.12); transform: translateY(-3px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: rgba(22,119,255,0.25);
         }
-        .wf-thumb {
-            width: 100%; aspect-ratio: 1 / 1; position: relative; overflow: hidden;
+
+        .wf-card-main { display: flex; gap: 12px; }
+        .wf-icon-box {
+            width: 48px; height: 48px; background: rgba(22,119,255,0.08); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; color: #1677ff; 
         }
-        /* 底部蒙层 + 标签 */
-        .wf-overlay {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            padding: 24px 10px 10px;
-            background: linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 100%);
-            display: flex; align-items: flex-end;
+        .wf-info { flex: 1; min-width: 0; padding-top: 2px; }
+        .wf-name {
+            font-size: 15px; font-weight: 600; color: #1a1a1a;
+            margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .wf-tag {
-            display: inline-flex; align-items: center; padding: 2px 9px;
-            background: rgba(255,255,255,0.18); backdrop-filter: blur(6px);
-            color: #fff; border-radius: 5px; font-size: 12px; font-weight: 500;
-            border: 1px solid rgba(255,255,255,0.25);
+        .wf-desc-text {
+            font-size: 13px; color: #666; line-height: 1.5;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden;
         }
+
+        .wf-card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 8px; padding-top: 4px;
+        }
+        .wf-type-tag { font-size: 11px; color: #999; }
+        .wf-meta { font-size: 11px; color: #aaa; }
+
+        /* More actions */
+        .wf-more-trigger {
+            position: absolute; bottom: 8px; right: 10px;
+            width: 24px; height: 24px; border-radius: 4px;
+            display: none; align-items: center; justify-content: center;
+            font-size: 18px; color: #999; font-weight: bold; line-height: 1;
+            z-index: 5;
+        }
+        .wf-card:hover .wf-more-trigger { display: flex; }
+        .wf-more-trigger:hover { background: #f0f0f0; color: #1a1a1a; }
+
+        .wf-menu {
+            position: absolute; bottom: 36px; right: 8px;
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border: 1px solid rgba(0,0,0,0.08);
+            padding: 4px 0; z-index: 100;
+            display: none; min-width: 120px;
+        }
+        .wf-menu.show { display: block; }
+        .wf-menu-item {
+            padding: 8px 16px; font-size: 12px; color: #333;
+            cursor: pointer; transition: background 0.1s;
+        }
+        .wf-menu-item:hover { background: #f5f7fa; }
+        .wf-menu-item.danger { color: #ff4d4f; }
 
         /* ── Toast ── */
         .toast {
@@ -1008,6 +1050,53 @@
         .notif-close { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #52C41A; opacity: 0.6; border-radius: 4px; flex-shrink: 0; margin-left: 4px; }
         .notif-close:hover { opacity: 1; }
 
+        /* ─── 创建工作流弹窗 Modal ─── */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45);
+            z-index: 3000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-content {
+            background: #fff; border-radius: 12px; width: 480px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: flex; flex-direction: column;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .modal-header {
+            padding: 16px 24px; border-bottom: 1px solid #f0f0f0;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-title { font-size: 16px; font-weight: 600; }
+        .modal-close { cursor: pointer; color: #999; font-size: 18px; background: none; border: none; }
+        .modal-close:hover { color: #333; }
+        .modal-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-label { font-size: 14px; font-weight: 500; color: #333; }
+        .form-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+        .form-input {
+            padding: 8px 12px; border: 1px solid #d9d9d9; border-radius: 6px;
+            font-size: 14px; outline: none; transition: 0.2s; font-family: inherit;
+        }
+        .form-input:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        textarea.form-input { resize: vertical; min-height: 80px; }
+        .cover-upload-area {
+            width: 100px; height: 100px; border: 1px dashed #d9d9d9; border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #999; cursor: pointer; transition: 0.2s; background: #fafafa;
+        }
+        .cover-upload-area:hover { border-color: #1677ff; color: #1677ff; background: #f0f5ff; }
+        .radio-group { display: flex; gap: 24px; }
+        .radio-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #555; }
+        .modal-footer {
+            padding: 16px 24px; border-top: 1px solid #f0f0f0;
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+
+        /* 辅助图标 */
+        svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     </style>
 </head>
 <body>
@@ -1027,7 +1116,7 @@
             <button class="type-btn" data-type="chat" onclick="switchType(this)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>文本
+                </svg>文案
             </button>
             <button class="type-btn active" data-type="image" onclick="switchType(this)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -1114,14 +1203,53 @@
     </div>
 
     <div class="workflow-wrap">
-        <div class="wf-header"><span class="wf-title">工作流</span></div>
-        <div class="wf-grid">
-            <div class="wf-card" onclick="useWorkflow('image')">
-                <div class="wf-thumb">
-                    <img src="工作流.png" alt="图像素延生" style="width:100%;height:100%;object-fit:cover;display:block;">
-                    <div class="wf-overlay"><span class="wf-tag">图像</span></div>
-                </div>
+        <div class="wf-header">
+            <div class="type-toggle" style="margin-left: 0;">
+                <button class="type-btn" data-type="chat" onclick="switchType(this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>文案
+                </button>
+                <button class="type-btn active" data-type="image" onclick="switchType(this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                    </svg>图像
+                </button>
+                <button class="type-btn" data-type="video" onclick="switchType(this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
+                    </svg>视频
+                </button>
             </div>
+            <button class="history-btn" style="position: static; transform: none;" onclick="openCreateModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                新建工作流
+            </button>
+        </div>
+
+        <!-- 置顶区域 -->
+        <div class="wf-section" id="sectionPinned">
+            <div class="wf-section-header">
+                <div class="wf-section-title">置顶</div>
+            </div>
+            <div class="wf-grid" id="wfPinned"></div>
+        </div>
+
+        <!-- 我的区域 -->
+        <div class="wf-section" id="sectionMine">
+            <div class="wf-section-header">
+                <div class="wf-section-title">我的</div>
+            </div>
+            <div class="wf-grid" id="wfMine"></div>
+        </div>
+
+        <!-- 广场区域 -->
+        <div class="wf-section" id="sectionSquare">
+            <div class="wf-section-header">
+                <div class="wf-section-title">广场</div>
+                <div class="wf-more-link" onclick="parent.postMessage({ action: 'openTab', title: '工作流广场', url: 'AI 创作/工作流广场.html' }, '*')">查看更多</div>
+            </div>
+            <div class="wf-grid" id="wfSquare"></div>
         </div>
     </div>
 
@@ -1229,6 +1357,95 @@
     <img class="asset-preview-img" id="assetPreviewImg" src="" alt="">
 </div>
 
+    <!-- 创建工作流弹窗 -->
+    <div class="modal-overlay" id="createWfModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">新建工作流生产线</div>
+                <button class="modal-close" onclick="closeCreateModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">封面</label>
+                    <div class="cover-upload-area">
+                        <svg viewBox="0 0 24 24" style="font-size: 24px; margin-bottom: 8px;"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <span>点击上传</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required">名称</label>
+                    <input type="text" class="form-input" id="wfName" placeholder="例如：春季女装爆款裂变工作流">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">主产物类型</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="wfType" value="copy" checked> 文案素材</label>
+                        <label class="radio-label"><input type="radio" name="wfType" value="image"> 图片素材</label>
+                        <label class="radio-label"><input type="radio" name="wfType" value="video"> 视频素材</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <textarea class="form-input" id="wfDesc" placeholder="简要描述该生产线的主要功能与适用场景..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label required">可见性权限</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="wfVisibility" value="private" checked> 仅自己可见</label>
+                        <label class="radio-label"><input type="radio" name="wfVisibility" value="public"> 团队内公开 (广场可见)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-default" onclick="closeCreateModal()">取消</button>
+                <button class="btn btn-primary" onclick="submitCreate()">创建并进入画布</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+const createWfModal = document.getElementById('createWfModal');
+
+function openCreateModal() {
+    if (!createWfModal) return;
+    createWfModal.classList.add('active');
+}
+
+function closeCreateModal() {
+    createWfModal.classList.remove('active');
+    document.getElementById('wfName').value = '';
+    document.getElementById('wfDesc').value = '';
+    document.querySelector('input[name="wfType"][value="copy"]').checked = true;
+    document.querySelector('input[name="wfVisibility"][value="private"]').checked = true;
+}
+
+function submitCreate() {
+    const name = document.getElementById('wfName').value;
+    if (!name.trim()) {
+        showToast('请输入工作流名称', 'error');
+        return;
+    }
+    closeCreateModal();
+    parent.postMessage({ 
+        action: 'openTab', 
+        title: name, 
+        url: 'AI 创作/工作流编辑器.html?name=' + encodeURIComponent(name) 
+    }, '*');
+}
+
+if (createWfModal) {
+    createWfModal.addEventListener('click', function(e) {
+        if(e.target === this) closeCreateModal();
+    });
+}
+</script>
+
 <script>
 const RATIO_SIZES = {
     '1:1':[16,16], '2:3':[11,16], '3:2':[16,11],
@@ -1322,10 +1539,11 @@ const PLATFORM_PRESETS = {
 const OPTS = {
     chat: [
         { key: 'chat-model', type: 'chat-model' },
-        { key: 'think',      type: 'toggle', label: '思考模式' },
-        { key: 'search',     type: 'toggle', label: '网络搜索' },
+        { key: 'count',     type: 'count', unit: '条',
+          values: ['1','5','10','20','50'] },
+        { key: 'style',     type: 'chips', label: '文案风格',
+          values: ['爆款重写', '卖点提炼', '小红书', '抖音', '朋友圈'], def: '爆款重写' },
         { key: 'project',    type: 'project' },
-        { key: 'upload',     type: 'upload-btn', label: '上传文件' },
     ],
     image: [
         { key: 'model',     type: 'model' },
@@ -1349,7 +1567,7 @@ const OPTS = {
 
 let curType = 'image';
 const sel = {
-    chat:  { model: 'gpt54mini', think: false, search: false, project: '' },
+    chat:  { model: 'gpt54mini', count: '1', style: '爆款重写', project: '' },
     image: { models: ['banana2'], modelCounts: {}, modelQuality: {}, ratio: '1:1', res: '2K', sizeW: 2048, sizeH: 2048, count: '1', project: '', ratioTab: '常用', platformSize: null, customRatios: [] },
     video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '5秒', project: '', frameFirst: null, frameLast: null },
 };
@@ -2882,13 +3100,96 @@ function openHistory() {
     parent.postMessage({ action: 'openTab', title: '我的任务', url: 'AI 创作/我的任务.html' }, '*');
 }
 
+// ── 工作流渲染逻辑 ──
+const WF_LABELS = { chat: '文案', image: '图像', video: '视频' };
+const MOCK_WFS = { chat: [], image: [], video: [] };
+
+// 生成模拟数据：置顶5，我的15，广场20
+['chat', 'image', 'video'].forEach(type => {
+    for(let i=1; i<=40; i++) {
+        MOCK_WFS[type].push({
+            id: `wf-${type}-${i}`,
+            name: i === 1 ? `爆款${WF_LABELS[type]}裂变工作流` : `${WF_LABELS[type]}生产流 ${i}`,
+            desc: `用于${WF_LABELS[type]}素材的高效自动化处理，支持多种参数调节与质量优化。`,
+            author: '张三',
+            date: '2025-02-12',
+            type: WF_LABELS[type],
+            isPinned: i <= 5,
+            isMine: i > 5 && i <= 20
+        });
+    }
+});
+
+function renderWorkflows() {
+    const list = MOCK_WFS[curType] || [];
+    const pinned = list.filter(w => w.isPinned);
+    const mine = list.filter(w => w.isMine);
+    const square = list.filter(w => !w.isPinned && !w.isMine).slice(0, 20);
+
+    const getWfIcon = (type) => {
+        if (type === 'chat') return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
+        if (type === 'image') return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+        return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
+    };
+
+    const renderGrid = (containerId, data) => {
+        const grid = document.getElementById(containerId);
+        if (!grid) return;
+        grid.innerHTML = data.map(w => `
+            <div class="wf-card" onclick="useWorkflow('${curType}')">
+                <div class="wf-card-main">
+                    <div class="wf-icon-box">${getWfIcon(curType)}</div>
+                    <div class="wf-info">
+                        <div class="wf-name">${w.name}</div>
+                        <div class="wf-desc-text">${w.desc}</div>
+                    </div>
+                </div>
+                <div class="wf-card-footer">
+                    <span class="wf-type-tag">${w.type}</span>
+                    <span class="wf-meta">${w.author} ${w.date}</span>
+                </div>
+                <div class="wf-more-trigger" onclick="toggleWfMenu(event, this)">...</div>
+                <div class="wf-menu">
+                    <div class="wf-menu-item" onclick="event.stopPropagation();closeAllMenus();showToast('${w.isPinned?'取消置顶':'置顶'}成功')">${w.isPinned?'取消置顶':'置顶'}</div>
+                    <div class="wf-menu-item" onclick="event.stopPropagation();closeAllMenus();parent.postMessage({ action: 'openTab', title: '编辑工作流', url: 'AI 创作/工作流编辑器.html?id=${w.id}' }, '*')">编辑</div>
+                    <div class="wf-menu-item" onclick="event.stopPropagation();closeAllMenus();showToast('副本已创建')">创建副本</div>
+                    <div class="wf-menu-item danger" onclick="event.stopPropagation();closeAllMenus();confirm('确定要删除吗？')">删除</div>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    renderGrid('wfPinned', pinned);
+    renderGrid('wfMine', mine);
+    renderGrid('wfSquare', square);
+}
+
+function toggleWfMenu(e, btn) {
+    e.stopPropagation();
+    const menu = btn.nextElementSibling;
+    const isShow = menu.classList.contains('show');
+    closeAllMenus();
+    if (!isShow) menu.classList.add('show');
+}
+
+function closeAllMenus() {
+    document.querySelectorAll('.wf-menu.show').forEach(m => m.classList.remove('show'));
+}
+
+document.addEventListener('click', closeAllMenus);
+
 function switchType(btn) {
-    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    curType = btn.dataset.type;
+    const type = btn.dataset.type;
+    curType = type;
+
+    // 同步所有 type-btn 状态
+    document.querySelectorAll('.type-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.type === type);
+    });
+
     const isChat = curType === 'chat';
 
-    // 上传区 & 参考图条（对话模式与图像/视频模式保持一致）
+    // 上传区 & 参考图条
     if (!document.getElementById('refAddBtn')) {
         document.getElementById('uploadBlock').style.display = '';
     }
@@ -2913,11 +3214,12 @@ function switchType(btn) {
     genText.innerHTML = '生成';
 
     // placeholder
-    const ph = { chat: '尝试描述你想要的文本内容', image: '尝试描述您想要创建的图像', video: '尝试描述您想要创建的视频' };
+    const ph = { chat: '尝试描述你想要的文案内容，或上传图片让 AI 识图写文', image: '尝试描述您想要创建的图像', video: '尝试描述您想要创建的视频' };
     document.getElementById('prompt').placeholder = ph[curType] || '';
 
     closeAll();
     renderOpts();
+    renderWorkflows();
 }
 
 function useWorkflow(type) {
@@ -2956,6 +3258,7 @@ function closeAll(e) {
 let _tt;
 function showToast(msg, type) {
     const el = document.getElementById('toast');
+    if (!el) return;
     el.textContent = msg;
     el.classList.toggle('error', type === 'error');
     el.classList.toggle('ghost', type === 'ghost');
@@ -2980,6 +3283,7 @@ document.addEventListener('click', closeAll);
 
 updateSize(sel.image.ratio, sel.image.res);
 renderOpts();
+renderWorkflows();
 syncToolboxParseState();
 syncToolboxFormatState();
 </script>
