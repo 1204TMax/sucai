@@ -3135,7 +3135,7 @@ function renderWorkflows() {
     const renderGrid = (containerId, data) => {
         const grid = document.getElementById(containerId);
         if (!grid) return;
-        grid.innerHTML = data.map(w => `
+        let html = data.map(w => `
             <div class="wf-card" onclick="useWorkflow('${curType}')">
                 <div class="wf-card-main">
                     <div class="wf-icon-box">${getWfIcon(curType)}</div>
@@ -3157,6 +3157,17 @@ function renderWorkflows() {
                 </div>
             </div>
         `).join('');
+
+        if (containerId === 'wfMine') {
+            html = `
+                <div class="wf-card" style="border: 1.5px dashed rgba(0,0,0,0.15); background: transparent; align-items: center; justify-content: center; min-height: 120px;" onclick="openCreateModal()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <div style="margin-top: 12px; font-weight: 500; color: #333">新建工作流</div>
+                    <div style="font-size: 12px; margin-top: 4px; color: #888">搭设自定义生产线</div>
+                </div>
+            ` + html;
+        }
+        grid.innerHTML = html;
     };
 
     renderGrid('wfPinned', pinned);

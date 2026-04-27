@@ -48,7 +48,7 @@
         .port-in { left: -7px; }
         .port-out { right: -7px; }
 
-        .sidebar-right { position: absolute; right: 0; top: 0; bottom: 0; width: 320px; background: #fff; border-left: 1px solid #e8e8e8; box-shadow: -2px 0 12px rgba(0,0,0,0.05); transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); z-index: 20; display: flex; flex-direction: column; }
+        .sidebar-right { position: absolute; right: 0; top: 0; bottom: 0; width: 340px; background: #fff; border-left: 1px solid #e8e8e8; box-shadow: -2px 0 12px rgba(0,0,0,0.05); transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1); z-index: 20; display: flex; flex-direction: column; }
         .sidebar-right.open { transform: translateX(0); }
         .config-header { padding: 16px; border-bottom: 1px solid #e8e8e8; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; }
         .config-close { cursor: pointer; color: #999; border: none; background: none; font-size: 18px; }
@@ -59,6 +59,8 @@
         .btn:hover { color: #1677ff; border-color: #1677ff; }
         .btn-primary { background: #1677ff; color: #fff; border-color: #1677ff; }
         .btn-primary:hover { background: #4096ff; border-color: #4096ff; color: #fff; }
+        .btn-mini { padding: 4px 10px; font-size: 12px; }
+        .btn-danger:hover { color: #ff4d4f; border-color: #ff4d4f; }
 
         .form-item { margin-bottom: 20px; }
         .form-item label { display: block; font-size: 13px; color: #333; margin-bottom: 8px; font-weight: 500; }
@@ -68,11 +70,16 @@
         .form-item input:focus,
         .form-item textarea:focus,
         .form-item select:focus { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
+        .form-item input[readonly] { background: #fafafa; color: #666; }
         .form-hint { font-size: 12px; color: #888; margin-top: 6px; line-height: 1.6; }
         .var-tag { display: inline-block; margin: 4px 6px 0 0; background: #e6f7ff; border: 1px solid #91d5ff; color: #1890ff; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; }
         .checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #333; }
         .checkbox-row input { width: auto; }
         .empty-hint { color: #bfbfbf; text-align: center; padding-top: 40px; font-size: 13px; }
+        .config-card { border: 1px solid #f0f0f0; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #fafafa; }
+        .config-card-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+        .config-card-title { font-size: 12px; color: #666; font-weight: 600; }
+        .inline-actions { display: flex; gap: 8px; margin-top: 12px; }
     </style>
 </head>
 <body>
@@ -148,6 +155,14 @@ function getNodeLabel(node) {
     return node.config?.name || getNodeDef(node)?.title || '未命名节点';
 }
 
+function getStartNode() {
+    return nodes.find(node => getNodeProcessorType(node) === 'system.start');
+}
+
+function getStartInputs() {
+    return getStartNode()?.config?.inputs || [];
+}
+
 function getUpstreamNodes(nodeId, allowedTypes = []) {
     const sourceIds = edges.filter(edge => edge.target === nodeId).map(edge => edge.source);
     return nodes.filter(node => {
@@ -168,12 +183,34 @@ function buildNodeOptions(nodeId, allowedTypes = [], selectedValue = '', placeho
     return options.join('');
 }
 
+function buildStartInputOptions(selectedValue = '', placeholder = '请选择开始节点输入') {
+    const startNode = getStartNode();
+    const inputs = getStartInputs();
+    const options = [`<option value="">${placeholder}</option>`];
+    if (!startNode) return options.join('');
+
+    inputs.forEach(input => {
+        const value = `{{${startNode.id}.${input.key}}}`;
+        const label = `${input.label || input.key} · ${input.type === 'file' ? '文件上传' : '提示词 / 文本'}`;
+        options.push(`<option value="${escapeHtml(value)}" ${selectedValue === value ? 'selected' : ''}>${escapeHtml(label)}</option>`);
+    });
+
+    return options.join('');
+}
+
 function renderVariableHint(nodeId, allowedTypes = []) {
-    const candidates = getUpstreamNodes(nodeId, allowedTypes);
-    if (!candidates.length) {
-        return '<div class="form-hint">当前还没有可引用的上游节点，连线后可在这里继续配置。</div>';
+    const startNode = getStartNode();
+    const startTags = startNode
+        ? getStartInputs().map(input => `<span class="var-tag">{{${escapeHtml(startNode.id)}.${escapeHtml(input.key)}}}</span>`)
+        : [];
+    const upstreamTags = getUpstreamNodes(nodeId, allowedTypes).map(node => `<span class="var-tag">{{${escapeHtml(node.id)}.output}}</span>`);
+    const tags = startTags.concat(upstreamTags);
+
+    if (!tags.length) {
+        return '<div class="form-hint">当前还没有可引用的开始节点输入或上游输出。</div>';
     }
-    return `<div class="form-hint">可引用变量：${candidates.map(node => `<span class="var-tag">{{${escapeHtml(node.id)}.output}}</span>`).join('')}</div>`;
+
+    return `<div class="form-hint">可引用变量：${tags.join('')}</div>`;
 }
 
 function renderCheckboxField(label, key, checked, hint = '') {
@@ -193,6 +230,78 @@ function renderSummary(lines) {
     return lines.map(line => `<div class="summary-line">${escapeHtml(line)}</div>`).join('');
 }
 
+function renderStartInputsEditor(node) {
+    const inputs = node.config.inputs || [];
+    if (!inputs.length) {
+        return '<div class="form-hint">暂无输入项，点击下方“新增输入”后，用户在运行工作流时就会看到对应表单。</div>';
+    }
+
+    return inputs.map((input, index) => `
+        <div class="config-card">
+            <div class="config-card-header">
+                <div class="config-card-title">输入 ${index + 1}</div>
+                <button class="btn btn-mini btn-danger" onclick="removeStartInput(${index})">删除</button>
+            </div>
+            <div class="form-item">
+                <label>字段名称</label>
+                <input type="text" value="${escapeHtml(input.label || '')}" placeholder="如：参考图、主提示词" oninput="updateStartInput(${index}, 'label', this.value)">
+            </div>
+            <div class="form-item">
+                <label>输入类型</label>
+                <select onchange="updateStartInput(${index}, 'type', this.value)">
+                    <option value="file" ${input.type === 'file' ? 'selected' : ''}>文件上传</option>
+                    <option value="text" ${input.type === 'text' ? 'selected' : ''}>提示词 / 文本</option>
+                </select>
+            </div>
+            <div class="form-hint">运行时变量：<span class="var-tag">{{${escapeHtml(node.id)}.${escapeHtml(input.key)}}}</span></div>
+        </div>
+    `).join('');
+}
+
+function renderSourceSection(node, sourceKey, manualKey, startRefKey, upstreamRefKey, label, manualPlaceholder, manualType = 'textarea') {
+    const source = node.config[sourceKey] || 'manual';
+    const manualField = manualType === 'textarea'
+        ? `<textarea rows="4" placeholder="${manualPlaceholder}" oninput="updateConfig('${manualKey}', this.value)">${escapeHtml(node.config[manualKey] || '')}</textarea>`
+        : `<input type="text" value="${escapeHtml(node.config[manualKey] || '')}" placeholder="${manualPlaceholder}" oninput="updateConfig('${manualKey}', this.value)">`;
+
+    let content = '';
+    if (source === 'manual') {
+        content = manualField;
+    } else if (source === 'start') {
+        content = `
+            <select onchange="updateConfig('${startRefKey}', this.value)">
+                ${buildStartInputOptions(node.config[startRefKey] || '', '请选择开始节点输入')}
+            </select>
+        `;
+    } else {
+        content = `
+            <select onchange="updateConfig('${upstreamRefKey}', this.value)">
+                ${buildNodeOptions(node.id, ['text.generate', 'image.generate', 'video.generate', 'control.review'], node.config[upstreamRefKey] || '', '请选择其他节点输出')}
+            </select>
+        `;
+    }
+
+    return `
+        <div class="form-item">
+            <label>${label}</label>
+            <select onchange="updateConfig('${sourceKey}', this.value)">
+                <option value="manual" ${source === 'manual' ? 'selected' : ''}>自己填写 / 上传</option>
+                <option value="start" ${source === 'start' ? 'selected' : ''}>继承开始节点输入</option>
+                <option value="upstream" ${source === 'upstream' ? 'selected' : ''}>继承其他节点输出</option>
+            </select>
+            <div style="margin-top: 10px;">${content}</div>
+            ${renderVariableHint(node.id, ['text.generate', 'image.generate', 'video.generate', 'control.review'])}
+        </div>
+    `;
+}
+
+function getResolvedFieldValue(config, sourceKey, manualKey, startRefKey, upstreamRefKey) {
+    const source = config[sourceKey] || 'manual';
+    if (source === 'start') return config[startRefKey] || '未设置';
+    if (source === 'upstream') return config[upstreamRefKey] || '未设置';
+    return config[manualKey] || '未设置';
+}
+
 const PROCESSOR_REGISTRY = {
     'system.start': {
         title: '开始节点',
@@ -203,34 +312,55 @@ const PROCESSOR_REGISTRY = {
         hasIn: false,
         hasOut: true,
         createDefaultConfig: () => ({
-            name: '新建工作流',
-            materialPool: '',
-            targetCount: 10,
-            inputParams: 'product_name\ncampaign_goal'
+            name: '开始',
+            outputType: 'image',
+            finalCount: 10,
+            resolution: '3:4',
+            inputs: [
+                { key: 'input_1', label: '主提示词', type: 'text' },
+                { key: 'input_2', label: '参考文件', type: 'file' }
+            ]
         }),
         getSummary: (config) => renderSummary([
-            `原料池：${config.materialPool || '未设置'}`,
-            `目标产出：${config.targetCount || 10}`,
-            `输入参数：${config.inputParams ? config.inputParams.split('\n').filter(Boolean).length : 0} 个`
-        ]),
+            `目标产出：${config.outputType === 'text' ? '文案' : config.outputType === 'video' ? '视频' : '图片'}`,
+            `最终数量：${config.finalCount || 10}`,
+            `输入项：${(config.inputs || []).length} 个`
+        ].concat(config.outputType === 'text' ? [] : [`分辨率：${config.resolution || '未设置'}`])),
         renderConfig: (node) => `
             <div class="form-item">
-                <label>工作流名称</label>
-                <input type="text" value="${escapeHtml(node.config.name || '')}" oninput="updateConfig('name', this.value)">
+                <label>名称</label>
+                <input type="text" value="开始" readonly>
             </div>
             <div class="form-item">
-                <label>原料 / 物料池</label>
-                <input type="text" value="${escapeHtml(node.config.materialPool || '')}" placeholder="如：减脂项目-头部素材池" oninput="updateConfig('materialPool', this.value)">
-                <div class="form-hint">开始节点要先明确本次运行使用哪一组原料或物料池。</div>
+                <label>目标产出类型</label>
+                <select onchange="updateConfig('outputType', this.value)">
+                    <option value="text" ${node.config.outputType === 'text' ? 'selected' : ''}>文案</option>
+                    <option value="image" ${node.config.outputType === 'image' ? 'selected' : ''}>图片</option>
+                    <option value="video" ${node.config.outputType === 'video' ? 'selected' : ''}>视频</option>
+                </select>
+                <div class="form-hint">这个通常在创建工作流时就确定下来。</div>
             </div>
             <div class="form-item">
-                <label>目标产出数量</label>
-                <input type="number" min="1" value="${escapeHtml(node.config.targetCount || 10)}" oninput="updateConfig('targetCount', this.value)">
+                <label>最终产出数量</label>
+                <input type="number" min="1" max="100" value="${escapeHtml(node.config.finalCount || 10)}" oninput="updateConfig('finalCount', this.value)">
             </div>
             <div class="form-item">
-                <label>动态输入参数</label>
-                <textarea rows="5" placeholder="每行一个参数名" oninput="updateConfig('inputParams', this.value)">${escapeHtml(node.config.inputParams || '')}</textarea>
-                <div class="form-hint">后续节点可通过 <span class="var-tag">{{${escapeHtml(node.id)}.参数名}}</span> 引用开始节点定义的输入。</div>
+                <label>${node.config.outputType === 'text' ? '比例 / 分辨率' : '比例 / 分辨率'}</label>
+                <select onchange="updateConfig('resolution', this.value)" ${node.config.outputType === 'text' ? 'disabled' : ''}>
+                    <option value="1:1" ${node.config.resolution === '1:1' ? 'selected' : ''}>1:1</option>
+                    <option value="3:4" ${node.config.resolution === '3:4' ? 'selected' : ''}>3:4</option>
+                    <option value="9:16" ${node.config.resolution === '9:16' ? 'selected' : ''}>9:16</option>
+                    <option value="16:9" ${node.config.resolution === '16:9' ? 'selected' : ''}>16:9</option>
+                </select>
+                <div class="form-hint">文案类型不依赖分辨率；图片和视频通常需要在这里预先约束比例。</div>
+            </div>
+            <div class="form-item">
+                <label>输入</label>
+                ${renderStartInputsEditor(node)}
+                <div class="inline-actions">
+                    <button class="btn btn-mini" onclick="addStartInput()">+ 新增输入</button>
+                </div>
+                <div class="form-hint">这里定义的是用户在使用工作流时要填写的表单项，一般是文件上传、提示词等。</div>
             </div>
         `
     },
@@ -244,50 +374,40 @@ const PROCESSOR_REGISTRY = {
         hasOut: true,
         createDefaultConfig: () => ({
             name: '文本生成',
-            prompt: '',
-            inputRef: '',
-            referenceImage: '',
-            count: 10,
-            style: '种草'
+            model: 'doubao-text',
+            promptSource: 'manual',
+            promptManual: '',
+            promptStartRef: '',
+            promptUpstreamRef: '',
+            referenceSource: 'start',
+            referenceManual: '',
+            referenceStartRef: '',
+            referenceUpstreamRef: '',
+            count: 10
         }),
         getSummary: (config) => renderSummary([
-            `节点名称：${config.name || '文本生成'}`,
-            `裂变数量：${config.count || 10} 条`,
-            `文案风格：${config.style || '未设置'}`
+            `模型：${config.model || '未设置'}`,
+            `生成数量：${config.count || 10}`,
+            `提示词：${getResolvedFieldValue(config, 'promptSource', 'promptManual', 'promptStartRef', 'promptUpstreamRef')}`
         ]),
         renderConfig: (node) => `
             <div class="form-item">
-                <label>节点名称</label>
+                <label>名称</label>
                 <input type="text" value="${escapeHtml(node.config.name || '')}" oninput="updateConfig('name', this.value)">
             </div>
             <div class="form-item">
-                <label>主输入说明</label>
-                <textarea rows="4" placeholder="描述要生成什么文本" oninput="updateConfig('prompt', this.value)">${escapeHtml(node.config.prompt || '')}</textarea>
-            </div>
-            <div class="form-item">
-                <label>引用上游变量</label>
-                <select onchange="updateConfig('inputRef', this.value)">
-                    ${buildNodeOptions(node.id, ['system.start', 'text.generate', 'image.generate', 'video.generate'], node.config.inputRef || '', '请选择上游输出')}
+                <label>模型</label>
+                <select onchange="updateConfig('model', this.value)">
+                    <option value="doubao-text" ${node.config.model === 'doubao-text' ? 'selected' : ''}>Doubao Text</option>
+                    <option value="claude-text" ${node.config.model === 'claude-text' ? 'selected' : ''}>Claude Text</option>
+                    <option value="gpt-text" ${node.config.model === 'gpt-text' ? 'selected' : ''}>GPT Text</option>
                 </select>
-                ${renderVariableHint(node.id, ['system.start', 'text.generate', 'image.generate', 'video.generate'])}
             </div>
+            ${renderSourceSection(node, 'promptSource', 'promptManual', 'promptStartRef', 'promptUpstreamRef', '提示词', '请输入提示词', 'textarea')}
+            ${renderSourceSection(node, 'referenceSource', 'referenceManual', 'referenceStartRef', 'referenceUpstreamRef', '参考文件', '填写参考文件链接、路径或说明', 'input')}
             <div class="form-item">
-                <label>参考图片</label>
-                <input type="text" value="${escapeHtml(node.config.referenceImage || '')}" placeholder="可填写图片链接或变量，如 {{n3.output}}" oninput="updateConfig('referenceImage', this.value)">
-            </div>
-            <div class="form-item">
-                <label>裂变数量</label>
+                <label>生成数量</label>
                 <input type="number" min="1" max="100" value="${escapeHtml(node.config.count || 10)}" oninput="updateConfig('count', this.value)">
-                <div class="form-hint">会议里明确文案裂变数量范围为 1-100。</div>
-            </div>
-            <div class="form-item">
-                <label>文案风格</label>
-                <select onchange="updateConfig('style', this.value)">
-                    <option value="种草" ${node.config.style === '种草' ? 'selected' : ''}>种草</option>
-                    <option value="信息流" ${node.config.style === '信息流' ? 'selected' : ''}>信息流</option>
-                    <option value="口播" ${node.config.style === '口播' ? 'selected' : ''}>口播</option>
-                    <option value="促转化" ${node.config.style === '促转化' ? 'selected' : ''}>促转化</option>
-                </select>
             </div>
         `
     },
@@ -301,54 +421,53 @@ const PROCESSOR_REGISTRY = {
         hasOut: true,
         createDefaultConfig: () => ({
             name: '图片生成',
-            prompt: '',
-            inputRef: '',
-            referenceImage: '',
+            model: 'flux-image',
+            promptSource: 'manual',
+            promptManual: '',
+            promptStartRef: '',
+            promptUpstreamRef: '',
+            referenceSource: 'start',
+            referenceManual: '',
+            referenceStartRef: '',
+            referenceUpstreamRef: '',
             count: 4,
-            ratio: '3:4',
-            autoCrop: true,
+            resolution: '3:4',
             removeWatermark: true
         }),
         getSummary: (config) => renderSummary([
-            `节点名称：${config.name || '图片生成'}`,
-            `生成数量：${config.count || 4} 张`,
-            `目标比例：${config.ratio || '3:4'}`
+            `模型：${config.model || '未设置'}`,
+            `生成数量：${config.count || 4}`,
+            `分辨率：${config.resolution || '3:4'}`
         ]),
         renderConfig: (node) => `
             <div class="form-item">
-                <label>节点名称</label>
+                <label>名称</label>
                 <input type="text" value="${escapeHtml(node.config.name || '')}" oninput="updateConfig('name', this.value)">
             </div>
             <div class="form-item">
-                <label>生成说明</label>
-                <textarea rows="4" placeholder="描述图片生成目标" oninput="updateConfig('prompt', this.value)">${escapeHtml(node.config.prompt || '')}</textarea>
-            </div>
-            <div class="form-item">
-                <label>引用上游变量</label>
-                <select onchange="updateConfig('inputRef', this.value)">
-                    ${buildNodeOptions(node.id, ['system.start', 'text.generate', 'image.generate', 'video.generate'], node.config.inputRef || '', '请选择上游输出')}
+                <label>模型</label>
+                <select onchange="updateConfig('model', this.value)">
+                    <option value="flux-image" ${node.config.model === 'flux-image' ? 'selected' : ''}>FLUX</option>
+                    <option value="midjourney-image" ${node.config.model === 'midjourney-image' ? 'selected' : ''}>Midjourney</option>
+                    <option value="doubao-image" ${node.config.model === 'doubao-image' ? 'selected' : ''}>Doubao Image</option>
                 </select>
-                ${renderVariableHint(node.id, ['system.start', 'text.generate', 'image.generate', 'video.generate'])}
             </div>
-            <div class="form-item">
-                <label>参考图</label>
-                <input type="text" value="${escapeHtml(node.config.referenceImage || '')}" placeholder="可填写图片链接或变量，如 {{n2.output}}" oninput="updateConfig('referenceImage', this.value)">
-            </div>
+            ${renderSourceSection(node, 'promptSource', 'promptManual', 'promptStartRef', 'promptUpstreamRef', '提示词', '请输入图片生成提示词', 'textarea')}
+            ${renderSourceSection(node, 'referenceSource', 'referenceManual', 'referenceStartRef', 'referenceUpstreamRef', '参考文件', '填写参考图链接、路径或说明', 'input')}
             <div class="form-item">
                 <label>生成数量</label>
-                <input type="number" min="1" max="50" value="${escapeHtml(node.config.count || 4)}" oninput="updateConfig('count', this.value)">
+                <input type="number" min="1" max="100" value="${escapeHtml(node.config.count || 4)}" oninput="updateConfig('count', this.value)">
             </div>
             <div class="form-item">
-                <label>目标比例</label>
-                <select onchange="updateConfig('ratio', this.value)">
-                    <option value="1:1" ${node.config.ratio === '1:1' ? 'selected' : ''}>1:1</option>
-                    <option value="3:4" ${node.config.ratio === '3:4' ? 'selected' : ''}>3:4</option>
-                    <option value="9:16" ${node.config.ratio === '9:16' ? 'selected' : ''}>9:16</option>
-                    <option value="16:9" ${node.config.ratio === '16:9' ? 'selected' : ''}>16:9</option>
+                <label>分辨率</label>
+                <select onchange="updateConfig('resolution', this.value)">
+                    <option value="1:1" ${node.config.resolution === '1:1' ? 'selected' : ''}>1:1</option>
+                    <option value="3:4" ${node.config.resolution === '3:4' ? 'selected' : ''}>3:4</option>
+                    <option value="9:16" ${node.config.resolution === '9:16' ? 'selected' : ''}>9:16</option>
+                    <option value="16:9" ${node.config.resolution === '16:9' ? 'selected' : ''}>16:9</option>
                 </select>
             </div>
-            ${renderCheckboxField('生成后自动裁剪', 'autoCrop', !!node.config.autoCrop, '裁剪动作内聚在图片节点里，不再拆独立节点。')}
-            ${renderCheckboxField('生成后自动去水印', 'removeWatermark', !!node.config.removeWatermark, '去水印同样内聚在图片节点里。')}
+            ${renderCheckboxField('是否去水印', 'removeWatermark', !!node.config.removeWatermark)}
         `
     },
     'video.generate': {
@@ -361,41 +480,53 @@ const PROCESSOR_REGISTRY = {
         hasOut: true,
         createDefaultConfig: () => ({
             name: '视频生成',
-            prompt: '',
-            inputRef: '',
-            referenceAsset: '',
-            count: 1
+            model: 'keling-video',
+            promptSource: 'manual',
+            promptManual: '',
+            promptStartRef: '',
+            promptUpstreamRef: '',
+            referenceSource: 'start',
+            referenceManual: '',
+            referenceStartRef: '',
+            referenceUpstreamRef: '',
+            count: 1,
+            resolution: '9:16',
+            removeWatermark: true
         }),
         getSummary: (config) => renderSummary([
-            `节点名称：${config.name || '视频生成'}`,
-            `生成数量：${config.count || 1} 条`,
-            `引用输入：${config.inputRef || '未设置'}`
+            `模型：${config.model || '未设置'}`,
+            `生成数量：${config.count || 1}`,
+            `分辨率：${config.resolution || '9:16'}`
         ]),
         renderConfig: (node) => `
             <div class="form-item">
-                <label>节点名称</label>
+                <label>名称</label>
                 <input type="text" value="${escapeHtml(node.config.name || '')}" oninput="updateConfig('name', this.value)">
             </div>
             <div class="form-item">
-                <label>生成说明</label>
-                <textarea rows="4" placeholder="描述视频生成目标" oninput="updateConfig('prompt', this.value)">${escapeHtml(node.config.prompt || '')}</textarea>
-            </div>
-            <div class="form-item">
-                <label>引用上游变量</label>
-                <select onchange="updateConfig('inputRef', this.value)">
-                    ${buildNodeOptions(node.id, ['system.start', 'text.generate', 'image.generate', 'video.generate'], node.config.inputRef || '', '请选择上游输出')}
+                <label>模型</label>
+                <select onchange="updateConfig('model', this.value)">
+                    <option value="keling-video" ${node.config.model === 'keling-video' ? 'selected' : ''}>可灵</option>
+                    <option value="runway-video" ${node.config.model === 'runway-video' ? 'selected' : ''}>Runway</option>
+                    <option value="doubao-video" ${node.config.model === 'doubao-video' ? 'selected' : ''}>Doubao Video</option>
                 </select>
-                ${renderVariableHint(node.id, ['system.start', 'text.generate', 'image.generate', 'video.generate'])}
             </div>
-            <div class="form-item">
-                <label>参考素材</label>
-                <input type="text" value="${escapeHtml(node.config.referenceAsset || '')}" placeholder="可填写图片/视频链接或变量" oninput="updateConfig('referenceAsset', this.value)">
-            </div>
+            ${renderSourceSection(node, 'promptSource', 'promptManual', 'promptStartRef', 'promptUpstreamRef', '提示词', '请输入视频生成提示词', 'textarea')}
+            ${renderSourceSection(node, 'referenceSource', 'referenceManual', 'referenceStartRef', 'referenceUpstreamRef', '参考文件', '填写参考素材链接、路径或说明', 'input')}
             <div class="form-item">
                 <label>生成数量</label>
-                <input type="number" min="1" max="20" value="${escapeHtml(node.config.count || 1)}" oninput="updateConfig('count', this.value)">
-                <div class="form-hint">当前版本只保留最小配置，不暴露拆解、混剪、换脸等复杂 processor 细项。</div>
+                <input type="number" min="1" max="100" value="${escapeHtml(node.config.count || 1)}" oninput="updateConfig('count', this.value)">
             </div>
+            <div class="form-item">
+                <label>分辨率</label>
+                <select onchange="updateConfig('resolution', this.value)">
+                    <option value="1:1" ${node.config.resolution === '1:1' ? 'selected' : ''}>1:1</option>
+                    <option value="3:4" ${node.config.resolution === '3:4' ? 'selected' : ''}>3:4</option>
+                    <option value="9:16" ${node.config.resolution === '9:16' ? 'selected' : ''}>9:16</option>
+                    <option value="16:9" ${node.config.resolution === '16:9' ? 'selected' : ''}>16:9</option>
+                </select>
+            </div>
+            ${renderCheckboxField('是否去水印', 'removeWatermark', !!node.config.removeWatermark)}
         `
     },
     'control.review': {
@@ -410,17 +541,17 @@ const PROCESSOR_REGISTRY = {
             name: '人工审查',
             reviewTarget: '',
             reviewRule: '',
-            reviewMode: 'blacklist',
+            reviewMode: 'single',
             allowBulkPass: true
         }),
         getSummary: (config) => renderSummary([
-            `节点名称：${config.name || '人工审查'}`,
             `审查对象：${config.reviewTarget || '未设置'}`,
-            '流转方式：通过后立即进入下游'
+            `审查方式：${config.reviewMode === 'blacklist' ? '黑白名单勾选' : '逐条通过 / 拒绝'}`,
+            '通过后立即进入下游'
         ]),
         renderConfig: (node) => `
             <div class="form-item">
-                <label>节点名称</label>
+                <label>名称</label>
                 <input type="text" value="${escapeHtml(node.config.name || '')}" oninput="updateConfig('name', this.value)">
             </div>
             <div class="form-item">
@@ -431,20 +562,16 @@ const PROCESSOR_REGISTRY = {
             </div>
             <div class="form-item">
                 <label>审查标准</label>
-                <textarea rows="4" placeholder="填写通过 / 拒绝的判断标准" oninput="updateConfig('reviewRule', this.value)">${escapeHtml(node.config.reviewRule || '')}</textarea>
+                <textarea rows="4" placeholder="填写通过 / 拒绝标准" oninput="updateConfig('reviewRule', this.value)">${escapeHtml(node.config.reviewRule || '')}</textarea>
             </div>
             <div class="form-item">
                 <label>审查方式</label>
                 <select onchange="updateConfig('reviewMode', this.value)">
-                    <option value="blacklist" ${node.config.reviewMode === 'blacklist' ? 'selected' : ''}>黑白名单勾选</option>
                     <option value="single" ${node.config.reviewMode === 'single' ? 'selected' : ''}>逐条通过 / 拒绝</option>
+                    <option value="blacklist" ${node.config.reviewMode === 'blacklist' ? 'selected' : ''}>黑白名单勾选</option>
                 </select>
             </div>
-            ${renderCheckboxField('允许全部通过', 'allowBulkPass', !!node.config.allowBulkPass, '会议里要求支持快捷操作与全部通过。')}
-            <div class="form-item">
-                <label>流转说明</label>
-                <div class="form-hint">人工审查默认是流式卡点：单个结果一旦通过，就立即流转到下游节点，不等待全量审核结束。</div>
-            </div>
+            ${renderCheckboxField('允许全部通过', 'allowBulkPass', !!node.config.allowBulkPass, '审核通过后默认立即流转下游，不等待全量结束。')}
         `
     },
     'system.end': {
@@ -455,21 +582,19 @@ const PROCESSOR_REGISTRY = {
         nodeKind: 'system',
         hasIn: true,
         hasOut: false,
-        createDefaultConfig: () => ({
-            name: '结束节点'
-        }),
+        createDefaultConfig: () => ({ name: '结束' }),
         getSummary: () => renderSummary([
-            '进入任务系统',
-            '不再配置复杂出库路由'
+            '固定为结束',
+            '默认进入任务系统'
         ]),
-        renderConfig: (node) => `
+        renderConfig: () => `
             <div class="form-item">
-                <label>节点名称</label>
-                <input type="text" value="${escapeHtml(node.config.name || '')}" oninput="updateConfig('name', this.value)">
+                <label>名称</label>
+                <input type="text" value="结束" readonly>
             </div>
             <div class="form-item">
                 <label>结束语义</label>
-                <div class="form-hint">结束节点不再提供复杂选项。工作流到达这里后，结果默认进入任务系统，由任务页继续承接查看、审查、入库与追溯。</div>
+                <div class="form-hint">结束节点只保留“结束”语义，不再配置生成参数。工作流到达这里后，默认进入任务系统。</div>
             </div>
         `
     }
@@ -486,12 +611,103 @@ const LEGACY_TYPE_MAP = {
 
 let activePaletteCategory = 'all';
 let nodes = [
-    { id: 'n1', processorType: 'system.start', x: 80, y: 160, config: { name: '新建工作流', materialPool: '减脂项目-头部素材池', targetCount: 20, inputParams: 'product_name\ncampaign_goal' } },
-    { id: 'n2', processorType: 'text.generate', x: 340, y: 160, config: { name: '文案裂变', prompt: '围绕产品卖点生成多方向文案', inputRef: '{{n1.output}}', referenceImage: '', count: 10, style: '信息流' } },
-    { id: 'n3', processorType: 'image.generate', x: 600, y: 160, config: { name: '图片裂变', prompt: '根据文案与参考图生成图片', inputRef: '{{n2.output}}', referenceImage: '', count: 4, ratio: '3:4', autoCrop: true, removeWatermark: true } },
-    { id: 'n4', processorType: 'video.generate', x: 860, y: 160, config: { name: '视频生成', prompt: '将图片与文案组装成短视频', inputRef: '{{n3.output}}', referenceAsset: '', count: 1 } },
-    { id: 'n5', processorType: 'control.review', x: 1120, y: 160, config: { name: '人工审查', reviewTarget: '{{n4.output}}', reviewRule: '通过：可投放；拒绝：明显重复或质量不达标', reviewMode: 'single', allowBulkPass: true } },
-    { id: 'n6', processorType: 'system.end', x: 1380, y: 160, config: { name: '结束节点' } }
+    {
+        id: 'n1',
+        processorType: 'system.start',
+        x: 80,
+        y: 160,
+        config: {
+            name: '开始',
+            outputType: 'image',
+            finalCount: 20,
+            resolution: '3:4',
+            inputs: [
+                { key: 'input_1', label: '主提示词', type: 'text' },
+                { key: 'input_2', label: '参考文件', type: 'file' }
+            ]
+        }
+    },
+    {
+        id: 'n2',
+        processorType: 'text.generate',
+        x: 340,
+        y: 160,
+        config: {
+            name: '文本生成',
+            model: 'doubao-text',
+            promptSource: 'start',
+            promptManual: '',
+            promptStartRef: '{{n1.input_1}}',
+            promptUpstreamRef: '',
+            referenceSource: 'start',
+            referenceManual: '',
+            referenceStartRef: '{{n1.input_2}}',
+            referenceUpstreamRef: '',
+            count: 10
+        }
+    },
+    {
+        id: 'n3',
+        processorType: 'image.generate',
+        x: 600,
+        y: 160,
+        config: {
+            name: '图片生成',
+            model: 'flux-image',
+            promptSource: 'upstream',
+            promptManual: '',
+            promptStartRef: '',
+            promptUpstreamRef: '{{n2.output}}',
+            referenceSource: 'start',
+            referenceManual: '',
+            referenceStartRef: '{{n1.input_2}}',
+            referenceUpstreamRef: '',
+            count: 4,
+            resolution: '3:4',
+            removeWatermark: true
+        }
+    },
+    {
+        id: 'n4',
+        processorType: 'video.generate',
+        x: 860,
+        y: 160,
+        config: {
+            name: '视频生成',
+            model: 'keling-video',
+            promptSource: 'upstream',
+            promptManual: '',
+            promptStartRef: '',
+            promptUpstreamRef: '{{n3.output}}',
+            referenceSource: 'upstream',
+            referenceManual: '',
+            referenceStartRef: '',
+            referenceUpstreamRef: '{{n3.output}}',
+            count: 1,
+            resolution: '9:16',
+            removeWatermark: true
+        }
+    },
+    {
+        id: 'n5',
+        processorType: 'control.review',
+        x: 1120,
+        y: 160,
+        config: {
+            name: '人工审查',
+            reviewTarget: '{{n4.output}}',
+            reviewRule: '通过：可投放；拒绝：明显重复、质量不达标或需要人工修正',
+            reviewMode: 'single',
+            allowBulkPass: true
+        }
+    },
+    {
+        id: 'n6',
+        processorType: 'system.end',
+        x: 1380,
+        y: 160,
+        config: { name: '结束' }
+    }
 ];
 
 let edges = [
@@ -513,7 +729,32 @@ const svgLayer = document.getElementById('svg-layer');
 const tempEdgeEl = document.getElementById('temp-edge');
 
 function getWorkflowNameNode() {
-    return nodes.find(node => getNodeProcessorType(node) === 'system.start');
+    return getStartNode();
+}
+
+function addStartInput() {
+    const node = nodes.find(item => item.id === activeNodeId && getNodeProcessorType(item) === 'system.start');
+    if (!node) return;
+    const nextIndex = (node.config.inputs || []).length + 1;
+    node.config.inputs.push({ key: `input_${Date.now()}`, label: `新输入${nextIndex}`, type: 'text' });
+    renderBoard();
+    openConfig(activeNodeId);
+}
+
+function updateStartInput(index, key, value) {
+    const node = nodes.find(item => item.id === activeNodeId && getNodeProcessorType(item) === 'system.start');
+    if (!node || !node.config.inputs || !node.config.inputs[index]) return;
+    node.config.inputs[index][key] = value;
+    renderBoard();
+    openConfig(activeNodeId);
+}
+
+function removeStartInput(index) {
+    const node = nodes.find(item => item.id === activeNodeId && getNodeProcessorType(item) === 'system.start');
+    if (!node || !node.config.inputs || !node.config.inputs[index]) return;
+    node.config.inputs.splice(index, 1);
+    renderBoard();
+    openConfig(activeNodeId);
 }
 
 function renderPaletteTabs() {
@@ -562,7 +803,7 @@ function renderBoard() {
     nodesLayer.innerHTML = '';
 
     const startNode = getWorkflowNameNode();
-    document.getElementById('head-title').innerText = startNode ? (startNode.config.name || '未命名工作流') : '未命名工作流';
+    document.getElementById('head-title').innerText = startNode ? '开始' : '未命名工作流';
 
     nodes.forEach(node => {
         const info = getNodeDef(node);
