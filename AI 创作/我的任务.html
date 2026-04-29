@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../共享样式/components.css">
   <link rel="stylesheet" href="../共享样式/project-picker.css">
   <link rel="stylesheet" href="../共享样式/image-preview.css">
+  <link rel="stylesheet" href="../共享样式/confirm-modal.css">
   <style>
     :root {
       /* ── 主色（Blue，10 级色阶） ── */
@@ -101,15 +102,16 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overflow: hidden; }
     body {
-      background: var(--bg-surface);
+      background: #f5f7fa;
       font-family: var(--font);
       font-size: var(--text-md); color: var(--text-hi);
       display: flex; flex-direction: column;
+      padding: 8px;
     }
 
     /* ═══ 整体布局 ═══ */
-    #root { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: var(--space-5) var(--space-5) 0; }
-    .task-scroll-area { flex: 1; overflow-y: auto; padding: var(--space-4) 0 var(--space-4); position: relative; }
+    #root { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 0; gap: 8px; }
+    .task-scroll-area { flex: 1; overflow-y: auto; padding: 0; position: relative; }
     .task-scroll-area::-webkit-scrollbar { width: var(--space-1); }
     .task-scroll-area::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 2px; }
     #input-box-root { flex-shrink: 0; }
@@ -261,6 +263,8 @@
     .c-tag-model { background: var(--bg-subtle); color: var(--text-lo); }
     .c-tag-pending { background: transparent; color: var(--text-muted); padding: 0; }
     .c-tag-generating { background: transparent; color: var(--accent-solid); padding: 0; }
+    .c-tag-pending_review { background: transparent; color: var(--accent-solid); padding: 0; }
+    .c-tag-reviewing { background: transparent; color: var(--accent-solid); padding: 0; }
     .c-tag-completed { background: transparent; color: var(--success); padding: 0; }
     .c-tag-failed { background: transparent; color: var(--error); padding: 0; }
     .c-tag-aborted { background: transparent; color: var(--warning); padding: 0; }
@@ -280,6 +284,35 @@
     .output-row.collapsed .o-thumb { flex: 0 0 52px; width: 52px; height: 52px; }
     .o-thumb { border-radius: var(--r-md); overflow: hidden; position: relative; cursor: pointer; background: var(--bg-subtle); }
     .o-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* 文案任务输出 */
+    .copy-output-list { flex-direction: column; align-items: stretch; gap: var(--space-2); padding: var(--space-2); background: var(--bg-subtle); border: 1px solid var(--border-1); border-radius: var(--r-lg); }
+    .copy-row { min-height: 40px; display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); background: var(--bg-surface); border: 1px solid var(--border-1); border-radius: var(--r-md); transition: border-color var(--ease), box-shadow var(--ease), background var(--ease); }
+    .copy-row:hover { border-color: var(--accent-border); box-shadow: 0 2px 8px rgba(22,119,255,0.08); }
+    .copy-row-index { width: 22px; height: 22px; border-radius: var(--r-sm); display: inline-flex; align-items: center; justify-content: center; background: var(--gray-2); color: var(--text-muted); font-size: var(--text-xs); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .copy-row-main { min-width: 0; display: flex; align-items: center; }
+    .copy-row-text { min-width: 0; color: var(--text-lo); font-size: var(--text-base); line-height: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .copy-row-actions { display: flex; align-items: center; gap: var(--space-1); flex-shrink: 0; }
+    .copy-row-btn { height: 24px; padding: 0 var(--space-2); border: 1px solid var(--border-1); background: var(--bg-surface); color: var(--text-lo); border-radius: var(--r-sm); font: 500 var(--text-xs)/1 var(--font); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: border-color var(--ease), color var(--ease), background var(--ease); }
+    .copy-row-btn svg { width: 12px; height: 12px; }
+    .copy-row-btn:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: var(--accent-bg); }
+    .copy-row-btn.primary { border-color: var(--accent-border); color: var(--accent-solid); background: var(--accent-bg); }
+    .copy-row-btn.primary:hover { background: var(--accent-solid); border-color: var(--accent-solid); color: var(--white); }
+    .copy-row-skeleton .copy-row-main { height: 20px; background: linear-gradient(90deg, var(--gray-2), var(--bg-hover), var(--gray-2)); background-size: 200% 100%; border-radius: var(--r-sm); animation: copy-shimmer 1.4s ease-in-out infinite; }
+    .copy-row-skeleton .copy-row-text, .copy-row-skeleton .copy-row-status, .copy-row-skeleton .copy-row-actions { display: none; }
+    .copy-output-footer { min-height: 24px; display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); padding: 0 var(--space-1); }
+    .copy-output-summary { color: var(--accent-solid); font-size: var(--text-xs); font-weight: 600; }
+    .copy-output-hint { color: var(--text-muted); font-size: var(--text-xs); }
+    .copy-more-link { border: 0; background: transparent; color: var(--text-lo); font-size: var(--text-xs); cursor: pointer; padding: 0; white-space: nowrap; }
+    .copy-more-link:hover { color: var(--accent-solid); }
+    @keyframes copy-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+    @media (max-width: 720px) {
+      .copy-row { grid-template-columns: 24px minmax(0, 1fr); align-items: start; }
+      .copy-row-actions { grid-column: 2; flex-wrap: wrap; }
+      .copy-row-main { align-items: flex-start; flex-direction: column; gap: var(--space-1); }
+      .copy-row-text { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+      .copy-output-footer { align-items: flex-start; flex-direction: column; }
+    }
 
     /* AI 生成角标 */
     .ai-badge { position: absolute; top: var(--space-1); left: var(--space-1); background: rgba(0,0,0,0.4); color: #fff; font-size: 10px; padding: 1px var(--space-2); border-radius: 3px; pointer-events: none; backdrop-filter: blur(2px); }
@@ -316,6 +349,7 @@
     .card-bottom .card-actions { padding: 0; }
     .card-bottom-meta { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-muted); margin-left: auto; }
     .card-bottom-meta .c-tag { margin: 0; }
+    .card-bottom-count { color: var(--text-lo); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
     .card-act-btn { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); position: relative; }
     .card-act-btn:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
     .card-act-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
@@ -324,6 +358,37 @@
     .card-act-stop { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid #fecaca; background: var(--bg-surface); font-size: var(--text-base); color: var(--error); cursor: pointer; transition: all var(--ease); }
     .card-act-stop:hover { border-color: var(--error); background: #fef2f2; }
     .card-act-stop svg, .card-act-stop img { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* 工作流待审查卡片 */
+    .workflow-task-card { background: var(--bg-surface); border-radius: var(--r-xl); border-color: var(--border-1); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+    .workflow-task-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.09); }
+    .workflow-review-output { padding-top: 0; padding-bottom: 0; }
+    .wf-abs-flow { display: flex; align-items: center; justify-content: space-between; gap: 0; padding: 20px 16px 18px; background: var(--bg-subtle); border: 1px solid var(--border-1); border-radius: var(--r-lg); }
+    .wf-abs-node { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 88px; flex-shrink: 0; }
+    .wf-abs-point { width: 12px; height: 12px; border-radius: 50%; background: var(--bg-surface); border: 2px solid var(--border-2); position: relative; z-index: 2; }
+    .wf-abs-label { margin-top: 10px; font-size: 12px; color: var(--text-muted); font-weight: 500; white-space: nowrap; text-align: center; }
+    .wf-abs-node.is-completed .wf-abs-point { background: var(--accent-solid); border-color: var(--accent-solid); }
+    .wf-abs-node.is-completed .wf-abs-label { color: var(--text-hi); }
+    .wf-abs-node.is-active-review { min-width: 168px; }
+    .wf-abs-node.is-active-review .wf-abs-point { width: 16px; height: 16px; background: #fff; border: 3px solid var(--accent-solid); box-shadow: 0 0 0 4px rgba(74,158,255,0.18); }
+    .wf-abs-node.is-active-review .wf-abs-label { color: var(--text-hi); font-weight: 600; }
+    .wf-abs-node.is-pending .wf-abs-label { color: var(--text-lo); }
+    .wf-abs-cta { margin-top: 10px; height: 28px; padding: 0 12px; border: none; border-radius: var(--r-md); background: var(--accent-solid); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; box-shadow: 0 4px 12px rgba(74,158,255,0.22); transition: background var(--ease), transform var(--ease), box-shadow var(--ease); }
+    .wf-abs-cta:hover { background: var(--accent-solid-h); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(74,158,255,0.26); }
+    .wf-animated-arrow { flex: 1 1 56px; min-width: 40px; max-width: 96px; height: 18px; position: relative; display: flex; align-items: center; }
+    .wf-arrow-line { position: absolute; left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%); background: linear-gradient(90deg, rgba(74,158,255,0.18) 0%, rgba(74,158,255,0.5) 50%, rgba(74,158,255,0.18) 100%); border-radius: 999px; overflow: hidden; }
+    .wf-arrow-line::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(74,158,255,0.48) 45%, transparent 90%); transform: translateX(-100%); animation: wf-line-flow 1.8s linear infinite; }
+    .wf-arrow-head { position: absolute; right: 0; top: 50%; width: 9px; height: 9px; border-top: 2px solid var(--accent-solid); border-right: 2px solid var(--accent-solid); transform: translateY(-50%) rotate(45deg); }
+    @keyframes wf-line-flow { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @media (max-width: 860px) {
+      .wf-abs-flow { align-items: stretch; flex-direction: column; gap: 10px; }
+      .wf-abs-node, .wf-abs-node.is-active-review { width: 100%; min-width: 0; }
+      .wf-animated-arrow { width: 2px; min-width: 2px; max-width: none; height: 24px; align-self: center; }
+      .wf-arrow-line { left: 50%; right: auto; width: 2px; height: 100%; transform: translateX(-50%); background: linear-gradient(180deg, rgba(74,158,255,0.18) 0%, rgba(74,158,255,0.5) 50%, rgba(74,158,255,0.18) 100%); }
+      .wf-arrow-line::after { background: linear-gradient(180deg, transparent 0%, rgba(74,158,255,0.48) 45%, transparent 90%); animation: wf-line-flow-mobile 1.8s linear infinite; }
+      .wf-arrow-head { right: auto; left: 50%; top: auto; bottom: 0; transform: translateX(-50%) rotate(135deg); }
+    }
+    @keyframes wf-line-flow-mobile { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
 
     /* 重新编辑下拉菜单 */
 
@@ -564,12 +629,86 @@
     .btn-reject { flex: 1; background: #fff; color: #E5484D; border: 1px solid #E5484D; padding: 8px; border-radius: 6px; cursor: pointer; }
     
     .review-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.5); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; backdrop-filter: blur(4px); }
+
+    .review-page { height: 100%; display: flex; flex-direction: column; background: var(--bg-page); padding: 8px; overflow: hidden; gap: 12px; }
+    .review-header-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 4px; }
+    .review-title-wrap { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .review-title-mark { width: 4px; height: 16px; background: var(--primary-6); border-radius: 2px; flex-shrink: 0; }
+    .review-title-main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .review-title { font-size: 15px; font-weight: 600; color: var(--text-hi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .review-subtitle { font-size: 12px; color: var(--text-muted); }
+    .review-node-tabs { display: flex; gap: 12px; padding: 0 4px; flex-wrap: wrap; }
+    .review-node-tab { position: relative; padding: 6px 16px; background: #fff; color: var(--text-hi); cursor: pointer; border: 1px solid var(--border-2); border-radius: 8px; display: flex; flex-direction: column; justify-content: center; min-width: 128px; transition: all var(--ease); }
+    .review-node-tab:hover { border-color: var(--primary-6); box-shadow: 0 4px 12px rgba(74,158,255,0.12); }
+    .review-node-tab.active { background: var(--primary-6); color: #fff; border-color: var(--primary-6); box-shadow: 0 6px 16px rgba(74,158,255,0.24); }
+    .review-node-tab-title { font-size: 13px; font-weight: 600; }
+    .review-node-tab-status { font-size: 10px; margin-top: 2px; opacity: 0.9; }
+    .review-node-tab-check { position: absolute; top: -6px; right: -6px; background: #10b981; color: #fff; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px; border: 2px solid #fff; }
+    .review-toolbar { background: #fff; border-radius: 8px; border: 1px solid var(--border-1); padding: 12px; margin: 0 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .review-toolbar-main { display: flex; align-items: center; gap: 16px; min-width: 0; flex-wrap: wrap; }
+    .review-filter-pills { display: flex; background: var(--gray-2); padding: 2px; border-radius: 999px; border: 1px solid var(--border-1); gap: 2px; }
+    .review-filter-pill { padding: 4px 12px; font-size: 12px; cursor: pointer; border-radius: 999px; transition: all var(--ease); color: var(--text-lo); background: transparent; border: none; }
+    .review-filter-pill.active { background: var(--primary-6); color: #fff; font-weight: 600; }
+    .review-live-stats { font-size: 12px; color: var(--text-lo); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .review-live-stats b { font-weight: 600; }
+    .review-toolbar-actions, .review-batch-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .review-batch-bar { background: var(--accent-bg); border: 1px solid var(--accent-border); padding: 4px 8px; border-radius: 999px; }
+    .review-batch-count { font-size: 12px; color: var(--accent-text); font-weight: 600; }
+    .review-toolbar-btn { height: 32px; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); transition: all var(--ease); }
+    .review-toolbar-btn:hover { border-color: var(--primary-6); color: var(--primary-6); }
+    .review-toolbar-btn.primary { background: var(--primary-6); color: #fff; border-color: var(--primary-6); }
+    .review-toolbar-btn.primary:hover { background: var(--primary-5); border-color: var(--primary-5); color: #fff; }
+    .review-toolbar-btn.danger { border-color: #fecaca; color: var(--error); }
+    .review-toolbar-btn.danger:hover { border-color: var(--error); background: #fef2f2; color: var(--error); }
+    .review-toolbar-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+    .review-grid-scroll { flex: 1; overflow-y: auto; padding: 0 4px; }
+    .review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding-bottom: 16px; }
+    .review-grid-card { position: relative; width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--ease); }
+    .review-grid-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.10); border-color: var(--primary-4); }
+    .review-grid-card.selected { border-color: var(--primary-6); box-shadow: 0 0 0 3px rgba(74,158,255,0.12), 0 8px 20px rgba(15,23,42,0.10); }
+    .review-grid-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .review-card-check { position: absolute; top: 8px; left: 8px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.96); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); opacity: 0; transition: all var(--ease); }
+    .review-grid-card.is-selectable:hover .review-card-check, .review-grid-card.selected .review-card-check { opacity: 1; }
+    .review-grid-card.selected .review-card-check { background: var(--primary-6); border-color: var(--primary-6); }
+    .review-card-status { position: absolute; top: 0; right: 0; color: #fff; padding: 2px 8px; border-radius: 0 0 0 6px; font-size: 10px; font-weight: 600; }
+    .review-card-status.approved { background: #10b981; }
+    .review-card-status.rejected { background: #ef4444; }
+    .review-prompt-tooltip { position: absolute; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.72); color: #fff; font-size: 10px; padding: 6px 10px; opacity: 0; transition: opacity var(--ease); pointer-events: none; max-height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
+    .review-grid-card:hover .review-prompt-tooltip { opacity: 1; }
+    .review-actions-hover { position: absolute; bottom: 0; left: 0; right: 0; min-height: 36px; background: rgba(255,255,255,0.96); display: flex; opacity: 0; transition: opacity var(--ease); border-top: 1px solid var(--border-1); }
+    .review-grid-card:hover .review-actions-hover { opacity: 1; }
+    .review-action-split { flex: 1; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+    .review-action-split + .review-action-split { border-left: 1px solid var(--border-1); }
+    .review-action-split.approve:hover { background: rgba(16,185,129,0.1); }
+    .review-action-split.reject:hover { background: rgba(239,68,68,0.1); }
+    .review-action-split.download { width: 40px; flex: 0 0 40px; }
+    .review-action-text { font-size: 11px; color: var(--primary-6); background: none; border: none; cursor: pointer; font-weight: 500; }
+    .review-preview-btn { position: absolute; top: 8px; left: 8px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.96); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; color: var(--text-lo); box-shadow: 0 2px 6px rgba(0,0,0,0.08); opacity: 0; transition: all var(--ease); }
+    .review-grid-card:hover .review-preview-btn { opacity: 1; }
+    .review-loading-card { width: 100%; aspect-ratio: 1; border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; background: #fff; }
+    .review-loading-card .cc-img-loading-thumb { width: 100%; height: 100%; }
+    .review-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: var(--text-ghost); text-align: center; }
+    .review-empty-title { font-size: 14px; margin-top: 16px; font-weight: 500; color: var(--text-lo); }
+    .review-empty-desc { font-size: 12px; margin-top: 6px; color: var(--text-muted); }
+    .review-bottom-shell { padding: 12px 20px 16px; background: linear-gradient(to top, var(--bg-page) 60%, transparent); }
+    .review-bottom-bar { max-width: 900px; margin: 0 auto; background: var(--bg-surface); border: 1px solid var(--border-1); border-radius: 14px; box-shadow: 0 -2px 12px rgba(0,0,0,0.03); min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 0 16px; }
+    .review-bottom-meta { display: flex; align-items: center; gap: 12px; min-width: 0; flex-wrap: wrap; }
+    .review-bottom-pill { height: 24px; padding: 0 10px; border-radius: 999px; background: var(--bg-subtle); color: var(--text-lo); font-size: 12px; display: inline-flex; align-items: center; }
+    .review-bottom-text { font-size: 13px; color: var(--text-lo); }
+    .review-bottom-tip { font-size: 12px; color: var(--text-muted); }
+    .review-bottom-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    @media (max-width: 920px) {
+      .review-toolbar, .review-bottom-bar { align-items: flex-start; flex-direction: column; }
+      .review-toolbar-actions, .review-batch-bar, .review-bottom-actions { width: 100%; }
+      .review-toolbar-btn { flex: 1 1 auto; }
+    }
   </style>
 </head>
 <body>
 
 <script src="../共享样式/components.js"></script>
 <script src="../共享样式/image-preview.js"></script>
+<script src="../共享样式/confirm-modal.js"></script>
 
 <div class="toast" id="toast">
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="#52C41A"/><polyline points="3.5,7 5.5,9.5 10.5,4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -739,8 +878,62 @@ if (typeof thumbOverlayHtml !== 'function') {
   };
 }
 
+function makeWorkflowDemoTask(cfg) {
+  const status = cfg.status;
+  const isReviewing = status === 'pending_review' || status === 'reviewing';
+  const isCompleted = status === 'completed';
+  const isFailed = status === 'failed';
+  const isAborted = status === 'aborted';
+  const reviewStatus = isReviewing ? 'pending_review' : (isCompleted ? 'completed' : 'pending');
+  const waitingReviewCount = isCompleted || isFailed || isAborted ? 0 : (isReviewing ? 2 : 2);
+  const baseItems = [
+    img(cfg.seed + '-1'),
+    img(cfg.seed + '-2'),
+    img(cfg.seed + '-3'),
+    img(cfg.seed + '-4')
+  ];
+  return {
+    id: cfg.id,
+    name: cfg.name,
+    type: 'workflow',
+    taskType: 'workflow_run',
+    resultType: 'image',
+    status,
+    createdTime: cfg.createdTime,
+    creator: '我',
+    source: 'workflow',
+    project: cfg.project || '护肤品推广',
+    workflowRun: {
+      workflowId: cfg.workflowId || cfg.id.replace('wf-', 'flow-'),
+      workflowName: cfg.name,
+      currentNodeId: isReviewing ? 'review-1' : (isCompleted ? 'end' : (isFailed ? 'failed-node' : (isAborted ? 'aborted-node' : 'image-1'))),
+      endBehavior: { destination: 'task_system' },
+      summary: { total: 50, generated: cfg.generated || 0, pendingReview: isReviewing ? 5 : 0, approved: isCompleted ? 50 : 0, downstreamRunning: status === 'generating' ? 18 : 0 },
+      nodes: [
+        { nodeId: 'start', processorType: 'system.start', title: '开始', status: status === 'pending' ? 'pending' : 'completed' },
+        { nodeId: 'image-1', processorType: 'image.generate', title: cfg.activeTitle || '图片生产', status: status === 'pending' ? 'pending' : (isFailed ? 'failed' : (isAborted ? 'aborted' : (isReviewing || isCompleted ? 'completed' : 'generating'))) },
+        { nodeId: 'review-1', processorType: 'control.review', title: cfg.reviewTitle || '审查A', status: reviewStatus, reviewTaskId: 'rv-' + cfg.id },
+        { nodeId: 'review-2', processorType: 'control.review', title: '视频初审', status: waitingReviewCount > 0 ? 'pending' : 'completed', reviewTaskId: 'rv-' + cfg.id + '-2' },
+        { nodeId: 'review-3', processorType: 'control.review', title: '成片终审', status: waitingReviewCount > 1 ? 'pending' : 'completed', reviewTaskId: 'rv-' + cfg.id + '-3' }
+      ],
+      reviewQueues: isReviewing ? [
+        { reviewTaskId: 'rv-' + cfg.id, sourceNodeId: 'image-1', resultType: 'image', status: 'pending_review', pendingCount: 5, approvedCount: 12, rejectedCount: 0 }
+      ] : []
+    },
+    input: { prompt: cfg.prompt || cfg.name, models: ['工作流'], ratio: cfg.ratio || '1920×1080', count: 50 },
+    output: isCompleted
+      ? { byModel: { '工作流': { total: cfg.generated !== undefined ? cfg.generated : 50, items: baseItems } }, items: [] }
+      : { byModel: { '工作流': { total: cfg.generated || 0, items: baseItems.slice(0, Math.min(cfg.generated || 0, 4)) } }, items: isReviewing ? [
+          { itemId: cfg.id + '-item-1', type: 'image', assetType: 'image', thumb: baseItems[0].thumb, url: baseItems[0].url, sourceNodeId: 'image-1', reviewTaskId: 'rv-' + cfg.id, reviewStatus: 'pending', createdTime: cfg.createdTime },
+          { itemId: cfg.id + '-item-2', type: 'image', assetType: 'image', thumb: baseItems[1].thumb, url: baseItems[1].url, sourceNodeId: 'image-1', reviewTaskId: 'rv-' + cfg.id, reviewStatus: 'pending', createdTime: cfg.createdTime }
+        ] : [] }
+  };
+}
+
 // ═══ Mock 数据 ═══
 const INITIAL_TASKS = [
+  makeWorkflowDemoTask({ id:'wf-pending-demo', name:'工作流状态样例：等待中', status:'pending', createdTime:'2026-04-27 09:00', seed:'wf-pending', activeTitle:'等待启动', generated:0 }),
+  makeWorkflowDemoTask({ id:'wf-generating-demo', name:'工作流状态样例：生成中', status:'generating', createdTime:'2026-04-27 09:12', seed:'wf-generating', activeTitle:'图片生产中', generated:18 }),
   { id:'wf-1', name:'美妆爆款短视频自动化生产', type:'workflow', taskType:'workflow_run', resultType:'mixed', status:'pending_review', createdTime:'2026-04-20 14:00', creator:'我',
     source:'workflow', project:'护肤品推广',
     workflowRun: {
@@ -752,8 +945,10 @@ const INITIAL_TASKS = [
       nodes: [
         { nodeId: 'copy-1', processorType: 'text.copy.generate', title: 'AI文案', status: 'completed', metrics: { total: 10, done: 10 } },
         { nodeId: 'image-1', processorType: 'image.generate', title: '底图裂变', status: 'pending_review', metrics: { total: 20, generated: 20, pendingReview: 5, approved: 15 } },
-        { nodeId: 'review-1', processorType: 'control.review', title: '人工审查', status: 'pending_review', reviewTaskId: 'rv-1' },
-        { nodeId: 'video-1', processorType: 'video.generate', title: '视频合成', status: 'pending', metrics: { total: 20, done: 0 } }
+        { nodeId: 'review-1', processorType: 'control.review', title: '审查A', status: 'pending_review', reviewTaskId: 'rv-1' },
+        { nodeId: 'video-1', processorType: 'video.generate', title: '视频合成', status: 'pending', metrics: { total: 20, done: 0 } },
+        { nodeId: 'review-2', processorType: 'control.review', title: '视频初审', status: 'pending', reviewTaskId: 'rv-2' },
+        { nodeId: 'review-3', processorType: 'control.review', title: '成片终审', status: 'pending', reviewTaskId: 'rv-3' }
       ],
       reviewQueues: [
         { reviewTaskId: 'rv-1', sourceNodeId: 'image-1', resultType: 'image', status: 'pending_review', pendingCount: 5, approvedCount: 15, rejectedCount: 0 }
@@ -770,14 +965,94 @@ const INITIAL_TASKS = [
       ]
     }
   },
+  makeWorkflowDemoTask({ id:'wf-completed-demo', name:'工作流状态样例：已完成', status:'completed', createdTime:'2026-04-27 10:20', seed:'wf-completed', generated:50 }),
+  makeWorkflowDemoTask({ id:'wf-failed-demo', name:'工作流状态样例：已失败', status:'failed', createdTime:'2026-04-27 10:32', seed:'wf-failed', activeTitle:'执行失败', generated:22 }),
+  makeWorkflowDemoTask({ id:'wf-aborted-demo', name:'工作流状态样例：已中止', status:'aborted', createdTime:'2026-04-27 10:45', seed:'wf-aborted', activeTitle:'已中止', generated:13 }),
   { id:'21', name:'小红书美妆文案裂变', type:'chat', taskType:'direct_generate', resultType:'text', status:'completed', createdTime:'2026-04-03 09:20', creator:'我',
     source:'universal', project:'护肤品推广',
     input:{ prompt:'帮我重写一下这组护肤品的爆款文案，要求针对小红书平台...', models:['gpt54mini'], count:20 },
-    output:{ byModel:{ gpt54mini:{ total:20, items:[{content:'✨ 拯救熬夜大黄皮！这款精华液真的绝了...'},{content:'谁懂啊姐妹们！真的被这款精华液惊艳到了...'}] }}}},
+    output:{ byModel:{ gpt54mini:{ total:20, items:[
+      {content:'✨ 拯救熬夜大黄皮！这款精华液真的绝了，三天脸色透亮到像开了柔光...'},
+      {content:'谁懂啊姐妹们！真的被这款精华液惊艳到了，熬夜后的暗沉感肉眼可见变轻...'},
+      {content:'黄皮姐妹先别急着换粉底，先把这瓶精华安排上，妆前状态会稳很多。'},
+      {content:'通勤党早八救命组合：水乳后叠一层它，底妆不卡粉，脸也不垮。'}
+    ] }}}},
   { id:'22', name:'抖音脚本创意裂变', type:'chat', taskType:'direct_generate', resultType:'text', status:'generating', createdTime:'2026-04-03 10:45', creator:'我',
     source:'universal',
     input:{ prompt:'夏季防晒霜短视频脚本，反转剧情风格...', models:['gpt54mini'], count:10 },
-    output:{ byModel:{ gpt54mini:{ total:10, items:[] }}}},
+    output:{ byModel:{ gpt54mini:{ total:10, items:[
+      {content:'开场：闺蜜说今天阴天不用防晒，下一秒镜头切到紫外线指数爆表的手机屏幕...'}
+    ] }}}},
+  { id:'23', name:'工作日早餐软文', type:'chat', taskType:'direct_generate', resultType:'text', status:'pending', createdTime:'2026-04-03 11:05', creator:'我',
+    source:'universal',
+    input:{ prompt:'围绕上班族早餐代餐奶昔，生成通勤场景软文...', models:['gpt54mini'], count:8 },
+    output:{ byModel:{ gpt54mini:{ total:0, items:[] }}}},
+  { id:'24', name:'暑期活动文案整批已中止', type:'chat', taskType:'direct_generate', resultType:'text', status:'aborted', createdTime:'2026-04-03 11:18', creator:'我',
+    source:'universal',
+    input:{ prompt:'暑期活动宣传文案，面向校园社群裂变传播...', models:['gpt54mini'], count:12 },
+    output:{ byModel:{ gpt54mini:{ total:12, items:[
+      {content:'暑期不想宅家？来参加这场轻量挑战赛，边玩边拿奖励，社群报名马上开冲。'},
+      {content:'这个暑假别再只刷短视频了，和朋友一起组队参加活动，解锁一整个假期的成就感。'}
+    ] }}}},
+  { id:'25', name:'新品口播脚本整批失败', type:'chat', taskType:'direct_generate', resultType:'text', status:'failed', createdTime:'2026-04-03 11:32', creator:'我',
+    source:'universal',
+    input:{ prompt:'新品口播脚本，要求口语化、节奏快、适合直播间转化...', models:['gpt54mini'], count:6 },
+    output:{ byModel:{ gpt54mini:{ total:6, items:[] }}}},
+  { id:'26', name:'品牌故事长文案（单条完成）', type:'chat', taskType:'direct_generate', resultType:'text', status:'completed', createdTime:'2026-04-03 11:45', creator:'我',
+    source:'universal',
+    input:{ prompt:'生成 1 条品牌故事长文案，用于公众号头图下方导语...', models:['gpt54mini'], count:1 },
+    output:{ byModel:{ gpt54mini:{ total:1, items:[
+      {content:'这不是一个突然爆红的品牌故事，而是一群人围着一件小事反复打磨很多年后，终于让用户在第一次接触时就能感受到真诚的结果。'}
+    ] }}}},
+  { id:'wf-copy-generating', name:'工作流文案状态样例：生成中', type:'workflow', taskType:'workflow_run', resultType:'text', status:'generating', createdTime:'2026-04-27 11:10', creator:'我',
+    source:'workflow',
+    workflowRun:{ workflowId:'wf-copy-generating', workflowName:'工作流文案生成', currentNodeId:'copy-1', summary:{ total:12, generated:3, pendingReview:0, approved:0, downstreamRunning:9 }, nodes:[
+      { nodeId:'start', processorType:'system.start', title:'开始', status:'completed' },
+      { nodeId:'copy-1', processorType:'text.copy.generate', title:'文案生成', status:'generating', metrics:{ total:12, done:3 } },
+      { nodeId:'end', processorType:'system.end', title:'结束', status:'pending' }
+    ], reviewQueues:[] },
+    input:{ prompt:'针对新款轻食餐，先生成一批朋友圈短文案...', models:['工作流'], count:12 },
+    output:{ byModel:{ '工作流': { total:3, items:[
+      {content:'今天中午不想吃太撑，但又想吃得认真一点，这份轻食刚好把满足感和轻负担都照顾到了。'},
+      {content:'工作日最怕午饭后犯困，这份轻食刚好让我有饱腹感，但不至于整个人都慢下来。'},
+      {content:'吃得清爽不是吃得委屈，关键是每一口都还有味道，这份轻食我愿意连续回购。'}
+    ] }}}},
+  { id:'wf-copy-review', name:'工作流文案状态样例：待审查', type:'workflow', taskType:'workflow_run', resultType:'text', status:'pending_review', createdTime:'2026-04-27 11:22', creator:'我',
+    source:'workflow',
+    workflowRun:{ workflowId:'wf-copy-review', workflowName:'工作流文案审查', currentNodeId:'review-1', summary:{ total:10, generated:6, pendingReview:2, approved:4, downstreamRunning:0 }, nodes:[
+      { nodeId:'copy-1', processorType:'text.copy.generate', title:'文案生成', status:'pending_review', metrics:{ total:10, generated:6, pendingReview:2, approved:4 } },
+      { nodeId:'review-1', processorType:'control.review', title:'文案初审', status:'pending_review', reviewTaskId:'rv-copy-1' },
+      { nodeId:'review-2', processorType:'control.review', title:'终审', status:'pending', reviewTaskId:'rv-copy-2' }
+    ], reviewQueues:[{ reviewTaskId:'rv-copy-1', sourceNodeId:'copy-1', resultType:'text', status:'pending_review', pendingCount:2, approvedCount:4, rejectedCount:0 }] },
+    input:{ prompt:'生成社群裂变文案，先产出候选，再由人工初审...', models:['工作流'], count:10 },
+    output:{ items:[
+      { itemId:'wf-copy-review-1', type:'text', content:'如果你最近正想找一个不太费力、但能稳稳坚持下去的生活改变，这套轻量计划非常适合先试试看。', reviewTaskId:'rv-copy-1', reviewStatus:'pending' },
+      { itemId:'wf-copy-review-2', type:'text', content:'别一上来就给自己太大压力，先把最容易做到的一步走稳，后面的改变反而会自然发生。', reviewTaskId:'rv-copy-1', reviewStatus:'pending' },
+      { itemId:'wf-copy-review-3', type:'text', content:'很多时候不是你执行力差，而是方法太重了，换成轻量方案后，反而更容易持续。', reviewTaskId:'rv-copy-1', reviewStatus:'approved' }
+    ] } },
+  { id:'wf-copy-completed', name:'工作流文案状态样例：已完成', type:'workflow', taskType:'workflow_run', resultType:'text', status:'completed', createdTime:'2026-04-27 11:36', creator:'我',
+    source:'workflow',
+    workflowRun:{ workflowId:'wf-copy-completed', workflowName:'工作流文案完成', currentNodeId:'end', summary:{ total:6, generated:6, pendingReview:0, approved:6, downstreamRunning:0 }, nodes:[
+      { nodeId:'copy-1', processorType:'text.copy.generate', title:'文案生成', status:'completed', metrics:{ total:6, done:6 } },
+      { nodeId:'end', processorType:'system.end', title:'结束', status:'completed' }
+    ], reviewQueues:[] },
+    input:{ prompt:'生成品牌周年活动社媒文案...', models:['工作流'], count:6 },
+    output:{ byModel:{ '工作流': { total:6, items:[
+      {content:'一年一度的品牌周年，不只是优惠更大，更是把这一年认真打磨过的体验一次性拿出来给你看。'},
+      {content:'如果你已经关注我们很久，这次周年活动会是最适合入手的一次；如果你刚刚认识我们，也正好从这里开始。'},
+      {content:'这次周年活动不是简单打折，而是把最值得体验的内容集中做了一次诚意释放。'}
+    ] }}}},
+  { id:'wf-copy-aborted', name:'工作流文案状态样例：已中止', type:'workflow', taskType:'workflow_run', resultType:'text', status:'aborted', createdTime:'2026-04-27 11:50', creator:'我',
+    source:'workflow',
+    workflowRun:{ workflowId:'wf-copy-aborted', workflowName:'工作流文案已中止', currentNodeId:'end', summary:{ total:10, generated:4, pendingReview:0, approved:0, downstreamRunning:0 }, nodes:[
+      { nodeId:'copy-1', processorType:'text.copy.generate', title:'文案生成', status:'aborted', metrics:{ total:10, done:4 } },
+      { nodeId:'end', processorType:'system.end', title:'结束', status:'pending' }
+    ], reviewQueues:[] },
+    input:{ prompt:'生成 APP 拉新话术，生成到一半后人工中止...', models:['工作流'], count:10 },
+    output:{ byModel:{ '工作流': { total:4, items:[
+      {content:'先别急着下载十几个工具，这个应用更适合想把流程一次梳顺的人。'},
+      {content:'如果你最近总觉得时间被碎事吃掉了，这个工具的价值在于帮你先把重点抓出来。'}
+    ] }}}},
   { id:'11', name:'新品详情页主图', type:'image', taskType:'direct_generate', resultType:'image', status:'failed', createdTime:'2026-04-01 10:18', creator:'我', partialFailed:true, successCount:3, failedCount:4,
     source:'universal',
     input:{ prompt:'大字报风格新品上市详情页首屏，深红色背景，烫金繁体大字"新品震撼上市"，副文案"颠覆传统 品质革命"，产品图居中打光，高端质感与复古宣传画风格融合', refImages:[], inputType:'text', models:['seedream5'], ratio:'3:4', res:'4K', count:7 },
@@ -832,24 +1107,172 @@ function relativeTime(ts) {
   if (diff < 86400000) return Math.floor(diff/3600000) + '小时前';
   return ts;
 }
-function getTaskOutput(task, modelId) {
+function normalizeTaskResultType(type) {
+  if (type === 'chat') return 'text';
+  if (type === 'mixed') return '';
+  return type || '';
+}
+function inferResultTypeFromItem(item) {
+  if (!item) return '';
+  if (item.type === 'video' || item.assetType === 'video') return 'video';
+  if (item.type === 'text' || item.type === 'chat' || typeof item.content === 'string') return 'text';
+  if (item.type === 'image' || item.assetType === 'image' || item.thumb || item.url) return 'image';
+  return '';
+}
+function filterOutputItemsByResultType(items, resultType) {
+  if (!resultType) return items || [];
+  return (items || []).filter(function(item) {
+    var itemType = inferResultTypeFromItem(item);
+    return itemType === resultType;
+  });
+}
+function getWorkflowReviewNodes(task) {
+  return ((task && task.workflowRun && task.workflowRun.nodes) || []).filter(function(node) {
+    return node.processorType === 'control.review';
+  });
+}
+function getWorkflowReviewQueue(task, reviewTaskId) {
+  var queues = task && task.workflowRun && task.workflowRun.reviewQueues ? task.workflowRun.reviewQueues : [];
+  if (reviewTaskId) {
+    return queues.find(function(queue) { return queue.reviewTaskId === reviewTaskId; }) || null;
+  }
+  return queues.find(function(queue) {
+    return queue.status === 'pending_review' || queue.status === 'reviewing';
+  }) || queues[0] || null;
+}
+function getWorkflowPrimaryResultType(task, modelId) {
+  var queueType = normalizeTaskResultType((getWorkflowReviewQueue(task) || {}).resultType);
+  if (queueType) return queueType;
+  var directType = normalizeTaskResultType(task.resultType || task.type);
+  if (directType) return directType;
+  var modelKey = modelId || (task.input && task.input.models && task.input.models[0]);
+  var byModel = task.output && task.output.byModel;
+  var modelOutput = byModel ? (byModel[modelKey] || Object.values(byModel)[0]) : null;
+  var firstItem = ((modelOutput && modelOutput.items) || (task.output && task.output.items) || []).find(Boolean);
+  var inferredType = inferResultTypeFromItem(firstItem);
+  if (inferredType) return inferredType;
+  var reversedNodes = ((task.workflowRun && task.workflowRun.nodes) || []).slice().reverse();
+  var matchedNode = reversedNodes.find(function(node) {
+    return /text|copy|chat/.test(node.processorType || '') || /image/.test(node.processorType || '') || /video/.test(node.processorType || '');
+  });
+  if (matchedNode) {
+    if (/video/.test(matchedNode.processorType || '')) return 'video';
+    if (/text|copy|chat/.test(matchedNode.processorType || '')) return 'text';
+    return 'image';
+  }
+  return 'image';
+}
+function getTaskPrimaryResultType(task, modelId) {
+  if (task.type === 'workflow') return getWorkflowPrimaryResultType(task, modelId);
+  return normalizeTaskResultType(task.resultType || task.type) || 'image';
+}
+function getWorkflowProducedCount(task, items, rawTotal) {
+  var summary = task && task.workflowRun && task.workflowRun.summary ? task.workflowRun.summary : {};
+  if (typeof summary.generated === 'number' && !Number.isNaN(summary.generated)) return summary.generated;
+  if (typeof rawTotal === 'number' && rawTotal > 0) return rawTotal;
+  return (items || []).length;
+}
+function getWorkflowRenderableOutput(task, modelId, resultType) {
+  var byModel = task.output && task.output.byModel;
+  var modelKey = modelId || (task.input && task.input.models && task.input.models[0]);
+  var modelOutput = byModel ? (byModel[modelKey] || Object.values(byModel)[0] || { total:0, items:[] }) : null;
+  var rawItems = modelOutput ? (modelOutput.items || []) : ((task.output && task.output.items) || []);
+  var filteredItems = filterOutputItemsByResultType(rawItems, resultType);
+  var producedCount = getWorkflowProducedCount(task, filteredItems, modelOutput ? modelOutput.total : 0);
+  return { total: Math.max(producedCount, filteredItems.length), items: filteredItems };
+}
+function getTaskOutput(task, modelId, resultTypeOverride) {
+  var resultType = normalizeTaskResultType(resultTypeOverride || getTaskPrimaryResultType(task, modelId));
+  if (task.type === 'workflow') {
+    return getWorkflowRenderableOutput(task, modelId, resultType);
+  }
   if (!task.output?.byModel) return { total:0, items:[] };
   if (modelId) return task.output.byModel[modelId] || { total:0, items:[] };
-  const first = task.input.models[0];
+  var first = task.input.models[0];
   return task.output.byModel[first] || { total:0, items:[] };
 }
 function getAllOutputItems(task) {
+  if (task.type === 'workflow') {
+    return getTaskOutput(task, state.cardModels[task.id] || task.input.models[0]).items || [];
+  }
   if (!task.output?.byModel) return [];
-  return Object.values(task.output.byModel).flatMap(m => m.items || []);
+  return Object.values(task.output.byModel).flatMap(function(m) { return m.items || []; });
 }
 function getAllOutputTotal(task) {
+  if (task.type === 'workflow') {
+    return getTaskOutput(task, state.cardModels[task.id] || task.input.models[0]).total || 0;
+  }
   if (!task.output?.byModel) return 0;
-  return Object.values(task.output.byModel).reduce((s,m) => s + (m.total||0), 0);
+  return Object.values(task.output.byModel).reduce(function(s, m) { return s + (m.total || 0); }, 0);
 }
-
 function getTaskRequestedCount(task, modelId) {
-  const cfg = getTaskModelConfig(task, modelId || task.input.models[0]);
+  if (task.type === 'workflow') {
+    var workflowTotal = task.workflowRun && task.workflowRun.summary ? Number(task.workflowRun.summary.total || 0) : 0;
+    if (workflowTotal > 0) return workflowTotal;
+  }
+  var cfg = getTaskModelConfig(task, modelId || task.input.models[0]);
   return parseInt(cfg.count || 0, 10) || 0;
+}
+function getTaskProducedCount(task, output) {
+  if (task.type === 'workflow') {
+    return getWorkflowProducedCount(task, output ? output.items : [], output ? output.total : 0);
+  }
+  if (!output) return 0;
+  if (task.type === 'chat' || task.resultType === 'text' || task.resultType === 'chat') {
+    return output.items ? output.items.length : 0;
+  }
+  if (typeof output.total === 'number' && output.total > 0) return output.total;
+  return output.items ? output.items.length : 0;
+}
+function getTaskQuantityUnit(resultType) {
+  if (resultType === 'text') return '条';
+  if (resultType === 'image') return '张';
+  return '个';
+}
+function getWorkflowDisplayStatus(task) {
+  var activeQueue = getWorkflowReviewQueue(task);
+  if (activeQueue && (activeQueue.status === 'pending_review' || activeQueue.status === 'reviewing')) {
+    return 'pending_review';
+  }
+  var hasActiveReviewNode = getWorkflowReviewNodes(task).some(function(node) {
+    return node.status === 'pending_review' || node.status === 'reviewing';
+  });
+  if (hasActiveReviewNode) return 'pending_review';
+  if (task.status === 'aborted') return 'aborted';
+  var hasWorkingNode = ((task.workflowRun && task.workflowRun.nodes) || []).some(function(node) {
+    if (node.processorType === 'control.review') return false;
+    return node.status === 'pending' || node.status === 'generating' || node.status === 'running' || node.status === 'queued';
+  });
+  if (hasWorkingNode || task.status === 'pending' || task.status === 'generating') return 'generating';
+  return 'completed';
+}
+function getTaskStatusLabel(status) {
+  return {
+    pending: '等待中',
+    generating: '生成中',
+    pending_review: '待审查',
+    reviewing: '待审查',
+    completed: '已完成',
+    failed: '已失败',
+    aborted: '已中止'
+  }[status] || status;
+}
+function getTaskCardViewModel(task, modelId) {
+  var resultType = getTaskPrimaryResultType(task, modelId);
+  var displayStatus = task.type === 'workflow' ? getWorkflowDisplayStatus(task) : task.status;
+  var output = getTaskOutput(task, modelId, resultType);
+  var expectedCount = getTaskRequestedCount(task, modelId);
+  var producedCount = getTaskProducedCount(task, output);
+  return {
+    resultType: resultType,
+    displayStatus: displayStatus,
+    output: output,
+    expectedCount: expectedCount,
+    producedCount: producedCount,
+    quantityUnit: getTaskQuantityUnit(resultType),
+    activeReviewQueue: getWorkflowReviewQueue(task),
+    displayMeta: getTaskDisplayMeta(task, modelId, resultType)
+  };
 }
 
 // ═══ 辅助函数 ═══
@@ -895,6 +1318,9 @@ const state = {
   viewMode: 'expanded',
   pageMode: routeParams.get('view') === 'review' ? 'review' : 'list',
   reviewContext: { taskId: routeParams.get('taskId') || '', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
+  reviewFilter: 'all',
+  reviewBatchMode: false,
+  reviewSelected: new Set(),
   filters: { status:'', search:'', project:'', dateRange:'', dateStart:'', dateEnd:'', model:'' },
   tasks: INITIAL_TASKS,
   chats: INITIAL_CHATS,
@@ -977,6 +1403,7 @@ function updateScrollBtn() {
 function renderAll() {
   if (state.pageMode === 'review') {
     renderReviewPage();
+    renderReviewBottomBar();
     return;
   }
   renderFilterBar();
@@ -1177,8 +1604,8 @@ function getNoticeTasks(kind, tasks) {
   var pool = tasks || getFilteredTasks();
   if (kind === 'generating') {
     return pool.filter(function(t) {
-      return (t.status === 'generating' || t.status === 'pending') && (t.id === '1' || t.id === '10');
-    }).slice(0, 2);
+      return t.status === 'generating' || t.status === 'pending';
+    }).slice(0, 5);
   }
   if (kind === 'reviewing') {
     return pool.filter(function(t) {
@@ -1191,7 +1618,7 @@ function getNoticeTasks(kind, tasks) {
 }
 
 function renderNoticeCard(kind, tasks) {
-  var title = kind === 'generating' ? '进行中任务' : (kind === 'reviewing' ? '审查中任务' : '已生成未查看');
+  var title = kind === 'generating' ? '进行中任务' : (kind === 'reviewing' ? '待审核任务' : '已生成未查看');
   var items = getNoticeTasks(kind, tasks);
   if (!items.length) return '';
   var expanded = !!state.noticeExpanded[kind];
@@ -1202,7 +1629,7 @@ function renderNoticeCard(kind, tasks) {
   var listHtml = items.map(function(task) {
     var statusText = kind === 'generating'
       ? (task.status === 'pending' ? '排队中' : '生成中')
-      : (kind === 'reviewing' ? '审查中' : '待查看');
+      : (kind === 'reviewing' ? '待审核' : '待查看');
     return '<div class="task-notice-item" onclick="focusTaskCard(\''+task.id+'\',\''+kind+'\')">'
       +'<div class="task-notice-item-main">'
       +'<div class="task-notice-item-top"><span class="task-notice-source">'+escHtml(getSourceLabel(task.source))+'</span><span class="task-notice-status">'+statusText+'</span></div>'
@@ -1233,9 +1660,10 @@ function renderTaskFeed() {
       panel.style.display = 'none';
       panel.innerHTML = '';
     } else {
+      var reviewingHtml = renderNoticeCard('reviewing', tasks);
       var unreadHtml = renderNoticeCard('unread', tasks);
       var generatingHtml = renderNoticeCard('generating', tasks);
-      var panelHtml = unreadHtml + generatingHtml;
+      var panelHtml = reviewingHtml + unreadHtml + generatingHtml;
       panel.style.display = panelHtml ? 'block' : 'none';
       panel.innerHTML = panelHtml ? '<div class="task-notice-panel">' + panelHtml + '</div>' : '';
     }
@@ -1259,41 +1687,53 @@ function renderTaskFeed() {
   if (window.__scrollToBottom) window.__scrollToBottom();
 }
 
-function renderTaskCard(task) {
-  var isMulti = task.input.models.length > 1;
-  var activeModel = state.cardModels[task.id] || task.input.models[0];
-  var collapsed = state.viewMode === 'collapsed';
-  var currentOutput = getTaskOutput(task, activeModel);
-  var sourceName = GEN_SOURCES[task.source] || task.source || '通用生成';
-  var displayMeta = getTaskDisplayMeta(task, activeModel);
-
-  // 工作流卡片特殊页头
+function renderTaskMetaItems(task, vm, activeModel, isMulti) {
+  var items = [];
   if (task.type === 'workflow') {
-    return `
-      <div class="task-card" id="task-card-${task.id}" data-task-id="${task.id}">
-        <div class="card-header" style="padding: 16px 20px 12px 20px; display: flex; align-items: center;">
-          <span style="border: 1px solid #d1d5db; color: #111827; font-size: 14px; padding: 4px 12px; border-radius: 4px; background: transparent;">工作流</span>
-          <span style="font-size: 16px; font-weight: 600; color: var(--text-hi); margin-left: 16px;">${escHtml(task.name)}</span>
-          <div style="margin-left: auto; display: flex; gap: 12px;">
-            <span style="border: 1px solid #d1d5db; color: #111827; font-size: 14px; padding: 4px 16px; border-radius: 4px; background: transparent;">${escHtml(task.resultType === 'mixed' ? '多模态' : (task.resultType === 'image' ? '图像' : '视频'))}</span>
-            <span style="border: 1px solid #d1d5db; color: #111827; font-size: 14px; padding: 4px 16px; border-radius: 4px; background: transparent;">${escHtml(displayMeta.ratioText || '1920*1080')}</span>
-          </div>
-        </div>
-        <div class="card-output" style="padding: 0;">${renderWorkflowOutputArea(task, collapsed)}</div>
-        <div class="card-bottom" style="padding: 8px 20px 16px 20px; display: flex; align-items: center; justify-content: space-between; border-top: none;">
-          <div style="display: flex; gap: 12px;">
-            <button style="background: #2563eb; color: #ffffff; border: none; padding: 6px 16px; font-size: 14px; cursor: pointer; border-radius: 6px;" onclick="openReviewPage('${task.id}')">开始审查</button>
-            <button style="background: transparent; color: #111827; border: 1px solid #d1d5db; padding: 6px 16px; font-size: 14px; cursor: pointer; border-radius: 6px;" onclick="openDetailModal('${task.id}')">查看详情</button>
-            <button style="background: transparent; color: #111827; border: 1px solid #d1d5db; padding: 6px 16px; font-size: 14px; cursor: pointer; border-radius: 6px;" onclick="handleReEditById('${task.id}')">重新编辑</button>
-            <button style="background: transparent; color: #111827; border: 1px solid #d1d5db; padding: 6px 16px; font-size: 14px; cursor: pointer; border-radius: 6px;" onclick="handleStopById('${task.id}')">停止生成</button>
-          </div>
-          <div style="font-size: 13px; color: var(--text-muted); display: flex; gap: 8px; align-items: center;">
-            <span class="c-tag c-tag-${task.status}">${{pending:'等待中',generating:'生成中',pending_review:'审查中',reviewing:'审查中',completed:'已完成',failed:'已失败',aborted:'已中止'}[task.status]||task.status}</span>
-            <span>${task.createdTime}</span>
-          </div>
-        </div>
-      </div>
-    `;
+    items.push(vm.displayMeta.resultTypeLabel);
+  } else {
+    items.push(isMulti ? '多模型' : (MODELS_MAP[activeModel] || activeModel));
+    if (vm.displayMeta.countText) items.push(vm.displayMeta.countText);
+  }
+  return items.concat(vm.displayMeta.specItems || []).filter(Boolean).map(function(item) {
+    return '<span class="card-meta-item">' + escHtml(item) + '</span>';
+  }).join('');
+}
+function renderTaskPromptBlock(task, showUseBtn) {
+  return '<div class="card-prompt-wrap"><span class="card-prompt" title="'+escHtml(task.input.prompt)+'">'+escHtml(task.input.prompt)+'</span>'
+    + (showUseBtn ? '<div class="card-prompt-fade"></div><button class="card-prompt-use-btn" onclick="event.stopPropagation();usePrompt(\''+task.id+'\')">使用提示词</button>' : '')
+    + '</div>';
+}
+function renderBottomCountMeta(task, vm) {
+  if (task.type !== 'workflow' || !vm.displayMeta.countProgressText) return '';
+  return '<span class="card-bottom-count">' + escHtml(vm.displayMeta.countProgressText) + '</span>';
+}
+function openWorkflowDetail(taskId) {
+  openDetailModal(taskId);
+}
+function openWorkflowResult(taskId) {
+  var task = getTaskById(taskId);
+  if (!task) return;
+  var vm = getTaskCardViewModel(task, state.cardModels[task.id] || task.input.models[0]);
+  var target = getViewAllTarget(task, vm);
+  parent.postMessage({ action:'openTab', title:target.title, url:target.url }, '*');
+}
+function openWorkflowReview(taskId) {
+  var task = getTaskById(taskId);
+  if (!task) return;
+  var queue = getWorkflowReviewQueue(task);
+  openReviewPage(taskId, queue ? queue.reviewTaskId : '');
+}
+function renderTaskCard(task) {
+  var isMulti = task.input.models ? task.input.models.length > 1 : false;
+  var activeModel = isMulti ? (state.cardModels[task.id] || task.input.models[0]) : (task.input.models && task.input.models.length > 0 ? task.input.models[0] : null);
+  var collapsed = state.viewMode === 'collapsed';
+  var vm = getTaskCardViewModel(task, activeModel);
+  var currentOutput = vm.output;
+  var sourceName = task.type === 'workflow' ? '工作流' : (GEN_SOURCES[task.source] || task.source || '通用生成');
+
+  if (task.type === 'workflow' && vm.displayStatus === 'pending_review') {
+    return renderWorkflowReviewCard(task, vm, collapsed);
   }
 
   var refThumbs = '';
@@ -1308,61 +1748,45 @@ function renderTaskCard(task) {
   }
 
   var modelTabsHtml = '';
-  if (isMulti && task.status === 'completed') {
+  if (isMulti && vm.displayStatus === 'completed') {
     modelTabsHtml = '<div class="model-tabs">'
       + task.input.models.map(function(m){
-          return '<button class="model-tab'+(m===activeModel?' active':'')+'" onclick="switchCardModel(\''+task.id+'\',\''+m+'\')">'+escHtml(MODELS_MAP[m]||m)+'<span class="model-tab-count">('+getTaskOutput(task,m).total+')</span></button>';
+          var modelVm = getTaskCardViewModel(task, m);
+          return '<button class="model-tab'+(m===activeModel?' active':'')+'" onclick="switchCardModel(\''+task.id+'\',\''+m+'\')">'+escHtml(MODELS_MAP[m]||m)+'<span class="model-tab-count">('+modelVm.producedCount+'/'+modelVm.expectedCount+')</span></button>';
         }).join('')
       +'</div>';
   }
 
-  var statusLabel = {pending:'等待中',generating:'生成中',pending_review:'待审',reviewing:'审查中',completed:'已完成',failed:'已失败',aborted:'已中止'}[task.status]||task.status;
-  var pulseDot = task.status==='generating' ? '<span class="pulse-dot"></span>' : '';
-  var resMeta = displayMeta.extra ? '<span class="card-meta-item">'+displayMeta.extra+'</span>' : '';
-  var modelMeta = isMulti ? '多模型' : (MODELS_MAP[activeModel]||activeModel);
+  var statusLabel = getTaskStatusLabel(vm.displayStatus);
+  var pulseDot = vm.displayStatus === 'generating' ? '<span class="pulse-dot"></span>' : '';
+  var metaHtml = renderTaskMetaItems(task, vm, activeModel, isMulti);
 
   return '<div class="task-card'+(task._new?' new-highlight':'')+'" id="task-card-'+task.id+'" data-task-id="'+task.id+'"><div class="card-header">'
     +'<span class="c-tag" style="background:var(--bg-subtle);color:var(--text-lo)">'+escHtml(sourceName)+'</span>'
     +refThumbs
-    +'<div class="card-prompt-wrap"><span class="card-prompt" title="'+escHtml(task.input.prompt)+'">'+escHtml(task.input.prompt)+'</span><div class="card-prompt-fade"></div><button class="card-prompt-use-btn" onclick="event.stopPropagation();usePrompt(\''+task.id+'\')">使用提示词</button></div>'
-    +'<div class="card-meta"><span class="card-meta-item">'+escHtml(modelMeta)+'</span><span class="card-meta-item">'+escHtml(displayMeta.ratioText)+'</span>'+resMeta+(task.project?'<span class="card-meta-item">'+escHtml(task.project)+'</span>':'')+'</div>'
+    +renderTaskPromptBlock(task, task.type !== 'workflow')
+    +'<div class="card-meta">'+metaHtml+'</div>'
     +'</div>'
     +modelTabsHtml
-    +'<div class="card-output">'+renderOutputArea(task, currentOutput, collapsed)+'</div>'
-    +'<div class="card-bottom">'+renderCardActions(task)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+task.status+'">'+statusLabel+pulseDot+'</span><span>'+relativeTime(task.createdTime)+'</span></div></div>'
+    +'<div class="card-output">'+renderOutputArea(task, currentOutput, collapsed, vm)+'</div>'
+    +'<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+statusLabel+pulseDot+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span></div></div>'
     +'</div>';
 }
 
-function renderOutputArea(task, currentOutput, collapsed) {
-  if (task.type === 'workflow') return renderWorkflowOutputArea(task, collapsed);
-  var s = task.status;
-  if (task.type === 'chat') {
-    return renderChatOutputRow(task, currentOutput, collapsed);
+function renderOutputArea(task, currentOutput, collapsed, vm) {
+  var s = vm.displayStatus;
+  if (vm.resultType === 'text') {
+    return renderChatOutputRow(task, currentOutput, collapsed, vm);
   }
   if (s === 'generating') {
-    return renderGeneratingOutputRow(task, currentOutput, collapsed);
-  }
-  if (s === 'failed') {
-    if (task.partialFailed) {
-      return renderPartialFailedOutputRow(task, currentOutput, collapsed);
-    }
-    return collapsed
-      ? '<div style="padding:8px 0;font-size:12px;color:#dc2626">生成失败 <button class="card-act-btn" style="margin-left:8px;padding:2px 10px;font-size:11px" onclick="handleRetryById(\''+task.id+'\')">重试</button></div>'
-      : '<div class="status-placeholder"><div class="status-placeholder-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5">'+SVG.err+'</svg></div><div class="status-placeholder-text">生成失败，请重试</div><div class="status-placeholder-text" style="font-size:12px;margin-top:-6px;">此处显示具体失败原因，具体原因列表见文档。</div><button class="card-act-btn" onclick="handleRetryById(\''+task.id+'\')">重试</button></div>';
+    return renderGeneratingOutputRow(task, currentOutput, collapsed, vm);
   }
   if (s === 'aborted') {
-    if (currentOutput.items.length > 0) return renderOutputRow(task, currentOutput, collapsed);
+    if (currentOutput.items.length > 0) return renderOutputRow(task, currentOutput, collapsed, vm);
     return collapsed ? '<div style="padding:8px 0;font-size:12px;color:#d97706">已中止生成</div>' : '<div class="status-placeholder"><div class="status-placeholder-text">已中止生成</div></div>';
   }
-  if (s === 'pending') {
-    return renderPendingOutputRow(task, collapsed);
-  }
-  if (s === 'completed') return renderOutputRow(task, currentOutput, collapsed);
-  return '';
-}
-
-function getWorkflowReviewQueue(task) {
-  return task && task.workflowRun && task.workflowRun.reviewQueues ? task.workflowRun.reviewQueues[0] : null;
+  if (s === 'completed') return renderOutputRow(task, currentOutput, collapsed, vm);
+  return renderPendingOutputRow(task, collapsed, vm);
 }
 
 function getWorkflowPendingItems(task, reviewTaskId) {
@@ -1371,31 +1795,84 @@ function getWorkflowPendingItems(task, reviewTaskId) {
   });
 }
 
-function renderWorkflowOutputArea(task, collapsed) {
-  const run = task.workflowRun;
-  const summary = run.summary;
-  
-  // 模拟原型图中的4个加载框和1个查看全部
-  const displayItems = [1, 2, 3, 4];
-  const remainingCount = 4;
-  
-  const thumbsHtml = displayItems.map((item, idx) => {
-    return `<div class="cc-img-loading-thumb" style="flex: 0 0 140px; height: 140px; background: #e5e7eb; border: 1px solid #d1d5db; border-radius: 0; display: flex; align-items: center; justify-content: center;"><div class="cc-img-loading-spinner" style="width: 40px; height: 40px; border: 4px solid #d8b4e2; border-bottom-color: #6a1b9a; border-radius: 50%; animation: spin 1s linear infinite;"></div></div>`;
-  }).join('');
-  
-  const viewAllHtml = `
-    <div class="o-thumb view-all-card" style="flex: 0 0 140px; height: 140px; background: #e5e7eb; border: 1px solid #d1d5db; border-radius: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;" onclick="parent.postMessage({action:'openTab',title:'全部结果',url:'AI 创作/全部结果-已成功.html'},'*')">
-      <div style="font-size: 16px; color: #111827; margin-bottom: 8px;">+${remainingCount}</div>
-      <span style="color: #2563eb; text-decoration: underline; font-size: 13px;">查看全部</span>
-    </div>
-  `;
+function getWorkflowResultTypeLabel(task, vm) {
+  var resultType = vm && vm.resultType ? vm.resultType : getTaskPrimaryResultType(task);
+  if (resultType === 'text') return '文案';
+  if (resultType === 'video') return '视频';
+  return '图像';
+}
 
-  return `
-    <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
-    <div class="output-row expanded" style="gap:12px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px; padding: 0 20px;">
-      ${thumbsHtml}${viewAllHtml}
-    </div>
-  `;
+function getWorkflowReviewStats(task) {
+  var run = task.workflowRun || {};
+  var queues = run.reviewQueues || [];
+  var ready = queues.reduce(function(sum, queue) {
+    return sum + (queue.status === 'pending_review' || queue.status === 'reviewing' ? Number(queue.pendingCount || 0) : 0);
+  }, 0);
+  var done = queues.reduce(function(sum, queue) {
+    return sum + Number(queue.approvedCount || 0) + Number(queue.rejectedCount || 0);
+  }, 0);
+  var reviewNodes = getWorkflowReviewNodes(task);
+  var activeQueue = getWorkflowReviewQueue(task);
+  var activeNode = reviewNodes.find(function(node) {
+    return activeQueue && node.reviewTaskId === activeQueue.reviewTaskId;
+  }) || reviewNodes.find(function(node) {
+    return node.status === 'pending_review' || node.status === 'reviewing';
+  });
+  var waitingCount = reviewNodes.filter(function(node) {
+    if (activeNode && node.reviewTaskId === activeNode.reviewTaskId) return false;
+    return node.status === 'pending';
+  }).length;
+  return {
+    readyCount: ready,
+    doneCount: done,
+    waitingCount: Math.max(waitingCount, 0),
+    activeTitle: activeNode ? activeNode.title : '审查节点',
+    activeReviewTaskId: activeQueue ? activeQueue.reviewTaskId : (activeNode ? activeNode.reviewTaskId : '')
+  };
+}
+
+function renderWorkflowReviewCard(task, vm) {
+  var stats = getWorkflowReviewStats(task);
+  var statusLabel = getTaskStatusLabel(vm.displayStatus);
+  var activeTitle = stats.activeTitle || '审查节点';
+  var remainingCount = stats.waitingCount || 0;
+  var metaHtml = renderTaskMetaItems(task, vm, task.input.models[0], false);
+  var arrowHtml = '<div class="wf-animated-arrow"><div class="wf-arrow-line"></div><div class="wf-arrow-head"></div></div>';
+  var nodesHtml = ''
+    + '<div class="wf-abs-node is-completed">'
+      + '<div class="wf-abs-point"></div>'
+      + '<div class="wf-abs-label">开始</div>'
+    + '</div>'
+    + arrowHtml
+    + '<div class="wf-abs-node is-active-review">'
+      + '<div class="wf-abs-point"></div>'
+      + '<div class="wf-abs-label">人工审核图片</div>'
+      + '<button class="wf-abs-cta" onclick="openReviewPage(\'' + task.id + '\',\'' + (stats.activeReviewTaskId || '') + '\')">开始审核' + stats.readyCount + '个结果</button>'
+    + '</div>';
+  if (remainingCount > 0) {
+    nodesHtml += arrowHtml
+      + '<div class="wf-abs-node is-pending">'
+        + '<div class="wf-abs-point"></div>'
+        + '<div class="wf-abs-label">剩余审核节点' + remainingCount + '个</div>'
+      + '</div>';
+  }
+  nodesHtml += arrowHtml
+    + '<div class="wf-abs-node is-pending">'
+      + '<div class="wf-abs-point"></div>'
+      + '<div class="wf-abs-label">结束</div>'
+    + '</div>';
+
+  return '<div class="task-card workflow-task-card'+(task._new?' new-highlight':'')+'" id="task-card-'+task.id+'" data-task-id="'+task.id+'">'
+    + '<div class="card-header">'
+      + '<span class="c-tag" style="background:var(--bg-subtle);color:var(--text-lo)">工作流</span>'
+      + renderTaskPromptBlock({ input:{ prompt: task.name }, id: task.id }, false)
+      + '<div class="card-meta">'+metaHtml+'</div>'
+    + '</div>'
+    + '<div class="card-output workflow-review-output">'
+      + '<div class="wf-abs-flow">'+nodesHtml+'</div>'
+    + '</div>'
+    + '<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+escHtml(statusLabel)+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span></div></div>'
+  + '</div>';
 }
 
 function openReviewPage(taskId, reviewTaskId) {
@@ -1458,11 +1935,23 @@ function approveReviewItem(itemId) {
   showToast('已通过');
 }
 
+function canRevokeReviewItem(task, item) {
+  if (!task || !item) return false;
+  var queue = getWorkflowReviewQueue(task);
+  var currentReviewTaskId = state.reviewContext.reviewTaskId || (queue && queue.reviewTaskId) || '';
+  if ((item.reviewTaskId || item.sourceNodeId) !== currentReviewTaskId) return false;
+  return task.status === 'reviewing' || task.status === 'pending_review';
+}
+
 function revokeReviewItem(itemId) {
   const task = getReviewRouteTask();
   if (!task) return;
   const item = (task.output.items || []).find(it => it.itemId === itemId);
   if (!item) return;
+  if (!canRevokeReviewItem(task, item)) {
+    showToast('下游已继续处理，当前结果不可撤回');
+    return;
+  }
   item.reviewStatus = 'pending';
   updateWorkflowStatusAfterReview(task);
   renderReviewPage();
@@ -1486,13 +1975,171 @@ function approveAllReviewRoute() {
   getWorkflowPendingItems(task, state.reviewContext.reviewTaskId).forEach(function(item) {
     item.reviewStatus = 'approved';
   });
+  clearReviewSelection();
+  state.reviewBatchMode = false;
   updateWorkflowStatusAfterReview(task);
   renderReviewPage();
   showToast(task.status === 'completed' ? '审核完成，已进入结果态' : '审核完成，正在触发下游节点');
 }
 
-function backToTaskListView() {
+function backToTaskListView(force) {
+  const task = getReviewRouteTask();
+  if (!force && task) {
+    const queue = getWorkflowReviewQueue(task);
+    const reviewTaskId = state.reviewContext.reviewTaskId || (queue && queue.reviewTaskId);
+    const pendingCount = getReviewRouteItems(task, reviewTaskId).filter(function(item) {
+      return item.reviewStatus === 'pending' || !item.reviewStatus;
+    }).length;
+    if (pendingCount > 0) {
+      openConfirmModal({
+        title: '仍有待审内容',
+        description: '当前还有 ' + pendingCount + ' 项待审内容，确定先返回任务列表吗？',
+        cancelText: '继续审查',
+        confirmText: '返回列表',
+        onConfirm: function() { backToTaskListView(true); }
+      });
+      return;
+    }
+  }
   parent.postMessage({ action:'openTab', title:'我的任务', url:'AI 创作/我的任务.html' }, '*');
+}
+
+function getReviewRouteItems(task, reviewTaskId) {
+  return (task && task.output && task.output.items ? task.output.items : []).filter(function(item) {
+    return item.reviewTaskId === reviewTaskId || item.sourceNodeId === reviewTaskId;
+  });
+}
+
+function getReviewVisibleItems() {
+  const task = getReviewRouteTask();
+  if (!task) return [];
+  const queue = getWorkflowReviewQueue(task);
+  const reviewTaskId = state.reviewContext.reviewTaskId || (queue && queue.reviewTaskId);
+  const allItems = getReviewRouteItems(task, reviewTaskId);
+  return allItems.filter(function(it) {
+    if (state.reviewFilter === 'pending') return it.reviewStatus === 'pending' || !it.reviewStatus;
+    if (state.reviewFilter === 'approved') return it.reviewStatus === 'approved';
+    if (state.reviewFilter === 'rejected') return it.reviewStatus === 'rejected';
+    return true;
+  });
+}
+
+function clearReviewSelection() {
+  state.reviewSelected.clear();
+}
+
+function toggleReviewBatch() {
+  state.reviewBatchMode = !state.reviewBatchMode;
+  clearReviewSelection();
+  renderReviewPage();
+}
+
+function toggleReviewSelect(itemId) {
+  if (state.reviewSelected.has(itemId)) state.reviewSelected.delete(itemId);
+  else state.reviewSelected.add(itemId);
+  renderReviewBottomBar();
+  var card = document.querySelector('.review-grid-card[data-item-id="' + itemId + '"]');
+  if (card) card.classList.toggle('selected', state.reviewSelected.has(itemId));
+}
+
+function selectAllVisibleReviewItems() {
+  const visible = getReviewVisibleItems().filter(function(it) {
+    return it.reviewStatus === 'pending' || !it.reviewStatus;
+  });
+  const allSelected = visible.length > 0 && visible.every(function(it) { return state.reviewSelected.has(it.itemId); });
+  if (allSelected) {
+    visible.forEach(function(it) { state.reviewSelected.delete(it.itemId); });
+  } else {
+    visible.forEach(function(it) { state.reviewSelected.add(it.itemId); });
+  }
+  renderReviewPage();
+}
+
+function applyBatchReviewAction(action, force) {
+  const ids = Array.from(state.reviewSelected);
+  if (!ids.length) return;
+  if (!force && action === 'rejected') {
+    openConfirmModal({
+      title: '批量拒绝',
+      description: '确定拒绝已选中的 ' + ids.length + ' 项内容吗？',
+      cancelText: '取消',
+      confirmText: '确认拒绝',
+      onConfirm: function() { applyBatchReviewAction('rejected', true); }
+    });
+    return;
+  }
+  const task = getReviewRouteTask();
+  if (!task) return;
+  ids.forEach(function(itemId) {
+    const item = (task.output.items || []).find(function(it) { return it.itemId === itemId; });
+    if (!item) return;
+    item.reviewStatus = action;
+  });
+  clearReviewSelection();
+  state.reviewBatchMode = false;
+  updateWorkflowStatusAfterReview(task);
+  renderReviewPage();
+  showToast(action === 'approved' ? '已批量通过' : '已批量拒绝');
+}
+
+function confirmApproveAllReviewRoute(force) {
+  if (!force) {
+    const pendingItems = getReviewVisibleItems().filter(function(it) {
+      return it.reviewStatus === 'pending' || !it.reviewStatus;
+    });
+    openConfirmModal({
+      title: '全部通过',
+      description: '确定将当前节点的 ' + pendingItems.length + ' 项待审内容全部通过吗？',
+      cancelText: '取消',
+      confirmText: '全部通过',
+      onConfirm: function() { confirmApproveAllReviewRoute(true); }
+    });
+    return;
+  }
+  approveAllReviewRoute();
+}
+
+function renderReviewBottomBar() {
+  const root = document.getElementById('input-box-root');
+  if (!root) return;
+  const task = getReviewRouteTask();
+  const visibleItems = getReviewVisibleItems();
+  const pendingCount = visibleItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; }).length;
+  const selectedCount = state.reviewSelected.size;
+  const isBatch = !!state.reviewBatchMode;
+  const reviewStats = task ? getWorkflowReviewStats(task) : { waitingCount: 0 };
+  const defaultText = task && task.status === 'generating'
+    ? '当前节点审完后，结果会继续流向下游生成。'
+    : '可点击卡片预览，或直接在卡片上快速通过 / 拒绝。';
+  root.innerHTML = '<div class="review-bottom-shell">'
+    + '<div class="review-bottom-bar">'
+      + '<div class="review-bottom-meta">'
+        + '<span class="review-bottom-pill">当前筛选 ' + visibleItems.length + ' 项</span>'
+        + '<span class="review-bottom-pill">待审 ' + pendingCount + ' 项</span>'
+        + '<span class="review-bottom-pill">未运行到 ' + (reviewStats.waitingCount || 0) + ' 个</span>'
+        + '<span class="review-bottom-text">' + (isBatch ? ('已选 ' + selectedCount + ' 项') : '审查台') + '</span>'
+        + '<span class="review-bottom-tip">' + (isBatch ? '批量模式下，点击卡片只会勾选，不会打开预览。' : defaultText) + '</span>'
+      + '</div>'
+      + '<div class="review-bottom-actions">'
+        + (isBatch
+          ? '<button class="review-toolbar-btn" onclick="selectAllVisibleReviewItems()">全选当前待审</button>'
+            + '<button class="review-toolbar-btn primary" ' + (selectedCount ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'approved\')">批量通过</button>'
+            + '<button class="review-toolbar-btn danger" ' + (selectedCount ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'rejected\')">批量拒绝</button>'
+            + '<button class="review-toolbar-btn" onclick="toggleReviewBatch()">取消选择</button>'
+          : '<button class="review-toolbar-btn primary" ' + (pendingCount ? '' : 'disabled') + ' onclick="focusPendingReview()">开始审查</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">批量选择</button>')
+      + '</div>'
+    + '</div>'
+  + '</div>';
+}
+
+function focusPendingReview() {
+  state.reviewFilter = 'pending';
+  state.reviewFocusIndex = 0;
+  renderReviewPage();
+  setTimeout(function() {
+    var grid = document.getElementById('reviewGridScroll');
+    if (grid) grid.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 50);
 }
 
 function renderReviewPage() {
@@ -1500,225 +2147,260 @@ function renderReviewPage() {
   const task = getReviewRouteTask();
   if (!task) {
     root.innerHTML = '<div class="empty-state" style="height:100%;display:flex;align-items:center;justify-content:center;">未找到对应审查任务</div>';
+    renderReviewBottomBar();
     return;
   }
   const queue = getWorkflowReviewQueue(task);
   const reviewTaskId = state.reviewContext.reviewTaskId || (queue && queue.reviewTaskId);
-  
-  const allItems = (task.output.items || []).filter(item => item.reviewTaskId === reviewTaskId || item.sourceNodeId === reviewTaskId);
-  if (!state.reviewFilter) state.reviewFilter = 'all';
-  
-  const displayItems = allItems.filter(it => {
-    if (state.reviewFilter === 'pending') return it.reviewStatus === 'pending' || !it.reviewStatus;
-    if (state.reviewFilter === 'approved') return it.reviewStatus === 'approved';
-    if (state.reviewFilter === 'rejected') return it.reviewStatus === 'rejected';
-    return true;
-  });
-
-  const pendingCount = allItems.filter(it => it.reviewStatus === 'pending' || !it.reviewStatus).length;
-  const approvedCount = allItems.filter(it => it.reviewStatus === 'approved').length;
-  const rejectedCount = allItems.filter(it => it.reviewStatus === 'rejected').length;
-  // Use downstreamRunning for generating count to match workflow logic
+  const allItems = getReviewRouteItems(task, reviewTaskId);
+  const displayItems = getReviewVisibleItems();
+  const pendingItems = allItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; });
+  const pendingCount = pendingItems.length;
+  const approvedCount = allItems.filter(function(it) { return it.reviewStatus === 'approved'; }).length;
+  const rejectedCount = allItems.filter(function(it) { return it.reviewStatus === 'rejected'; }).length;
+  const reviewedCount = approvedCount + rejectedCount;
+  const reviewStats = getWorkflowReviewStats(task);
+  const waitingReviewCount = reviewStats.waitingCount || 0;
   const generatingCount = (task.workflowRun && task.workflowRun.summary) ? task.workflowRun.summary.downstreamRunning : 0;
+  const activeNode = (task.workflowRun.nodes || []).find(function(node) {
+    return node.reviewTaskId === reviewTaskId || node.nodeId === reviewTaskId;
+  });
+  const activeNodeTitle = activeNode && activeNode.title ? activeNode.title : '审查节点';
+  const reviewNodes = (task.workflowRun.nodes || []).filter(function(n) { return n.processorType === 'control.review'; });
 
-  // Tabs
-  const reviewNodes = (task.workflowRun.nodes || []).filter(n => n.processorType === 'control.review');
-  let tabsHtml = reviewNodes.map((node, i) => {
-    const isCurrent = (node.reviewTaskId === reviewTaskId) || (node.nodeId === reviewTaskId) || (!reviewTaskId && i === 0);
+  const tabsHtml = reviewNodes.map(function(node, i) {
+    const targetReviewTaskId = node.reviewTaskId || node.nodeId;
+    const isCurrent = node.reviewTaskId === reviewTaskId || node.nodeId === reviewTaskId || (!reviewTaskId && i === 0);
     const isDone = node.status === 'completed';
-    const statusText = isDone ? '完成审查' : (node.status === 'pending_review' ? '审查中' : '未开始');
-    const bg = isCurrent ? 'var(--primary-6)' : '#fff';
-    const color = isCurrent ? '#fff' : 'var(--text-hi)';
-    const borderColor = isCurrent ? 'var(--primary-6)' : 'var(--border-2)';
-
-    return `
-      <div style="position: relative; padding: 4px 16px; background: ${bg}; color: ${color}; cursor: pointer; border: 1px solid ${borderColor}; border-radius: 4px; display: flex; flex-direction: column; justify-content: center; height: 38px; min-width: 120px; box-shadow: ${isCurrent?'0 2px 8px rgba(74,158,255,0.3)':'none'};" onclick="state.reviewContext.reviewTaskId='${node.reviewTaskId || node.nodeId}'; renderReviewPage();">
-        <div style="font-size: 13px; font-weight: 600;">${node.title || '审查节点'}</div>
-        <div style="font-size: 10px; margin-top: 1px; opacity: 0.9;">${statusText}</div>
-        ${isDone ? `<div style="position:absolute; top:-6px; right:-6px; background:#10b981; color:#fff; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; font-size:10px; border:2px solid #fff;">✓</div>` : ''}
-      </div>
-    `;
+    const statusText = isDone ? '完成审查' : (node.status === 'pending_review' || node.status === 'reviewing' ? '审查中' : '未开始');
+    return '<button class="review-node-tab' + (isCurrent ? ' active' : '') + '" onclick="state.reviewContext.reviewTaskId=\'' + targetReviewTaskId + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">'
+      + '<span class="review-node-tab-title">' + escHtml(node.title || '审查节点') + '</span>'
+      + '<span class="review-node-tab-status">' + escHtml(statusText) + '</span>'
+      + (isDone ? '<span class="review-node-tab-check">✓</span>' : '')
+      + '</button>';
   }).join('');
-
-  // Grid
-  const focusIdx = state.reviewFocusIndex || 0;
-  let gridHtml = displayItems.map((it, idx) => {
-    let actionsOverlay = '';
-    const isFocused = idx === focusIdx;
-    const focusStyle = isFocused ? 'outline: 2px solid var(--primary-6); outline-offset: 2px; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1;' : '';
-    
-    let statusBadge = '';
-    if (it.reviewStatus === 'approved') statusBadge = '<div style="background:#10b981; color:#fff; padding:2px 8px; border-radius:0 0 0 4px; font-size:10px; font-weight:600;">已通过</div>';
-    else if (it.reviewStatus === 'rejected') statusBadge = '<div style="background:#ef4444; color:#fff; padding:2px 8px; border-radius:0 0 0 4px; font-size:10px; font-weight:600;">已拒绝</div>';
-
-    const downloadAction = `event.stopPropagation(); const a=document.createElement('a'); a.href='${it.url}'; a.download='asset.png'; a.click();`;
-    
-    if (it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') {
-      actionsOverlay = `
-        <div class="review-actions-hover" style="position: absolute; bottom: 0; left: 0; right: 0; height: 32px; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: space-between; padding: 0 8px; border-top: 1px solid var(--border-1); opacity:0; transition:opacity 0.2s;">
-          <button class="thumb-act" title="下载" onclick="${downloadAction}">${CC_PREVIEW_ICONS.download}</button>
-          <button style="font-size:11px; color:var(--primary-6); background:none; border:none; cursor:pointer; font-weight:500;" onclick="event.stopPropagation(); revokeReviewItem('${it.itemId}');">撤回重审</button>
-        </div>
-      `;
-    } else {
-      actionsOverlay = `
-        <div class="review-actions-hover" style="position: absolute; bottom: 0; left: 0; right: 0; height: 36px; background: rgba(255,255,255,0.95); display: flex; border-top: 1px solid var(--border-1); opacity:0; transition:opacity 0.2s;">
-          <div style="flex: 1; display: flex; justify-content: center; align-items: center; cursor: pointer; border-right: 1px solid var(--border-1);" onclick="event.stopPropagation();approveReviewItem('${it.itemId}')" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='transparent'">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div style="width: 36px; display: flex; justify-content: center; align-items: center; border-right: 1px solid var(--border-1); cursor:pointer;" onclick="${downloadAction}">
-            ${CC_PREVIEW_ICONS.download}
-          </div>
-          <div style="flex: 1; display: flex; justify-content: center; align-items: center; cursor: pointer;" onclick="event.stopPropagation();rejectReviewItem('${it.itemId}')" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </div>
-        </div>
-      `;
-    }
-    
-    const prompt = it.prompt || (task.input && task.input.prompt) || '暂无描述';
-
-    return `
-      <div class="review-grid-card" style="position: relative; width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid var(--border-2); border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; ${focusStyle}" 
-           onclick="window.__previewMedia({type:'image', url:'${it.url}'}, ${JSON.stringify(displayItems.map(i=>({type:'image', url:i.url})))}, ${idx})"
-           onmouseenter="this.querySelector('.review-prompt-tooltip').style.opacity='1'; this.querySelector('.review-actions-hover').style.opacity='1'; state.reviewFocusIndex=${idx};"
-           onmouseleave="this.querySelector('.review-prompt-tooltip').style.opacity='0'; this.querySelector('.review-actions-hover').style.opacity='0';">
-        ${it.url ? `<img src="${it.url}" style="width: 100%; height: 100%; object-fit: cover;">` : ''}
-        <div style="position: absolute; top: 0; right: 0;">${statusBadge}</div>
-        <div class="review-prompt-tooltip" style="position: absolute; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 10px; padding: 6px 10px; opacity: 0; transition: opacity 0.2s; pointer-events: none; max-height: 40px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4;">
-          ${prompt}
-        </div>
-        ${actionsOverlay}
-      </div>
-    `;
-  }).join('');
-
-  if (generatingCount > 0 && state.reviewFilter === 'all') {
-    for (let i = 0; i < Math.min(8, generatingCount); i++) {
-      gridHtml += `
-        <div style="position: relative; width: 100%; aspect-ratio: 1; background: var(--gray-2); border: 1px solid var(--border-2); border-radius: 4px; display: flex; align-items: center; justify-content: center;">
-          <svg style="animation: spin 1s linear infinite;" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary-6)" stroke-width="2" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
-        </div>
-      `;
-    }
-  }
 
   const filterTabs = [
     { k: 'all', l: '全部', c: allItems.length },
-    { k: 'pending', l: '待审', c: pendingCount },
+    { k: 'pending', l: '可审查', c: pendingCount },
     { k: 'approved', l: '已通过', c: approvedCount },
     { k: 'rejected', l: '已拒绝', c: rejectedCount }
-  ].map(f => `
-    <div style="padding: 4px 12px; font-size: 12px; cursor: pointer; border-radius: 100px; transition: all 0.2s; ${state.reviewFilter === f.k ? 'background:var(--primary-6); color:#fff; font-weight:600;' : 'color:var(--text-lo);'}" onclick="state.reviewFilter='${f.k}'; state.reviewFocusIndex=0; renderReviewPage();">
-      ${f.l} <span style="opacity:0.8; font-weight:normal; margin-left:2px;">${f.c}</span>
-    </div>
-  `).join('');
+  ].map(function(f) {
+    return '<button class="review-filter-pill' + (state.reviewFilter === f.k ? ' active' : '') + '" onclick="state.reviewFilter=\'' + f.k + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">'
+      + f.l + ' <span style="opacity:0.8;font-weight:normal;margin-left:2px;">' + f.c + '</span>'
+      + '</button>';
+  }).join('');
 
-  root.innerHTML = `
-    <div style="height:100%; display:flex; flex-direction:column; background: var(--bg-page); padding: 8px; overflow: hidden;" id="reviewPageContainer">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 4px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <div style="width: 4px; height: 16px; background: var(--primary-6); border-radius: 2px;"></div>
-          <div style="font-size: 15px; font-weight: 600; color: var(--text-hi);">审查台：${task.name}</div>
-        </div>
-        <button class="card-act-btn" style="height: 32px; padding: 6px 12px; font-size: 13px; background:#fff; border: 1px solid var(--border-2); border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 4px;" onclick="backToTaskListView()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-          返回任务列表
-        </button>
-      </div>
-      
-      <div style="display: flex; gap: 12px; margin-bottom: 16px; padding: 0 4px;">
-        ${tabsHtml}
-      </div>
+  let gridHtml = displayItems.map(function(it, idx) {
+    const isFocused = idx === (state.reviewFocusIndex || 0);
+    const isSelected = state.reviewSelected.has(it.itemId);
+    const isPending = it.reviewStatus === 'pending' || !it.reviewStatus;
+    const canRevoke = canRevokeReviewItem(task, it);
+    const listJson = JSON.stringify(displayItems.map(function(item) { return { type: 'image', url: item.url }; }));
+    const previewAction = 'event.stopPropagation(); window.__previewMedia({type:\'image\', url:\'' + it.url + '\'}, ' + listJson + ', ' + idx + ');';
+    const cardClick = state.reviewBatchMode
+      ? 'toggleReviewSelect(\'' + it.itemId + '\')'
+      : 'window.__previewMedia({type:\'image\', url:\'' + it.url + '\'}, ' + listJson + ', ' + idx + ')';
+    const downloadAction = 'event.stopPropagation(); const a=document.createElement(\'a\'); a.href=\'' + it.url + '\'; a.download=\'asset.png\'; a.click();';
+    let statusBadge = '';
+    if (it.reviewStatus === 'approved') statusBadge = '<div class="review-card-status approved">已通过</div>';
+    else if (it.reviewStatus === 'rejected') statusBadge = '<div class="review-card-status rejected">已拒绝</div>';
+    let actionsOverlay = '';
+    if (!isPending) {
+      actionsOverlay = '<div class="review-actions-hover">'
+        + '<div class="review-action-split download" onclick="' + downloadAction + '">' + CC_PREVIEW_ICONS.download + '</div>'
+        + '<div class="review-action-split" onclick="event.stopPropagation(); ' + (canRevoke ? ('revokeReviewItem(\'' + it.itemId + '\')') : 'showToast(\'下游已继续处理，当前结果不可撤回\')') + ';"><button class="review-action-text"' + (canRevoke ? '' : ' style="color:var(--text-ghost)"') + '>撤回重审</button></div>'
+      + '</div>';
+    } else {
+      actionsOverlay = '<div class="review-actions-hover">'
+        + '<div class="review-action-split approve" onclick="event.stopPropagation(); approveReviewItem(\'' + it.itemId + '\');"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
+        + '<div class="review-action-split download" onclick="' + downloadAction + '">' + CC_PREVIEW_ICONS.download + '</div>'
+        + '<div class="review-action-split reject" onclick="event.stopPropagation(); rejectReviewItem(\'' + it.itemId + '\');"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>'
+      + '</div>';
+    }
+    const prompt = it.prompt || (task.input && task.input.prompt) || '暂无描述';
+    return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + (state.reviewBatchMode ? ' is-selectable' : '') + '" data-item-id="' + escHtml(it.itemId) + '"'
+      + (isFocused ? ' style="outline:2px solid var(--primary-6);outline-offset:2px;z-index:1;"' : '')
+      + ' onclick="' + cardClick + '" onmouseenter="state.reviewFocusIndex=' + idx + ';">'
+      + (it.url ? '<img src="' + escHtml(it.url) + '" alt="">' : '')
+      + statusBadge
+      + '<div class="review-prompt-tooltip">' + escHtml(prompt) + '</div>'
+      + (state.reviewBatchMode
+          ? '<div class="review-card-check">✓</div><button class="review-preview-btn" onclick="' + previewAction + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>'
+          : '')
+      + actionsOverlay
+      + '</div>';
+  }).join('');
 
-      <div style="background:#fff; border-radius:8px; border:1px solid var(--border-1); padding: 12px; margin: 0 4px 12px 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div style="display: flex; gap: 16px; align-items: center;">
-            <div style="display: flex; background: var(--gray-2); padding: 2px; border-radius: 100px; border: 1px solid var(--border-1);">
-              ${filterTabs}
-            </div>
-            <div style="width: 1px; height: 16px; background: var(--border-2);"></div>
-            <div style="font-size: 12px; color: var(--text-lo);">
-              实时：正在生成 <b style="color:var(--primary-6)">${generatingCount}</b> | 
-              待审 <b style="color:#f59e0b">${pendingCount}</b> | 
-              已审 <b style="color:#10b981">${approvedCount + rejectedCount}</b>
-            </div>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button id="autoApproveBtn" style="height: 32px; padding: 6px 16px; background: #fff; color: var(--primary-6); border: 1px solid var(--primary-6); border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;" onclick="handleAutoApprove()">自动通过</button>
-            <button id="approveAllBtn" style="height: 32px; padding: 6px 16px; background: var(--primary-6); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;" onclick="approveAllReviewRoute()">全部通过</button>
-          </div>
-        </div>
-      </div>
+  if (generatingCount > 0 && state.reviewFilter === 'all') {
+    for (let i = 0; i < Math.min(6, generatingCount); i++) {
+      gridHtml += '<div class="review-loading-card"><div class="cc-img-loading-thumb"><div class="cc-img-loading-spinner"></div></div></div>';
+    }
+  }
 
-      <div style="flex: 1; overflow-y: auto; padding: 0 4px;" id="reviewGridScroll">
-        ${displayItems.length === 0 && (state.reviewFilter !== 'all' || generatingCount === 0) ? `
-          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:300px; color: var(--text-ghost);">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.5;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            <div style="font-size: 14px; margin-top: 16px; font-weight:500;">当前没有待审查项</div>
-          </div>
-        ` : `
-          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding-bottom: 32px;">
-            ${gridHtml}
-          </div>
-        `}
-      </div>
-    </div>
-  `;
+  let emptyTitle = '当前没有可审查项';
+  let emptyDesc = '当前筛选下没有可处理内容。';
+  if (!allItems.length) {
+    emptyTitle = '当前节点暂无产出';
+    emptyDesc = '上游结果回流后，这里会继续出现可审内容。';
+  } else if (state.reviewFilter !== 'all') {
+    emptyTitle = '当前筛选暂无结果';
+    emptyDesc = '你可以切换到其他筛选，或等待新的审查结果回流。';
+  } else if (reviewedCount > 0 && generatingCount > 0 && pendingCount === 0) {
+    emptyTitle = '当前节点已审完';
+    emptyDesc = '已通过内容正在流向下游继续生成。';
+  }
+
+  root.innerHTML = '<div class="review-page" id="reviewPageContainer">'
+    + '<div class="review-header-bar">'
+      + '<div class="review-title-wrap">'
+        + '<div class="review-title-mark"></div>'
+        + '<div class="review-title-main">'
+          + '<div class="review-title">审查台：' + escHtml(task.name) + '</div>'
+          + '<div class="review-subtitle">当前节点：' + escHtml(activeNodeTitle) + ' · 可审 ' + pendingCount + ' 项 · 未运行到 ' + waitingReviewCount + ' 个 · 已处理 ' + reviewedCount + ' 项</div>'
+        + '</div>'
+      + '</div>'
+      + '<button class="card-act-btn" onclick="backToTaskListView()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>返回任务列表</button>'
+    + '</div>'
+    + '<div class="review-node-tabs">' + tabsHtml + '</div>'
+    + '<div class="review-toolbar">'
+      + '<div class="review-toolbar-main">'
+        + '<div class="review-filter-pills">' + filterTabs + '</div>'
+        + '<div class="sep"></div>'
+        + '<div class="review-live-stats">'
+          + '<span>正在生成 <b style="color:var(--primary-6)">' + generatingCount + '</b></span>'
+          + '<span>可审查 <b style="color:#f59e0b">' + pendingCount + '</b></span>'
+          + '<span>未运行到 <b style="color:var(--text-lo)">' + waitingReviewCount + '</b></span>'
+          + '<span>已处理 <b style="color:#10b981">' + reviewedCount + '</b></span>'
+        + '</div>'
+      + '</div>'
+      + '<div class="review-toolbar-actions">'
+        + (state.reviewBatchMode
+            ? '<div class="review-batch-bar"><span class="review-batch-count">已选 ' + state.reviewSelected.size + ' 项</span><button class="review-toolbar-btn" onclick="selectAllVisibleReviewItems()">全选待审</button><button class="review-toolbar-btn primary" ' + (state.reviewSelected.size ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'approved\')">批量通过</button><button class="review-toolbar-btn danger" ' + (state.reviewSelected.size ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'rejected\')">批量拒绝</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">取消选择</button></div>'
+            : '<button class="review-toolbar-btn primary" ' + (pendingCount ? '' : 'disabled') + ' onclick="focusPendingReview()">开始审查</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">批量选择</button><button id="autoApproveBtn" class="review-toolbar-btn" ' + (pendingCount ? '' : 'disabled') + ' onclick="handleAutoApprove()">自动通过</button><button id="approveAllBtn" class="review-toolbar-btn" ' + (pendingCount ? '' : 'disabled') + ' onclick="confirmApproveAllReviewRoute()">全部通过</button>')
+      + '</div>'
+    + '</div>'
+    + '<div class="review-grid-scroll" id="reviewGridScroll">'
+      + (displayItems.length === 0 && (state.reviewFilter !== 'all' || generatingCount === 0)
+          ? '<div class="review-empty"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.5;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><div class="review-empty-title">' + emptyTitle + '</div><div class="review-empty-desc">' + emptyDesc + '</div></div>'
+          : '<div class="review-grid">' + gridHtml + '</div>')
+    + '</div>'
+  + '</div>';
+  renderReviewBottomBar();
 }
 
 function handleAutoApprove() {
   const btn = document.getElementById('autoApproveBtn');
-  btn.innerHTML = '<svg class="cc-img-loading-spinner" style="width:14px;height:14px;margin-right:4px;border-width:2px;" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle></svg> 处理中...';
+  if (!btn) return;
+  btn.innerHTML = '<svg class="cc-img-loading-spinner" style="width:14px;height:14px;margin-right:4px;border-width:2px;" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle></svg>处理中...';
   btn.style.pointerEvents = 'none';
   btn.style.opacity = '0.7';
-  setTimeout(() => {
+  setTimeout(function() {
     approveAllReviewRoute();
   }, 800);
 }
 
-function renderChatOutputRow(task, output, collapsed) {
-  const items = (output.items || []).slice(0, 3);
-  const total = output.total || 0;
-  
-  const listHtml = items.map((it, idx) => `
-    <div style="display:flex; gap:8px; align-items:flex-start; margin-bottom:4px; min-width:0;">
-      <span style="font-family:monospace; color:var(--text-ghost); font-size:11px; padding-top:2px;">${idx+1}.</span>
-      <div style="font-size:13px; color:var(--text-lo); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1;">
-        ${escHtml(it.content || '')}
-      </div>
-    </div>
-  `).join('');
-
-  return `
-    <div class="output-row ${collapsed ? 'collapsed' : 'expanded'}" style="flex-direction:column; align-items:stretch; gap:4px; padding:8px 12px; background:var(--gray-2); border-radius:var(--r-md); border:1px solid var(--border-1);">
-      ${listHtml || '<div style="color:var(--text-ghost); font-size:12px;">文案生成中...</div>'}
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-top:4px; padding-top:4px; border-top:1px dashed var(--border-1);">
-        <div style="font-size:11px; color:var(--accent-solid); font-weight:500;">
-          共计产出 ${total} 条文案
-        </div>
-        ${total > 3 ? `
-          <div style="font-size:11px; color:var(--text-muted); cursor:pointer;" onclick="parent.postMessage({action:'openTab',title:'全部结果',url:'AI 创作/全部结果-已成功.html'},'*')">
-            查看更多...
-          </div>
-        ` : ''}
-      </div>
-    </div>
-  `;
+function encodeInlineArg(text) {
+  return encodeURIComponent(String(text || ''));
 }
 
-function renderOutputRow(task, output, collapsed) {
+function renderCopyItemRow(task, item, idx) {
+  var content = item.content || '';
+  var encodedContent = encodeInlineArg(content);
+  return ''
+    + '<div class="copy-row">'
+      + '<span class="copy-row-index">' + (idx + 1) + '</span>'
+      + '<div class="copy-row-main">'
+        + '<div class="copy-row-text" title="' + escHtml(content) + '">' + escHtml(content) + '</div>'
+      + '</div>'
+      + '<div class="copy-row-actions">'
+        + '<button class="copy-row-btn" title="复制文案" onclick="event.stopPropagation();copyTextResult(decodeURIComponent(\'' + encodedContent + '\'))">' + icon(SVG.txt, 12) + '复制</button>'
+      + '</div>'
+    + '</div>';
+}
+
+function renderCopySkeletonRow(idx) {
+  return ''
+    + '<div class="copy-row copy-row-skeleton">'
+      + '<span class="copy-row-index">' + (idx + 1) + '</span>'
+      + '<div class="copy-row-main"></div>'
+      + '<div class="copy-row-actions"></div>'
+    + '</div>';
+}
+
+function renderChatOutputRow(task, output, collapsed, vm) {
+  var maxPreview = collapsed ? 2 : 4;
+  var items = (output.items || []).slice(0, maxPreview);
+  var total = vm.expectedCount || output.total || task.input.count || items.length;
+  var rows = items.map(function(it, idx){ return renderCopyItemRow(task, it, idx); });
+
+  if (vm.displayStatus === 'generating') {
+    var targetRows = Math.min(maxPreview, Math.max(total, maxPreview));
+    var skeletonCount = Math.max(targetRows - rows.length, 1);
+    for (var i = 0; i < skeletonCount && rows.length < maxPreview; i++) {
+      rows.push(renderCopySkeletonRow(rows.length));
+    }
+  }
+
+  if (!rows.length) {
+    rows.push(renderCopySkeletonRow(0));
+  }
+
+  var completedCount = vm.producedCount || (output.items || []).length;
+  var unit = vm.quantityUnit || '条';
+  var summaryText = vm.displayStatus === 'generating'
+    ? '已产出 ' + completedCount + ' / ' + total + ' ' + unit
+    : '共计产出 ' + completedCount + ' / ' + total + ' ' + unit;
+  var hintText = vm.displayStatus === 'generating' ? '剩余内容生成后会补到列表中' : (total > items.length ? '其余内容可在完整结果中查看' : '完整内容已展示');
+  var target = getViewAllTarget(task, vm);
+
+  return ''
+    + '<div class="output-row copy-output-list ' + (collapsed ? 'collapsed' : 'expanded') + '">'
+      + rows.join('')
+      + '<div class="copy-output-footer">'
+        + '<div><span class="copy-output-summary">' + summaryText + '</span><span class="copy-output-hint"> · ' + hintText + '</span></div>'
+        + (total > items.length ? '<button class="copy-more-link" onclick="event.stopPropagation();parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>' : '')
+      + '</div>'
+    + '</div>';
+}
+
+function copyTextResult(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function(){ showToast('已复制文案'); }).catch(function(){ showToast('复制失败，请手动选择'); });
+  } else {
+    showToast('当前浏览器不支持自动复制');
+  }
+}
+
+function editCopyResult(taskId, index) {
+  showToast('已进入第 ' + (index + 1) + ' 条文案编辑');
+}
+
+function regenerateCopyResult(taskId, index) {
+  showToast('已发起第 ' + (index + 1) + ' 条文案再生');
+}
+
+function adoptCopyResult(taskId, index) {
+  showToast('已采用第 ' + (index + 1) + ' 条文案');
+}
+
+function renderOutputRow(task, output, collapsed, vm) {
   var MAX = collapsed ? 8 : 4;
-  var showItems = output.items.slice(0, MAX);
-  var remaining = output.total - showItems.length;
+  var resultType = vm && vm.resultType ? vm.resultType : getTaskPrimaryResultType(task, state.cardModels[task.id] || task.input.models[0]);
+  var targetShowCount = vm && (vm.displayStatus === 'completed' || vm.displayStatus === 'aborted')
+    ? Math.min(output.items.length, Math.max(MAX - 1, 1))
+    : MAX;
+  var showItems = output.items.slice(0, targetShowCount);
+  var totalForViewAll = Math.max(vm && vm.producedCount ? vm.producedCount : 0, output.total || 0, output.items.length);
+  var remaining = Math.max(totalForViewAll - showItems.length, 0);
   var thumbs = showItems.map(function(item, i){
-    return item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
+    return resultType === 'video' || item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
   }).join('');
-  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining) : '';
+  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+viewAll+'</div>';
 }
 
-function renderGeneratingOutputRow(task, output, collapsed) {
+function renderGeneratingOutputRow(task, output, collapsed, vm) {
   var MAX = collapsed ? 8 : 4;
   var baseSlots = Math.max(MAX - 1, 0);
   var showItems = output.items.slice(0, baseSlots);
@@ -1727,12 +2409,12 @@ function renderGeneratingOutputRow(task, output, collapsed) {
   }).join('');
   var loadingCount = Math.max(baseSlots - showItems.length, 0);
   var loadingHtml = Array(loadingCount + 1).join('<div class="cc-img-loading-thumb"><div class="cc-img-loading-spinner"></div></div>');
-  var remaining = Math.max(getTaskRequestedCount(task, state.cardModels[task.id] || task.input.models[0]) - showItems.length, 0);
-  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining) : '';
+  var remaining = Math.max((vm.expectedCount || getTaskRequestedCount(task, state.cardModels[task.id] || task.input.models[0])) - showItems.length, 0);
+  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+loadingHtml+viewAll+'</div>';
 }
 
-function renderPartialFailedOutputRow(task, output, collapsed) {
+function renderPartialFailedOutputRow(task, output, collapsed, vm) {
   var MAX = collapsed ? 8 : 4;
   var baseSlots = Math.max(MAX - 1, 0);
   var showItems = output.items.slice(0, baseSlots);
@@ -1740,41 +2422,59 @@ function renderPartialFailedOutputRow(task, output, collapsed) {
     return item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
   }).join('');
   var remaining = Math.max((task.failedCount || 0), 0);
-  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining) : '';
+  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+viewAll+'</div>';
 }
 
-function renderPendingOutputRow(task, collapsed) {
+function renderPendingOutputRow(task, collapsed, vm) {
   var MAX = collapsed ? 8 : 4;
   var baseSlots = Math.max(MAX - 1, 0);
   var placeholders = Array(baseSlots + 1).join('<div class="cc-img-pending-thumb"></div>');
-  var remaining = Math.max(getTaskRequestedCount(task, state.cardModels[task.id] || task.input.models[0]), 0);
-  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining) : '';
+  var remaining = Math.max((vm && vm.expectedCount) || getTaskRequestedCount(task, state.cardModels[task.id] || task.input.models[0]), 0);
+  var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+placeholders+viewAll+'</div>';
 }
 
-function getViewAllTarget(task) {
-  if (!task) return { title:'全部结果', url:'AI 创作/全部结果_等待中.html' };
-  if (task.status === 'completed') {
-    return { title:'全部结果', url:'AI 创作/全部结果-已成功.html' };
+function buildUnifiedResultUrl(task, vm) {
+  var activeModel = state.cardModels[task.id] || (task.input && task.input.models && task.input.models[0]) || '';
+  var resultType = vm && vm.resultType ? vm.resultType : getTaskPrimaryResultType(task, activeModel);
+  var status = vm && vm.displayStatus ? vm.displayStatus : task.status;
+  var unifiedStatus = status;
+  if (task.type !== 'workflow' && (task.status === 'failed' || task.partialFailed)) {
+    unifiedStatus = 'completed';
+  } else if (status === 'reviewing') {
+    unifiedStatus = 'pending_review';
+  } else if (status !== 'pending' && status !== 'generating' && status !== 'completed' && status !== 'aborted' && status !== 'pending_review') {
+    unifiedStatus = 'completed';
   }
-  if (task.status === 'pending' || task.status === 'generating') {
-    return { title:'全部结果', url:'AI 创作/全部结果_等待中.html' };
+  var source = task.type === 'workflow' ? 'workflow' : 'universal';
+  var displayMeta = vm && vm.displayMeta ? vm.displayMeta : getTaskDisplayMeta(task, activeModel, resultType);
+  var params = new URLSearchParams();
+  params.set('taskId', task.id || '');
+  params.set('source', source);
+  params.set('resultType', resultType || 'image');
+  params.set('status', unifiedStatus || 'completed');
+  params.set('taskName', task.name || '');
+  params.set('project', task.project || '');
+  params.set('prompt', (task.input && task.input.prompt) || '');
+  params.set('model', activeModel === '工作流' ? '工作流' : (MODELS_MAP[activeModel] || activeModel || ''));
+  params.set('ratio', displayMeta && displayMeta.ratioText ? displayMeta.ratioText : '');
+  params.set('extra', displayMeta && displayMeta.extra ? displayMeta.extra : '');
+  params.set('expected', vm && typeof vm.expectedCount === 'number' ? String(vm.expectedCount) : '');
+  params.set('produced', vm && typeof vm.producedCount === 'number' ? String(vm.producedCount) : '');
+  if (task.type === 'workflow') {
+    params.set('workflowName', task.workflowRun && task.workflowRun.workflowName ? task.workflowRun.workflowName : (task.name || ''));
   }
-  if (task.status === 'failed' && task.partialFailed) {
-    return { title:'全部结果', url:'AI 创作/全部结果_部分失败.html' };
-  }
-  if (task.status === 'failed') {
-    return { title:'全部结果', url:'AI 创作/全部结果_全部失败.html' };
-  }
-  if (task.status === 'aborted') {
-    return { title:'全部结果', url:'AI 创作/全部结果-正在生成:已中止.html' };
-  }
-  return { title:'全部结果', url:'AI 创作/全部结果_等待中.html' };
+  return 'AI 创作/全部结果-统一版.html?' + params.toString();
 }
 
-function renderViewAllCard(task, remaining) {
-  var target = getViewAllTarget(task);
+function getViewAllTarget(task, vm) {
+  if (!task) return { title:'全部结果', url:'AI 创作/全部结果-统一版.html' };
+  return { title:'全部结果', url: buildUnifiedResultUrl(task, vm) };
+}
+
+function renderViewAllCard(task, remaining, vm) {
+  var target = getViewAllTarget(task, vm);
   return '<div class="o-thumb view-all-card" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')"><div class="view-all-num">+'+remaining+'</div><span>查看全部</span></div>';
 }
 
@@ -1803,48 +2503,68 @@ function renderImageThumb(item, index) {
     +'</div>';
 }
 
-function renderCardActions(task) {
-  var id = task.id, s = task.status;
+function renderCardActions(task, vm) {
+  var id = task.id;
+  var s = vm && vm.displayStatus ? vm.displayStatus : task.status;
+  if (task.type === 'workflow') {
+    if (s === 'generating' || s === 'pending') {
+      return '<div class="card-actions">'
+        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
+        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+        +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
+        +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
+        +'</div>';
+    }
+    if (s === 'pending_review') {
+      return '<div class="card-actions">'
+        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
+        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+        +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
+        +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
+        +'</div>';
+    }
+    if (s === 'aborted') {
+      return '<div class="card-actions">'
+        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
+        +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
+        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+        +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
+        +'</div>';
+    }
+    if (s === 'completed') {
+      return '<div class="card-actions">'
+        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
+        +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
+        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+        +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
+        +'</div>';
+    }
+  }
   if (s === 'completed' || s === 'aborted') {
-    var target = getViewAllTarget(task);
+    var target = getViewAllTarget(task, vm);
     return '<div class="card-actions">'
       +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
       +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
       +'<button class="card-act-more" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>'
       +'</div>';
   }
-  if (s === 'failed') {
-    if (task.partialFailed) {
-      var target = getViewAllTarget(task);
-      return '<div class="card-actions">'
-        +'<button class="card-act-btn" style="border-color:var(--accent-border);background:var(--accent-bg);color:var(--accent-solid)" onclick="event.stopPropagation()">重试失败项</button>'
-        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
-        +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
-        +'<button class="card-act-more" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>'
-        +'</div>';
-    }
-    return '<div class="card-actions">'
-      +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
-      +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
-      +'</div>';
-  }
-  if (s === 'pending_review' || s === 'reviewing') {
-    var queue = getWorkflowReviewQueue(task);
+  if (s === 'pending_review') {
+    var queue = vm && vm.activeReviewQueue ? vm.activeReviewQueue : getWorkflowReviewQueue(task);
     return '<div class="card-actions">'
       +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
       +'<button class="card-act-btn" style="border-color:var(--accent-border);background:var(--accent-bg);color:var(--accent-solid)" onclick="openReviewPage(\''+id+'\',\''+(queue ? queue.reviewTaskId : '')+'\')">进入审查</button>'
       +'</div>';
   }
-  if (s === 'generating') {
+  if (s === 'generating' || s === 'pending') {
     return '<div class="card-actions">'
       +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
       +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
       +'</div>';
   }
-  if (s === 'pending') {
+  if (task.status === 'failed') {
     return '<div class="card-actions">'
       +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
-      +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
+      +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
       +'</div>';
   }
   return '';
@@ -1916,16 +2636,17 @@ function renderDetailModalBody() {
   var task = state.detailTask; if (!task) return;
   var page = state.detailPage, activeModel = state.detailActiveModel;
   var isMulti = task.input.models.length > 1;
-  var currentOutput = getTaskOutput(task, activeModel);
-  var displayMeta = getTaskDisplayMeta(task, activeModel);
+  var vm = getTaskCardViewModel(task, activeModel);
+  var currentOutput = vm.output;
+  var displayMeta = vm.displayMeta;
   var pageItems = currentOutput.items.slice((page-1)*DM_PAGE_SIZE, page*DM_PAGE_SIZE);
-  var totalPages = Math.ceil(currentOutput.total / DM_PAGE_SIZE);
-  var sourceName = GEN_SOURCES[task.source] || task.source || '通用生成';
+  var totalPages = Math.ceil(Math.max(currentOutput.total, 1) / DM_PAGE_SIZE);
+  var sourceName = task.type === 'workflow' ? '工作流' : (GEN_SOURCES[task.source] || task.source || '通用生成');
 
   var modelTabsHtml = isMulti ? '<div class="model-tabs" style="margin:0 -24px;padding:0 24px">'
     +task.input.models.map(function(m){
-      var meta = getTaskDisplayMeta(task, m);
-      return '<button class="model-tab'+(m===activeModel?' active':'')+'" onclick="switchDetailModel(\''+m+'\')">'+escHtml(MODELS_MAP[m]||m)+'<span class="model-tab-count">('+getTaskOutput(task,m).total+'/'+meta.count+')</span></button>';
+      var modelVm = getTaskCardViewModel(task, m);
+      return '<button class="model-tab'+(m===activeModel?' active':'')+'" onclick="switchDetailModel(\''+m+'\')">'+escHtml(MODELS_MAP[m]||m)+'<span class="model-tab-count">('+modelVm.producedCount+'/'+modelVm.expectedCount+')</span></button>';
     }).join('')+'</div>' : '';
 
   var refImgsHtml = (task.input.refImages && task.input.refImages.length > 0)
@@ -1949,17 +2670,17 @@ function renderDetailModalBody() {
   }
 
   document.getElementById('detailModalBody').innerHTML =
-    '<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="c-tag" style="background:#f5f5f5;color:#666">'+escHtml(sourceName)+'</span><span class="c-tag c-tag-'+task.status+'">'+(task.status==='completed'?'已完成':task.status)+'</span><span style="font-size:12px;color:#999">'+task.createdTime+'</span></div><div style="font-size:16px;font-weight:600;color:#1a1a1a">'+escHtml(task.name)+'</div></div>'
+    '<div style="margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span class="c-tag" style="background:#f5f5f5;color:#666">'+escHtml(sourceName)+'</span><span class="c-tag c-tag-'+vm.displayStatus+'">'+escHtml(getTaskStatusLabel(vm.displayStatus))+'</span><span style="font-size:12px;color:#999">'+task.createdTime+'</span></div><div style="font-size:16px;font-weight:600;color:#1a1a1a">'+escHtml(task.name)+'</div></div>'
     +'<div class="detail-input-section"><div class="detail-label">输入信息</div><div class="detail-prompt">'+escHtml(task.input.prompt)+'</div>'
     +'<div class="detail-params">'
     +task.input.models.map(function(m){ return '<span class="detail-param">模型: <strong>'+escHtml(MODELS_MAP[m]||m)+'</strong></span>'; }).join('')
     +(displayMeta.ratioText?'<span class="detail-param">比例: <strong>'+escHtml(displayMeta.ratioText)+'</strong></span>':'')
-    +(task.type==='image' && displayMeta.extra?'<span class="detail-param">分辨率: <strong>'+escHtml(displayMeta.extra)+'</strong></span>':'')
-    +(task.type==='video' && displayMeta.extra?'<span class="detail-param">时长: <strong>'+escHtml(displayMeta.extra)+'</strong></span>':'')
-    +'<span class="detail-param">数量: <strong>'+displayMeta.count+'</strong></span></div>'
+    +(vm.resultType==='image' && displayMeta.extra?'<span class="detail-param">分辨率: <strong>'+escHtml(displayMeta.extra)+'</strong></span>':'')
+    +(vm.resultType==='video' && displayMeta.extra?'<span class="detail-param">时长: <strong>'+escHtml(displayMeta.extra)+'</strong></span>':'')
+    +'<span class="detail-param">数量: <strong>'+vm.producedCount+'/'+vm.expectedCount+'</strong></span></div>'
     +refImgsHtml+'</div>'
     +modelTabsHtml
-    +'<div style="margin-top:12px"><div class="detail-label">输出内容 ('+currentOutput.total+' '+(task.type==='video'?'个':'张')+')</div><div class="detail-output-grid">'+thumbGridHtml+'</div>'+paginationHtml+'</div>';
+    +'<div style="margin-top:12px"><div class="detail-label">输出内容 ('+vm.producedCount+'/'+vm.expectedCount+' '+vm.quantityUnit+')</div><div class="detail-output-grid">'+thumbGridHtml+'</div>'+paginationHtml+'</div>';
 }
 
 // ═══ 任务事件 ═══
@@ -1973,6 +2694,10 @@ window.addEventListener('taskCreated', function(e) {
 
 window.addEventListener('taskUpdated', function(e) {
   state.tasks = state.tasks.map(function(t){ return t.id===e.detail.id ? Object.assign({},t,e.detail) : t; });
+  if (state.pageMode === 'review') {
+    renderReviewPage();
+    return;
+  }
   renderTaskFeed();
 });
 
@@ -1986,6 +2711,9 @@ setProjectPickerAdapter({
   setValue: function(value) { state.filters.project = value; },
   refresh: function() { renderFilterBar(); renderTaskFeed(); }
 });
+if (state.pageMode === 'review') {
+  renderReviewBottomBar();
+}
 </script>
 
 <script>
@@ -2055,15 +2783,40 @@ function getTaskModelConfig(task, modelId) {
   };
 }
 
-function getTaskDisplayMeta(task, modelId) {
-  const cfg = getTaskModelConfig(task, modelId);
-  const ratioText = cfg.platformSize ? `${cfg.platformSize.w}×${cfg.platformSize.h}` : (cfg.ratio || '');
-  const extra = task.type === 'video' ? (cfg.dur || '') : (cfg.res || '');
-  return { ratioText, extra, count: cfg.count || 0 };
+function getTaskDisplayMeta(task, modelId, resultTypeOverride) {
+  var cfg = getTaskModelConfig(task, modelId);
+  var resultType = normalizeTaskResultType(resultTypeOverride || getTaskPrimaryResultType(task, modelId));
+  var ratioText = cfg.platformSize ? (cfg.platformSize.w + '×' + cfg.platformSize.h) : (cfg.ratio || '');
+  var expectedCount = getTaskRequestedCount(task, modelId);
+  var producedCount = getTaskProducedCount(task, getTaskOutput(task, modelId, resultType));
+  var unit = getTaskQuantityUnit(resultType);
+  var countText = expectedCount ? (expectedCount + unit) : '';
+  var countProgressText = expectedCount ? (producedCount + ' / ' + expectedCount + unit) : '';
+  var extra = '';
+  if (resultType === 'video') extra = cfg.dur || '';
+  if (resultType === 'image') extra = cfg.res || '';
+  var resultTypeLabel = resultType === 'text' ? '文案' : (resultType === 'video' ? '视频' : '图像');
+  var specItems = [];
+  if (resultType !== 'text' && ratioText) specItems.push(ratioText);
+  if (extra) specItems.push(extra);
+  return {
+    ratioText: resultType === 'text' ? '' : ratioText,
+    extra: resultType === 'text' ? '' : extra,
+    count: expectedCount || 0,
+    countText: countText,
+    countProgressText: countProgressText,
+    resultTypeLabel: resultTypeLabel,
+    specItems: specItems,
+    metaItems: specItems
+  };
 }
 
 (function initInputBox() {
   const root = document.getElementById('input-box-root');
+  if (state.pageMode === 'review') {
+    root.innerHTML = '';
+    return;
+  }
   root.innerHTML = `
   <div class="input-box-wrapper" style="position:relative">
     <button class="scroll-bottom-btn" id="scrollBottomBtn" onclick="window.__scrollToBottom && window.__scrollToBottom()">
@@ -2109,13 +2862,17 @@ function collapseInputBox() {
   document.getElementById('inputBox').classList.remove('expanded');
 }
 document.addEventListener('click', function(e) {
+  if (state.pageMode === 'review') return;
   const box = document.getElementById('inputBox');
   if (!box || !box.classList.contains('expanded')) return;
   if (box.contains(e.target)) return;
   if (e.target.closest('.upload-dropdown') || e.target.closest('.asset-modal-mask') || e.target.closest('.opt-dd')) return;
   collapseInputBox();
 });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') collapseInputBox(); });
+document.addEventListener('keydown', function(e) {
+  if (state.pageMode === 'review') return;
+  if (e.key === 'Escape') collapseInputBox();
+});
 
 function onInputChange() {
   const has = document.getElementById('inputPrompt').value.trim().length > 0;

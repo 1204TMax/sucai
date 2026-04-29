@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>全部结果 - 统一版</title>
+  <link rel="stylesheet" href="../共享样式/components.css">
+  <link rel="stylesheet" href="../共享样式/image-preview.css">
+  <script src="../共享样式/components.js"></script>
+  <script src="../共享样式/image-preview.js"></script>
+  <style>
+    :root {
+      --primary-1: #E8F4FF;
+      --primary-2: #C4E2FF;
+      --primary-5: #5AA4FF;
+      --primary-6: #4A9EFF;
+      --primary-7: #3580DB;
+      --gray-1: #FCFCFD;
+      --gray-2: #F8F9FA;
+      --gray-3: #F1F3F5;
+      --gray-4: #E9ECEF;
+      --gray-6: #CED4DA;
+      --gray-8: #868E96;
+      --gray-9: #6C757D;
+      --gray-11: #495057;
+      --gray-12: #212529;
+      --bg-page: var(--gray-2);
+      --bg-surface: var(--gray-1);
+      --bg-subtle: var(--gray-3);
+      --bg-hover: var(--gray-4);
+      --border-1: var(--gray-4);
+      --border-2: var(--gray-6);
+      --text-hi: var(--gray-12);
+      --text-lo: var(--gray-11);
+      --text-muted: var(--gray-9);
+      --text-ghost: var(--gray-8);
+      --accent-bg: var(--primary-1);
+      --accent-border: var(--primary-2);
+      --accent-solid: var(--primary-6);
+      --accent-solid-h: var(--primary-5);
+      --accent-text: var(--primary-7);
+      --success-bg: #f6ffed;
+      --success-border: #b7eb8f;
+      --success-text: #389e0d;
+      --warning-bg: #fffbe6;
+      --warning-border: #ffe58f;
+      --warning-text: #d48806;
+      --error-bg: #fff1f0;
+      --error-border: #ffccc7;
+      --error-text: #ff4d4f;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --text-xs: 11px;
+      --text-sm: 12px;
+      --text-base: 13px;
+      --text-md: 14px;
+      --text-lg: 16px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --h-xs: 22px;
+      --h-sm: 28px;
+      --h-md: 32px;
+      --r-sm: 4px;
+      --r-md: 6px;
+      --r-lg: 8px;
+      --r-xl: 12px;
+      --r-full: 9999px;
+      --shadow-1: 0 1px 2px -2px rgba(0,0,0,0.16), 0 3px 6px 0 rgba(0,0,0,0.12), 0 5px 12px 4px rgba(0,0,0,0.09);
+      --shadow-2: 0 3px 6px -4px rgba(0,0,0,0.12), 0 6px 16px 0 rgba(0,0,0,0.08), 0 9px 28px 8px rgba(0,0,0,0.05);
+      --shadow-3: 0 8px 24px rgba(0,0,0,0.15);
+      --copy-max: 960px;
+      --dock-collapsed: 28px;
+      --dock-expanded: 220px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: var(--text-md);
+      line-height: 1.5715;
+      background: var(--bg-page);
+      color: var(--text-hi);
+      padding: var(--space-2);
+    }
+
+    .page-layout {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .page-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-xl);
+      overflow: hidden;
+      margin-bottom: var(--space-2);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .row-pad {
+      padding: var(--space-3) var(--space-5);
+    }
+
+    .row-sep {
+      border-bottom: 1px solid var(--border-1);
+    }
+
+    .row-end {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    .sep {
+      width: 1px;
+      height: 16px;
+      background: var(--border-1);
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--text-hi);
+    }
+
+    .card-subtitle,
+    .card-meta-line,
+    .meta-value,
+    .toolbar-note,
+    .review-inline-desc,
+    .empty-desc,
+    .detail-desc {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .card-meta-line {
+      margin-top: 2px;
+    }
+
+    .status-tag,
+    .source-tag,
+    .review-mini-tag {
+      display: inline-flex;
+      align-items: center;
+      height: 22px;
+      padding: 0 8px;
+      border-radius: var(--r-full);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      line-height: 1;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .source-tag {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .status-pending,
+    .status-generating {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .status-completed {
+      background: var(--success-bg);
+      border-color: var(--success-border);
+      color: var(--success-text);
+    }
+
+    .status-pending_review {
+      background: var(--warning-bg);
+      border-color: var(--warning-border);
+      color: var(--warning-text);
+    }
+
+    .status-aborted {
+      background: var(--error-bg);
+      border-color: var(--error-border);
+      color: var(--error-text);
+    }
+
+    .review-mini-tag {
+      background: var(--warning-bg);
+      border-color: var(--warning-border);
+      color: var(--warning-text);
+      height: 20px;
+      font-size: var(--text-xs);
+    }
+
+    .ref-thumbs {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+
+    .ref-thumb {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      flex-shrink: 0;
+      object-fit: cover;
+      border: 1px solid var(--border-1);
+      background: var(--bg-subtle);
+    }
+
+    .meta-value {
+      color: var(--text-lo);
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .f-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      align-items: center;
+    }
+
+    .chip {
+      height: var(--h-xs);
+      padding: 0 var(--space-2);
+      border-radius: var(--r-sm);
+      font: 500 var(--text-xs)/1 var(--font);
+      color: var(--text-lo);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-1);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      white-space: nowrap;
+    }
+
+    .pills {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-full);
+      padding: 2px;
+      gap: 1px;
+      flex-shrink: 0;
+    }
+
+    .pill {
+      height: var(--h-xs);
+      padding: 0 var(--space-3);
+      border-radius: var(--r-full);
+      font: 500 var(--text-sm)/1 var(--font);
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 120ms ease;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .pill:hover {
+      color: var(--text-lo);
+    }
+
+    .pill.on {
+      background: var(--bg-surface);
+      color: var(--text-hi);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .pill-note {
+      background: transparent;
+      border: none;
+      padding: 0;
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .b {
+      height: var(--h-sm);
+      padding: 0 var(--space-3);
+      border-radius: var(--r-md);
+      font: 500 var(--text-sm)/1 var(--font);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      white-space: nowrap;
+      transition: all 120ms ease;
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      color: var(--text-lo);
+    }
+
+    .b:hover {
+      border-color: var(--border-2);
+      color: var(--text-hi);
+    }
+
+    .b-soft {
+      background: var(--bg-subtle);
+      border-color: var(--border-1);
+    }
+
+    .b-solid {
+      background: var(--accent-solid);
+      border-color: var(--accent-solid);
+      color: #fff;
+    }
+
+    .b-solid:hover {
+      background: var(--accent-solid-h);
+      border-color: var(--accent-solid-h);
+      color: #fff;
+    }
+
+    .b-danger {
+      background: var(--error-text);
+      border-color: var(--error-text);
+      color: #fff;
+    }
+
+    .b-danger:hover {
+      color: #fff;
+      opacity: 0.92;
+    }
+
+    .b-icon {
+      width: var(--h-sm);
+      padding: 0;
+    }
+
+    .review-inline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-5);
+      background: var(--warning-bg);
+      border-top: 1px solid var(--warning-border);
+      border-bottom: 1px solid var(--warning-border);
+      margin: 0 0 var(--space-2);
+      border-radius: var(--r-lg);
+    }
+
+    .review-inline-main {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .review-inline-title {
+      font-size: var(--text-base);
+      font-weight: 600;
+      color: var(--warning-text);
+    }
+
+    .toolbar-compact {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .copy-wrap {
+      display: flex;
+      justify-content: center;
+      padding-top: var(--space-2);
+    }
+
+    .copy-list {
+      width: 100%;
+      max-width: var(--copy-max);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .copy-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-4);
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .copy-item:hover {
+      border-color: var(--accent-border);
+      box-shadow: var(--shadow-1);
+    }
+
+    .copy-item.is-reviewing {
+      border-color: var(--warning-border);
+      background: linear-gradient(0deg, rgba(250,173,20,0.04), rgba(250,173,20,0.04)), var(--bg-surface);
+    }
+
+    .copy-num {
+      width: 28px;
+      min-width: 28px;
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      font-weight: 600;
+      padding-top: 2px;
+    }
+
+    .copy-content {
+      min-width: 0;
+      flex: 1;
+      color: var(--text-lo);
+      font-size: var(--text-base);
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .copy-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      flex-wrap: wrap;
+      opacity: 0;
+      transition: opacity 120ms ease;
+    }
+
+    .copy-item:hover .copy-actions {
+      opacity: 1;
+    }
+
+    .visual-groups {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      padding-top: var(--space-1);
+    }
+
+    .visual-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .visual-group-head {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-1);
+    }
+
+    .visual-group-title {
+      font-size: var(--text-md);
+      font-weight: 600;
+      color: var(--text-hi);
+    }
+
+    .visual-group-count {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+
+    .visual-row {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .visual-row-last {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .visual-item {
+      position: relative;
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+      border: 1px solid var(--border-1);
+      background: var(--bg-subtle);
+    }
+
+    .visual-item:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-2);
+      border-color: var(--accent-border);
+      z-index: 1;
+    }
+
+    .visual-item.is-loading {
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .visual-item.is-selected {
+      border-color: var(--accent-solid);
+      box-shadow: 0 0 0 2px rgba(74,158,255,0.12);
+    }
+
+    .visual-item.is-reviewing {
+      border-color: var(--warning-border);
+    }
+
+    .visual-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: var(--bg-subtle);
+    }
+
+    .visual-meta {
+      position: absolute;
+      right: var(--space-2);
+      bottom: var(--space-2);
+      height: 22px;
+      padding: 0 var(--space-2);
+      border-radius: var(--r-sm);
+      background: rgba(255,255,255,0.9);
+      color: var(--text-lo);
+      font-size: var(--text-sm);
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,0.92);
+    }
+
+    .visual-check {
+      position: absolute;
+      top: var(--space-2);
+      left: var(--space-2);
+      width: 18px;
+      height: 18px;
+      border-radius: var(--r-sm);
+      background: rgba(0,0,0,0.32);
+      color: #fff;
+      font-size: var(--text-xs);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.85);
+      z-index: 3;
+    }
+
+    .page-main.is-batch .visual-check,
+    .visual-item.is-selected .visual-check {
+      display: inline-flex;
+    }
+
+    .visual-item.is-selected .visual-check {
+      background: var(--accent-solid);
+      border-color: var(--accent-solid);
+    }
+
+    .empty-card {
+      min-height: 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 72px 24px;
+      text-align: center;
+    }
+
+    .empty-inner {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      align-items: center;
+    }
+
+    .empty-title {
+      font-size: 24px;
+      line-height: 1.33;
+      font-weight: 600;
+      color: var(--text-hi);
+    }
+
+    .dock {
+      width: var(--dock-collapsed);
+      min-width: var(--dock-collapsed);
+      overflow: hidden;
+      transition: width 140ms ease;
+      position: sticky;
+      top: var(--space-2);
+    }
+
+    .dock:hover,
+    .dock:focus-within {
+      width: var(--dock-expanded);
+      min-width: var(--dock-expanded);
+    }
+
+    .dock-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-1);
+      display: flex;
+      min-height: 320px;
+    }
+
+    .dock-handle {
+      width: var(--dock-collapsed);
+      min-width: var(--dock-collapsed);
+      background: var(--accent-bg);
+      border-right: 1px solid var(--accent-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-3) 4px;
+      color: var(--accent-text);
+      font-size: var(--text-sm);
+      letter-spacing: 1px;
+    }
+
+    .dock-body {
+      min-width: calc(var(--dock-expanded) - var(--dock-collapsed));
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .dock-title {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .seg-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+
+    .seg-btn {
+      height: var(--h-sm);
+      padding: 0 var(--space-3);
+      border-radius: var(--r-md);
+      border: 1px solid var(--border-1);
+      background: var(--bg-surface);
+      color: var(--text-lo);
+      font: 500 var(--text-sm)/1 var(--font);
+      cursor: pointer;
+      transition: all 120ms ease;
+    }
+
+    .seg-btn:hover {
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .seg-btn.is-active {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .modal-mask {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-5);
+      z-index: 1000;
+    }
+
+    .modal-mask.visible {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(720px, 100%);
+      max-height: calc(100vh - 48px);
+      background: var(--bg-surface);
+      border-radius: var(--r-xl);
+      box-shadow: var(--shadow-3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-head,
+    .modal-foot {
+      padding: var(--space-4) var(--space-5);
+      border-bottom: 1px solid var(--border-1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .modal-foot {
+      border-bottom: none;
+      border-top: 1px solid var(--border-1);
+      justify-content: flex-end;
+    }
+
+    .modal-title {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--text-hi);
+    }
+
+    .modal-body {
+      padding: var(--space-5);
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+
+    .detail-box {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .detail-box.full {
+      grid-column: 1 / -1;
+    }
+
+    .detail-label {
+      font-size: var(--text-sm);
+      color: var(--text-muted);
+    }
+
+    .detail-value {
+      font-size: var(--text-base);
+      color: var(--text-lo);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .detail-ref-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .detail-ref {
+      width: 72px;
+      height: 72px;
+      border-radius: var(--r-lg);
+      object-fit: cover;
+      border: 1px solid var(--border-1);
+      background: var(--bg-subtle);
+      cursor: pointer;
+    }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      min-width: 160px;
+      padding: 10px 14px;
+      border-radius: var(--r-lg);
+      background: rgba(33,37,41,0.9);
+      color: #fff;
+      font-size: var(--text-base);
+      box-shadow: var(--shadow-2);
+      display: none;
+      z-index: 1200;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    @media (max-width: 960px) {
+      .page-layout {
+        flex-direction: column-reverse;
+      }
+
+      .dock,
+      .dock:hover,
+      .dock:focus-within {
+        width: 100%;
+        min-width: 100%;
+      }
+
+      .dock-card {
+        min-height: auto;
+      }
+
+      .dock-handle {
+        width: 56px;
+        min-width: 56px;
+      }
+
+      .dock-body {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .row-end {
+        margin-left: 0;
+      }
+
+      .copy-item {
+        flex-direction: column;
+      }
+
+      .copy-actions {
+        opacity: 1;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .visual-grid {
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-layout">
+    <main class="page-main" id="pageMain">
+      <div class="card">
+        <div class="row row-pad row-sep">
+          <div style="min-width:0;flex:1;">
+            <div class="card-title">
+              <span id="cardTitle"></span>
+              <span class="source-tag" id="sourceTag"></span>
+              <span class="status-tag" id="statusTag"></span>
+            </div>
+            <div class="card-subtitle" id="cardSubtitle"></div>
+            <div class="card-meta-line" id="cardMetaLine"></div>
+          </div>
+          <div class="row-end">
+            <button class="b b-soft" id="detailBtn">查看详情</button>
+          </div>
+        </div>
+
+        <div class="row row-pad row-sep" style="gap:var(--space-4);flex-wrap:nowrap;" id="metaRow">
+          <div id="refGroup" style="display:flex;align-items:center;gap:var(--space-2);flex-shrink:0;">
+            <div class="ref-thumbs" id="refThumbs"></div>
+          </div>
+          <div class="meta-value" id="infoPrompt"></div>
+        </div>
+
+        <div class="row row-pad" id="toolbarRow">
+          <div class="toolbar-compact" style="width:100%;">
+            <div class="row" id="toolbarLead"></div>
+            <div class="row-end" id="toolbarActions"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="reviewInlineWrap"></div>
+      <div id="contentStage"></div>
+    </main>
+
+    <aside class="dock" aria-label="结果页切换控制器">
+      <div class="dock-card">
+        <div class="dock-handle">
+          <span>切</span>
+          <span>换</span>
+          <span>结</span>
+          <span>果</span>
+        </div>
+        <div class="dock-body">
+          <div>
+            <div class="dock-title">来源</div>
+            <div class="seg-wrap" id="sourceOptions"></div>
+          </div>
+          <div>
+            <div class="dock-title">类型</div>
+            <div class="seg-wrap" id="typeOptions"></div>
+          </div>
+          <div>
+            <div class="dock-title">状态</div>
+            <div class="seg-wrap" id="statusOptions"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal-mask" id="detailModal" onclick="if(event.target===this)closeDetailModal()">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">任务详情</div>
+          <div class="detail-desc">工作流输入信息与本次任务的核心参数展示在这里。</div>
+        </div>
+        <button class="b b-soft" onclick="closeDetailModal()">关闭</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-foot">
+        <button class="b b-soft" onclick="closeDetailModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-mask" id="abortModal" onclick="if(event.target===this)closeAbortModal()">
+    <div class="modal-card" style="width:min(480px,100%);">
+      <div class="modal-head">
+        <div class="modal-title">是否中止生成？</div>
+        <button class="b b-soft" onclick="closeAbortModal()">关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="detail-box full">
+          <div class="detail-label">说明</div>
+          <div class="detail-value">中止后当前页面会切换为“已中止”状态，未完成项不再继续生成，已产出内容会保留在展示区。</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="b b-soft" onclick="closeAbortModal()">取消</button>
+        <button class="b b-danger" onclick="confirmAbort()">确认中止</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const SOURCE_OPTIONS = [
+      { value: 'universal', label: '通用生成' },
+      { value: 'workflow', label: '工作流' }
+    ];
+    const TYPE_OPTIONS = [
+      { value: 'text', label: '文案' },
+      { value: 'image', label: '图像' },
+      { value: 'video', label: '视频' }
+    ];
+    const STATUS_OPTIONS = [
+      { value: 'pending', label: '排队中' },
+      { value: 'generating', label: '生成中' },
+      { value: 'completed', label: '已完成' },
+      { value: 'aborted', label: '已中止' },
+      { value: 'pending_review', label: '待审核' }
+    ];
+    const DENSITY_OPTIONS = [
+      { value: 'sparse', label: '大' },
+      { value: 'medium', label: '中' },
+      { value: 'dense', label: '小' }
+    ];
+    const ROUTE = new URLSearchParams(window.location.search);
+    const STATE = {
+      source: ROUTE.get('source') || 'universal',
+      resultType: ROUTE.get('resultType') || 'image',
+      status: ROUTE.get('status') || 'completed',
+      density: 'medium',
+      batchMode: false,
+      selectedIds: new Set(),
+      initial: {
+        source: ROUTE.get('source') || 'universal',
+        resultType: ROUTE.get('resultType') || 'image',
+        status: ROUTE.get('status') || 'completed',
+        taskName: ROUTE.get('taskName') || '',
+        workflowName: ROUTE.get('workflowName') || '',
+        project: ROUTE.get('project') || '',
+        prompt: ROUTE.get('prompt') || '',
+        modelLabel: ROUTE.get('model') || '',
+        ratioText: ROUTE.get('ratio') || '',
+        extraText: ROUTE.get('extra') || '',
+        expectedCount: ROUTE.get('expected') || '',
+        producedCount: ROUTE.get('produced') || ''
+      }
+    };
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeJs(text) {
+      return String(text || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+    }
+
+    function showToast(message) {
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(function() {
+        el.classList.remove('show');
+      }, 1600);
+    }
+
+    function getStatusLabel(status) {
+      return {
+        pending: '排队中',
+        generating: '生成中',
+        completed: '已完成',
+        aborted: '已中止',
+        pending_review: '待审核'
+      }[status] || '已完成';
+    }
+
+    function getSourceLabel(source) {
+      return source === 'workflow' ? '工作流' : '通用生成';
+    }
+
+    function getTypeLabel(type) {
+      return { text: '文案', image: '图像', video: '视频' }[type] || '图像';
+    }
+
+    function getStatusClass(status) {
+      return 'status-' + status;
+    }
+
+    function rand(seed, index) {
+      return seed + '-' + index;
+    }
+
+    function imageItem(seed, ratio, modelLabel, index) {
+      return {
+        id: seed + '-img-' + index,
+        type: 'image',
+        model: modelLabel,
+        ratio: ratio,
+        thumb: 'https://picsum.photos/seed/' + rand(seed, index) + '/800/800',
+        url: 'https://picsum.photos/seed/' + rand(seed, index) + '/1600/1600'
+      };
+    }
+
+    function videoItem(seed, ratio, modelLabel, duration, index) {
+      return {
+        id: seed + '-video-' + index,
+        type: 'video',
+        model: modelLabel,
+        ratio: ratio,
+        duration: duration,
+        thumb: 'https://picsum.photos/seed/' + rand(seed, index) + '/1280/720',
+        url: '../icon/步数1-1.mp4'
+      };
+    }
+
+    function textItem(seed, modelLabel, index) {
+      const pool = [
+        '熬夜后的脸色真的很难骗过镜头，这条文案主打“提亮 + 修护”双收益，适合放在小红书种草和详情页首屏。',
+        '通勤女生最怕底妆不服帖，这版文案强调妆前状态、肤感和成分安心感，更适合日常投放。',
+        '如果你需要的是更直接的成交表达，这条会把“价格锚点 + 功效卖点 + 场景代入”放在前两句。',
+        '这条更适合作为工作流审校后的终稿版，节奏更短，口语感更强，适合抖音口播脚本改写。',
+        '内容重点放在“敏感肌也能安心用”，语气更克制，适合品牌官方账号和搜索流量场景。',
+        '如果想强化高级感和质感认知，这条会偏视觉想象型表达，更适合海报文案或 KV 配文。'
+      ];
+      return {
+        id: seed + '-text-' + index,
+        type: 'text',
+        model: modelLabel,
+        content: pool[index % pool.length]
+      };
+    }
+
+    function getScenarioMeta(selection) {
+      const useInitial = selection.source === STATE.initial.source
+        && selection.resultType === STATE.initial.resultType
+        && selection.status === STATE.initial.status;
+      const routeMeta = useInitial ? STATE.initial : {};
+      const source = selection.source;
+      const resultType = selection.resultType;
+      const status = selection.status;
+      const taskName = routeMeta.taskName || (source === 'workflow'
+        ? (resultType === 'text' ? '美妆自动化文案生产任务' : (resultType === 'video' ? '美妆自动化视频生产任务' : '美妆自动化图片生产任务'))
+        : (resultType === 'text' ? '护肤品文案裂变' : (resultType === 'video' ? '产品视频批量生成' : '详情页主图批量生成')));
+      const workflowName = routeMeta.workflowName || (source === 'workflow'
+        ? (resultType === 'text' ? '文案审核工作流' : (resultType === 'video' ? '视频审核工作流' : '图片审核工作流'))
+        : '');
+      const modelLabel = routeMeta.modelLabel || (source === 'workflow' ? '工作流' : (resultType === 'text' ? 'GPT-5.4 mini' : (resultType === 'video' ? 'Seedance 2.0' : 'Seedream 5.0')));
+      const ratioText = routeMeta.ratioText || (resultType === 'text' ? '' : (resultType === 'video' ? '9:16' : '1920×1080'));
+      const extraText = routeMeta.extraText || (resultType === 'text' ? '' : (resultType === 'video' ? '5秒' : '2K'));
+      const expectedCount = Number(routeMeta.expectedCount || (resultType === 'text' ? 20 : (resultType === 'video' ? 16 : 50)));
+      const producedCount = Number(routeMeta.producedCount || (status === 'pending' ? 0 : (status === 'generating' ? Math.max(4, Math.floor(expectedCount / 3)) : (status === 'aborted' ? Math.max(4, Math.floor(expectedCount / 2)) : (status === 'pending_review' ? Math.max(6, Math.floor(expectedCount / 2)) : expectedCount)))));
+      const project = routeMeta.project || (source === 'workflow' ? '护肤品推广' : (resultType === 'video' ? '走路赚金币' : '护肤品推广'));
+      const prompt = routeMeta.prompt || (source === 'workflow'
+        ? '工作流输入信息已收起，点击右上角“查看详情”查看本次任务的具体输入字段。'
+        : (resultType === 'text'
+          ? '请围绕新品精华液，生成更适合小红书投放场景的 20 条文案，语气自然，不要过度营销。'
+          : (resultType === 'video'
+            ? '在阳光明媚的草地上奔跑的金毛寻回犬，毛发蓬松，背景虚化，高清写实风格，自然光照。'
+            : '在柔光环境中拍摄高质感护肤品主图，突出“提亮修护”的核心卖点。')));
+      return {
+        source: source,
+        sourceLabel: getSourceLabel(source),
+        resultType: resultType,
+        resultTypeLabel: getTypeLabel(resultType),
+        status: status,
+        statusLabel: getStatusLabel(status),
+        taskName: taskName,
+        workflowName: workflowName,
+        modelLabel: modelLabel,
+        ratioText: ratioText,
+        extraText: extraText,
+        expectedCount: expectedCount,
+        producedCount: producedCount,
+        project: project,
+        prompt: prompt,
+        reviewNodeName: source === 'workflow' ? (resultType === 'text' ? '文案审核节点' : (resultType === 'video' ? '视频审核节点' : '图片审核节点')) : '',
+        reviewPendingCount: status === 'pending_review' ? Math.max(1, expectedCount - producedCount) : 0,
+        reviewProducedCount: status === 'pending_review' ? producedCount : 0,
+        refs: resultType === 'text'
+          ? ['https://picsum.photos/seed/text-ref-1/240/240']
+          : (resultType === 'video'
+            ? ['https://picsum.photos/seed/video-ref-1/240/240', 'https://picsum.photos/seed/video-ref-2/240/240']
+            : ['https://picsum.photos/seed/image-ref-1/240/240', 'https://picsum.photos/seed/image-ref-2/240/240'])
+      };
+    }
+
+    function buildOutputItems(meta) {
+      const items = [];
+      for (let i = 0; i < meta.producedCount; i += 1) {
+        if (meta.resultType === 'text') {
+          items.push(textItem(meta.source + '-' + meta.status, meta.modelLabel, i));
+        } else if (meta.resultType === 'video') {
+          items.push(videoItem(meta.source + '-' + meta.status, meta.ratioText || '9:16', meta.modelLabel, meta.extraText || '5秒', i));
+        } else {
+          items.push(imageItem(meta.source + '-' + meta.status, meta.ratioText || '1920×1080', meta.modelLabel, i));
+        }
+      }
+      return items;
+    }
+
+    function currentMeta() {
+      const meta = getScenarioMeta({ source: STATE.source, resultType: STATE.resultType, status: STATE.status });
+      meta.outputItems = buildOutputItems(meta);
+      return meta;
+    }
+
+    function updateRoute(meta) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('source', meta.source);
+      params.set('resultType', meta.resultType);
+      params.set('status', meta.status);
+      history.replaceState({}, '', window.location.pathname + '?' + params.toString());
+    }
+
+    function renderSegOptions(targetId, options, currentValue, onChange) {
+      const root = document.getElementById(targetId);
+      root.innerHTML = options.map(function(item) {
+        return '<button class="seg-btn' + (item.value === currentValue ? ' is-active' : '') + '" type="button" data-value="' + item.value + '">' + item.label + '</button>';
+      }).join('');
+      root.querySelectorAll('.seg-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          onChange(btn.getAttribute('data-value'));
+        });
+      });
+    }
+
+    function renderHeader(meta) {
+      document.getElementById('cardTitle').textContent = '已产出 ' + meta.producedCount + (meta.resultType === 'text' ? ' 条' : (meta.resultType === 'image' ? ' 张' : ' 条'));
+      document.getElementById('sourceTag').textContent = meta.sourceLabel;
+      const statusTag = document.getElementById('statusTag');
+      statusTag.textContent = meta.statusLabel;
+      statusTag.className = 'status-tag ' + getStatusClass(meta.status);
+      document.getElementById('cardSubtitle').textContent = [meta.project, meta.resultTypeLabel, meta.sourceLabel].filter(Boolean).join(' · ');
+      document.getElementById('cardMetaLine').textContent = meta.source === 'workflow'
+        ? ('任务：' + meta.taskName + '    工作流：' + (meta.workflowName || meta.taskName))
+        : ('任务：' + meta.taskName + '    模型：' + meta.modelLabel + (meta.resultType !== 'text' && meta.extraText ? '    ' + (meta.resultType === 'video' ? '时长：' : '分辨率：') + meta.extraText : ''));
+    }
+
+    function renderMetaRow(meta) {
+      const refGroup = document.getElementById('refGroup');
+      const refThumbs = document.getElementById('refThumbs');
+      if (meta.refs && meta.refs.length) {
+        refThumbs.innerHTML = meta.refs.map(function(url, index) {
+          return '<img class="ref-thumb" src="' + escapeHtml(url) + '" alt="参考图' + (index + 1) + '" onclick="previewReference(\'' + escapeJs(url) + '\')">';
+        }).join('');
+        refGroup.style.display = '';
+      } else {
+        refGroup.style.display = 'none';
+      }
+      document.getElementById('infoPrompt').textContent = meta.source === 'workflow'
+        ? '工作流输入信息已收起，点击右上角“查看详情”查看本次任务的具体输入字段。'
+        : meta.prompt;
+    }
+
+    function renderToolbar(meta) {
+      const lead = document.getElementById('toolbarLead');
+      const actions = document.getElementById('toolbarActions');
+      if (meta.resultType === 'text') {
+        lead.innerHTML = '<span class="toolbar-note">文案结果</span><span class="pill-note">列表已按阅读优先方式排版。</span>';
+      } else {
+        const ratioText = meta.resultType === 'video' ? (meta.ratioText || '9:16') : (meta.ratioText || '1920×1080');
+        lead.innerHTML = '<div class="f-chips"><span class="chip">' + escapeHtml(meta.modelLabel) + '</span></div><div class="sep"></div><div class="pills"><button class="pill on" type="button">' + escapeHtml(ratioText) + '</button></div>';
+      }
+      const btns = [];
+      if (meta.resultType !== 'text') {
+        const densityHtml = '<div class="pills">' + DENSITY_OPTIONS.map(function(item) {
+          return '<button class="pill' + (STATE.density === item.value ? ' on' : '') + '" type="button" data-density="' + item.value + '">' + item.label + '</button>';
+        }).join('') + '</div><div class="sep"></div>';
+        btns.push(densityHtml);
+      }
+      if (meta.status === 'pending_review') btns.push('<button class="b b-solid" type="button" onclick="goReview()">去审核</button>');
+      if (meta.resultType !== 'text') btns.push('<button class="b b-soft" type="button" onclick="toggleBatchMode()">' + (STATE.batchMode ? '取消批量' : '批量选择') + '</button>');
+      btns.push('<button class="b b-soft" type="button" onclick="downloadAll()">' + (meta.resultType === 'text' ? '复制全部' : '下载全部') + '</button>');
+      btns.push('<button class="b b-soft" type="button" onclick="archiveAll()">全部入库</button>');
+      if (meta.status === 'pending' || meta.status === 'generating') btns.push('<button class="b b-danger" type="button" onclick="openAbortModal()">中止生成</button>');
+      actions.innerHTML = btns.join('');
+      actions.querySelectorAll('[data-density]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          STATE.density = btn.getAttribute('data-density');
+          renderPage();
+        });
+      });
+    }
+
+    function renderReviewInline(meta) {
+      const root = document.getElementById('reviewInlineWrap');
+      if (meta.status !== 'pending_review') {
+        root.innerHTML = '';
+        return;
+      }
+      root.innerHTML = '<div class="review-inline">'
+        + '<div class="review-inline-main">'
+        + '<div class="review-inline-title">当前有待审核节点，请优先处理</div>'
+        + '<div class="review-inline-desc">节点：' + escapeHtml(meta.reviewNodeName) + ' · 待处理：' + meta.reviewPendingCount + ' 条 · 已产出：' + meta.reviewProducedCount + ' 条</div>'
+        + '</div>'
+        + '<div class="row-end" style="margin-left:auto"><button class="b b-solid" type="button" onclick="goReview()">去审核</button></div>'
+        + '</div>';
+    }
+
+    function getItemAspect(meta, item) {
+      const ratio = item.ratio || meta.ratioText || '';
+      if (ratio.indexOf('9:16') > -1) return 9 / 16;
+      if (ratio.indexOf('16:9') > -1 || ratio.indexOf('1920×1080') > -1) return 16 / 9;
+      if (ratio.indexOf('1:1') > -1) return 1;
+      if (ratio.indexOf('3:4') > -1) return 3 / 4;
+      return meta.resultType === 'video' ? 16 / 9 : 3 / 4;
+    }
+
+    function getRowHeight() {
+      return {
+        sparse: 240,
+        medium: 188,
+        dense: 144
+      }[STATE.density] || 188;
+    }
+
+    function justifyRows(items, containerWidth, meta) {
+      const rows = [];
+      let row = [];
+      let aspectSum = 0;
+      const targetHeight = getRowHeight();
+      items.forEach(function(item) {
+        const aspect = getItemAspect(meta, item);
+        row.push({ item: item, aspect: aspect });
+        aspectSum += aspect;
+        if (aspectSum * targetHeight + (row.length - 1) * 8 >= containerWidth) {
+          const available = containerWidth - (row.length - 1) * 8;
+          const rowHeight = available / aspectSum;
+          rows.push({
+            last: false,
+            items: row.map(function(entry) {
+              return {
+                item: entry.item,
+                width: entry.aspect * rowHeight,
+                height: rowHeight
+              };
+            })
+          });
+          row = [];
+          aspectSum = 0;
+        }
+      });
+      if (row.length) {
+        rows.push({
+          last: true,
+          items: row.map(function(entry) {
+            return {
+              item: entry.item,
+              width: entry.aspect * targetHeight,
+              height: targetHeight
+            };
+          })
+        });
+      }
+      return rows;
+    }
+
+    function renderVisualItem(meta, item, index, width, height) {
+      if (item.isLoading) {
+        return '<div class="visual-item is-loading" style="width:' + Math.round(width) + 'px;height:' + Math.round(height) + 'px;"><div class="cc-img-loading-thumb" style="width:100%;height:100%;"><div class="cc-img-loading-spinner"></div></div></div>';
+      }
+      const reviewClass = meta.status === 'pending_review' && index < meta.reviewPendingCount ? ' is-reviewing' : '';
+      const selectedClass = STATE.selectedIds.has(item.id) ? ' is-selected' : '';
+      const downloadAction = "event.stopPropagation();downloadVisualById('" + escapeJs(item.id) + "')";
+      const overlay = thumbOverlayHtml('', downloadAction);
+      const metaText = meta.resultType === 'video' ? (item.duration || meta.extraText || '5秒') : (item.ratio || meta.ratioText || '1920×1080');
+      return '<div class="visual-item' + selectedClass + reviewClass + '" data-item-id="' + escapeHtml(item.id) + '" style="width:' + Math.round(width) + 'px;height:' + Math.round(height) + 'px;" onclick="handleVisualItemClick(\'' + escapeJs(item.id) + '\')">'
+        + '<img class="visual-thumb" src="' + escapeHtml(item.thumb || item.url || '') + '" alt="">'
+        + '<div class="visual-check">✓</div>'
+        + overlay
+        + '<div class="visual-meta">' + escapeHtml(metaText) + '</div>'
+        + '</div>';
+    }
+
+    function renderVisual(meta) {
+      const stage = document.getElementById('contentStage');
+      const stageWidth = Math.max(stage.clientWidth || 0, 1120);
+      const visualItems = meta.outputItems.slice();
+      let pendingSlots = meta.status === 'pending' ? (meta.expectedCount || 8) : Math.max(meta.expectedCount - meta.producedCount, 0);
+      while (pendingSlots > 0) {
+        visualItems.push({ id: 'pending-' + pendingSlots, type: meta.resultType, ratio: meta.ratioText, isLoading: true, duration: meta.extraText });
+        pendingSlots -= 1;
+      }
+      if (!visualItems.length) {
+        stage.innerHTML = '<div class="card empty-card"><div class="empty-inner"><div class="empty-title">当前没有可展示的结果</div><div class="empty-desc">你可以通过右侧悬浮切换器切换来源、类型或状态。</div></div></div>';
+        return;
+      }
+      const rows = justifyRows(visualItems, stageWidth - 24, meta);
+      const groupTitle = meta.modelLabel || '结果';
+      stage.innerHTML = '<div class="visual-groups"><div class="visual-group"><div class="visual-group-head"><div class="visual-group-title">' + escapeHtml(groupTitle) + '</div><div class="visual-group-count">' + visualItems.length + (meta.resultType === 'video' ? ' 条' : ' 张') + '</div></div>' + rows.map(function(row) {
+        return '<div class="' + (row.last ? 'visual-row-last' : 'visual-row') + '">' + row.items.map(function(entry, index) {
+          return renderVisualItem(meta, entry.item, index, entry.width, entry.height);
+        }).join('') + '</div>';
+      }).join('') + '</div></div>';
+    }
+
+    function renderCopy(meta) {
+      const stage = document.getElementById('contentStage');
+      const items = meta.outputItems.slice();
+      let pendingSlots = meta.status === 'pending' ? (meta.expectedCount || 4) : Math.max(meta.expectedCount - meta.producedCount, 0);
+      while (pendingSlots > 0) {
+        items.push({ id: 'pending-text-' + pendingSlots, isLoading: true });
+        pendingSlots -= 1;
+      }
+      if (!items.length) {
+        stage.innerHTML = '<div class="card empty-card"><div class="empty-inner"><div class="empty-title">当前没有可展示的文案</div><div class="empty-desc">你可以通过右侧悬浮切换器切换来源、类型或状态。</div></div></div>';
+        return;
+      }
+      stage.innerHTML = '<div class="copy-wrap"><div class="copy-list">' + items.map(function(item, index) {
+        if (item.isLoading) {
+          return '<div class="copy-item"><div class="copy-num">' + String(index + 1).padStart(2, '0') + '</div><div class="copy-content"><div class="cc-img-loading-thumb" style="width:100%;height:64px;border-radius:var(--r-lg)"><div class="cc-img-loading-spinner"></div></div></div></div>';
+        }
+        const reviewClass = meta.status === 'pending_review' && index < meta.reviewPendingCount ? ' is-reviewing' : '';
+        const reviewTag = meta.status === 'pending_review' && index < meta.reviewPendingCount ? '<span class="review-mini-tag">待审核</span>' : '';
+        return '<div class="copy-item' + reviewClass + '">'
+          + '<div class="copy-num">' + String(index + 1).padStart(2, '0') + '</div>'
+          + '<div class="copy-content">' + escapeHtml(item.content || '') + '</div>'
+          + '<div class="copy-actions">'
+          + reviewTag
+          + '<button class="b b-soft" type="button" onclick="copySingleText(\'' + escapeJs(item.content || '') + '\')">复制</button>'
+          + '<button class="b b-soft" type="button" onclick="archiveSingleText()">入库</button>'
+          + '</div>'
+          + '</div>';
+      }).join('') + '</div></div>';
+    }
+
+    function renderDetail(meta) {
+      const body = document.getElementById('detailBody');
+      const refHtml = meta.refs.map(function(url, idx) {
+        return '<img class="detail-ref" src="' + escapeHtml(url) + '" alt="参考图' + (idx + 1) + '" onclick="previewReference(\'' + escapeJs(url) + '\')">';
+      }).join('');
+      body.innerHTML = '<div class="detail-grid">'
+        + '<div class="detail-box"><div class="detail-label">任务名称</div><div class="detail-value">' + escapeHtml(meta.taskName) + '</div></div>'
+        + (meta.source === 'workflow' ? '<div class="detail-box"><div class="detail-label">工作流名称</div><div class="detail-value">' + escapeHtml(meta.workflowName || meta.taskName) + '</div></div>' : '')
+        + '<div class="detail-box"><div class="detail-label">来源</div><div class="detail-value">' + escapeHtml(meta.sourceLabel) + '</div></div>'
+        + '<div class="detail-box"><div class="detail-label">输出类型</div><div class="detail-value">' + escapeHtml(meta.resultTypeLabel) + '</div></div>'
+        + '<div class="detail-box"><div class="detail-label">状态</div><div class="detail-value">' + escapeHtml(meta.statusLabel) + '</div></div>'
+        + '<div class="detail-box"><div class="detail-label">模型</div><div class="detail-value">' + escapeHtml(meta.modelLabel) + '</div></div>'
+        + '<div class="detail-box"><div class="detail-label">产出进度</div><div class="detail-value">' + meta.producedCount + ' / ' + meta.expectedCount + (meta.resultType === 'text' ? '条' : (meta.resultType === 'image' ? '张' : '条')) + '</div></div>'
+        + (meta.resultType === 'text' ? '' : '<div class="detail-box"><div class="detail-label">比例</div><div class="detail-value">' + escapeHtml(meta.ratioText || '未指定') + '</div></div>')
+        + (meta.resultType === 'text' ? '' : '<div class="detail-box"><div class="detail-label">' + (meta.resultType === 'video' ? '时长' : '分辨率') + '</div><div class="detail-value">' + escapeHtml(meta.extraText || '未指定') + '</div></div>')
+        + '<div class="detail-box full"><div class="detail-label">输入内容</div><div class="detail-value">' + escapeHtml(meta.prompt) + '</div></div>'
+        + '<div class="detail-box full"><div class="detail-label">参考图</div><div class="detail-ref-row">' + (refHtml || '<span class="detail-value">无</span>') + '</div></div>'
+        + '</div>';
+    }
+
+    function renderPage() {
+      const meta = currentMeta();
+      updateRoute(meta);
+      renderHeader(meta);
+      renderMetaRow(meta);
+      renderToolbar(meta);
+      renderReviewInline(meta);
+      renderDetail(meta);
+      document.getElementById('pageMain').classList.toggle('is-batch', STATE.batchMode && meta.resultType !== 'text');
+      if (meta.resultType === 'text') renderCopy(meta);
+      else renderVisual(meta);
+    }
+
+    function copySingleText(text) {
+      navigator.clipboard.writeText(text).then(function() { showToast('文案已复制'); }).catch(function() { showToast('复制失败'); });
+    }
+
+    function copyAllText() {
+      const meta = currentMeta();
+      const text = meta.outputItems.map(function(item, index) {
+        return String(index + 1).padStart(2, '0') + '. ' + (item.content || '');
+      }).join('\n\n');
+      navigator.clipboard.writeText(text).then(function() { showToast('已复制全部文案'); }).catch(function() { showToast('复制失败'); });
+    }
+
+    function archiveSingleText() {
+      showToast('已入库到素材库');
+    }
+
+    function archiveAll() {
+      showToast('已批量入库到素材库');
+    }
+
+    function downloadAll() {
+      const meta = currentMeta();
+      if (meta.resultType === 'text') {
+        copyAllText();
+        return;
+      }
+      showToast('已开始下载全部结果');
+    }
+
+    function downloadVisualById(itemId) {
+      const meta = currentMeta();
+      const item = meta.outputItems.find(function(entry) { return entry.id === itemId; });
+      if (!item) return;
+      const a = document.createElement('a');
+      a.href = item.url || item.thumb || '';
+      a.download = meta.resultType === 'video' ? 'result.mp4' : 'result.png';
+      a.click();
+      showToast('已开始下载');
+    }
+
+    function toggleBatchMode() {
+      const meta = currentMeta();
+      if (meta.resultType === 'text') return;
+      STATE.batchMode = !STATE.batchMode;
+      STATE.selectedIds.clear();
+      renderPage();
+    }
+
+    function handleVisualItemClick(itemId) {
+      const meta = currentMeta();
+      const item = meta.outputItems.find(function(entry) { return entry.id === itemId; });
+      if (!item) return;
+      if (STATE.batchMode) {
+        if (STATE.selectedIds.has(itemId)) STATE.selectedIds.delete(itemId);
+        else STATE.selectedIds.add(itemId);
+        renderPage();
+        return;
+      }
+      if (item.type === 'video') previewVideo(item.url, item.duration || meta.extraText || '5秒');
+      else previewImageById(itemId);
+    }
+
+    function previewImageById(itemId) {
+      const meta = currentMeta();
+      const items = meta.outputItems.filter(function(item) { return item.type === 'image'; });
+      const current = items.find(function(item) { return item.id === itemId; });
+      if (!current || typeof window.__previewImage !== 'function') return;
+      const list = items.map(function(item) { return item.url || item.thumb; }).filter(Boolean);
+      const idx = items.findIndex(function(item) { return item.id === itemId; });
+      window.__previewImage(current.url || current.thumb, list, idx >= 0 ? idx : 0);
+    }
+
+    function previewVideo(url, duration) {
+      if (typeof window.__previewMedia !== 'function') return;
+      window.__previewMedia({ type: 'video', url: url, duration: duration }, [{ type: 'video', url: url, duration: duration }], 0);
+    }
+
+    function previewReference(url) {
+      if (typeof window.__previewImage !== 'function') return;
+      window.__previewImage(url, [url], 0);
+    }
+
+    function openDetailModal() {
+      document.getElementById('detailModal').classList.add('visible');
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.remove('visible');
+    }
+
+    function openAbortModal() {
+      document.getElementById('abortModal').classList.add('visible');
+    }
+
+    function closeAbortModal() {
+      document.getElementById('abortModal').classList.remove('visible');
+    }
+
+    function confirmAbort() {
+      STATE.status = 'aborted';
+      STATE.batchMode = false;
+      STATE.selectedIds.clear();
+      closeAbortModal();
+      showToast('已中止');
+      renderPage();
+    }
+
+    function goReview() {
+      showToast('已进入审核节点');
+    }
+
+    function bootOptions() {
+      renderSegOptions('sourceOptions', SOURCE_OPTIONS, STATE.source, function(value) {
+        STATE.source = value;
+        STATE.batchMode = false;
+        STATE.selectedIds.clear();
+        renderPage();
+      });
+      renderSegOptions('typeOptions', TYPE_OPTIONS, STATE.resultType, function(value) {
+        STATE.resultType = value;
+        STATE.batchMode = false;
+        STATE.selectedIds.clear();
+        renderPage();
+      });
+      renderSegOptions('statusOptions', STATUS_OPTIONS, STATE.status, function(value) {
+        STATE.status = value;
+        STATE.batchMode = false;
+        STATE.selectedIds.clear();
+        renderPage();
+      });
+    }
+
+    document.getElementById('detailBtn').addEventListener('click', openDetailModal);
+    if (typeof initImagePreview === 'function') initImagePreview();
+    bootOptions();
+    renderPage();
+  </script>
+</body>
+</html>
