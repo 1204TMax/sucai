@@ -949,31 +949,106 @@
 
         /* ── 工作流 ── */
         :root {
-            --primary-1: #E8F4FF;
-            --primary-2: #C4E2FF;
-            --primary-5: #5AA4FF;
-            --primary-6: #4A9EFF;
-            --primary-7: #3580DB;
-            --text-hi: #212529;
-            --text-lo: #495057;
-            --text-muted: #6C757D;
-            --text-ghost: #868E96;
-            --white: #FFFFFF;
-            --bg-surface: #FCFCFD;
-            --bg-subtle: #F1F3F5;
-            --bg-hover: #E9ECEF;
-            --border-1: #E9ECEF;
-            --border-2: #CED4DA;
-            --accent-bg: var(--primary-1);
-            --accent-border: var(--primary-2);
-            --accent-solid: var(--primary-6);
+            /* ── 主色（Blue，10 级色阶） ── */
+            --primary-1:  #E8F4FF;  /* 选中背景 */
+            --primary-2:  #C4E2FF;  /* 选中边框 */
+            --primary-3:  #96C8FF;
+            --primary-4:  #6DAFFF;
+            --primary-5:  #5AA4FF;  /* 按钮 hover */
+            --primary-6:  #4A9EFF;  /* ★ 主色 — 按钮、链接、焦点 */
+            --primary-7:  #3580DB;  /* 选中文字、pressed */
+            --primary-8:  #2463B5;
+            --primary-9:  #164A8F;
+            --primary-10: #0B336A;
+
+            /* ── 灰阶（Slate，偏蓝冷灰，12 级） ── */
+            --gray-1:  #FCFCFD;  /* 卡片背景 */
+            --gray-2:  #F8F9FA;  /* 页面背景 */
+            --gray-3:  #F1F3F5;  /* subtle 背景 */
+            --gray-4:  #E9ECEF;  /* 默认边框、hover 背景 */
+            --gray-5:  #DEE2E6;  /* active 背景 */
+            --gray-6:  #CED4DA;  /* hover 边框 */
+            --gray-7:  #ADB5BD;  /* 强调边框 */
+            --gray-8:  #868E96;  /* placeholder */
+            --gray-9:  #6C757D;  /* 次要文字 */
+            --gray-10: #5A6169;
+            --gray-11: #495057;  /* 正文文字 */
+            --gray-12: #212529;  /* 标题文字 */
+
+            /* ── 语义映射（组件中只用这些） ── */
+            --bg-page:      var(--gray-2);
+            --bg-surface:   var(--gray-1);
+            --bg-subtle:    var(--gray-3);
+            --bg-hover:     var(--gray-4);
+            --bg-active:    var(--gray-5);
+
+            --border-1:     var(--gray-4);
+            --border-2:     var(--gray-6);
+            --border-3:     var(--gray-7);
+
+            --text-hi:      var(--gray-12);
+            --text-lo:      var(--gray-11);
+            --text-muted:   var(--gray-9);
+            --text-ghost:   var(--gray-8);
+
+            --accent-bg:      var(--primary-1);
+            --accent-border:  var(--primary-2);
+            --accent-solid:   var(--primary-6);
             --accent-solid-h: var(--primary-5);
-            --accent-text: var(--primary-7);
-            --r-md: 6px;
-            --r-lg: 8px;
-            --h-sm: 28px;
-            --h-md: 32px;
+            --accent-text:    var(--primary-7);
+
+            /* ── 状态色 ── */
+            --success: #34C759;
+            --success-bg: #F6FFED;
+            --success-border: #D9F7BE;
+            --warning: #FF9500;
+            --warning-bg: #FFFBE6;
+            --warning-border: #FFE58F;
+            --error:   #E5484D;
+            --error-bg: #FFF2F0;
+            --error-border: #FFCCC7;
+
+            /* ── 固定色（不随主题变） ── */
+            --white: #fff;            /* 深色背景上的文字、图标 */
+            --overlay: rgba(0,0,0,0.45); /* 遮罩层 */
+
+            /* ── 字体 ── */
+            --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "Noto Sans SC", sans-serif;
+            --text-xxs:  10px;  /* 仅限角标、时长标签等极小辅助文字 */
+            --text-xs:   11px;
+            --text-sm:   12px;
+            --text-base: 13px;
+            --text-md:   14px;
+            --text-lg:   16px;
+            --text-xl:   18px;  /* 弹窗标题 */
+
+            /* ── 间距（4px 网格） ── */
+            --space-0: 2px;   /* 仅限微调：列表项间距、内部对齐偏移 */
+            --space-1: 4px;
+            --space-2: 8px;
             --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-7: 32px;
+            --space-8: 40px;
+            --space-9: 48px;
+
+            /* ── 组件高度（所有交互组件必须从中选） ── */
+            --h-xs: 22px;   /* chip, badge, pill, range-input */
+            --h-sm: 28px;   /* 按钮, 搜索框 */
+            --h-md: 32px;   /* select trigger */
+            --h-lg: 36px;   /* 大按钮（极少用） */
+
+            /* ── 圆角 ── */
+            --r-sm:   4px;   /* chip, range-input */
+            --r-md:   6px;   /* 按钮, 搜索框 */
+            --r-lg:   8px;   /* select trigger */
+            --r-xl:   12px;  /* 卡片, dropdown */
+            --r-full: 9999px; /* pill, badge, active-chip */
+
+            /* ── 过渡 ── */
+            --ease: 120ms ease;
         }
         .workflow-wrap { width: 100%; max-width: 1120px; margin-top: 240px; }
         .wf-main-header {
@@ -1144,12 +1219,12 @@
 
         /* ─── 创建工作流弹窗 Modal ─── */
         .modal-overlay {
-            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45);
+            position: fixed; inset: 0; background: var(--overlay);
             z-index: 3000; display: none; align-items: center; justify-content: center;
         }
         .modal-overlay.active { display: flex; }
         .modal-content {
-            background: var(--bg-surface); border-radius: 12px; width: 456px;
+            background: var(--bg-surface); border-radius: var(--r-xl); width: 456px;
             border: 1px solid var(--border-1);
             box-shadow: 0 12px 28px rgba(0,0,0,0.12); display: flex; flex-direction: column;
             animation: modalFadeIn 0.2s ease-out;
@@ -1159,53 +1234,65 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .modal-header {
-            padding: 14px 16px; border-bottom: 1px solid var(--border-1);
+            padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-1);
             display: flex; justify-content: space-between; align-items: center;
         }
-        .modal-title { font-size: 18px; font-weight: 600; color: var(--text-hi); }
+        .modal-title { font-size: var(--text-xl); font-weight: 600; color: var(--text-hi); }
         .modal-close {
-            width: 28px; height: 28px; border-radius: var(--r-md); border: none;
+            width: var(--h-sm); height: var(--h-sm); border-radius: var(--r-md); border: none;
             cursor: pointer; color: var(--text-muted); background: transparent;
             display: inline-flex; align-items: center; justify-content: center;
         }
         .modal-close:hover { color: var(--text-hi); background: var(--bg-subtle); }
-        .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-label { font-size: 13px; font-weight: 500; color: var(--text-lo); }
-        .form-label.required::before { content: '*'; color: #ff4d4f; margin-right: 4px; }
+        .modal-body { padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4); }
+        .form-group { display: flex; flex-direction: column; gap: var(--space-1); }
+        .form-label { font-size: var(--text-base); font-weight: 500; color: var(--text-lo); }
+        .form-label.required::before { content: '*'; color: var(--error); margin-right: var(--space-1); }
         .form-input {
-            height: 32px; padding: 0 12px; border: 1px solid var(--border-1); border-radius: var(--r-md);
-            font-size: 13px; color: var(--text-lo); outline: none; transition: 0.2s; font-family: inherit;
+            height: var(--h-md); padding: 0 var(--space-3); border: 1px solid var(--border-1); border-radius: var(--r-md);
+            font-size: var(--text-base); color: var(--text-lo); outline: none; transition: 0.2s; font-family: inherit;
             background: var(--bg-surface);
         }
         .form-input:focus { border-color: var(--accent-border); box-shadow: 0 0 0 3px var(--accent-bg); }
-        textarea.form-input { resize: vertical; min-height: 72px; padding: 9px 12px; line-height: 1.55; }
-        .cover-editor { display: flex; align-items: center; gap: 12px; }
+        textarea.form-input { resize: vertical; min-height: 72px; padding: var(--space-2) var(--space-3); line-height: 1.55; }
+        .cover-editor { display: flex; align-items: center; gap: var(--space-3); }
         .cover-preview {
-            width: 96px; height: 96px; border-radius: 10px;
+            width: 96px; height: 96px; border-radius: var(--r-xl);
             display: flex; align-items: center; justify-content: center;
-            color: var(--white); font-size: 18px; font-weight: 700; line-height: 1.25;
-            text-align: center; padding: 12px; background: linear-gradient(135deg, #1677ff, #13c2c2);
+            color: var(--white); font-size: var(--text-xl); font-weight: 700; line-height: 1.25;
+            text-align: center; padding: var(--space-3); background: linear-gradient(135deg, #1677ff, #13c2c2);
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
         }
-        .cover-side { display: flex; flex-direction: column; gap: 8px; }
-        .cover-tip { font-size: 12px; color: var(--text-muted); }
+        .cover-side { display: flex; flex-direction: column; gap: var(--space-2); }
+        .cover-tip { font-size: var(--text-sm); color: var(--text-muted); }
         .cover-upload-area {
-            width: fit-content; min-width: 108px; height: 32px; padding: 0 12px;
+            width: fit-content; min-width: 108px; height: var(--h-md); padding: 0 var(--space-3);
             border: 1px dashed var(--border-2); border-radius: var(--r-md);
-            display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+            display: inline-flex; align-items: center; justify-content: center; gap: var(--space-1);
             color: var(--text-lo); cursor: pointer; transition: 0.2s; background: var(--bg-subtle);
-            font-size: 13px;
+            font-size: var(--text-base);
         }
         .cover-upload-area:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: var(--accent-bg); }
-        .cover-upload-area svg { font-size: 16px; }
-        .radio-group { display: flex; gap: 18px; flex-wrap: wrap; }
-        .radio-label { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-lo); }
+        .cover-upload-area svg { font-size: var(--text-lg); }
+        .radio-group { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+        .radio-label { display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: var(--text-base); color: var(--text-lo); }
         .radio-label input { accent-color: var(--accent-solid); }
         .modal-footer {
-            padding: 14px 16px; border-top: 1px solid var(--border-1);
-            display: flex; justify-content: flex-end; gap: 8px;
+            padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border-1);
+            display: flex; justify-content: flex-end; gap: var(--space-2);
         }
+
+        /* 弹窗按钮样式 (Design System) */
+        .b {
+            height: var(--h-md); padding: 0 var(--space-3); border-radius: var(--r-md);
+            font: 500 var(--text-sm)/1 var(--font); border: 1px solid transparent;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            gap: var(--space-1); white-space: nowrap; transition: all var(--ease);
+        }
+        .b-solid { background: var(--accent-solid); color: var(--white); }
+        .b-solid:hover { background: var(--accent-solid-h); }
+        .b-soft { background: var(--bg-subtle); color: var(--text-lo); border-color: var(--border-1); }
+        .b-soft:hover { background: var(--bg-hover); color: var(--text-hi); border-color: var(--border-2); }
 
         /* 辅助图标 */
         svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -1452,14 +1539,14 @@
     <div class="modal-overlay" id="createWfModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">新建工作流生产线</div>
+                <div class="modal-title">新建工作流</div>
                 <button class="modal-close" onclick="closeCreateModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
             </div>
             
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label required">名称</label>
-                    <input type="text" class="form-input" id="wfName" placeholder="例如：春季女装爆款裂变工作流" oninput="updateCoverPreview()">
+                    <input type="text" class="form-input" id="wfName" placeholder="请输入工作流名称" oninput="updateCoverPreview()">
                 </div>
 
                 <div class="form-group">
@@ -1473,7 +1560,7 @@
 
                 <div class="form-group">
                     <label class="form-label">描述</label>
-                    <textarea class="form-input" id="wfDesc" placeholder="简要描述该生产线的主要功能与适用场景..."></textarea>
+                    <textarea class="form-input" id="wfDesc" placeholder="简要描述该工作流的主要功能和适用场景"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -1482,10 +1569,13 @@
                         <div class="cover-preview" id="wfCoverPreview">新建<br>工作流</div>
                         <div class="cover-side">
                             <div class="cover-tip" id="wfCoverTip">默认根据名称自动生成，可选上传封面</div>
-                            <label class="cover-upload-area" for="wfCoverInput">
-                                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                                <span>上传封面</span>
-                            </label>
+                            <div style="display: flex; align-items: center; gap: var(--space-2);">
+                                <label class="cover-upload-area" for="wfCoverInput">
+                                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                    <span id="wfCoverUploadText">上传封面</span>
+                                </label>
+                                <button class="b b-soft" id="wfCoverDeleteBtn" style="display: none; padding: 0 var(--space-2); color: var(--error);" onclick="deleteUploadedCover()">删除</button>
+                            </div>
                             <input type="file" id="wfCoverInput" accept="image/*" style="display:none" onchange="mockUploadCover(this)">
                         </div>
                     </div>
@@ -1496,14 +1586,13 @@
                     <div class="radio-group">
                         <label class="radio-label"><input type="radio" name="wfVisibility" value="private" checked> 仅自己可见</label>
                         <label class="radio-label"><input type="radio" name="wfVisibility" value="team"> 团队公开</label>
-                        <label class="radio-label"><input type="radio" name="wfVisibility" value="square"> 广场公开</label>
                     </div>
                 </div>
             </div>
 
             <div class="modal-footer">
-                <button class="btn btn-default" onclick="closeCreateModal()">取消</button>
-                <button class="btn btn-primary" onclick="submitCreate()">创建并进入画布</button>
+                <button class="b b-soft" onclick="closeCreateModal()">取消</button>
+                <button class="b b-solid" onclick="submitCreate()">创建并进入画布</button>
             </div>
         </div>
     </div>
@@ -1513,6 +1602,26 @@ const createWfModal = document.getElementById('createWfModal');
 
 function openCreateModal() {
     if (!createWfModal) return;
+    if (localStorage.getItem('has_workflow_draft') === '1') {
+        openConfirmModal({
+            title: '提示',
+            description: '检测到有未完成的工作流，是否进入上次编辑的工作流？',
+            cancelText: '新建工作流',
+            confirmText: '进入上次编辑',
+            onConfirm: function() {
+                parent.postMessage({
+                    action: 'openTab',
+                    title: '工作流编辑器',
+                    url: 'AI 创作/工作流编辑器.html?draft=1'
+                }, '*');
+            },
+            onCancel: function() {
+                try { localStorage.removeItem('has_workflow_draft'); } catch(e) {}
+                createWfModal.classList.add('active');
+            }
+        });
+        return;
+    }
     createWfModal.classList.add('active');
 }
 
@@ -1520,7 +1629,20 @@ function closeCreateModal() {
     createWfModal.classList.remove('active');
     document.getElementById('wfName').value = '';
     document.getElementById('wfDesc').value = '';
-    document.getElementById('wfCoverInput').value = '';
+    const coverInput = document.getElementById('wfCoverInput');
+    if (coverInput) {
+        coverInput.value = '';
+        if (window.customCoverUrl) {
+            URL.revokeObjectURL(window.customCoverUrl);
+            window.customCoverUrl = null;
+        }
+        const tip = document.getElementById('wfCoverTip');
+        const uploadText = document.getElementById('wfCoverUploadText');
+        const deleteBtn = document.getElementById('wfCoverDeleteBtn');
+        if (tip) tip.textContent = '默认根据名称自动生成，可选上传封面';
+        if (uploadText) uploadText.textContent = '上传封面';
+        if (deleteBtn) deleteBtn.style.display = 'none';
+    }
     document.querySelector('input[name="wfType"][value="copy"]').checked = true;
     document.querySelector('input[name="wfVisibility"][value="private"]').checked = true;
     updateCoverPreview();
@@ -1534,8 +1656,16 @@ function getCoverText(name) {
 function updateCoverPreview() {
     const preview = document.getElementById('wfCoverPreview');
     const nameInput = document.getElementById('wfName');
-    const tip = document.getElementById('wfCoverTip');
+    
     if (!preview || !nameInput) return;
+    
+    if (window.customCoverUrl) {
+        preview.innerHTML = `<img src="${window.customCoverUrl}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;">`;
+        preview.style.background = 'transparent';
+        preview.style.boxShadow = 'none';
+        return;
+    }
+
     const text = getCoverText(nameInput.value);
     preview.innerHTML = text.length > 3 ? `${text.slice(0, 3)}<br>${text.slice(3)}` : text;
     const palettes = [
@@ -1546,14 +1676,44 @@ function updateCoverPreview() {
     ];
     const idx = text.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % palettes.length;
     preview.style.background = `linear-gradient(135deg, ${palettes[idx][0]}, ${palettes[idx][1]})`;
-    if (tip) tip.textContent = '默认根据名称自动生成，可选上传封面';
+    preview.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255,0.22)';
 }
 
 function mockUploadCover(input) {
     const tip = document.getElementById('wfCoverTip');
-    if (tip && input.files && input.files[0]) {
-        tip.textContent = `已选择：${input.files[0].name}`;
+    const uploadText = document.getElementById('wfCoverUploadText');
+    const deleteBtn = document.getElementById('wfCoverDeleteBtn');
+    
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (tip) tip.textContent = `已选择：${file.name}`;
+        if (uploadText) uploadText.textContent = '重新上传';
+        if (deleteBtn) deleteBtn.style.display = 'inline-flex';
+        
+        if (window.customCoverUrl) {
+            URL.revokeObjectURL(window.customCoverUrl);
+        }
+        window.customCoverUrl = URL.createObjectURL(file);
+        updateCoverPreview();
     }
+}
+
+function deleteUploadedCover() {
+    const input = document.getElementById('wfCoverInput');
+    const tip = document.getElementById('wfCoverTip');
+    const uploadText = document.getElementById('wfCoverUploadText');
+    const deleteBtn = document.getElementById('wfCoverDeleteBtn');
+    
+    if (input) input.value = '';
+    if (tip) tip.textContent = '默认根据名称自动生成，可选上传封面';
+    if (uploadText) uploadText.textContent = '上传封面';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    
+    if (window.customCoverUrl) {
+        URL.revokeObjectURL(window.customCoverUrl);
+        window.customCoverUrl = null;
+    }
+    updateCoverPreview();
 }
 
 function submitCreate() {
@@ -1672,8 +1832,6 @@ const OPTS = {
         { key: 'chat-model', type: 'chat-model' },
         { key: 'count',     type: 'count', unit: '条',
           values: ['1','5','10','20','50'] },
-        { key: 'style',     type: 'chips', label: '文案风格',
-          values: ['爆款重写', '卖点提炼', '小红书', '抖音', '朋友圈'], def: '爆款重写' },
         { key: 'project',    type: 'project' },
     ],
     image: [

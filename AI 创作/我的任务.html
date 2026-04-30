@@ -673,10 +673,9 @@
     .review-card-status { position: absolute; top: 0; right: 0; color: #fff; padding: 2px 8px; border-radius: 0 0 0 6px; font-size: 10px; font-weight: 600; }
     .review-card-status.approved { background: #10b981; }
     .review-card-status.rejected { background: #ef4444; }
-    .review-prompt-tooltip { position: absolute; top: 0; left: 0; right: 0; background: rgba(0,0,0,0.72); color: #fff; font-size: 10px; padding: 6px 10px; opacity: 0; transition: opacity var(--ease); pointer-events: none; max-height: 44px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.4; }
-    .review-grid-card:hover .review-prompt-tooltip { opacity: 1; }
     .review-actions-hover { position: absolute; bottom: 0; left: 0; right: 0; min-height: 36px; background: rgba(255,255,255,0.96); display: flex; opacity: 0; transition: opacity var(--ease); border-top: 1px solid var(--border-1); }
     .review-grid-card:hover .review-actions-hover { opacity: 1; }
+    .review-actions-visible { position: absolute; bottom: 0; left: 0; right: 0; min-height: 36px; background: rgba(255,255,255,0.96); display: flex; border-top: 1px solid var(--border-1); }
     .review-action-split { flex: 1; display: flex; justify-content: center; align-items: center; cursor: pointer; }
     .review-action-split + .review-action-split { border-left: 1px solid var(--border-1); }
     .review-action-split.approve:hover { background: rgba(16,185,129,0.1); }
@@ -1318,7 +1317,7 @@ const state = {
   viewMode: 'expanded',
   pageMode: routeParams.get('view') === 'review' ? 'review' : 'list',
   reviewContext: { taskId: routeParams.get('taskId') || '', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
-  reviewFilter: 'all',
+  reviewFilter: 'pending',
   reviewBatchMode: false,
   reviewSelected: new Set(),
   filters: { status:'', search:'', project:'', dateRange:'', dateStart:'', dateEnd:'', model:'' },
@@ -1690,7 +1689,7 @@ function renderTaskFeed() {
 function renderTaskMetaItems(task, vm, activeModel, isMulti) {
   var items = [];
   if (task.type === 'workflow') {
-    items.push(vm.displayMeta.resultTypeLabel);
+    return '';
   } else {
     items.push(isMulti ? '多模型' : (MODELS_MAP[activeModel] || activeModel));
     if (vm.displayMeta.countText) items.push(vm.displayMeta.countText);
@@ -1705,11 +1704,38 @@ function renderTaskPromptBlock(task, showUseBtn) {
     + '</div>';
 }
 function renderBottomCountMeta(task, vm) {
-  if (task.type !== 'workflow' || !vm.displayMeta.countProgressText) return '';
+  if (task.type === 'workflow') return '';
+  if (!vm.displayMeta.countProgressText) return '';
   return '<span class="card-bottom-count">' + escHtml(vm.displayMeta.countProgressText) + '</span>';
 }
 function openWorkflowDetail(taskId) {
-  openDetailModal(taskId);
+  var task = getTaskById(taskId);
+  if (!task) return;
+  var nodes = task.workflowRun ? task.workflowRun.nodes || [] : [];
+  var html = '<div class="detail-modal-mask show" id="wfRunModalMask" onclick="this.remove()">'
+           + '<div class="detail-modal" style="width:500px; padding:24px; max-height:80vh; overflow:auto; display:flex; flex-direction:column; gap:16px" onclick="event.stopPropagation()">'
+           + '<div style="font-size:18px; font-weight:600; color:var(--text-hi)">任务运行情况</div>'
+           + '<div style="display:flex; flex-direction:column; gap:12px">';
+  nodes.forEach(function(node) {
+    if (node.nodeId === 'start' || node.nodeId === 'end') return;
+    html += '<div style="background:var(--bg-subtle); border-radius:var(--r-md); padding:16px; display:flex; flex-direction:column; gap:8px">';
+    html += '<div style="font-weight:500; color:var(--text-hi)">节点：' + escHtml(node.title || node.nodeId) + '</div>';
+    if (node.status === 'completed' || node.status === 'pending_review') {
+       html += '<div style="font-size:13px; color:var(--success)">生成任务' + escHtml(node.title || node.nodeId) + '成功，任务参数：' + escHtml(node.processorType) + '</div>';
+    } else if (node.status === 'failed' || node.status === 'aborted') {
+       html += '<div style="font-size:13px; color:var(--error)">生成任务' + escHtml(node.title || node.nodeId) + '失败，任务参数：' + escHtml(node.processorType) + '，原因：' + (node.status === 'aborted' ? '已中止' : '执行异常') + '</div>';
+    } else {
+       html += '<div style="font-size:13px; color:var(--text-lo)">状态：' + escHtml(node.status === 'generating' ? '生成中' : (node.status === 'pending' ? '等待中' : node.status)) + '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>'
+        + '<div style="display:flex; justify-content:flex-end; margin-top:8px">'
+        + '<button class="card-act-btn" style="background:var(--bg-surface); padding:6px 16px; border-radius:var(--r-full); border:1px solid var(--border-2); cursor:pointer" onclick="document.getElementById(\'wfRunModalMask\').remove()">关闭</button>'
+        + '</div></div></div>';
+  var wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstElementChild);
 }
 function openWorkflowResult(taskId) {
   var task = getTaskById(taskId);
@@ -1982,6 +2008,36 @@ function approveAllReviewRoute() {
   showToast(task.status === 'completed' ? '审核完成，已进入结果态' : '审核完成，正在触发下游节点');
 }
 
+function confirmRejectAllReviewRoute(force) {
+  if (!force) {
+    const pendingItems = getReviewVisibleItems().filter(function(it) {
+      return it.reviewStatus === 'pending' || !it.reviewStatus;
+    });
+    openConfirmModal({
+      title: '全部拒绝',
+      description: '确定将当前节点的 ' + pendingItems.length + ' 项待审内容全部拒绝吗？',
+      cancelText: '取消',
+      confirmText: '全部拒绝',
+      onConfirm: function() { confirmRejectAllReviewRoute(true); }
+    });
+    return;
+  }
+  rejectAllReviewRoute();
+}
+
+function rejectAllReviewRoute() {
+  const task = getReviewRouteTask();
+  if (!task) return;
+  getWorkflowPendingItems(task, state.reviewContext.reviewTaskId).forEach(function(item) {
+    item.reviewStatus = 'rejected';
+  });
+  clearReviewSelection();
+  state.reviewBatchMode = false;
+  updateWorkflowStatusAfterReview(task);
+  renderReviewPage();
+  showToast(task.status === 'completed' ? '审核完成，已进入结果态' : '审核完成，正在触发下游节点');
+}
+
 function backToTaskListView(force) {
   const task = getReviewRouteTask();
   if (!force && task) {
@@ -2102,34 +2158,7 @@ function confirmApproveAllReviewRoute(force) {
 function renderReviewBottomBar() {
   const root = document.getElementById('input-box-root');
   if (!root) return;
-  const task = getReviewRouteTask();
-  const visibleItems = getReviewVisibleItems();
-  const pendingCount = visibleItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; }).length;
-  const selectedCount = state.reviewSelected.size;
-  const isBatch = !!state.reviewBatchMode;
-  const reviewStats = task ? getWorkflowReviewStats(task) : { waitingCount: 0 };
-  const defaultText = task && task.status === 'generating'
-    ? '当前节点审完后，结果会继续流向下游生成。'
-    : '可点击卡片预览，或直接在卡片上快速通过 / 拒绝。';
-  root.innerHTML = '<div class="review-bottom-shell">'
-    + '<div class="review-bottom-bar">'
-      + '<div class="review-bottom-meta">'
-        + '<span class="review-bottom-pill">当前筛选 ' + visibleItems.length + ' 项</span>'
-        + '<span class="review-bottom-pill">待审 ' + pendingCount + ' 项</span>'
-        + '<span class="review-bottom-pill">未运行到 ' + (reviewStats.waitingCount || 0) + ' 个</span>'
-        + '<span class="review-bottom-text">' + (isBatch ? ('已选 ' + selectedCount + ' 项') : '审查台') + '</span>'
-        + '<span class="review-bottom-tip">' + (isBatch ? '批量模式下，点击卡片只会勾选，不会打开预览。' : defaultText) + '</span>'
-      + '</div>'
-      + '<div class="review-bottom-actions">'
-        + (isBatch
-          ? '<button class="review-toolbar-btn" onclick="selectAllVisibleReviewItems()">全选当前待审</button>'
-            + '<button class="review-toolbar-btn primary" ' + (selectedCount ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'approved\')">批量通过</button>'
-            + '<button class="review-toolbar-btn danger" ' + (selectedCount ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'rejected\')">批量拒绝</button>'
-            + '<button class="review-toolbar-btn" onclick="toggleReviewBatch()">取消选择</button>'
-          : '<button class="review-toolbar-btn primary" ' + (pendingCount ? '' : 'disabled') + ' onclick="focusPendingReview()">开始审查</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">批量选择</button>')
-      + '</div>'
-    + '</div>'
-  + '</div>';
+  root.innerHTML = '';
 }
 
 function focusPendingReview() {
@@ -2196,11 +2225,11 @@ function renderReviewPage() {
     const isSelected = state.reviewSelected.has(it.itemId);
     const isPending = it.reviewStatus === 'pending' || !it.reviewStatus;
     const canRevoke = canRevokeReviewItem(task, it);
-    const listJson = JSON.stringify(displayItems.map(function(item) { return { type: 'image', url: item.url }; }));
-    const previewAction = 'event.stopPropagation(); window.__previewMedia({type:\'image\', url:\'' + it.url + '\'}, ' + listJson + ', ' + idx + ');';
+    const listJson = JSON.stringify(displayItems.map(function(item) { return { id: item.itemId, type: 'image', url: item.url, prompt: item.prompt || (task.input && task.input.prompt) || '', status: item.reviewStatus }; }));
+    const previewAction = 'event.stopPropagation(); openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\');';
     const cardClick = state.reviewBatchMode
       ? 'toggleReviewSelect(\'' + it.itemId + '\')'
-      : 'window.__previewMedia({type:\'image\', url:\'' + it.url + '\'}, ' + listJson + ', ' + idx + ')';
+      : 'openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\')';
     const downloadAction = 'event.stopPropagation(); const a=document.createElement(\'a\'); a.href=\'' + it.url + '\'; a.download=\'asset.png\'; a.click();';
     let statusBadge = '';
     if (it.reviewStatus === 'approved') statusBadge = '<div class="review-card-status approved">已通过</div>';
@@ -2208,26 +2237,21 @@ function renderReviewPage() {
     let actionsOverlay = '';
     if (!isPending) {
       actionsOverlay = '<div class="review-actions-hover">'
-        + '<div class="review-action-split download" onclick="' + downloadAction + '">' + CC_PREVIEW_ICONS.download + '</div>'
-        + '<div class="review-action-split" onclick="event.stopPropagation(); ' + (canRevoke ? ('revokeReviewItem(\'' + it.itemId + '\')') : 'showToast(\'下游已继续处理，当前结果不可撤回\')') + ';"><button class="review-action-text"' + (canRevoke ? '' : ' style="color:var(--text-ghost)"') + '>撤回重审</button></div>'
       + '</div>';
     } else {
-      actionsOverlay = '<div class="review-actions-hover">'
+      actionsOverlay = '<div class="review-actions-visible">'
         + '<div class="review-action-split approve" onclick="event.stopPropagation(); approveReviewItem(\'' + it.itemId + '\');"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
-        + '<div class="review-action-split download" onclick="' + downloadAction + '">' + CC_PREVIEW_ICONS.download + '</div>'
         + '<div class="review-action-split reject" onclick="event.stopPropagation(); rejectReviewItem(\'' + it.itemId + '\');"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>'
       + '</div>';
     }
-    const prompt = it.prompt || (task.input && task.input.prompt) || '暂无描述';
     return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + (state.reviewBatchMode ? ' is-selectable' : '') + '" data-item-id="' + escHtml(it.itemId) + '"'
       + (isFocused ? ' style="outline:2px solid var(--primary-6);outline-offset:2px;z-index:1;"' : '')
       + ' onclick="' + cardClick + '" onmouseenter="state.reviewFocusIndex=' + idx + ';">'
-      + (it.url ? '<img src="' + escHtml(it.url) + '" alt="">' : '')
+      + (it.url ? '<div style="width:100%;padding-bottom:177.78%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>' : '')
       + statusBadge
-      + '<div class="review-prompt-tooltip">' + escHtml(prompt) + '</div>'
       + (state.reviewBatchMode
           ? '<div class="review-card-check">✓</div><button class="review-preview-btn" onclick="' + previewAction + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>'
-          : '')
+          : '<button class="review-preview-btn" onclick="' + previewAction + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>')
       + actionsOverlay
       + '</div>';
   }).join('');
@@ -2256,28 +2280,19 @@ function renderReviewPage() {
       + '<div class="review-title-wrap">'
         + '<div class="review-title-mark"></div>'
         + '<div class="review-title-main">'
-          + '<div class="review-title">审查台：' + escHtml(task.name) + '</div>'
-          + '<div class="review-subtitle">当前节点：' + escHtml(activeNodeTitle) + ' · 可审 ' + pendingCount + ' 项 · 未运行到 ' + waitingReviewCount + ' 个 · 已处理 ' + reviewedCount + ' 项</div>'
+          + '<div class="review-title">审核-' + escHtml(task.name) + '</div>'
         + '</div>'
       + '</div>'
-      + '<button class="card-act-btn" onclick="backToTaskListView()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>返回任务列表</button>'
     + '</div>'
     + '<div class="review-node-tabs">' + tabsHtml + '</div>'
     + '<div class="review-toolbar">'
       + '<div class="review-toolbar-main">'
         + '<div class="review-filter-pills">' + filterTabs + '</div>'
-        + '<div class="sep"></div>'
-        + '<div class="review-live-stats">'
-          + '<span>正在生成 <b style="color:var(--primary-6)">' + generatingCount + '</b></span>'
-          + '<span>可审查 <b style="color:#f59e0b">' + pendingCount + '</b></span>'
-          + '<span>未运行到 <b style="color:var(--text-lo)">' + waitingReviewCount + '</b></span>'
-          + '<span>已处理 <b style="color:#10b981">' + reviewedCount + '</b></span>'
-        + '</div>'
       + '</div>'
       + '<div class="review-toolbar-actions">'
         + (state.reviewBatchMode
             ? '<div class="review-batch-bar"><span class="review-batch-count">已选 ' + state.reviewSelected.size + ' 项</span><button class="review-toolbar-btn" onclick="selectAllVisibleReviewItems()">全选待审</button><button class="review-toolbar-btn primary" ' + (state.reviewSelected.size ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'approved\')">批量通过</button><button class="review-toolbar-btn danger" ' + (state.reviewSelected.size ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'rejected\')">批量拒绝</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">取消选择</button></div>'
-            : '<button class="review-toolbar-btn primary" ' + (pendingCount ? '' : 'disabled') + ' onclick="focusPendingReview()">开始审查</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">批量选择</button><button id="autoApproveBtn" class="review-toolbar-btn" ' + (pendingCount ? '' : 'disabled') + ' onclick="handleAutoApprove()">自动通过</button><button id="approveAllBtn" class="review-toolbar-btn" ' + (pendingCount ? '' : 'disabled') + ' onclick="confirmApproveAllReviewRoute()">全部通过</button>')
+            : '<button id="approveAllBtn" class="review-toolbar-btn" ' + (pendingCount ? '' : 'disabled') + ' onclick="confirmApproveAllReviewRoute()">全部通过</button><button id="rejectAllBtn" class="review-toolbar-btn danger" ' + (pendingCount ? '' : 'disabled') + ' onclick="confirmRejectAllReviewRoute()">全部拒绝</button>')
       + '</div>'
     + '</div>'
     + '<div class="review-grid-scroll" id="reviewGridScroll">'
@@ -2285,8 +2300,124 @@ function renderReviewPage() {
           ? '<div class="review-empty"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.5;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><div class="review-empty-title">' + emptyTitle + '</div><div class="review-empty-desc">' + emptyDesc + '</div></div>'
           : '<div class="review-grid">' + gridHtml + '</div>')
     + '</div>'
+  + '</div>'
+  + '<div class="modal-mask" id="reviewPreviewModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;" onclick="if(event.target===this)closeReviewPreview()">'
+    + '<div class="review-preview-box" style="display:flex;width:90%;max-width:1200px;height:90vh;background:var(--bg-surface);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12);">'
+      + '<div class="review-preview-left" style="flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;">'
+        + '<button class="review-preview-close" style="position:absolute;top:16px;left:16px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;" onclick="closeReviewPreview()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>'
+        + '<div id="reviewPreviewMedia" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;"></div>'
+        + '<button id="reviewPreviewPrev" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;" onclick="navReviewPreview(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>'
+        + '<button id="reviewPreviewNext" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;" onclick="navReviewPreview(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
+        + '<div style="position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:10;" id="reviewPreviewControls"></div>'
+      + '</div>'
+      + '<div class="review-preview-right" style="width:320px;background:var(--bg-subtle);border-left:1px solid var(--border-1);display:flex;flex-direction:column;">'
+        + '<div style="padding:16px;border-bottom:1px solid var(--border-1);font-weight:600;font-size:15px;">生成信息</div>'
+        + '<div style="flex:1;overflow-y:auto;padding:16px;font-size:13px;" id="reviewPreviewInfo"></div>'
+      + '</div>'
+    + '</div>'
   + '</div>';
   renderReviewBottomBar();
+}
+
+let __reviewPreviewData = { taskId: '', items: [], currentIndex: 0 };
+function openReviewPreview(taskId, itemId) {
+  const task = ALL_TASKS.find(function(t) { return t.id === taskId; });
+  if (!task) return;
+  
+  const displayItems = getReviewVisibleItems();
+  if (displayItems.length === 0) return;
+  
+  const index = displayItems.findIndex(function(it) { return it.itemId === itemId; });
+  __reviewPreviewData = {
+    taskId: taskId,
+    items: displayItems,
+    currentIndex: index >= 0 ? index : 0,
+    task: task
+  };
+  
+  const modal = document.getElementById('reviewPreviewModal');
+  if (modal) modal.style.display = 'flex';
+  renderReviewPreviewContent();
+}
+
+function closeReviewPreview() {
+  const modal = document.getElementById('reviewPreviewModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function navReviewPreview(dir) {
+  let nextIdx = __reviewPreviewData.currentIndex + dir;
+  if (nextIdx < 0) nextIdx = __reviewPreviewData.items.length - 1;
+  if (nextIdx >= __reviewPreviewData.items.length) nextIdx = 0;
+  __reviewPreviewData.currentIndex = nextIdx;
+  renderReviewPreviewContent();
+}
+
+function renderReviewPreviewContent() {
+  const idx = __reviewPreviewData.currentIndex;
+  const items = __reviewPreviewData.items;
+  const task = __reviewPreviewData.task;
+  const item = items[idx];
+  
+  const mediaContainer = document.getElementById('reviewPreviewMedia');
+  if (item.url) {
+    if (item.url.endsWith('.mp4') || item.url.includes('video')) {
+      mediaContainer.innerHTML = '<video src="' + escHtml(item.url) + '" controls autoplay style="max-width:100%;max-height:100%;object-fit:contain;"></video>';
+    } else {
+      mediaContainer.innerHTML = '<img src="' + escHtml(item.url) + '" style="max-width:100%;max-height:100%;object-fit:contain;user-select:none;"/>';
+    }
+  } else {
+    mediaContainer.innerHTML = '<div style="color:#fff;opacity:0.5;">暂无媒体内容</div>';
+  }
+  
+  const controlsContainer = document.getElementById('reviewPreviewControls');
+  const isPending = item.reviewStatus === 'pending' || !item.reviewStatus;
+  
+  let controlsHtml = '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#fff;color:#333;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="downloadFromPreview(\'' + escHtml(item.url) + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>下载</button>';
+  
+  if (isPending) {
+    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#10b981;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="approveFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>通过</button>';
+    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#ef4444;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="rejectFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>不通过</button>';
+  } else {
+    controlsHtml += '<div style="height:40px;padding:0 24px;border-radius:20px;background:rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;font-weight:600;">' + (item.reviewStatus === 'approved' ? '已通过' : '已拒绝') + '</div>';
+  }
+  
+  controlsContainer.innerHTML = controlsHtml;
+  
+  const infoContainer = document.getElementById('reviewPreviewInfo');
+  const prompt = item.prompt || (task.input && task.input.prompt) || '暂无描述';
+  
+  infoContainer.innerHTML = '<div style="margin-bottom:12px;color:var(--text-muted);">提示词</div>'
+    + '<div style="background:var(--bg-page);padding:12px;border-radius:8px;line-height:1.5;margin-bottom:20px;">' + escHtml(prompt) + '</div>'
+    + '<div style="margin-bottom:12px;color:var(--text-muted);">参考文件</div>'
+    + '<div style="color:var(--text-ghost);font-style:italic;">暂无参考文件</div>';
+}
+
+function approveFromPreview(itemId) {
+  approveReviewItem(itemId);
+  // Automatically go to next if possible
+  setTimeout(function() {
+    const originalItem = __reviewPreviewData.items.find(function(i) { return i.itemId === itemId; });
+    if (originalItem) originalItem.reviewStatus = 'approved';
+    navReviewPreview(1);
+  }, 100);
+}
+
+function rejectFromPreview(itemId) {
+  rejectReviewItem(itemId);
+  setTimeout(function() {
+    const originalItem = __reviewPreviewData.items.find(function(i) { return i.itemId === itemId; });
+    if (originalItem) originalItem.reviewStatus = 'rejected';
+    navReviewPreview(1);
+  }, 100);
+}
+
+function downloadFromPreview(url) {
+  if (!url) return;
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'asset.png';
+  a.click();
 }
 
 function handleAutoApprove() {
@@ -2465,7 +2596,8 @@ function buildUnifiedResultUrl(task, vm) {
   if (task.type === 'workflow') {
     params.set('workflowName', task.workflowRun && task.workflowRun.workflowName ? task.workflowRun.workflowName : (task.name || ''));
   }
-  return 'AI 创作/全部结果-统一版.html?' + params.toString();
+  var baseUrl = task.type === 'workflow' ? 'AI 创作/工作流全部结果页.html' : 'AI 创作/全部结果-统一版.html';
+  return baseUrl + '?' + params.toString();
 }
 
 function getViewAllTarget(task, vm) {
