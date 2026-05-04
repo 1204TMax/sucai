@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作流展示逻辑 - 量化投放系统</title>
+  <style>
+    :root {
+      --primary-1: #E8F4FF;
+      --primary-2: #C4E2FF;
+      --primary-5: #5AA4FF;
+      --primary-6: #4A9EFF;
+      --primary-7: #3580DB;
+      --gray-1: #FCFCFD;
+      --gray-2: #F8F9FA;
+      --gray-3: #F1F3F5;
+      --gray-4: #E9ECEF;
+      --gray-5: #DEE2E6;
+      --gray-6: #CED4DA;
+      --gray-7: #ADB5BD;
+      --gray-8: #868E96;
+      --gray-9: #6C757D;
+      --gray-11: #495057;
+      --gray-12: #212529;
+      --bg-page: var(--gray-2);
+      --bg-surface: var(--gray-1);
+      --bg-subtle: var(--gray-3);
+      --bg-hover: var(--gray-4);
+      --bg-active: var(--gray-5);
+      --border-1: var(--gray-4);
+      --border-2: var(--gray-6);
+      --border-3: var(--gray-7);
+      --text-hi: var(--gray-12);
+      --text-lo: var(--gray-11);
+      --text-muted: var(--gray-9);
+      --text-ghost: var(--gray-8);
+      --accent-bg: var(--primary-1);
+      --accent-border: var(--primary-2);
+      --accent-solid: var(--primary-6);
+      --accent-solid-h: var(--primary-5);
+      --accent-text: var(--primary-7);
+      --success: #34C759;
+      --success-bg: #F6FFED;
+      --success-border: #D9F7BE;
+      --warning: #FF9500;
+      --warning-bg: #FFFBE6;
+      --warning-border: #FFE58F;
+      --error: #E5484D;
+      --error-bg: #FFF2F0;
+      --error-border: #FFCCC7;
+      --white: #fff;
+      --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", "Noto Sans SC", sans-serif;
+      --text-xs: 11px;
+      --text-sm: 12px;
+      --text-base: 13px;
+      --text-md: 14px;
+      --text-lg: 16px;
+      --text-xl: 18px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-7: 32px;
+      --h-xs: 22px;
+      --h-sm: 28px;
+      --h-md: 32px;
+      --h-lg: 36px;
+      --r-sm: 4px;
+      --r-md: 6px;
+      --r-lg: 8px;
+      --r-xl: 12px;
+      --r-full: 9999px;
+      --ease: 120ms ease;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      background: var(--bg-page);
+      color: var(--text-lo);
+      font: var(--text-base)/1.55 var(--font);
+      padding: var(--space-2);
+    }
+    button { font-family: inherit; }
+
+    .page {
+      min-height: calc(100vh - 16px);
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: var(--space-2);
+    }
+
+    .surface {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-xl);
+      min-width: 0;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      overflow: hidden;
+    }
+
+    .topbar {
+      height: 56px;
+      padding: 0 var(--space-4);
+      border-bottom: 1px solid var(--border-1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+    }
+
+    .title-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-width: 0;
+    }
+
+    .title {
+      color: var(--text-hi);
+      font-size: var(--text-lg);
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex-shrink: 0;
+    }
+
+    .b {
+      height: var(--h-md);
+      padding: 0 var(--space-3);
+      border-radius: var(--r-md);
+      font-size: var(--text-base);
+      font-weight: 500;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      white-space: nowrap;
+      transition: all var(--ease);
+    }
+    .b:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 1px; }
+    .b-solid { background: var(--accent-solid); color: var(--white); }
+    .b-solid:hover { background: var(--accent-solid-h); }
+    .b-soft { background: var(--bg-subtle); color: var(--text-lo); border-color: var(--border-1); }
+    .b-soft:hover { background: var(--bg-hover); color: var(--text-hi); border-color: var(--border-2); }
+    .b-ghost { background: transparent; color: var(--text-muted); }
+    .b-ghost:hover { background: var(--bg-subtle); color: var(--text-lo); }
+
+    .tag {
+      min-height: var(--h-xs);
+      padding: 0 var(--space-2);
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border-1);
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      font-size: var(--text-sm);
+      line-height: 1;
+      white-space: nowrap;
+    }
+    .tag-blue { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent-text); }
+    .tag-green { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+    .tag-orange { background: var(--warning-bg); border-color: var(--warning-border); color: var(--warning); }
+
+    .canvas {
+      position: relative;
+      min-height: 680px;
+      overflow: auto;
+      background-image: radial-gradient(var(--border-1) 1px, transparent 1px);
+      background-size: 20px 20px;
+      padding: var(--space-7);
+    }
+
+    .flow {
+      min-width: 920px;
+      display: grid;
+      grid-template-columns: repeat(5, 160px);
+      gap: var(--space-4);
+      align-items: center;
+      padding: var(--space-5) 0;
+    }
+
+    .node {
+      min-height: 170px;
+      border: 1px solid var(--border-1);
+      background: var(--bg-surface);
+      border-radius: var(--r-xl);
+      padding: var(--space-3);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      cursor: pointer;
+      transition: all var(--ease);
+      position: relative;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .node:hover { border-color: var(--border-2); transform: translateY(-1px); }
+    .node.active {
+      border-color: var(--accent-solid);
+      box-shadow: 0 0 0 2px var(--accent-bg), 0 6px 18px rgba(0,0,0,0.08);
+    }
+    .node:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      right: -28px;
+      width: 28px;
+      height: 1px;
+      background: var(--border-3);
+    }
+    .node:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: calc(50% - 4px);
+      right: -29px;
+      width: 8px;
+      height: 8px;
+      border-top: 1px solid var(--border-3);
+      border-right: 1px solid var(--border-3);
+      transform: rotate(45deg);
+    }
+
+    .node-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-2);
+    }
+
+    .node-title {
+      color: var(--text-hi);
+      font-size: var(--text-md);
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .node-kicker {
+      color: var(--text-muted);
+      font-size: var(--text-xs);
+      margin-top: var(--space-1);
+    }
+
+    .node-type {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--r-md);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-1);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .node.active .node-type {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+    }
+
+    .node-summary {
+      color: var(--text-lo);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 54px;
+    }
+
+    .node-foot {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+
+    .section {
+      margin-top: var(--space-5);
+    }
+
+    .section:first-child { margin-top: 0; }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+
+    .section-title {
+      color: var(--text-hi);
+      font-size: var(--text-md);
+      font-weight: 650;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-2);
+    }
+
+    .card {
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      background: var(--bg-surface);
+      padding: var(--space-3);
+      min-width: 0;
+    }
+
+    .card-soft { background: var(--bg-subtle); }
+
+    .card-title {
+      color: var(--text-hi);
+      font-size: var(--text-sm);
+      font-weight: 650;
+      margin-bottom: var(--space-2);
+    }
+
+    .kv {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .kv-row {
+      display: grid;
+      grid-template-columns: 68px 1fr;
+      gap: var(--space-2);
+      align-items: start;
+      font-size: var(--text-sm);
+    }
+
+    .kv-label { color: var(--text-muted); }
+    .kv-value { color: var(--text-lo); min-width: 0; }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+    }
+
+    .detail {
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      overflow: hidden;
+    }
+
+    .detail-head {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border-1);
+    }
+
+    .detail-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-3);
+      margin-bottom: var(--space-2);
+    }
+
+    .detail-title {
+      color: var(--text-hi);
+      font-size: var(--text-lg);
+      font-weight: 650;
+    }
+
+    .detail-desc {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      line-height: 1.55;
+    }
+
+    .tabs {
+      padding: var(--space-2) var(--space-4);
+      border-bottom: 1px solid var(--border-1);
+      display: flex;
+      gap: var(--space-1);
+      overflow-x: auto;
+    }
+
+    .tab {
+      height: var(--h-sm);
+      border: 1px solid transparent;
+      border-radius: var(--r-md);
+      background: transparent;
+      color: var(--text-muted);
+      padding: 0 var(--space-3);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab:hover { background: var(--bg-subtle); color: var(--text-lo); }
+    .tab.active {
+      background: var(--accent-bg);
+      border-color: var(--accent-border);
+      color: var(--accent-text);
+      font-weight: 600;
+    }
+
+    .detail-body {
+      padding: var(--space-4);
+      overflow: auto;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .field {
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      padding: var(--space-3);
+      background: var(--bg-surface);
+    }
+
+    .field-main {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-2);
+      margin-bottom: var(--space-2);
+    }
+
+    .field-name {
+      color: var(--text-hi);
+      font-size: var(--text-sm);
+      font-weight: 650;
+    }
+
+    .field-desc {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+    }
+
+    .option-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-2);
+    }
+
+    .option {
+      border: 1px solid var(--border-1);
+      background: var(--bg-surface);
+      border-radius: var(--r-lg);
+      padding: var(--space-3);
+      cursor: pointer;
+      transition: all var(--ease);
+      min-height: 78px;
+    }
+    .option:hover { border-color: var(--border-2); background: var(--bg-subtle); }
+    .option.active {
+      border-color: var(--accent-solid);
+      background: var(--accent-bg);
+    }
+
+    .option-title {
+      color: var(--text-hi);
+      font-size: var(--text-sm);
+      font-weight: 650;
+      margin-bottom: var(--space-1);
+    }
+
+    .option-desc {
+      color: var(--text-muted);
+      font-size: var(--text-xs);
+      line-height: 1.45;
+    }
+
+    .trace {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .trace-step {
+      display: grid;
+      grid-template-columns: 24px 1fr auto;
+      gap: var(--space-2);
+      align-items: start;
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      padding: var(--space-3);
+      background: var(--bg-surface);
+    }
+
+    .step-index {
+      width: 24px;
+      height: 24px;
+      border-radius: var(--r-full);
+      background: var(--accent-bg);
+      border: 1px solid var(--accent-border);
+      color: var(--accent-text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xs);
+      font-weight: 700;
+    }
+
+    .trace-title {
+      color: var(--text-hi);
+      font-size: var(--text-sm);
+      font-weight: 650;
+      margin-bottom: var(--space-1);
+    }
+
+    .trace-desc {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+    }
+
+    .result-preview {
+      display: grid;
+      gap: var(--space-2);
+    }
+
+    .prompt-item {
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      padding: var(--space-3);
+      background: var(--bg-surface);
+      color: var(--text-lo);
+      font-size: var(--text-sm);
+      line-height: 1.55;
+    }
+
+    .mini-images {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-2);
+    }
+
+    .mini-image {
+      aspect-ratio: 3 / 4;
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-lg);
+      background:
+        linear-gradient(135deg, var(--accent-bg), var(--bg-subtle));
+      display: flex;
+      align-items: end;
+      padding: var(--space-2);
+      color: var(--text-muted);
+      font-size: var(--text-xs);
+    }
+
+    .note {
+      border: 1px solid var(--accent-border);
+      background: var(--accent-bg);
+      border-radius: var(--r-lg);
+      color: var(--accent-text);
+      padding: var(--space-3);
+      font-size: var(--text-sm);
+      line-height: 1.55;
+    }
+
+    .empty {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+      text-align: center;
+      padding: var(--space-5);
+      border: 1px dashed var(--border-2);
+      border-radius: var(--r-lg);
+      background: var(--bg-subtle);
+    }
+
+    @media (max-width: 1120px) {
+      .page { grid-template-columns: 1fr; }
+      .detail { min-height: 640px; }
+    }
+
+    @media (max-width: 720px) {
+      body { padding: var(--space-2); }
+      .topbar { height: auto; align-items: flex-start; padding: var(--space-3); flex-direction: column; }
+      .toolbar { width: 100%; overflow-x: auto; }
+      .canvas { padding: var(--space-4); }
+      .flow { min-width: 0; grid-template-columns: 1fr; }
+      .node { min-height: auto; }
+      .node:not(:last-child)::after,
+      .node:not(:last-child)::before { display: none; }
+      .split, .option-grid, .mini-images { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="main surface">
+      <header class="topbar">
+        <div class="title-wrap">
+          <div class="title">爆款图衍生工作流</div>
+          <div class="subtitle">画布保持 5 个节点，人工审核作为通用节点，审核对象由节点配置决定。</div>
+        </div>
+        <div class="toolbar">
+          <span class="tag tag-blue">讨论稿</span>
+          <button class="b b-soft" id="toggleTraceBtn">显示执行层</button>
+          <button class="b b-solid" id="runBtn">模拟运行</button>
+        </div>
+      </header>
+
+      <section class="canvas" aria-label="工作流画布">
+        <div class="flow" id="flow"></div>
+
+        <div class="section" id="executionLayer" hidden>
+          <div class="section-head">
+            <div class="section-title">爆款图衍生节点内部执行层</div>
+            <span class="tag">默认隐藏，运行和排错时展开</span>
+          </div>
+          <div class="trace" id="inlineTrace"></div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="detail surface">
+      <div class="detail-head">
+        <div class="detail-title-row">
+          <div class="detail-title" id="detailTitle">节点详情</div>
+          <span class="tag tag-green" id="detailStatus">已配置</span>
+        </div>
+        <div class="detail-desc" id="detailDesc"></div>
+      </div>
+
+      <div class="tabs" id="tabs"></div>
+
+      <div class="detail-body" id="detailBody"></div>
+    </aside>
+  </div>
+
+  <script>
+    const nodes = [
+      {
+        id: 'start',
+        type: '输入',
+        title: '开始',
+        kicker: '运行输入',
+        summary: '上传爆款图，填写产品信息和目标数量。',
+        tags: ['爆款图 1 张', '产品信息', '目标数量'],
+        desc: '开始节点只负责定义使用者运行工作流时需要提交什么。',
+        action: '收集运行输入，并把输入转成后续节点可引用的变量。',
+        inputs: [
+          { name: '爆款图', meta: 'image / 单张 / 必填', desc: '用户上传一张已经验证有效的参考图片。' },
+          { name: '产品信息', meta: 'text / 单条 / 可选', desc: '用于约束衍生方向，例如品类、卖点、人群。' },
+          { name: '生成数量', meta: 'number / 单值 / 必填', desc: '本次希望得到多少条新图片提示词或最终图片。' }
+        ],
+        outputs: [
+          { name: '爆款图变量', meta: 'image', desc: '后续拆解节点读取的参考图。' },
+          { name: '产品信息变量', meta: 'text', desc: '参与拆解、衍生和合并提示词。' },
+          { name: '目标数量', meta: 'number', desc: '控制衍生和合并的输出数量。' }
+        ]
+      },
+      {
+        id: 'derive',
+        type: '封装',
+        title: '爆款图衍生',
+        kicker: '业务封装节点',
+        summary: '内部完成拆解、候选衍生、提示词合并和合理性过滤。',
+        tags: ['中度衍生', '保留风格/构图', '输出 50 条提示词'],
+        desc: '这个节点在画布上保持简单，但内部步骤和中间产物可以展开查看。',
+        action: '拆解爆款图，基于关键维度生成候选集合，再合并成一批新图片提示词。',
+        inputs: [
+          { name: '爆款图变量', meta: 'image', desc: '来自开始节点，用于识别人物、场景、动作、构图和风格。' },
+          { name: '产品信息变量', meta: 'text', desc: '约束衍生不要偏离业务目标。' },
+          { name: '目标数量', meta: 'number', desc: '控制最终提示词集合数量。' }
+        ],
+        outputs: [
+          { name: '提示词集合', meta: 'text[] / 默认对外输出', desc: '进入图片生成节点，也可先接人工审核节点审查提示词。' },
+          { name: '拆解结果', meta: 'structured / 可展开', desc: '用于排错和后续复用。' },
+          { name: '衍生候选', meta: 'structured / 可展开', desc: '人物、场景、动作等候选集合。' }
+        ],
+        special: true
+      },
+      {
+        id: 'image',
+        type: '生成',
+        title: '图片生成',
+        kicker: '批量生成',
+        summary: '根据提示词生成图片，配置比例、分辨率和单条生成数量。',
+        tags: ['3:4', '高清', '1 图/提示词'],
+        desc: '图片生成独立成节点，因为它是主要成本点，也需要单独配置和重试。',
+        action: '批量调用图片模型，按提示词集合生成图片。',
+        inputs: [
+          { name: '提示词集合', meta: 'text[]', desc: '来自爆款图衍生节点；如果需要生成前审核，也可以先经过人工审核。' },
+          { name: '图片参数', meta: 'structured', desc: '比例、分辨率、模型、每条生成数量。' }
+        ],
+        outputs: [
+          { name: '图片集合', meta: 'image[]', desc: '进入人工审核节点或直接结束。' },
+          { name: '生成日志', meta: 'structured', desc: '记录失败原因和成本信息。' }
+        ]
+      },
+      {
+        id: 'manualReview',
+        type: '审查',
+        title: '人工审核',
+        kicker: '通用检查点',
+        summary: '按配置审核提示词、图片、视频或文本，本示例审核生成后的图片。',
+        tags: ['审核对象：图片', '批量通过', '全部拒绝'],
+        desc: '人工审核是一个通用节点，不区分“提示词审核”“图片审核”等节点类型；审核什么由输入内容和节点配置决定。',
+        action: '人工筛选输入内容，并输出通过集合与拒绝记录。',
+        inputs: [
+          { name: '待审核内容', meta: 'text[] / image[] / video[]', desc: '本示例接收图片生成节点输出的图片集合。' },
+          { name: '审核规则', meta: 'structured', desc: '质量要求、风险项、是否允许批量通过、是否需要拒绝原因。' }
+        ],
+        outputs: [
+          { name: '通过集合', meta: '与输入同类型', desc: '通过审核的内容进入下游。' },
+          { name: '拒绝记录', meta: 'structured', desc: '保留拒绝内容、拒绝原因和处理人。' }
+        ]
+      },
+      {
+        id: 'end',
+        type: '输出',
+        title: '结束',
+        kicker: '最终结果',
+        summary: '输出最终图片，可查看全部、下载、入库。',
+        tags: ['查看全部', '下载', '入库'],
+        desc: '结束节点声明这个工作流最终给用户什么结果。',
+        action: '汇总最终通过图片，并进入结果页和任务中心。',
+        inputs: [
+          { name: '通过集合', meta: 'image[]', desc: '来自人工审核节点，本示例为通过审核的图片集合。' }
+        ],
+        outputs: [
+          { name: '最终素材结果', meta: 'image[]', desc: '进入工作流全部结果页。' }
+        ]
+      }
+    ];
+
+    const internalSteps = [
+      { title: '图片理解 / 拆解', desc: '识别人物、场景、动作、构图、风格、卖点，输出结构化拆解结果。', out: '拆解结果' },
+      { title: '候选衍生', desc: '围绕可变化维度生成候选集合，例如人物、场景、动作各 20 条。', out: '衍生候选' },
+      { title: '提示词合并', desc: '按“均衡搭配”把候选集合组装为 50 条图片提示词。', out: '组合前提示词' },
+      { title: '合理性过滤', desc: '过滤不合理、重复、偏离产品信息的组合。', out: '提示词集合' }
+    ];
+
+    const tabs = [
+      { id: 'contract', label: '输入输出' },
+      { id: 'config', label: '设置' },
+      { id: 'trace', label: '执行层' },
+      { id: 'result', label: '运行产物' }
+    ];
+
+    const state = {
+      activeNode: 'derive',
+      activeTab: 'contract',
+      traceVisible: false,
+      hasRun: false,
+      deriveLevel: '适度扩展'
+    };
+
+    const flow = document.getElementById('flow');
+    const tabsEl = document.getElementById('tabs');
+    const detailBody = document.getElementById('detailBody');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailDesc = document.getElementById('detailDesc');
+    const detailStatus = document.getElementById('detailStatus');
+    const inlineTrace = document.getElementById('inlineTrace');
+    const executionLayer = document.getElementById('executionLayer');
+
+    function currentNode() {
+      return nodes.find(node => node.id === state.activeNode);
+    }
+
+    function renderFlow() {
+      flow.innerHTML = nodes.map(node => `
+        <button class="node ${node.id === state.activeNode ? 'active' : ''}" data-node="${node.id}" type="button">
+          <div class="node-head">
+            <div>
+              <div class="node-title">${node.title}</div>
+              <div class="node-kicker">${node.kicker}</div>
+            </div>
+            <div class="node-type">${node.type.slice(0, 1)}</div>
+          </div>
+          <div class="node-summary">${node.summary}</div>
+          <div class="node-foot">${node.tags.map(tag => `<span class="tag ${node.special ? 'tag-blue' : ''}">${tag}</span>`).join('')}</div>
+        </button>
+      `).join('');
+
+      flow.querySelectorAll('.node').forEach(button => {
+        button.addEventListener('click', () => {
+          state.activeNode = button.dataset.node;
+          state.activeTab = 'contract';
+          render();
+        });
+      });
+    }
+
+    function renderTabs() {
+      const node = currentNode();
+      const visibleTabs = tabs.filter(tab => node.special || !['trace'].includes(tab.id));
+      tabsEl.innerHTML = visibleTabs.map(tab => `
+        <button class="tab ${tab.id === state.activeTab ? 'active' : ''}" data-tab="${tab.id}" type="button">${tab.label}</button>
+      `).join('');
+
+      tabsEl.querySelectorAll('.tab').forEach(button => {
+        button.addEventListener('click', () => {
+          state.activeTab = button.dataset.tab;
+          render();
+        });
+      });
+    }
+
+    function renderDetailHead() {
+      const node = currentNode();
+      detailTitle.textContent = node.title;
+      detailDesc.textContent = node.desc;
+      detailStatus.textContent = node.special ? '封装节点' : '独立节点';
+      detailStatus.className = node.special ? 'tag tag-blue' : 'tag tag-green';
+    }
+
+    function fieldList(items) {
+      return `
+        <div class="field-grid">
+          ${items.map(item => `
+            <div class="field">
+              <div class="field-main">
+                <div class="field-name">${item.name}</div>
+                <span class="tag">${item.meta}</span>
+              </div>
+              <div class="field-desc">${item.desc}</div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderContract(node) {
+      return `
+        <div class="section">
+          <div class="section-head"><div class="section-title">Action</div></div>
+          <div class="note">${node.action}</div>
+        </div>
+        <div class="section">
+          <div class="split">
+            <div class="card">
+              <div class="card-title">Input</div>
+              ${fieldList(node.inputs)}
+            </div>
+            <div class="card">
+              <div class="card-title">Output</div>
+              ${fieldList(node.outputs)}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderConfig(node) {
+      if (!node.special && node.id !== 'start' && node.id !== 'image' && node.id !== 'manualReview' && node.id !== 'end') {
+        return `<div class="empty">这个节点没有额外设置。</div>`;
+      }
+
+      if (node.id === 'derive') {
+        return `
+          <div class="section">
+            <div class="section-head"><div class="section-title">默认设置</div></div>
+            <div class="option-grid">
+              ${['轻微变化', '适度扩展', '大幅发散'].map(level => `
+                <button class="option ${state.deriveLevel === level ? 'active' : ''}" data-level="${level}" type="button">
+                  <div class="option-title">${level}</div>
+                  <div class="option-desc">${level === '轻微变化' ? '保留更多原图结构' : level === '适度扩展' ? '平衡相似度和差异' : '探索更多创意方向'}</div>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-head"><div class="section-title">保留重点</div></div>
+            <div class="pill-row">
+              ${['风格', '构图', '人物', '场景', '动作', '卖点'].map((item, index) => `
+                <span class="tag ${index < 3 ? 'tag-blue' : ''}">${item}</span>
+              `).join('')}
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-head"><div class="section-title">组合方式</div></div>
+            <div class="field-grid">
+              <div class="field">
+                <div class="field-main">
+                  <div class="field-name">均衡搭配</div>
+                  <span class="tag tag-green">MVP 默认</span>
+                </div>
+                <div class="field-desc">系统从候选集中智能随机组合 N 条，控制数量并过滤重复和明显不合理组合。</div>
+              </div>
+              <div class="field">
+                <div class="field-main">
+                  <div class="field-name">逐项替换、全部组合、智能挑选</div>
+                  <span class="tag">后续预留</span>
+                </div>
+                <div class="field-desc">底层保留能力，暂不在 MVP 默认展示，避免配置过重。</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (node.id === 'start') {
+        return fieldList(node.inputs);
+      }
+
+      if (node.id === 'image') {
+        return `
+          <div class="field-grid">
+            ${[
+              { name: '图片比例', meta: '3:4', desc: '用于投放素材的主要画幅。' },
+              { name: '分辨率', meta: '高清', desc: '如果结果会继续作为参考图，可选择更高分辨率。' },
+              { name: '单条生成数量', meta: '1 张', desc: '每条通过提示词生成几张图片。' }
+            ].map(item => `
+              <div class="field">
+                <div class="field-main"><div class="field-name">${item.name}</div><span class="tag tag-blue">${item.meta}</span></div>
+                <div class="field-desc">${item.desc}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (node.id === 'manualReview') {
+        return `
+          <div class="field-grid">
+            <div class="field">
+              <div class="field-main"><div class="field-name">审核对象</div><span class="tag tag-blue">图片集合</span></div>
+              <div class="field-desc">当前节点接在图片生成后，因此审核对象是图片；如果接在爆款图衍生后，则审核对象可以是提示词。</div>
+            </div>
+            <div class="field">
+              <div class="field-main"><div class="field-name">批量操作</div><span class="tag tag-green">开启</span></div>
+              <div class="field-desc">支持全部通过、全部拒绝和单项通过/拒绝。</div>
+            </div>
+            <div class="field">
+              <div class="field-main"><div class="field-name">拒绝原因</div><span class="tag">可选</span></div>
+              <div class="field-desc">保留拒绝原因，帮助回看衍生质量或生成失败原因。</div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-main"><div class="field-name">查看全部</div><span class="tag tag-blue">开启</span></div>
+            <div class="field-desc">进入工作流全部结果页查看所有最终产物。</div>
+          </div>
+          <div class="field">
+            <div class="field-main"><div class="field-name">入库</div><span class="tag tag-green">开启</span></div>
+            <div class="field-desc">通过审查的图片可以进入后续素材管理链路。</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTrace() {
+      return `
+        <div class="trace">
+          ${internalSteps.map((step, index) => `
+            <div class="trace-step">
+              <div class="step-index">${index + 1}</div>
+              <div>
+                <div class="trace-title">${step.title}</div>
+                <div class="trace-desc">${step.desc}</div>
+              </div>
+              <span class="tag ${index === internalSteps.length - 1 ? 'tag-green' : 'tag-blue'}">${step.out}</span>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function renderResult(node) {
+      if (!state.hasRun) {
+        return `<div class="empty">点击“模拟运行”后查看节点产物。</div>`;
+      }
+
+      if (node.id === 'derive') {
+        return `
+          <div class="section">
+            <div class="section-head"><div class="section-title">拆解结果</div><span class="tag tag-green">已完成</span></div>
+            <div class="card card-soft">
+              <div class="kv">
+                ${[
+                  ['人物', '年轻女性，真实护肤状态，干净皮肤'],
+                  ['场景', '浴室镜前，晨间自然光，高级简洁空间'],
+                  ['动作', '手持精华液，轻拍脸颊'],
+                  ['构图', '半身近景，人物居中，产品在右下区域'],
+                  ['风格', '浅色调，高级感，真实生活感'],
+                  ['卖点', '补水、修护、熬夜急救']
+                ].map(row => `
+                  <div class="kv-row"><div class="kv-label">${row[0]}</div><div class="kv-value">${row[1]}</div></div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="section-head"><div class="section-title">提示词预览</div><span class="tag tag-blue">50 条</span></div>
+            <div class="result-preview">
+              ${[
+                '刚下班的都市白领女性在高级感浴室镜前轻拍精华液到脸颊，浅色调，真实生活感，半身近景。',
+                '熬夜后护肤的年轻女性在晨光里的卧室梳妆台观察皮肤状态，高级护肤广告质感。',
+                '运动后补水护肤的女性在干净更衣区使用精华液，柔和自然光，产品露出清晰。'
+              ].map(text => `<div class="prompt-item">${text}</div>`).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      if (node.id === 'image' || node.id === 'end') {
+        return `
+          <div class="section">
+            <div class="section-head"><div class="section-title">图片预览</div><span class="tag tag-blue">${node.id === 'end' ? '最终 32 张' : '生成 42 张'}</span></div>
+            <div class="mini-images">
+              <div class="mini-image">图 01</div>
+              <div class="mini-image">图 02</div>
+              <div class="mini-image">图 03</div>
+              <div class="mini-image">图 04</div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (node.id === 'manualReview') {
+        return `
+          <div class="section">
+            <div class="section-head"><div class="section-title">审核结果</div><span class="tag tag-green">通过 32 / 42</span></div>
+            <div class="mini-images">
+              <div class="mini-image">通过 01</div>
+              <div class="mini-image">通过 02</div>
+              <div class="mini-image">通过 03</div>
+              <div class="mini-image">通过 04</div>
+            </div>
+          </div>
+          <div class="section">
+            <div class="result-preview">
+              <div class="prompt-item">拒绝：10 张，原因包括主体不清晰、产品露出弱、画面偏离参考风格。</div>
+            </div>
+          </div>
+        `;
+      }
+
+      return renderContract(node);
+    }
+
+    function renderDetailBody() {
+      const node = currentNode();
+      if (state.activeTab === 'contract') detailBody.innerHTML = renderContract(node);
+      if (state.activeTab === 'config') detailBody.innerHTML = renderConfig(node);
+      if (state.activeTab === 'trace') detailBody.innerHTML = node.special ? renderTrace() : `<div class="empty">只有封装节点需要展示内部执行层。</div>`;
+      if (state.activeTab === 'result') detailBody.innerHTML = renderResult(node);
+
+      detailBody.querySelectorAll('[data-level]').forEach(button => {
+        button.addEventListener('click', () => {
+          state.deriveLevel = button.dataset.level;
+          render();
+        });
+      });
+    }
+
+    function renderInlineTrace() {
+      inlineTrace.innerHTML = internalSteps.map((step, index) => `
+        <div class="trace-step">
+          <div class="step-index">${index + 1}</div>
+          <div>
+            <div class="trace-title">${step.title}</div>
+            <div class="trace-desc">${step.desc}</div>
+          </div>
+          <span class="tag">${step.out}</span>
+        </div>
+      `).join('');
+      executionLayer.hidden = !state.traceVisible;
+    }
+
+    function render() {
+      renderFlow();
+      renderTabs();
+      renderDetailHead();
+      renderDetailBody();
+      renderInlineTrace();
+      document.getElementById('toggleTraceBtn').textContent = state.traceVisible ? '隐藏执行层' : '显示执行层';
+    }
+
+    document.getElementById('toggleTraceBtn').addEventListener('click', () => {
+      state.traceVisible = !state.traceVisible;
+      render();
+    });
+
+    document.getElementById('runBtn').addEventListener('click', () => {
+      state.hasRun = true;
+      state.activeNode = 'derive';
+      state.activeTab = 'result';
+      state.traceVisible = true;
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

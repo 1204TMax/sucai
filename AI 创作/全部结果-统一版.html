@@ -1243,7 +1243,14 @@
       }
       if (meta.status === 'pending_review') btns.push('<button class="b b-solid" type="button" onclick="goReview()">去审核</button>');
       if (meta.resultType !== 'text') btns.push('<button class="b b-soft" type="button" onclick="toggleBatchMode()">' + (STATE.batchMode ? '取消批量' : '批量选择') + '</button>');
-      btns.push('<button class="b b-soft" type="button" onclick="downloadAll()">' + (meta.resultType === 'text' ? '复制全部' : '下载全部') + '</button>');
+      
+      if (meta.resultType === 'text') {
+          btns.push('<button class="b b-soft" type="button" onclick="exportExcel()">导出 Excel</button>');
+          btns.push('<button class="b b-soft" type="button" onclick="downloadAll()">复制全部</button>');
+      } else {
+          btns.push('<button class="b b-soft" type="button" onclick="downloadAll()">下载全部</button>');
+      }
+      
       btns.push('<button class="b b-soft" type="button" onclick="archiveAll()">全部入库</button>');
       if (meta.status === 'pending' || meta.status === 'generating') btns.push('<button class="b b-danger" type="button" onclick="openAbortModal()">中止生成</button>');
       actions.innerHTML = btns.join('');
@@ -1440,6 +1447,23 @@
         return String(index + 1).padStart(2, '0') + '. ' + (item.content || '');
       }).join('\n\n');
       navigator.clipboard.writeText(text).then(function() { showToast('已复制全部文案'); }).catch(function() { showToast('复制失败'); });
+    }
+
+    function exportExcel() {
+      const meta = currentMeta();
+      const rows = [['序号', '文案内容']];
+      meta.outputItems.forEach(function(item, index) {
+        rows.push([String(index + 1), item.content || '']);
+      });
+      const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + rows.map(e => e.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", (meta.taskName || "文案结果") + ".csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('已导出 Excel');
     }
 
     function archiveSingleText() {

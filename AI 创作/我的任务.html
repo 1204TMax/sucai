@@ -1249,8 +1249,8 @@ function getTaskStatusLabel(status) {
   return {
     pending: '等待中',
     generating: '生成中',
-    pending_review: '待审查',
-    reviewing: '待审查',
+    pending_review: '待人工审核',
+    reviewing: '待人工审核',
     completed: '已完成',
     failed: '已失败',
     aborted: '已中止'
@@ -1872,8 +1872,8 @@ function renderWorkflowReviewCard(task, vm) {
     + arrowHtml
     + '<div class="wf-abs-node is-active-review">'
       + '<div class="wf-abs-point"></div>'
-      + '<div class="wf-abs-label">人工审核图片</div>'
-      + '<button class="wf-abs-cta" onclick="openReviewPage(\'' + task.id + '\',\'' + (stats.activeReviewTaskId || '') + '\')">开始审核' + stats.readyCount + '个结果</button>'
+      + '<div class="wf-abs-label">待人工审核图片 (' + stats.readyCount + '张)</div>'
+      + '<button class="wf-abs-cta" onclick="openReviewPage(\'' + task.id + '\',\'' + (stats.activeReviewTaskId || '') + '\')">点击审核</button>'
     + '</div>';
   if (remainingCount > 0) {
     nodesHtml += arrowHtml

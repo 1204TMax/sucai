@@ -756,15 +756,8 @@
             <div class="card-title" id="cardTitle"></div>
             <div class="card-subtitle" id="cardSubtitle"></div>
         </div>
-    </div>
-
-    <!-- Row 2: Refs + Prompt -->
-    <div class="row row-pad row-sep" style="gap:var(--space-4);flex-wrap:nowrap;" id="metaRow">
-        <div style="display:flex;align-items:center;gap:var(--space-2);flex-shrink:0;" id="refGroup">
-            <div class="ref-thumbs" id="refThumbs"></div>
-        </div>
-        <div style="display:flex;align-items:center;gap:var(--space-2);min-width:0;flex:1;">
-            <span class="meta-value" id="infoPrompt"></span>
+        <div class="row-end">
+            <button class="b b-soft" onclick="alert('展示工作流复杂输入参数等详情内容')">查看详情</button>
         </div>
     </div>
 
@@ -894,39 +887,6 @@ function renderInfo() {
     document.getElementById('cardTitle').innerHTML = `已生成:${totalCount}条 <span class="status-tag ${statusClass}">${statusText}</span>`;
     const parts = ['任务名称AAAA'];
     document.getElementById('cardSubtitle').textContent = parts.join(' · ');
-
-    // Row 2: prompt
-    document.getElementById('infoPrompt').textContent = p.prompt;
-
-    // Row 2: refs (放到提示词前面，无标题)
-    const refGroup = document.getElementById('refGroup');
-    const refThumbs = document.getElementById('refThumbs');
-    if (p.refs && p.refs.length) {
-        refThumbs.innerHTML = p.refs.map((r, i) =>
-            `<div class="ref-thumb" style="background:${r.color}" title="${r.name}"
-                  onclick="openRefPreview(${i})"></div>`
-        ).join('');
-        refGroup.style.display = '';
-    } else {
-        refGroup.style.display = 'none';
-    }
-}
-
-function openRefPreview(idx) {
-    const ref = PAGE_INFO.refs[idx];
-    if (!ref) return;
-    const mask   = document.getElementById('previewMask');
-    const canvas = document.getElementById('previewCanvas');
-    const foot   = document.getElementById('previewFoot');
-    canvas.style.cssText = `
-        background: ${ref.color};
-        width: 400px; height: 400px;
-        max-width: 80vw; max-height: 70vh;
-        border-radius: 8px 8px 0 0;
-    `;
-    canvas.textContent = ref.name;
-    foot.innerHTML = `<button class="b b-soft" onclick="closePreview()">关闭</button>`;
-    mask.classList.add('visible');
 }
 
 // ═══════════════════════════════════════════════════

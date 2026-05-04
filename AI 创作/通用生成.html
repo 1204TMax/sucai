@@ -1414,7 +1414,7 @@
         <!-- 收藏区域 -->
         <div class="wf-section" id="sectionPinned">
             <div class="wf-section-header">
-                <div class="wf-section-title">收藏</div>
+                <div class="wf-section-title">我的收藏</div>
             </div>
             <div class="wf-grid" id="wfPinned"></div>
         </div>
@@ -1423,9 +1423,8 @@
         <div class="wf-section" id="sectionMine">
             <div class="wf-section-header">
                 <div class="wf-section-title-row">
-                    <div class="wf-section-title">我的</div>
+                    <div class="wf-section-title">我的创建</div>
                 </div>
-                <div class="wf-more-link" onclick="parent.postMessage({ action: 'openTab', title: '工作流广场', url: 'AI 创作/工作流广场.html' }, '*')">查看工作流广场</div>
             </div>
             <div class="wf-grid" id="wfMine"></div>
         </div>
@@ -3465,7 +3464,7 @@ function renderWorkflows() {
                 </div>
                 <div class="wf-desc-text">${w.desc}</div>
                 <div class="wf-card-footer">
-                    <span class="wf-meta">${w.author} · ${w.date || '刚刚'}</span>
+                    <span class="wf-meta">${w.date || '刚刚'}</span>
                 </div>
                 <div class="wf-menu">${menuHtml}</div>
             </div>

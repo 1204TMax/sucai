@@ -556,10 +556,6 @@
           <input id="createDate" type="date">
         </div>
         <div class="sep"></div>
-        <div class="f-chips" aria-label="来源筛选">
-          <button class="chip" id="officialOnly" type="button" aria-pressed="false" onclick="toggleSourceFilter(this)">官方创建</button>
-          <button class="chip" id="mineOnly" type="button" aria-pressed="false" onclick="toggleSourceFilter(this)">我创建的</button>
-        </div>
         <div class="row-end">
           <button class="b b-ghost" type="button" onclick="resetFilters()">清空筛选</button>
         </div>
@@ -637,8 +633,6 @@
     const keyword = document.getElementById('keyword');
     const creator = document.getElementById('creator');
     const createDate = document.getElementById('createDate');
-    const officialOnly = document.getElementById('officialOnly');
-    const mineOnly = document.getElementById('mineOnly');
     const toast = document.getElementById('toast');
 
     function esc(s) {
@@ -727,18 +721,15 @@
       const term = keyword.value.trim().toLowerCase();
       const creatorTerm = creator.value.trim().toLowerCase();
       const dateTerm = createDate.value;
-      const checkedSources = [];
-      if (officialOnly.classList.contains('on')) checkedSources.push('official');
-      if (mineOnly.classList.contains('on')) checkedSources.push('mine');
 
       return workflows
         .filter(item => item.type === state.activeType)
+        .filter(item => !isMineWorkflow(item)) // Only show others' workflows in plaza
         .filter(item => {
           const matchedText = !term || [item.name, item.desc, item.creator, item.project].some(v => String(v).toLowerCase().includes(term));
           const matchedCreator = !creatorTerm || String(item.creator).toLowerCase().includes(creatorTerm);
           const matchedDate = !dateTerm || item.createdAt === dateTerm;
-          const matchedSource = checkedSources.length === 0 || checkedSources.includes(item.source);
-          return matchedText && matchedCreator && matchedDate && matchedSource;
+          return matchedText && matchedCreator && matchedDate;
         })
         .sort((a, b) => {
           switch (state.sortBy) {
@@ -864,21 +855,10 @@
       render();
     }
 
-    function toggleSourceFilter(btn) {
-      const nextActive = !btn.classList.contains('on');
-      btn.classList.toggle('on', nextActive);
-      btn.setAttribute('aria-pressed', String(nextActive));
-      render();
-    }
-
     function resetFilters() {
       keyword.value = '';
       creator.value = '';
       createDate.value = '';
-      [officialOnly, mineOnly].forEach(btn => {
-        btn.classList.remove('on');
-        btn.setAttribute('aria-pressed', 'false');
-      });
       render();
     }
 

@@ -551,11 +551,18 @@ const PROCESSOR_REGISTRY = {
             </div>
             ${referenceHtml}
             <div class="form-item">
-                <label>比例/分辨率</label>
+                <label>比例/分辨率 <span class="form-hint" style="display:inline;margin-left:4px;" title="若作为后续节点的参考图，建议选择较高分辨率">?</span></label>
                 <select onchange="updateConfigAndRefresh('ratio', this.value)">
                     ${renderValueOptions(IMAGE_RATIO_VALUES, node.config.ratio || '1:1')}
                 </select>
                 ${node.config.ratio === '自定义' ? `<div style="margin-top: 8px;"><input type="text" placeholder="输入自定义比例或分辨率，如 1920x1080" value="${node.config.customRatio || ''}" oninput="updateConfig('customRatio', this.value)"></div>` : ''}
+            </div>
+            <div class="form-item">
+                <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;">
+                    <input type="checkbox" ${node.config.removeWatermark ? 'checked' : ''} onchange="updateConfig('removeWatermark', this.checked)">
+                    开启自动去水印
+                </label>
+                <div class="form-hint">生成或处理后的图片将尝试去除水印</div>
             </div>
             ${renderCountInput(node, 4)}
         `;
@@ -616,17 +623,18 @@ const PROCESSOR_REGISTRY = {
             </div>
             ${referenceHtml}
             <div class="form-item">
-                <label>比例/分辨率</label>
+                <label>比例/分辨率 <span class="form-hint" style="display:inline;margin-left:4px;" title="若作为后续节点的参考图，建议选择较高分辨率">?</span></label>
                 <select onchange="updateConfigAndRefresh('ratio', this.value)">
                     ${renderValueOptions(VIDEO_RATIO_VALUES, node.config.ratio || '16:9')}
                 </select>
                 ${node.config.ratio === '自定义' ? `<div style="margin-top: 8px;"><input type="text" placeholder="输入自定义比例或分辨率，如 1920x1080" value="${node.config.customRatio || ''}" oninput="updateConfig('customRatio', this.value)"></div>` : ''}
             </div>
             <div class="form-item">
-                <label>时长</label>
-                <select onchange="updateConfig('duration', this.value)">
-                    ${renderValueOptions(getVideoDurations(node.config.model), node.config.duration || getVideoDurations(node.config.model)[0] || '5秒')}
-                </select>
+                <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;">
+                    <input type="checkbox" ${node.config.removeWatermark ? 'checked' : ''} onchange="updateConfig('removeWatermark', this.checked)">
+                    开启自动去水印
+                </label>
+                <div class="form-hint">生成或处理后的视频将尝试去除水印</div>
             </div>
             ${renderCountInput(node, 1)}
         `;
@@ -988,7 +996,18 @@ function onDrop(e) {
     const rect = canvasEl.getBoundingClientRect();
     const cx = e.clientX - rect.left - canvasOffset.x - 100;
     const cy = e.clientY - rect.top - canvasOffset.y - 20;
-    nodes.push({ id: 'n' + Date.now(), processorType: type, x: cx, y: cy, config: def.createDefaultConfig() });
+    
+    let baseConfig = def.createDefaultConfig();
+    let baseName = baseConfig.name;
+    let name = baseName;
+    let counter = 1;
+    while(nodes.some(n => n.config && n.config.name === name)) {
+        counter++;
+        name = `${baseName}-${counter}`;
+    }
+    baseConfig.name = name;
+    
+    nodes.push({ id: 'n' + Date.now(), processorType: type, x: cx, y: cy, config: baseConfig });
     renderBoard();
 }
 
@@ -1346,16 +1365,7 @@ function renderReferenceSelector(nodeId, fieldKey, allowedTypes, label) {
     const variables = getAvailableNodeInputs(nodeId).filter(variable => allowedTypes.includes(variable.type) || allowedTypes.includes(variable.type === 'video.generate' ? 'video' : variable.type));
     const node = nodes.find(n => n.id === nodeId);
     const current = node?.config?.[fieldKey] || '';
-    const source = node?.config?.referenceSource || 'upload';
-    const uploadName = node?.config?.referenceUploadName || '';
-    const uploadBlock = `
-        <label class="upload-dropzone" ondragover="toggleDropzoneState(event, true)" ondragleave="toggleDropzoneState(event, false)" ondrop="handleReferenceDrop(event)">
-            <input type="file" style="display:none;" onchange="handleReferenceUploadChange(event)">
-            <div class="upload-dropzone-title">点击上传或拖拽上传</div>
-            <div class="upload-dropzone-desc">${uploadName ? `已选择：${uploadName}` : `上传要作为${label}的文件`}</div>
-        </label>
-    `;
-    
+
     const groups = {};
     variables.forEach(v => {
         if (!groups[v.source]) groups[v.source] = [];
@@ -1366,9 +1376,8 @@ function renderReferenceSelector(nodeId, fieldKey, allowedTypes, label) {
     }).join('');
 
     const previousOutputBlock = `<select onchange="setReferenceToken('${fieldKey}', this.value)"><option value="">请选择之前节点输出的文件</option>${optionsHtml}</select><div class="form-hint">从之前节点输出的文件中，选择要作为参考传入的内容。</div>`;
-    return `<div class="form-item"><label>${label}</label><div class="source-switch"><button type="button" class="source-chip${source === 'upload' ? ' active' : ''}" onclick="setReferenceSource('upload')">手动上传</button><button type="button" class="source-chip${source === 'previous' ? ' active' : ''}" onclick="setReferenceSource('previous')">之前节点输出</button></div>${source === 'upload' ? uploadBlock : previousOutputBlock}</div>`;
+    return `<div class="form-item"><label>${label}</label>${previousOutputBlock}</div>`;
 }
-
 function renderStartInputsEditor(node) {
     return (node.config.inputs || []).map((input, idx) => `
         <div class="config-card">

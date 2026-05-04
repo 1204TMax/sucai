@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作流通用节点方案</title>
+  <style>
+    :root {
+      --ant-primary-1: #E6F4FF;
+      --ant-primary-2: #BAE0FF;
+      --ant-primary-3: #91CAFF;
+      --ant-primary-4: #69B1FF;
+      --ant-primary-5: #4096FF;
+      --ant-primary-6: #1677FF;
+      --ant-primary-7: #0958D9;
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+      --ant-bg-base: #F5F5F5;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h1: 30px;
+      --ant-font-size-h2: 24px;
+      --ant-font-size-h3: 20px;
+      --ant-font-size-h4: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+      --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: var(--ant-size-xs);
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-family: var(--ant-font-family);
+      font-size: var(--ant-font-size);
+      line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
+    }
+
+    h1 {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-h1);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-h2);
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-h4);
+      font-weight: 700;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    code,
+    pre {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    }
+
+    pre {
+      margin: 0;
+      padding: var(--ant-size);
+      overflow: auto;
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-text-color);
+      color: var(--ant-text-color-inverse);
+      font-size: var(--ant-font-size-sm);
+      line-height: 1.55;
+      white-space: pre-wrap;
+    }
+
+    .page {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-container);
+      padding: var(--ant-size-lg);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+      gap: var(--ant-size-lg);
+      align-items: stretch;
+    }
+
+    .hero-main {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--ant-size-sm);
+    }
+
+    .eyebrow {
+      color: var(--ant-primary-6);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--ant-text-color-secondary);
+    }
+
+    .hero-summary {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--ant-size-xs);
+    }
+
+    .summary-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xxs);
+      min-height: 86px;
+      border: 1px solid var(--ant-primary-2);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-primary-1);
+      padding: var(--ant-size);
+    }
+
+    .summary-card strong {
+      color: var(--ant-primary-7);
+      font-size: var(--ant-font-size);
+    }
+
+    .summary-card span {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .scenario {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.2fr);
+      gap: var(--ant-size);
+      align-items: stretch;
+    }
+
+    .mock-image {
+      display: flex;
+      min-height: 280px;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius-lg);
+      background:
+        linear-gradient(145deg, var(--ant-text-color), var(--ant-text-color-secondary)),
+        var(--ant-bg-tertiary);
+      padding: var(--ant-size);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .mock-image-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size-xs);
+    }
+
+    .mock-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border-radius: var(--ant-border-radius-sm);
+      background: var(--ant-bg-container);
+      padding: 0 var(--ant-size-xs);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 700;
+    }
+
+    .mock-title {
+      font-size: var(--ant-font-size-h2);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .mock-note {
+      color: var(--ant-text-color-inverse);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .scenario-panel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--ant-size-xs);
+    }
+
+    .info-card {
+      display: flex;
+      min-height: 120px;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-secondary);
+      padding: var(--ant-size);
+    }
+
+    .info-card strong {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+    }
+
+    .info-card p {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--ant-size-xs);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius-sm);
+      background: var(--ant-bg-tertiary);
+      padding: 0 var(--ant-size-xs);
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .tag.blue {
+      border-color: var(--ant-primary-2);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-7);
+    }
+
+    .tag.green {
+      border-color: var(--ant-success-2);
+      background: var(--ant-success-1);
+      color: var(--ant-success-6);
+    }
+
+    .tag.orange {
+      border-color: var(--ant-warning-2);
+      background: var(--ant-warning-1);
+      color: var(--ant-warning-6);
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: var(--ant-size);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-container);
+      padding: var(--ant-size);
+    }
+
+    .step.is-text {
+      border-color: var(--ant-primary-2);
+      background: linear-gradient(180deg, var(--ant-primary-1), var(--ant-bg-container));
+    }
+
+    .step-side {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      border-right: 1px solid var(--ant-border-color-secondary);
+      padding-right: var(--ant-size);
+    }
+
+    .step-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-tertiary);
+      color: var(--ant-text-color-secondary);
+      font-weight: 800;
+    }
+
+    .step-title {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xxs);
+    }
+
+    .step-title strong {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-h4);
+      line-height: 1.35;
+    }
+
+    .step-title span {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .step-content {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--ant-size-xs);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      min-height: 136px;
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-secondary);
+      padding: var(--ant-size-sm);
+    }
+
+    .field-label {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 800;
+    }
+
+    .field strong {
+      color: var(--ant-text-color);
+    }
+
+    .field p {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .important {
+      border-color: var(--ant-warning-2);
+      background: var(--ant-warning-1);
+    }
+
+    .source-grid,
+    .guard-grid,
+    .node-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--ant-size-xs);
+    }
+
+    .node-grid {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .rule-card,
+    .node-card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-secondary);
+      padding: var(--ant-size);
+    }
+
+    .node-card {
+      min-height: 112px;
+    }
+
+    .node-card strong,
+    .rule-card strong {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+    }
+
+    .node-card span,
+    .rule-card span {
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    details {
+      overflow: hidden;
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-container);
+    }
+
+    summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      min-height: 48px;
+      cursor: pointer;
+      list-style: none;
+      padding: 0 var(--ant-size);
+      color: var(--ant-text-color);
+      font-weight: 800;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "展开";
+      color: var(--ant-primary-6);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 700;
+    }
+
+    details[open] summary::after {
+      content: "收起";
+    }
+
+    .details-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      border-top: 1px solid var(--ant-border-color-secondary);
+      padding: var(--ant-size);
+    }
+
+    @media (max-width: 1180px) {
+      .hero,
+      .scenario,
+      .step,
+      .source-grid,
+      .guard-grid,
+      .node-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .step-side {
+        border-right: 0;
+        border-bottom: 1px solid var(--ant-border-color-secondary);
+        padding-right: 0;
+        padding-bottom: var(--ant-size);
+      }
+
+      .step-content,
+      .scenario-panel,
+      .hero-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .section {
+        padding: var(--ant-size);
+      }
+
+      h1 {
+        font-size: var(--ant-font-size-h2);
+      }
+
+      h2 {
+        font-size: var(--ant-font-size-h3);
+      }
+
+      .step-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="section hero">
+      <div class="hero-main">
+        <div class="eyebrow">示例推演，允许业务预设节点</div>
+        <h1>一张爆款图，怎样通过“爆款拆解”节点变成一批新素材</h1>
+        <p class="muted">用户画布上可以看到“爆款拆解”这个节点。它是文本生成节点的预设形态：系统预置拆解提示词、输出格式和解析规则，同时保留用户自定义提示词与模型原始文本输出。</p>
+      </div>
+      <div class="hero-summary">
+        <div class="summary-card">
+          <strong>用户关心</strong>
+          <span>这张图能改哪里、这次改什么、最后生成多少素材。</span>
+        </div>
+        <div class="summary-card">
+          <strong>系统坚持</strong>
+          <span>爆款拆解可以是用户可见节点，但底层仍复用文本生成能力。</span>
+        </div>
+        <div class="summary-card">
+          <strong>默认策略</strong>
+          <span>1 个主变量 + 若干联动变量，避免全排列失控。</span>
+        </div>
+        <div class="summary-card">
+          <strong>高级规则</strong>
+          <span>一个节点对外只交出一份结果，但这份结果里面可以很丰富。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div>
+        <h2>本页只讲这一个例子</h2>
+        <p class="muted">用户上传一张“60 年代客厅，爷爷隐身了”的爆款图，希望保持爆款结构，衍生出一批可投放图片和视频。</p>
+      </div>
+      <div class="scenario">
+        <div class="mock-image" role="img" aria-label="示例爆款图：60 年代客厅，标题为爷爷隐身了">
+          <div class="mock-image-top">
+            <span class="mock-pill">60 年代客厅</span>
+            <span class="mock-pill">爆款参考图</span>
+          </div>
+          <div>
+            <div class="mock-title">爷爷隐身了</div>
+            <p class="mock-note">复古惊悚标题图，人物、年代、地点、事件都可能成为可变项。</p>
+          </div>
+        </div>
+        <div class="scenario-panel">
+          <div class="info-card">
+            <strong>用户输入</strong>
+            <p>爆款图、商品信息、目标数量：先生成 5 张图和 5 条短视频。</p>
+            <div class="tag-row">
+              <span class="tag blue">开始节点</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <strong>本轮策略</strong>
+            <p>爆款拆解先产出可选参数池；后续文本生成只改人物，标题称呼跟着改。</p>
+            <div class="tag-row">
+              <span class="tag orange">爆款拆解节点</span>
+            </div>
+          </div>
+          <div class="info-card">
+            <strong>预期结果</strong>
+            <p>得到“婆婆隐身了、奶奶隐身了、外公隐身了”等提示词、图片和视频。</p>
+            <div class="tag-row">
+              <span class="tag green">可作为最终结果</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div>
+        <h2>从开始到结束，一步一步跑</h2>
+        <p class="muted">下面每一步都写清楚：底层用哪个通用节点、提示词或配置是什么、生成结果是什么。开始和结束都是边界节点，没有动作，只负责把输入原样交给后续或作为最终结果。</p>
+      </div>
+
+      <div class="step-list">
+        <article class="step">
+          <div class="step-side">
+            <span class="step-number">1</span>
+            <div class="step-title">
+              <strong>开始节点</strong>
+              <span>用户主动输入，输入就是输出</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">开始</span>
+              <span class="tag">没有动作</span>
+              <span class="tag">输入 = 输出</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>用户上传爆款图，填写商品信息、目标数量和本次目标。</p>
+            </div>
+            <div class="field important">
+              <div class="field-label">特殊规则</div>
+              <p>开始节点不处理、不生成、不整理字段。它的特殊之处是：所有输入都来自用户主动输入，并原样暴露给后续节点。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">输出</div>
+              <p><strong>类型：结构化对象</strong></p>
+              <p>示例：开始结果 = { 爆款图、商品信息、目标数量：5、目标：“衍生图片和视频” }</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step is-text">
+          <div class="step-side">
+            <span class="step-number">2</span>
+            <div class="step-title">
+              <strong>爆款拆解节点</strong>
+              <span>用户可见节点，底层是文本生成预设</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">爆款拆解</span>
+              <span class="tag">文本生成预设</span>
+              <span class="tag">保留原始回答</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>拿到第 1 步用户上传的爆款图、商品信息、目标数量和用户目标。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">提示词</div>
+              <p>预设提示词 + 用户补充提示词：请拆解这张爆款图，识别画面骨架、人物、年代、地点、异常事件、标题、构图和不可变约束，并按指定格式输出。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">生成结果</div>
+              <p><strong>类型：结构化对象</strong></p>
+              <p>最简单示例：这张图是“60 年代客厅，爷爷隐身了”。可改的是“人物、年代、标题称呼”。不能乱改的是“复古客厅构图、惊悚标题风格”。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step is-text">
+          <div class="step-side">
+            <span class="step-number">3</span>
+            <div class="step-title">
+              <strong>爆款拆解节点 -> 结构化结果</strong>
+              <span>可选参数在这个节点里出现</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">爆款拆解</span>
+              <span class="tag">结构化结果</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>使用模型原始回答，以及系统解析后的结构化结果。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">动作</div>
+              <p>系统解析模型回答：成功则得到结构化结果；失败则保留模型原始回答，并进入格式修复或人工确认。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">生成结果</div>
+              <p><strong>类型：结构化对象</strong></p>
+              <p>示例：可改参数里有人物、年代、地点、事件、标题称呼；人物和标题称呼存在联动关系。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step is-text">
+          <div class="step-side">
+            <span class="step-number">4</span>
+            <div class="step-title">
+              <strong>文本生成节点配置 -> 选择本轮改什么</strong>
+              <span>这一步可以由预设推荐，也可以用户确认</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">文本生成</span>
+              <span class="tag orange">用户在乎</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>拿到爆款拆解节点给出的候选参数池：人物、年代、地点、异常事件、标题称呼、构图约束。</p>
+            </div>
+            <div class="field important">
+              <div class="field-label">配置</div>
+              <p>本轮只改“人物”；“标题称呼”跟随人物联动；年代、地点、隐身效果、构图固定。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">生成结果</div>
+              <p><strong>类型：配置结果</strong></p>
+              <p>示例：主变量=人物；联动变量=标题称呼；固定项=60 年代、客厅、隐身、复古构图。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step is-text">
+          <div class="step-side">
+            <span class="step-number">5</span>
+            <div class="step-title">
+              <strong>文本生成节点 -> 候选值生成提示词</strong>
+              <span>只围绕选中的主变量生成</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">文本生成</span>
+              <span class="tag">内部步骤 3</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>使用第 4 步配置：本轮主变量是“人物”。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">提示词</div>
+              <p>请只围绕“人物”生成 5 个适合这个题材的替换候选，保持年龄感、家庭关系和惊悚题材适配。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">生成结果</div>
+              <p><strong>类型：文本数组</strong></p>
+              <p>示例：婆婆、奶奶、外公、老伴、退休女教师。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step is-text">
+          <div class="step-side">
+            <span class="step-number">6</span>
+            <div class="step-title">
+              <strong>文本生成节点 -> 拼装提示词和脚本</strong>
+              <span>把候选值装回大提示词</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">文本生成</span>
+              <span class="tag">内部步骤 4</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>爆款拆解节点给出的原始大提示词 + 人物候选数组 + 标题称呼联动规则。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">提示词</div>
+              <p>请把人物候选装回原始大提示词，并同步修改标题称呼，生成图片提示词和视频脚本。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">生成结果</div>
+              <p><strong>类型：结构化对象</strong></p>
+              <p>示例：第 1 条图片提示词 = “60 年代客厅里，婆婆出现隐身效果，标题写‘婆婆隐身了’...”</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step">
+          <div class="step-side">
+            <span class="step-number">7</span>
+            <div class="step-title">
+              <strong>图像生成节点</strong>
+              <span>从图片提示词批量出图</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag green">图像生成</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>使用第 6 步生成的图片提示词数组，也可以引用原爆款图作为参考。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">动作</div>
+              <p>逐条生成图片，锁住构图、标题位置、复古色调，只替换本轮变量。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">输出</div>
+              <p><strong>类型：图片数组</strong></p>
+              <p>示例：图片 1 = 婆婆隐身了；图片 2 = 奶奶隐身了。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step">
+          <div class="step-side">
+            <span class="step-number">8</span>
+            <div class="step-title">
+              <strong>视频生成节点</strong>
+              <span>用图片和脚本合成视频</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag green">视频生成</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>使用第 7 步的图片数组 + 第 6 步的视频脚本。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">动作</div>
+              <p>默认一一配对：第 1 张图配第 1 条脚本。用户也可以选择推荐组合或随机组合。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">输出</div>
+              <p><strong>类型：视频数组</strong></p>
+              <p>示例：视频 1 = 婆婆隐身了 6 秒短视频；视频 2 = 奶奶隐身了 6 秒短视频。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step">
+          <div class="step-side">
+            <span class="step-number">9</span>
+            <div class="step-title">
+              <strong>人工审核节点</strong>
+              <span>统一审核文本、图片或视频</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag orange">人工审核</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>可以接图片数组、视频数组，也可以接文本生成的提示词包。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">动作</div>
+              <p>用户通过、驳回、补充修改意见；驳回项可以回到对应节点重跑。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">输出</div>
+              <p><strong>类型：审核后的结果数组 / 结构化对象</strong></p>
+              <p>示例：20 张图通过 8 张，3 条视频通过 2 条，1 条视频要求重跑。</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="step">
+          <div class="step-side">
+            <span class="step-number">10</span>
+            <div class="step-title">
+              <strong>结束节点</strong>
+              <span>接收最终结果，输入就是输出</span>
+            </div>
+            <div class="tag-row">
+              <span class="tag blue">结束</span>
+              <span class="tag">没有动作</span>
+              <span class="tag">输入 = 输出</span>
+            </div>
+          </div>
+          <div class="step-content">
+            <div class="field">
+              <div class="field-label">输入</div>
+              <p>拿到人工审核通过的图片、视频和生成记录。</p>
+            </div>
+            <div class="field important">
+              <div class="field-label">特殊规则</div>
+              <p>结束节点不处理、不生成、不汇总、不导出。它的特殊之处是：把上游传入内容原样声明为整个工作流的最终结果。</p>
+            </div>
+            <div class="field">
+              <div class="field-label">输出</div>
+              <p><strong>类型：结构化对象 / 数组 / 素材数组</strong></p>
+              <p>示例：结束结果 = 人工审核通过后的结果。</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div>
+        <h2>两个容易混乱的点，单独说清楚</h2>
+        <p class="muted">这两点是后续兼容性的核心：可选参数主要由爆款拆解节点产出，但文本生成节点决定本轮怎么用。</p>
+      </div>
+
+      <div class="source-grid">
+        <div class="rule-card">
+          <strong>来源 1：爆款拆解识别</strong>
+          <span>例：人物=爷爷、地点=客厅、年代=60 年代、事件=隐身。</span>
+        </div>
+        <div class="rule-card">
+          <strong>来源 2：工作流预设</strong>
+          <span>例：人物、标题称呼、地点、年代通常可以作为衍生维度。</span>
+        </div>
+        <div class="rule-card">
+          <strong>来源 3：用户手动添加</strong>
+          <span>例：用户觉得“情绪氛围”也应该变，可以手动补充成参数。</span>
+        </div>
+      </div>
+
+      <div class="guard-grid">
+        <div class="rule-card">
+          <strong>默认做法</strong>
+          <span>只选 1 个主变量：人物。标题称呼作为联动变量自动跟随。</span>
+        </div>
+        <div class="rule-card">
+          <strong>生成数量</strong>
+          <span>5 个人物候选生成 5 条素材，不是把所有参数交叉组合。</span>
+        </div>
+        <div class="rule-card">
+          <strong>高级选项</strong>
+          <span>用户明确选择多个主变量时，才显示预计组合数和成本提醒。</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div>
+        <h2>用户画布可以有“爆款拆解”，底层仍复用文本生成</h2>
+        <p class="muted">这里把“基础能力类型”和“业务预设节点”分开：爆款拆解是用户可拖拽、可理解的节点，但它的底层能力还是文本生成。</p>
+      </div>
+      <div class="node-grid">
+        <div class="node-card">
+          <strong>开始</strong>
+          <span>没有动作，用户输入原样成为输出结果。</span>
+        </div>
+        <div class="node-card">
+          <strong>爆款拆解</strong>
+          <span>文本生成预设节点，预置提示词、输出格式和解析规则。</span>
+        </div>
+        <div class="node-card">
+          <strong>文本生成</strong>
+          <span>保留用户自定义提示词，可自由生成或结构化输出。</span>
+        </div>
+        <div class="node-card">
+          <strong>图像生成</strong>
+          <span>消费图片提示词，产出图片数组。</span>
+        </div>
+        <div class="node-card">
+          <strong>视频生成</strong>
+          <span>消费图片和脚本，产出视频数组。</span>
+        </div>
+        <div class="node-card">
+          <strong>人工审核</strong>
+          <span>接什么审什么，输出确认结果。</span>
+        </div>
+        <div class="node-card">
+          <strong>结束</strong>
+          <span>没有动作，上游输入原样成为最终结果。</span>
+        </div>
+      </div>
+
+      <details>
+        <summary>高级：中文字段和技术字段怎么对应</summary>
+        <div class="details-body">
+          <p class="muted">默认页面给用户看中文字段。研发实现时可以用英文 key，但需要在产品层显示中文名称。</p>
+          <pre>{
+  "爆款拆解结果": {
+    "模型原始回答": "大模型原始返回文本，完整保留",
+    "实际使用提示词": "预设提示词 + 用户补充提示词 + 输出格式要求",
+    "解析状态": "解析成功",
+    "结构化结果": {
+      "原始大提示词": "60 年代客厅里，爷爷出现隐身效果...",
+      "可改参数": [
+        {
+          "参数名": "人物",
+          "原值": "爷爷",
+          "联动参数": ["标题称呼"]
+        },
+        {
+          "参数名": "标题称呼",
+          "原值": "爷爷",
+          "来源": "跟随人物变化"
+        }
+      ],
+      "候选参数池": [
+        { "参数名": "人物", "来源": "图片识别 + 标题识别", "本轮推荐": true },
+        { "参数名": "年代", "来源": "图片识别 + 预设", "本轮推荐": false }
+      ]
+    }
+  },
+  "文本生成结果": {
+    "模型原始回答": "大模型原始返回文本，完整保留",
+    "结构化结果": {
+      "结果类型": "提示词包",
+      "素材项": [
+        {
+          "参数取值": {
+            "人物": "婆婆",
+            "标题称呼": "婆婆",
+            "年代": "60 年代",
+            "事件": "隐身"
+          },
+          "图片提示词": "60 年代客厅里，婆婆出现隐身效果，标题写“婆婆隐身了”...",
+          "视频脚本": "镜头 1：复古客厅；镜头 2：婆婆逐渐透明；镜头 3：标题强化。"
+        }
+      ]
+    }
+  }
+}</pre>
+          <div class="source-grid">
+            <div class="rule-card">
+              <strong>模型原始回答</strong>
+              <span>对应技术字段 raw_text，用来保留大模型原始返回内容。</span>
+            </div>
+            <div class="rule-card">
+              <strong>结构化结果</strong>
+              <span>对应技术字段 parsed，给系统和下游节点稳定读取。</span>
+            </div>
+            <div class="rule-card">
+              <strong>实际使用提示词</strong>
+              <span>对应技术字段 prompt_used，用来追溯这次到底发给模型了什么。</span>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details>
+        <summary>高级：爆款拆解为什么不是新的基础能力类型</summary>
+        <div class="details-body">
+          <p class="muted">它是“文本生成 + 预设提示词 + 输出格式 + JSON 解析”的封装。这样用户可以直接使用爆款拆解节点，系统也能继续用同一套文本生成能力扩展出标题改写、卖点提炼、脚本生成等业务节点。</p>
+          <pre>{
+  "display_node": {
+    "name": "爆款拆解",
+    "base_type": "text_generation",
+    "preset_id": "hot_image_analysis",
+    "user_prompt_editable": true,
+    "keep_raw_text": true,
+    "structured_output": true
+  }
+}</pre>
+        </div>
+      </details>
+    </section>
+  </main>
+</body>
+</html>
