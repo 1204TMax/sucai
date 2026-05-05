@@ -243,63 +243,6 @@
       white-space: nowrap;
     }
 
-    .f-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-1);
-      align-items: center;
-    }
-
-    .chip {
-      height: var(--h-xs);
-      padding: 0 var(--space-2);
-      border-radius: var(--r-sm);
-      font: 500 var(--text-xs)/1 var(--font);
-      color: var(--text-lo);
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-1);
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1);
-      white-space: nowrap;
-    }
-
-    .pills {
-      display: inline-flex;
-      align-items: center;
-      background: var(--bg-subtle);
-      border: 1px solid var(--border-1);
-      border-radius: var(--r-full);
-      padding: 2px;
-      gap: 1px;
-      flex-shrink: 0;
-    }
-
-    .pill {
-      height: var(--h-xs);
-      padding: 0 var(--space-3);
-      border-radius: var(--r-full);
-      font: 500 var(--text-sm)/1 var(--font);
-      color: var(--text-muted);
-      border: none;
-      background: transparent;
-      cursor: pointer;
-      transition: all 120ms ease;
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1);
-    }
-
-    .pill:hover {
-      color: var(--text-lo);
-    }
-
-    .pill.on {
-      background: var(--bg-surface);
-      color: var(--text-hi);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-
     .pill-note {
       background: transparent;
       border: none;
@@ -357,11 +300,6 @@
     .b-danger:hover {
       color: #fff;
       opacity: 0.92;
-    }
-
-    .b-icon {
-      width: var(--h-sm);
-      padding: 0;
     }
 
     .review-inline {
@@ -462,132 +400,6 @@
 
     .copy-item:hover .copy-actions {
       opacity: 1;
-    }
-
-    .visual-groups {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-3);
-      padding-top: var(--space-1);
-    }
-
-    .visual-group {
-      display: flex;
-      flex-direction: column;
-      gap: var(--space-2);
-    }
-
-    .visual-group-head {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-1);
-    }
-
-    .visual-group-title {
-      font-size: var(--text-md);
-      font-weight: 600;
-      color: var(--text-hi);
-    }
-
-    .visual-group-count {
-      font-size: var(--text-xs);
-      color: var(--text-muted);
-    }
-
-    .visual-row {
-      display: flex;
-      gap: var(--space-2);
-      margin-bottom: var(--space-2);
-    }
-
-    .visual-row-last {
-      display: flex;
-      gap: var(--space-2);
-      margin-bottom: var(--space-2);
-    }
-
-    .visual-item {
-      position: relative;
-      border-radius: var(--r-lg);
-      overflow: hidden;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
-      border: 1px solid var(--border-1);
-      background: var(--bg-subtle);
-    }
-
-    .visual-item:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-2);
-      border-color: var(--accent-border);
-      z-index: 1;
-    }
-
-    .visual-item.is-loading {
-      cursor: default;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .visual-item.is-selected {
-      border-color: var(--accent-solid);
-      box-shadow: 0 0 0 2px rgba(74,158,255,0.12);
-    }
-
-    .visual-item.is-reviewing {
-      border-color: var(--warning-border);
-    }
-
-    .visual-thumb {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      background: var(--bg-subtle);
-    }
-
-    .visual-meta {
-      position: absolute;
-      right: var(--space-2);
-      bottom: var(--space-2);
-      height: 22px;
-      padding: 0 var(--space-2);
-      border-radius: var(--r-sm);
-      background: rgba(255,255,255,0.9);
-      color: var(--text-lo);
-      font-size: var(--text-sm);
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid rgba(255,255,255,0.92);
-    }
-
-    .visual-check {
-      position: absolute;
-      top: var(--space-2);
-      left: var(--space-2);
-      width: 18px;
-      height: 18px;
-      border-radius: var(--r-sm);
-      background: rgba(0,0,0,0.32);
-      color: #fff;
-      font-size: var(--text-xs);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      border: 1px solid rgba(255,255,255,0.85);
-      z-index: 3;
-    }
-
-    .page-main.is-batch .visual-check,
-    .visual-item.is-selected .visual-check {
-      display: inline-flex;
-    }
-
-    .visual-item.is-selected .visual-check {
-      background: var(--accent-solid);
-      border-color: var(--accent-solid);
     }
 
     .empty-card {
@@ -860,10 +672,6 @@
       .detail-grid {
         grid-template-columns: 1fr;
       }
-
-      .visual-grid {
-        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-      }
     }
   </style>
 </head>
@@ -910,18 +718,10 @@
         <div class="dock-handle">
           <span>切</span>
           <span>换</span>
-          <span>结</span>
-          <span>果</span>
+          <span>状</span>
+          <span>态</span>
         </div>
         <div class="dock-body">
-          <div>
-            <div class="dock-title">来源</div>
-            <div class="seg-wrap" id="sourceOptions"></div>
-          </div>
-          <div>
-            <div class="dock-title">类型</div>
-            <div class="seg-wrap" id="typeOptions"></div>
-          </div>
           <div>
             <div class="dock-title">状态</div>
             <div class="seg-wrap" id="statusOptions"></div>
@@ -970,45 +770,27 @@
 
   <script>
     const SOURCE_OPTIONS = [
-      { value: 'universal', label: '通用生成' },
       { value: 'workflow', label: '工作流' }
-    ];
-    const TYPE_OPTIONS = [
-      { value: 'text', label: '文案' },
-      { value: 'image', label: '图像' },
-      { value: 'video', label: '视频' }
     ];
     const STATUS_OPTIONS = [
       { value: 'pending', label: '排队中' },
       { value: 'generating', label: '生成中' },
       { value: 'completed', label: '已完成' },
       { value: 'aborted', label: '已中止' },
-      { value: 'pending_review', label: '待审核' }
-    ];
-    const DENSITY_OPTIONS = [
-      { value: 'sparse', label: '大' },
-      { value: 'medium', label: '中' },
-      { value: 'dense', label: '小' }
+      { value: 'pending_review', label: '待人工审核' }
     ];
     const ROUTE = new URLSearchParams(window.location.search);
     const STATE = {
-      source: ROUTE.get('source') || 'universal',
-      resultType: ROUTE.get('resultType') || 'image',
+      source: ROUTE.get('source') || 'workflow',
       status: ROUTE.get('status') || 'completed',
-      density: 'medium',
-      batchMode: false,
-      selectedIds: new Set(),
       initial: {
-        source: ROUTE.get('source') || 'universal',
-        resultType: ROUTE.get('resultType') || 'image',
+        source: ROUTE.get('source') || 'workflow',
         status: ROUTE.get('status') || 'completed',
         taskName: ROUTE.get('taskName') || '',
         workflowName: ROUTE.get('workflowName') || '',
         project: ROUTE.get('project') || '',
         prompt: ROUTE.get('prompt') || '',
         modelLabel: ROUTE.get('model') || '',
-        ratioText: ROUTE.get('ratio') || '',
-        extraText: ROUTE.get('extra') || '',
         expectedCount: ROUTE.get('expected') || '',
         producedCount: ROUTE.get('produced') || ''
       }
@@ -1043,7 +825,7 @@
         generating: '生成中',
         completed: '已完成',
         aborted: '已中止',
-        pending_review: '待审核'
+        pending_review: '待人工审核'
       }[status] || '已完成';
     }
 
@@ -1051,39 +833,9 @@
       return source === 'workflow' ? '工作流' : '通用生成';
     }
 
-    function getTypeLabel(type) {
-      return { text: '文案', image: '图像', video: '视频' }[type] || '图像';
-    }
-
     function getStatusClass(status) {
+      if (status === 'pending_review') return 'status-generating';
       return 'status-' + status;
-    }
-
-    function rand(seed, index) {
-      return seed + '-' + index;
-    }
-
-    function imageItem(seed, ratio, modelLabel, index) {
-      return {
-        id: seed + '-img-' + index,
-        type: 'image',
-        model: modelLabel,
-        ratio: ratio,
-        thumb: 'https://picsum.photos/seed/' + rand(seed, index) + '/800/800',
-        url: 'https://picsum.photos/seed/' + rand(seed, index) + '/1600/1600'
-      };
-    }
-
-    function videoItem(seed, ratio, modelLabel, duration, index) {
-      return {
-        id: seed + '-video-' + index,
-        type: 'video',
-        model: modelLabel,
-        ratio: ratio,
-        duration: duration,
-        thumb: 'https://picsum.photos/seed/' + rand(seed, index) + '/1280/720',
-        url: '../icon/步数1-1.mp4'
-      };
     }
 
     function textItem(seed, modelLabel, index) {
@@ -1104,75 +856,52 @@
     }
 
     function getScenarioMeta(selection) {
-      const useInitial = selection.source === STATE.initial.source
-        && selection.resultType === STATE.initial.resultType
-        && selection.status === STATE.initial.status;
+      const useInitial = selection.source === STATE.initial.source && selection.status === STATE.initial.status;
       const routeMeta = useInitial ? STATE.initial : {};
       const source = selection.source;
-      const resultType = selection.resultType;
       const status = selection.status;
-      const taskName = routeMeta.taskName || (source === 'workflow'
-        ? (resultType === 'text' ? '美妆自动化文案生产任务' : (resultType === 'video' ? '美妆自动化视频生产任务' : '美妆自动化图片生产任务'))
-        : (resultType === 'text' ? '护肤品文案裂变' : (resultType === 'video' ? '产品视频批量生成' : '详情页主图批量生成')));
-      const workflowName = routeMeta.workflowName || (source === 'workflow'
-        ? (resultType === 'text' ? '文案审核工作流' : (resultType === 'video' ? '视频审核工作流' : '图片审核工作流'))
-        : '');
-      const modelLabel = routeMeta.modelLabel || (source === 'workflow' ? '工作流' : (resultType === 'text' ? 'GPT-5.4 mini' : (resultType === 'video' ? 'Seedance 2.0' : 'Seedream 5.0')));
-      const ratioText = routeMeta.ratioText || (resultType === 'text' ? '' : (resultType === 'video' ? '9:16' : '1920×1080'));
-      const extraText = routeMeta.extraText || (resultType === 'text' ? '' : (resultType === 'video' ? '5秒' : '2K'));
-      const expectedCount = Number(routeMeta.expectedCount || (resultType === 'text' ? 20 : (resultType === 'video' ? 16 : 50)));
-      const producedCount = Number(routeMeta.producedCount || (status === 'pending' ? 0 : (status === 'generating' ? Math.max(4, Math.floor(expectedCount / 3)) : (status === 'aborted' ? Math.max(4, Math.floor(expectedCount / 2)) : (status === 'pending_review' ? Math.max(6, Math.floor(expectedCount / 2)) : expectedCount)))));
-      const project = routeMeta.project || (source === 'workflow' ? '护肤品推广' : (resultType === 'video' ? '走路赚金币' : '护肤品推广'));
+      const taskName = routeMeta.taskName || (source === 'workflow' ? '美妆自动化文案生产任务' : '护肤品文案裂变');
+      const workflowName = routeMeta.workflowName || (source === 'workflow' ? '文案审核工作流' : '');
+      const modelLabel = routeMeta.modelLabel || (source === 'workflow' ? '工作流' : 'GPT-5.4 mini');
+      const expectedCount = Number(routeMeta.expectedCount || 20);
+      let producedCount = Number(routeMeta.producedCount);
+      if (!routeMeta.producedCount) {
+          producedCount = status === 'pending' ? 0 : ((status === 'generating' || status === 'pending_review') ? Math.max(4, Math.floor(expectedCount / 3)) : (status === 'aborted' ? Math.max(4, Math.floor(expectedCount / 2)) : expectedCount));
+      }
+      const project = routeMeta.project || '护肤品推广';
       const prompt = routeMeta.prompt || (source === 'workflow'
         ? '工作流输入信息已收起，点击右上角“查看详情”查看本次任务的具体输入字段。'
-        : (resultType === 'text'
-          ? '请围绕新品精华液，生成更适合小红书投放场景的 20 条文案，语气自然，不要过度营销。'
-          : (resultType === 'video'
-            ? '在阳光明媚的草地上奔跑的金毛寻回犬，毛发蓬松，背景虚化，高清写实风格，自然光照。'
-            : '在柔光环境中拍摄高质感护肤品主图，突出“提亮修护”的核心卖点。')));
+        : '请围绕新品精华液，生成更适合小红书投放场景的 20 条文案，语气自然，不要过度营销。');
+      
       return {
         source: source,
         sourceLabel: getSourceLabel(source),
-        resultType: resultType,
-        resultTypeLabel: getTypeLabel(resultType),
         status: status,
         statusLabel: getStatusLabel(status),
         taskName: taskName,
         workflowName: workflowName,
         modelLabel: modelLabel,
-        ratioText: ratioText,
-        extraText: extraText,
         expectedCount: expectedCount,
         producedCount: producedCount,
         project: project,
         prompt: prompt,
-        reviewNodeName: source === 'workflow' ? (resultType === 'text' ? '文案审核节点' : (resultType === 'video' ? '视频审核节点' : '图片审核节点')) : '',
+        reviewNodeName: source === 'workflow' ? '文案审核节点' : '',
         reviewPendingCount: status === 'pending_review' ? Math.max(1, expectedCount - producedCount) : 0,
         reviewProducedCount: status === 'pending_review' ? producedCount : 0,
-        refs: resultType === 'text'
-          ? ['https://picsum.photos/seed/text-ref-1/240/240']
-          : (resultType === 'video'
-            ? ['https://picsum.photos/seed/video-ref-1/240/240', 'https://picsum.photos/seed/video-ref-2/240/240']
-            : ['https://picsum.photos/seed/image-ref-1/240/240', 'https://picsum.photos/seed/image-ref-2/240/240'])
+        refs: ['https://picsum.photos/seed/text-ref-1/240/240']
       };
     }
 
     function buildOutputItems(meta) {
       const items = [];
       for (let i = 0; i < meta.producedCount; i += 1) {
-        if (meta.resultType === 'text') {
-          items.push(textItem(meta.source + '-' + meta.status, meta.modelLabel, i));
-        } else if (meta.resultType === 'video') {
-          items.push(videoItem(meta.source + '-' + meta.status, meta.ratioText || '9:16', meta.modelLabel, meta.extraText || '5秒', i));
-        } else {
-          items.push(imageItem(meta.source + '-' + meta.status, meta.ratioText || '1920×1080', meta.modelLabel, i));
-        }
+        items.push(textItem(meta.source + '-' + meta.status, meta.modelLabel, i));
       }
       return items;
     }
 
     function currentMeta() {
-      const meta = getScenarioMeta({ source: STATE.source, resultType: STATE.resultType, status: STATE.status });
+      const meta = getScenarioMeta({ source: STATE.source, status: STATE.status });
       meta.outputItems = buildOutputItems(meta);
       return meta;
     }
@@ -1180,7 +909,6 @@
     function updateRoute(meta) {
       const params = new URLSearchParams(window.location.search);
       params.set('source', meta.source);
-      params.set('resultType', meta.resultType);
       params.set('status', meta.status);
       history.replaceState({}, '', window.location.pathname + '?' + params.toString());
     }
@@ -1198,18 +926,42 @@
     }
 
     function renderHeader(meta) {
-      document.getElementById('cardTitle').textContent = '已产出 ' + meta.producedCount + (meta.resultType === 'text' ? ' 条' : (meta.resultType === 'image' ? ' 张' : ' 条'));
-      document.getElementById('sourceTag').textContent = meta.sourceLabel;
-      const statusTag = document.getElementById('statusTag');
-      statusTag.textContent = meta.statusLabel;
-      statusTag.className = 'status-tag ' + getStatusClass(meta.status);
-      document.getElementById('cardSubtitle').textContent = [meta.project, meta.resultTypeLabel, meta.sourceLabel].filter(Boolean).join(' · ');
-      document.getElementById('cardMetaLine').textContent = meta.source === 'workflow'
-        ? ('任务：' + meta.taskName + '    工作流：' + (meta.workflowName || meta.taskName))
-        : ('任务：' + meta.taskName + '    模型：' + meta.modelLabel + (meta.resultType !== 'text' && meta.extraText ? '    ' + (meta.resultType === 'video' ? '时长：' : '分辨率：') + meta.extraText : ''));
+      const titleEl = document.getElementById('cardTitle');
+      const sourceTagEl = document.getElementById('sourceTag');
+      const statusTagEl = document.getElementById('statusTag');
+      const subtitleEl = document.getElementById('cardSubtitle');
+      const metaLineEl = document.getElementById('cardMetaLine');
+      const detailBtnEl = document.getElementById('detailBtn');
+
+      if (meta.source === 'workflow') {
+        titleEl.textContent = '已生成：' + meta.producedCount + ' / ' + meta.expectedCount + '条';
+        sourceTagEl.style.display = 'none';
+        statusTagEl.textContent = meta.statusLabel;
+        statusTagEl.className = 'status-tag ' + getStatusClass(meta.status);
+        subtitleEl.textContent = meta.workflowName || meta.taskName;
+        metaLineEl.style.display = 'none';
+        detailBtnEl.style.display = 'none';
+      } else {
+        titleEl.textContent = '已产出 ' + meta.producedCount + ' 条';
+        sourceTagEl.textContent = meta.sourceLabel;
+        sourceTagEl.style.display = '';
+        statusTagEl.textContent = meta.statusLabel;
+        statusTagEl.className = 'status-tag ' + getStatusClass(meta.status);
+        subtitleEl.textContent = [meta.project, '文案', meta.sourceLabel].filter(Boolean).join(' · ');
+        metaLineEl.textContent = '任务：' + meta.taskName + '    模型：' + meta.modelLabel;
+        metaLineEl.style.display = '';
+        detailBtnEl.style.display = '';
+      }
     }
 
     function renderMetaRow(meta) {
+      const metaRow = document.getElementById('metaRow');
+      if (meta.source === 'workflow') {
+        metaRow.style.display = 'none';
+        return;
+      }
+      metaRow.style.display = '';
+      
       const refGroup = document.getElementById('refGroup');
       const refThumbs = document.getElementById('refThumbs');
       if (meta.refs && meta.refs.length) {
@@ -1220,158 +972,35 @@
       } else {
         refGroup.style.display = 'none';
       }
-      document.getElementById('infoPrompt').textContent = meta.source === 'workflow'
-        ? '工作流输入信息已收起，点击右上角“查看详情”查看本次任务的具体输入字段。'
-        : meta.prompt;
+      document.getElementById('infoPrompt').textContent = meta.prompt;
     }
 
     function renderToolbar(meta) {
       const lead = document.getElementById('toolbarLead');
       const actions = document.getElementById('toolbarActions');
-      if (meta.resultType === 'text') {
+      
+      if (meta.source === 'workflow') {
+        lead.innerHTML = '';
+      } else {
         lead.innerHTML = '<span class="toolbar-note">文案结果</span><span class="pill-note">列表已按阅读优先方式排版。</span>';
-      } else {
-        const ratioText = meta.resultType === 'video' ? (meta.ratioText || '9:16') : (meta.ratioText || '1920×1080');
-        lead.innerHTML = '<div class="f-chips"><span class="chip">' + escapeHtml(meta.modelLabel) + '</span></div><div class="sep"></div><div class="pills"><button class="pill on" type="button">' + escapeHtml(ratioText) + '</button></div>';
       }
+      
       const btns = [];
-      if (meta.resultType !== 'text') {
-        const densityHtml = '<div class="pills">' + DENSITY_OPTIONS.map(function(item) {
-          return '<button class="pill' + (STATE.density === item.value ? ' on' : '') + '" type="button" data-density="' + item.value + '">' + item.label + '</button>';
-        }).join('') + '</div><div class="sep"></div>';
-        btns.push(densityHtml);
-      }
-      if (meta.status === 'pending_review') btns.push('<button class="b b-solid" type="button" onclick="goReview()">去审核</button>');
-      if (meta.resultType !== 'text') btns.push('<button class="b b-soft" type="button" onclick="toggleBatchMode()">' + (STATE.batchMode ? '取消批量' : '批量选择') + '</button>');
       
-      if (meta.resultType === 'text') {
-          btns.push('<button class="b b-soft" type="button" onclick="exportExcel()">导出 Excel</button>');
-          btns.push('<button class="b b-soft" type="button" onclick="downloadAll()">复制全部</button>');
-      } else {
-          btns.push('<button class="b b-soft" type="button" onclick="downloadAll()">下载全部</button>');
+      btns.push('<button class="b b-soft" type="button" onclick="exportExcel()">导出 Excel</button>');
+      
+      if (meta.source !== 'workflow') {
+        btns.push('<button class="b b-soft" type="button" onclick="copyAllText()">复制全部</button>');
+        btns.push('<button class="b b-soft" type="button" onclick="archiveAll()">全部入库</button>');
       }
       
-      btns.push('<button class="b b-soft" type="button" onclick="archiveAll()">全部入库</button>');
-      if (meta.status === 'pending' || meta.status === 'generating') btns.push('<button class="b b-danger" type="button" onclick="openAbortModal()">中止生成</button>');
+      if (meta.status === 'pending' || meta.status === 'generating' || meta.status === 'pending_review') btns.push('<button class="b b-danger" type="button" onclick="openAbortModal()">中止生成</button>');
       actions.innerHTML = btns.join('');
-      actions.querySelectorAll('[data-density]').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-          STATE.density = btn.getAttribute('data-density');
-          renderPage();
-        });
-      });
     }
 
     function renderReviewInline(meta) {
       const root = document.getElementById('reviewInlineWrap');
-      if (meta.status !== 'pending_review') {
-        root.innerHTML = '';
-        return;
-      }
-      root.innerHTML = '<div class="review-inline">'
-        + '<div class="review-inline-main">'
-        + '<div class="review-inline-title">当前有待审核节点，请优先处理</div>'
-        + '<div class="review-inline-desc">节点：' + escapeHtml(meta.reviewNodeName) + ' · 待处理：' + meta.reviewPendingCount + ' 条 · 已产出：' + meta.reviewProducedCount + ' 条</div>'
-        + '</div>'
-        + '<div class="row-end" style="margin-left:auto"><button class="b b-solid" type="button" onclick="goReview()">去审核</button></div>'
-        + '</div>';
-    }
-
-    function getItemAspect(meta, item) {
-      const ratio = item.ratio || meta.ratioText || '';
-      if (ratio.indexOf('9:16') > -1) return 9 / 16;
-      if (ratio.indexOf('16:9') > -1 || ratio.indexOf('1920×1080') > -1) return 16 / 9;
-      if (ratio.indexOf('1:1') > -1) return 1;
-      if (ratio.indexOf('3:4') > -1) return 3 / 4;
-      return meta.resultType === 'video' ? 16 / 9 : 3 / 4;
-    }
-
-    function getRowHeight() {
-      return {
-        sparse: 240,
-        medium: 188,
-        dense: 144
-      }[STATE.density] || 188;
-    }
-
-    function justifyRows(items, containerWidth, meta) {
-      const rows = [];
-      let row = [];
-      let aspectSum = 0;
-      const targetHeight = getRowHeight();
-      items.forEach(function(item) {
-        const aspect = getItemAspect(meta, item);
-        row.push({ item: item, aspect: aspect });
-        aspectSum += aspect;
-        if (aspectSum * targetHeight + (row.length - 1) * 8 >= containerWidth) {
-          const available = containerWidth - (row.length - 1) * 8;
-          const rowHeight = available / aspectSum;
-          rows.push({
-            last: false,
-            items: row.map(function(entry) {
-              return {
-                item: entry.item,
-                width: entry.aspect * rowHeight,
-                height: rowHeight
-              };
-            })
-          });
-          row = [];
-          aspectSum = 0;
-        }
-      });
-      if (row.length) {
-        rows.push({
-          last: true,
-          items: row.map(function(entry) {
-            return {
-              item: entry.item,
-              width: entry.aspect * targetHeight,
-              height: targetHeight
-            };
-          })
-        });
-      }
-      return rows;
-    }
-
-    function renderVisualItem(meta, item, index, width, height) {
-      if (item.isLoading) {
-        return '<div class="visual-item is-loading" style="width:' + Math.round(width) + 'px;height:' + Math.round(height) + 'px;"><div class="cc-img-loading-thumb" style="width:100%;height:100%;"><div class="cc-img-loading-spinner"></div></div></div>';
-      }
-      const reviewClass = meta.status === 'pending_review' && index < meta.reviewPendingCount ? ' is-reviewing' : '';
-      const selectedClass = STATE.selectedIds.has(item.id) ? ' is-selected' : '';
-      const downloadAction = "event.stopPropagation();downloadVisualById('" + escapeJs(item.id) + "')";
-      const overlay = thumbOverlayHtml('', downloadAction);
-      const metaText = meta.resultType === 'video' ? (item.duration || meta.extraText || '5秒') : (item.ratio || meta.ratioText || '1920×1080');
-      return '<div class="visual-item' + selectedClass + reviewClass + '" data-item-id="' + escapeHtml(item.id) + '" style="width:' + Math.round(width) + 'px;height:' + Math.round(height) + 'px;" onclick="handleVisualItemClick(\'' + escapeJs(item.id) + '\')">'
-        + '<img class="visual-thumb" src="' + escapeHtml(item.thumb || item.url || '') + '" alt="">'
-        + '<div class="visual-check">✓</div>'
-        + overlay
-        + '<div class="visual-meta">' + escapeHtml(metaText) + '</div>'
-        + '</div>';
-    }
-
-    function renderVisual(meta) {
-      const stage = document.getElementById('contentStage');
-      const stageWidth = Math.max(stage.clientWidth || 0, 1120);
-      const visualItems = meta.outputItems.slice();
-      let pendingSlots = meta.status === 'pending' ? (meta.expectedCount || 8) : Math.max(meta.expectedCount - meta.producedCount, 0);
-      while (pendingSlots > 0) {
-        visualItems.push({ id: 'pending-' + pendingSlots, type: meta.resultType, ratio: meta.ratioText, isLoading: true, duration: meta.extraText });
-        pendingSlots -= 1;
-      }
-      if (!visualItems.length) {
-        stage.innerHTML = '<div class="card empty-card"><div class="empty-inner"><div class="empty-title">当前没有可展示的结果</div><div class="empty-desc">你可以通过右侧悬浮切换器切换来源、类型或状态。</div></div></div>';
-        return;
-      }
-      const rows = justifyRows(visualItems, stageWidth - 24, meta);
-      const groupTitle = meta.modelLabel || '结果';
-      stage.innerHTML = '<div class="visual-groups"><div class="visual-group"><div class="visual-group-head"><div class="visual-group-title">' + escapeHtml(groupTitle) + '</div><div class="visual-group-count">' + visualItems.length + (meta.resultType === 'video' ? ' 条' : ' 张') + '</div></div>' + rows.map(function(row) {
-        return '<div class="' + (row.last ? 'visual-row-last' : 'visual-row') + '">' + row.items.map(function(entry, index) {
-          return renderVisualItem(meta, entry.item, index, entry.width, entry.height);
-        }).join('') + '</div>';
-      }).join('') + '</div></div>';
+      root.innerHTML = '';
     }
 
     function renderCopy(meta) {
@@ -1383,22 +1012,27 @@
         pendingSlots -= 1;
       }
       if (!items.length) {
-        stage.innerHTML = '<div class="card empty-card"><div class="empty-inner"><div class="empty-title">当前没有可展示的文案</div><div class="empty-desc">你可以通过右侧悬浮切换器切换来源、类型或状态。</div></div></div>';
+        stage.innerHTML = '<div class="card empty-card"><div class="empty-inner"><div class="empty-title">当前没有可展示的文案</div><div class="empty-desc">你可以通过右侧悬浮切换器切换来源或状态。</div></div></div>';
         return;
       }
       stage.innerHTML = '<div class="copy-wrap"><div class="copy-list">' + items.map(function(item, index) {
         if (item.isLoading) {
           return '<div class="copy-item"><div class="copy-num">' + String(index + 1).padStart(2, '0') + '</div><div class="copy-content"><div class="cc-img-loading-thumb" style="width:100%;height:64px;border-radius:var(--r-lg)"><div class="cc-img-loading-spinner"></div></div></div></div>';
         }
-        const reviewClass = meta.status === 'pending_review' && index < meta.reviewPendingCount ? ' is-reviewing' : '';
-        const reviewTag = meta.status === 'pending_review' && index < meta.reviewPendingCount ? '<span class="review-mini-tag">待审核</span>' : '';
+        const reviewClass = '';
+        const reviewTag = '';
+        
+        let actionBtns = '<button class="b b-soft" type="button" onclick="copySingleText(\'' + escapeJs(item.content || '') + '\')">复制</button>';
+        if (meta.source !== 'workflow') {
+          actionBtns += '<button class="b b-soft" type="button" onclick="archiveSingleText()">入库</button>';
+        }
+
         return '<div class="copy-item' + reviewClass + '">'
           + '<div class="copy-num">' + String(index + 1).padStart(2, '0') + '</div>'
           + '<div class="copy-content">' + escapeHtml(item.content || '') + '</div>'
           + '<div class="copy-actions">'
           + reviewTag
-          + '<button class="b b-soft" type="button" onclick="copySingleText(\'' + escapeJs(item.content || '') + '\')">复制</button>'
-          + '<button class="b b-soft" type="button" onclick="archiveSingleText()">入库</button>'
+          + actionBtns
           + '</div>'
           + '</div>';
       }).join('') + '</div></div>';
@@ -1413,12 +1047,9 @@
         + '<div class="detail-box"><div class="detail-label">任务名称</div><div class="detail-value">' + escapeHtml(meta.taskName) + '</div></div>'
         + (meta.source === 'workflow' ? '<div class="detail-box"><div class="detail-label">工作流名称</div><div class="detail-value">' + escapeHtml(meta.workflowName || meta.taskName) + '</div></div>' : '')
         + '<div class="detail-box"><div class="detail-label">来源</div><div class="detail-value">' + escapeHtml(meta.sourceLabel) + '</div></div>'
-        + '<div class="detail-box"><div class="detail-label">输出类型</div><div class="detail-value">' + escapeHtml(meta.resultTypeLabel) + '</div></div>'
         + '<div class="detail-box"><div class="detail-label">状态</div><div class="detail-value">' + escapeHtml(meta.statusLabel) + '</div></div>'
         + '<div class="detail-box"><div class="detail-label">模型</div><div class="detail-value">' + escapeHtml(meta.modelLabel) + '</div></div>'
-        + '<div class="detail-box"><div class="detail-label">产出进度</div><div class="detail-value">' + meta.producedCount + ' / ' + meta.expectedCount + (meta.resultType === 'text' ? '条' : (meta.resultType === 'image' ? '张' : '条')) + '</div></div>'
-        + (meta.resultType === 'text' ? '' : '<div class="detail-box"><div class="detail-label">比例</div><div class="detail-value">' + escapeHtml(meta.ratioText || '未指定') + '</div></div>')
-        + (meta.resultType === 'text' ? '' : '<div class="detail-box"><div class="detail-label">' + (meta.resultType === 'video' ? '时长' : '分辨率') + '</div><div class="detail-value">' + escapeHtml(meta.extraText || '未指定') + '</div></div>')
+        + '<div class="detail-box"><div class="detail-label">产出进度</div><div class="detail-value">' + meta.producedCount + ' / ' + meta.expectedCount + '条</div></div>'
         + '<div class="detail-box full"><div class="detail-label">输入内容</div><div class="detail-value">' + escapeHtml(meta.prompt) + '</div></div>'
         + '<div class="detail-box full"><div class="detail-label">参考图</div><div class="detail-ref-row">' + (refHtml || '<span class="detail-value">无</span>') + '</div></div>'
         + '</div>';
@@ -1432,9 +1063,11 @@
       renderToolbar(meta);
       renderReviewInline(meta);
       renderDetail(meta);
-      document.getElementById('pageMain').classList.toggle('is-batch', STATE.batchMode && meta.resultType !== 'text');
-      if (meta.resultType === 'text') renderCopy(meta);
-      else renderVisual(meta);
+      renderCopy(meta);
+
+      document.querySelectorAll('#statusOptions .seg-btn').forEach(btn => {
+        btn.classList.toggle('is-active', btn.getAttribute('data-value') === STATE.status);
+      });
     }
 
     function copySingleText(text) {
@@ -1474,63 +1107,6 @@
       showToast('已批量入库到素材库');
     }
 
-    function downloadAll() {
-      const meta = currentMeta();
-      if (meta.resultType === 'text') {
-        copyAllText();
-        return;
-      }
-      showToast('已开始下载全部结果');
-    }
-
-    function downloadVisualById(itemId) {
-      const meta = currentMeta();
-      const item = meta.outputItems.find(function(entry) { return entry.id === itemId; });
-      if (!item) return;
-      const a = document.createElement('a');
-      a.href = item.url || item.thumb || '';
-      a.download = meta.resultType === 'video' ? 'result.mp4' : 'result.png';
-      a.click();
-      showToast('已开始下载');
-    }
-
-    function toggleBatchMode() {
-      const meta = currentMeta();
-      if (meta.resultType === 'text') return;
-      STATE.batchMode = !STATE.batchMode;
-      STATE.selectedIds.clear();
-      renderPage();
-    }
-
-    function handleVisualItemClick(itemId) {
-      const meta = currentMeta();
-      const item = meta.outputItems.find(function(entry) { return entry.id === itemId; });
-      if (!item) return;
-      if (STATE.batchMode) {
-        if (STATE.selectedIds.has(itemId)) STATE.selectedIds.delete(itemId);
-        else STATE.selectedIds.add(itemId);
-        renderPage();
-        return;
-      }
-      if (item.type === 'video') previewVideo(item.url, item.duration || meta.extraText || '5秒');
-      else previewImageById(itemId);
-    }
-
-    function previewImageById(itemId) {
-      const meta = currentMeta();
-      const items = meta.outputItems.filter(function(item) { return item.type === 'image'; });
-      const current = items.find(function(item) { return item.id === itemId; });
-      if (!current || typeof window.__previewImage !== 'function') return;
-      const list = items.map(function(item) { return item.url || item.thumb; }).filter(Boolean);
-      const idx = items.findIndex(function(item) { return item.id === itemId; });
-      window.__previewImage(current.url || current.thumb, list, idx >= 0 ? idx : 0);
-    }
-
-    function previewVideo(url, duration) {
-      if (typeof window.__previewMedia !== 'function') return;
-      window.__previewMedia({ type: 'video', url: url, duration: duration }, [{ type: 'video', url: url, duration: duration }], 0);
-    }
-
     function previewReference(url) {
       if (typeof window.__previewImage !== 'function') return;
       window.__previewImage(url, [url], 0);
@@ -1554,8 +1130,6 @@
 
     function confirmAbort() {
       STATE.status = 'aborted';
-      STATE.batchMode = false;
-      STATE.selectedIds.clear();
       closeAbortModal();
       showToast('已中止');
       renderPage();
@@ -1566,22 +1140,8 @@
     }
 
     function bootOptions() {
-      renderSegOptions('sourceOptions', SOURCE_OPTIONS, STATE.source, function(value) {
-        STATE.source = value;
-        STATE.batchMode = false;
-        STATE.selectedIds.clear();
-        renderPage();
-      });
-      renderSegOptions('typeOptions', TYPE_OPTIONS, STATE.resultType, function(value) {
-        STATE.resultType = value;
-        STATE.batchMode = false;
-        STATE.selectedIds.clear();
-        renderPage();
-      });
       renderSegOptions('statusOptions', STATUS_OPTIONS, STATE.status, function(value) {
         STATE.status = value;
-        STATE.batchMode = false;
-        STATE.selectedIds.clear();
         renderPage();
       });
     }

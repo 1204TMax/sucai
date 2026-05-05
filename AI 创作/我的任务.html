@@ -965,7 +965,7 @@ const INITIAL_TASKS = [
     }
   },
   makeWorkflowDemoTask({ id:'wf-completed-demo', name:'工作流状态样例：已完成', status:'completed', createdTime:'2026-04-27 10:20', seed:'wf-completed', generated:50 }),
-  makeWorkflowDemoTask({ id:'wf-failed-demo', name:'工作流状态样例：已失败', status:'failed', createdTime:'2026-04-27 10:32', seed:'wf-failed', activeTitle:'执行失败', generated:22 }),
+  makeWorkflowDemoTask({ id:'wf-failed-demo', name:'工作流状态样例：已失败', status:'failed', createdTime:'2026-04-27 10:32', seed:'wf-failed', activeTitle:'图像生成节点', generated:22 }),
   makeWorkflowDemoTask({ id:'wf-aborted-demo', name:'工作流状态样例：已中止', status:'aborted', createdTime:'2026-04-27 10:45', seed:'wf-aborted', activeTitle:'已中止', generated:13 }),
   { id:'21', name:'小红书美妆文案裂变', type:'chat', taskType:'direct_generate', resultType:'text', status:'completed', createdTime:'2026-04-03 09:20', creator:'我',
     source:'universal', project:'护肤品推广',
@@ -976,11 +976,13 @@ const INITIAL_TASKS = [
       {content:'黄皮姐妹先别急着换粉底，先把这瓶精华安排上，妆前状态会稳很多。'},
       {content:'通勤党早八救命组合：水乳后叠一层它，底妆不卡粉，脸也不垮。'}
     ] }}}},
-  { id:'22', name:'抖音脚本创意裂变', type:'chat', taskType:'direct_generate', resultType:'text', status:'generating', createdTime:'2026-04-03 10:45', creator:'我',
-    source:'universal',
-    input:{ prompt:'夏季防晒霜短视频脚本，反转剧情风格...', models:['gpt54mini'], count:10 },
-    output:{ byModel:{ gpt54mini:{ total:10, items:[
+  { id:'22', name:'抖音脚本创意裂变', type:'chat', taskType:'direct_generate', resultType:'text', status:'completed', createdTime:'2026-04-03 10:45', creator:'我',
+    source:'universal', project:'护肤品推广',
+    input:{ prompt:'夏季防晒霜短视频脚本，反转剧情风格...', models:['gemini-31-pro','gpt54'], count:10 },
+    output:{ byModel:{ 'gemini-31-pro':{ total:10, items:[
       {content:'开场：闺蜜说今天阴天不用防晒，下一秒镜头切到紫外线指数爆表的手机屏幕...'}
+    ] }, 'gpt54':{ total:10, items:[
+      {content:'（音乐起）画面中心是一个大大的太阳，配文：今天真的不需要防晒吗？...'}
     ] }}}},
   { id:'23', name:'工作日早餐软文', type:'chat', taskType:'direct_generate', resultType:'text', status:'pending', createdTime:'2026-04-03 11:05', creator:'我',
     source:'universal',
@@ -1649,7 +1651,7 @@ function renderNoticeCard(kind, tasks) {
     +'</div>';
 }
 
-function renderTaskFeed() {
+function renderTaskFeed(shouldScroll) {
   var tasks = getFilteredTasks();
   var wrap = document.getElementById('taskFeedWrap');
   var panel = document.getElementById('taskFloatingPanel');
@@ -1683,7 +1685,7 @@ function renderTaskFeed() {
   scheduleTaskFloatingPanelPosition();
   updateScrollBtn();
   // 渲染后滚动到底部
-  if (window.__scrollToBottom) window.__scrollToBottom();
+  if (shouldScroll !== false && window.__scrollToBottom) window.__scrollToBottom();
 }
 
 function renderTaskMetaItems(task, vm, activeModel, isMulti) {
@@ -1692,7 +1694,11 @@ function renderTaskMetaItems(task, vm, activeModel, isMulti) {
     return '';
   } else {
     items.push(isMulti ? '多模型' : (MODELS_MAP[activeModel] || activeModel));
-    if (vm.displayMeta.countText) items.push(vm.displayMeta.countText);
+    if (vm.resultType === 'text') {
+      if (task.project) items.push(task.project);
+    } else {
+      if (vm.displayMeta.countText) items.push(vm.displayMeta.countText);
+    }
   }
   return items.concat(vm.displayMeta.specItems || []).filter(Boolean).map(function(item) {
     return '<span class="card-meta-item">' + escHtml(item) + '</span>';
@@ -1705,6 +1711,7 @@ function renderTaskPromptBlock(task, showUseBtn) {
 }
 function renderBottomCountMeta(task, vm) {
   if (task.type === 'workflow') return '';
+  if (vm.resultType === 'text') return '';
   if (!vm.displayMeta.countProgressText) return '';
   return '<span class="card-bottom-count">' + escHtml(vm.displayMeta.countProgressText) + '</span>';
 }
@@ -1712,27 +1719,43 @@ function openWorkflowDetail(taskId) {
   var task = getTaskById(taskId);
   if (!task) return;
   var nodes = task.workflowRun ? task.workflowRun.nodes || [] : [];
-  var html = '<div class="detail-modal-mask show" id="wfRunModalMask" onclick="this.remove()">'
-           + '<div class="detail-modal" style="width:500px; padding:24px; max-height:80vh; overflow:auto; display:flex; flex-direction:column; gap:16px" onclick="event.stopPropagation()">'
-           + '<div style="font-size:18px; font-weight:600; color:var(--text-hi)">任务运行情况</div>'
-           + '<div style="display:flex; flex-direction:column; gap:12px">';
-  nodes.forEach(function(node) {
-    if (node.nodeId === 'start' || node.nodeId === 'end') return;
-    html += '<div style="background:var(--bg-subtle); border-radius:var(--r-md); padding:16px; display:flex; flex-direction:column; gap:8px">';
-    html += '<div style="font-weight:500; color:var(--text-hi)">节点：' + escHtml(node.title || node.nodeId) + '</div>';
-    if (node.status === 'completed' || node.status === 'pending_review') {
-       html += '<div style="font-size:13px; color:var(--success)">生成任务' + escHtml(node.title || node.nodeId) + '成功，任务参数：' + escHtml(node.processorType) + '</div>';
-    } else if (node.status === 'failed' || node.status === 'aborted') {
-       html += '<div style="font-size:13px; color:var(--error)">生成任务' + escHtml(node.title || node.nodeId) + '失败，任务参数：' + escHtml(node.processorType) + '，原因：' + (node.status === 'aborted' ? '已中止' : '执行异常') + '</div>';
-    } else {
-       html += '<div style="font-size:13px; color:var(--text-lo)">状态：' + escHtml(node.status === 'generating' ? '生成中' : (node.status === 'pending' ? '等待中' : node.status)) + '</div>';
-    }
-    html += '</div>';
+  var failedNodes = nodes.filter(function(node) { return node.status === 'failed' || node.status === 'aborted'; });
+  
+  var errorsByTitle = {};
+  failedNodes.forEach(function(node) {
+    var title = node.title || node.nodeId;
+    if (!errorsByTitle[title]) errorsByTitle[title] = new Set();
+    var reason = node.status === 'aborted' ? '已中止' : '敏感词问题XXXXXXXXX';
+    errorsByTitle[title].add(reason);
   });
+
+  var titles = Object.keys(errorsByTitle);
+  
+  var html = '<div class="detail-modal-mask show" id="wfRunModalMask" onclick="this.remove()" style="display:flex; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; backdrop-filter:blur(2px);">'
+           + '<div class="detail-modal" style="width:400px; padding:40px 32px 32px; max-height:80vh; overflow-y:auto; display:flex; flex-direction:column; background:var(--bg-surface); border-radius:var(--r-xl); box-shadow:var(--shadow-3); cursor:default; transition:all 0.3s;" onclick="event.stopPropagation()">'
+           + '<div style="display:flex; flex-direction:column; gap:32px">';
+           
+  if (titles.length === 0) {
+     html += '<div style="color:var(--text-muted); font-size:var(--text-base); text-align:center; padding:40px 0;">暂无失败节点信息</div>';
+  } else {
+     titles.forEach(function(title) {
+       html += '<div style="display:flex; flex-direction:column; gap:6px">';
+       html += '<div style="font-size:var(--text-lg); font-weight:600; color:var(--text-hi); letter-spacing:-0.01em;">' + escHtml(title) + '</div>';
+       errorsByTitle[title].forEach(function(reason) {
+         html += '<div style="display:flex; align-items:flex-start; gap:8px; font-size:var(--text-md); color:var(--text-muted); line-height:1.5;">'
+               + '<span style="color:var(--error); margin-top:2px;">•</span>'
+               + '<span>发生错误：' + escHtml(reason) + '</span>'
+               + '</div>';
+       });
+       html += '</div>';
+     });
+  }
+  
   html += '</div>'
-        + '<div style="display:flex; justify-content:flex-end; margin-top:8px">'
-        + '<button class="card-act-btn" style="background:var(--bg-surface); padding:6px 16px; border-radius:var(--r-full); border:1px solid var(--border-2); cursor:pointer" onclick="document.getElementById(\'wfRunModalMask\').remove()">关闭</button>'
+        + '<div style="display:flex; justify-content:center; margin-top:40px">'
+        + '<button style="background:var(--bg-subtle); color:var(--text-lo); padding:0 32px; height:var(--h-md); border-radius:var(--r-full); border:1px solid var(--border-1); cursor:pointer; font-size:var(--text-sm); font-weight:500; transition:all 0.2s;" onmouseover="this.style.background=\'var(--bg-hover)\';this.style.borderColor=\'var(--border-2)\'" onmouseout="this.style.background=\'var(--bg-subtle)\';this.style.borderColor=\'var(--border-1)\'" onclick="document.getElementById(\'wfRunModalMask\').remove()">关闭</button>'
         + '</div></div></div>';
+        
   var wrap = document.createElement('div');
   wrap.innerHTML = html;
   document.body.appendChild(wrap.firstElementChild);
@@ -1904,7 +1927,7 @@ function renderWorkflowReviewCard(task, vm) {
 function openReviewPage(taskId, reviewTaskId) {
   parent.postMessage({
     action: 'openTab',
-    title: '审查台',
+    title: '人工审核页',
     url: 'AI 创作/我的任务.html?view=review&taskId=' + encodeURIComponent(taskId) + '&reviewTaskId=' + encodeURIComponent(reviewTaskId)
   }, '*');
 }
@@ -2478,19 +2501,14 @@ function renderChatOutputRow(task, output, collapsed, vm) {
   }
 
   var completedCount = vm.producedCount || (output.items || []).length;
-  var unit = vm.quantityUnit || '条';
-  var summaryText = vm.displayStatus === 'generating'
-    ? '已产出 ' + completedCount + ' / ' + total + ' ' + unit
-    : '共计产出 ' + completedCount + ' / ' + total + ' ' + unit;
-  var hintText = vm.displayStatus === 'generating' ? '剩余内容生成后会补到列表中' : (total > items.length ? '其余内容可在完整结果中查看' : '完整内容已展示');
   var target = getViewAllTarget(task, vm);
 
   return ''
     + '<div class="output-row copy-output-list ' + (collapsed ? 'collapsed' : 'expanded') + '">'
       + rows.join('')
-      + '<div class="copy-output-footer">'
-        + '<div><span class="copy-output-summary">' + summaryText + '</span><span class="copy-output-hint"> · ' + hintText + '</span></div>'
-        + (total > items.length ? '<button class="copy-more-link" onclick="event.stopPropagation();parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>' : '')
+      + '<div class="copy-output-footer" style="justify-content: flex-end; gap: 8px;">'
+        + '<span style="font-size: 13px; color: var(--text-muted);">' + completedCount + ' / ' + total + '</span>'
+        + (total > items.length ? '<button class="copy-more-link" style="margin-left: 4px;" onclick="event.stopPropagation();parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>' : '')
       + '</div>'
     + '</div>';
 }
@@ -2596,7 +2614,28 @@ function buildUnifiedResultUrl(task, vm) {
   if (task.type === 'workflow') {
     params.set('workflowName', task.workflowRun && task.workflowRun.workflowName ? task.workflowRun.workflowName : (task.name || ''));
   }
-  var baseUrl = task.type === 'workflow' ? 'AI 创作/工作流全部结果页.html' : 'AI 创作/全部结果-统一版.html';
+  var baseUrl = 'AI 创作/全部结果-统一版.html';
+  if (task.type === 'workflow') {
+    if (resultType === 'text') {
+      baseUrl = 'AI 创作/文案-工作流-全部结果.html';
+    } else {
+      var ds = vm && vm.displayStatus ? vm.displayStatus : task.status;
+      if (ds === 'completed') {
+        baseUrl = 'AI 创作/工作流-全部结果-已成功.html';
+      } else if (ds === 'aborted') {
+        baseUrl = 'AI 创作/工作流-全部结果-部分失败.html';
+      } else if (ds === 'failed') {
+        var produced = vm && typeof vm.producedCount === 'number' ? vm.producedCount : 0;
+        if (produced > 0 || task.partialFailed) {
+          baseUrl = 'AI 创作/工作流-全部结果-部分失败.html';
+        } else {
+          baseUrl = 'AI 创作/工作流-全部结果-全部失败.html';
+        }
+      } else {
+        baseUrl = 'AI 创作/工作流-全部结果-等待中.html';
+      }
+    }
+  }
   return baseUrl + '?' + params.toString();
 }
 
@@ -2641,7 +2680,6 @@ function renderCardActions(task, vm) {
   if (task.type === 'workflow') {
     if (s === 'generating' || s === 'pending') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
         +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
@@ -2649,7 +2687,6 @@ function renderCardActions(task, vm) {
     }
     if (s === 'pending_review') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
         +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
@@ -2657,7 +2694,6 @@ function renderCardActions(task, vm) {
     }
     if (s === 'aborted') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
@@ -2669,6 +2705,12 @@ function renderCardActions(task, vm) {
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
+        +'</div>';
+    }
+    if (s === 'failed' || task.status === 'failed') {
+      return '<div class="card-actions">'
+        +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
+        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'</div>';
     }
   }
@@ -2716,7 +2758,7 @@ document.addEventListener('click', function(e) {
 
 function switchCardModel(taskId, modelId) {
   state.cardModels[taskId] = modelId;
-  renderTaskFeed();
+  renderTaskFeed(false);
 }
 
 function handleReEditById(id) { var t=getTaskById(id); if(t) window.__handleReEdit(t); }

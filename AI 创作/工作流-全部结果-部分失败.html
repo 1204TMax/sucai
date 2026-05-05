@@ -136,6 +136,10 @@
 
         /* ── Row 1: Title ── */
         .card-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex-wrap: wrap;
             font-size: var(--text-lg);
             font-weight: 600;
             color: var(--text-hi);
@@ -145,18 +149,19 @@
             color: var(--text-muted);
             margin-top: 2px;
         }
+
         .status-tag {
             display: inline-flex;
             align-items: center;
-            margin-left: var(--space-2);
-            height: 24px;
-            padding: 0 10px;
-            border-radius: 999px;
-            background: #fff1f0;
-            border: 1px solid #ffccc7;
-            color: #cf1322;
-            font: 500 var(--text-sm)/1 var(--font);
-            vertical-align: middle;
+            height: 22px;
+            padding: 0 8px;
+            border-radius: var(--r-sm);
+            background: var(--bg-hover);
+            border: none;
+            color: var(--text-lo);
+            font-size: var(--text-sm);
+            font-weight: normal;
+            line-height: 1;
         }
 
         .batch-actions {
@@ -241,29 +246,15 @@
         }
 
         .pill-single {
-            background: #fff;
-            border: 1px solid var(--border-1);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.72);
-            padding: 0 var(--space-3);
+            background: transparent;
+            box-shadow: none;
+            padding: 0;
             color: var(--text-lo);
             cursor: default;
         }
 
         .pill-single:hover {
             color: var(--text-lo);
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            height: 28px;
-            padding: 0 12px;
-            border-radius: 999px;
-            border: 1px solid var(--border-1);
-            background: #fff;
-            color: var(--text-lo);
-            font: 500 var(--text-sm)/1 var(--font);
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.72);
         }
 
         .pill-n {
@@ -718,43 +709,6 @@
             color: var(--text-hi);
         }
 
-        /* ── Failure Empty State ── */
-        .failure-state {
-            min-height: 520px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 96px 24px;
-        }
-
-        .failure-state-inner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            gap: 12px;
-        }
-
-        .failure-title {
-            font-size: 24px;
-            line-height: 1.3333;
-            font-weight: 600;
-            color: #ff4d4f;
-        }
-
-        .failure-desc {
-            font-size: 14px;
-            line-height: 1.5715;
-            color: var(--text-muted);
-        }
-
-        .failure-actions {
-            margin-top: 8px;
-            display: flex;
-            justify-content: center;
-        }
-
     </style>
 </head>
 <body>
@@ -762,65 +716,39 @@
 <!-- ══════════════════════════════════════════
      Toolbar
 ══════════════════════════════════════════ -->
-<div class="card">
-    <!-- Row 1: Title -->
-    <div class="row row-pad row-sep">
-        <div style="min-width:0;flex:1;">
-            <div class="card-title" id="cardTitle"></div>
-            <div class="card-subtitle" id="cardSubtitle"></div>
+<div style="padding-bottom: var(--space-4); border-bottom: 1px solid var(--border-1); margin-bottom: var(--space-4); display: flex; justify-content: space-between; align-items: flex-end;">
+    <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        <div style="display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-md); color: var(--text-hi);">
+            <span id="genProgress">已生成：16 / 100条</span>
+            <span class="status-tag" id="statusTag">已成功</span>
         </div>
-        <div class="status-pill" id="currentStatus"></div>
+        <div style="font-size: var(--text-lg); color: var(--text-hi);" id="workflowName">XXXX工作流</div>
     </div>
 
-    <!-- Row 2: Refs + Prompt -->
-    <div class="row row-pad row-sep" style="gap:var(--space-4);flex-wrap:nowrap;" id="metaRow">
-        <div style="display:flex;align-items:center;gap:var(--space-2);flex-shrink:0;" id="refGroup">
-            <div class="ref-thumbs" id="refThumbs"></div>
+    <div class="row-end" id="toolbarActions" style="margin-bottom: 2px;">
+        <!-- Density toggle -->
+        <div class="pills">
+            <button class="pill" onclick="setDensity('sparse',this)">大</button>
+            <button class="pill on" onclick="setDensity('medium',this)">中</button>
+            <button class="pill" onclick="setDensity('dense',this)">小</button>
         </div>
-        <div style="display:flex;align-items:center;gap:var(--space-2);min-width:0;flex:1;">
-            <span class="meta-value" id="infoPrompt"></span>
-        </div>
-    </div>
+        <div class="sep"></div>
+        <button class="b b-soft" id="dlAllBtn" onclick="downloadAll()">下载全部</button>
+        <button class="b b-solid" id="batchBtn" onclick="toggleBatch()">批量选择</button>
 
-    <!-- Row 3: Filters + Actions -->
-    <div class="row row-pad" id="filterRow">
-        <div class="f-chips" id="modelChips"></div>
-        <div class="sep" id="filterSep1"></div>
-        <div class="pills ratio-pills" id="ratioTabs"></div>
-
-        <div class="row-end" id="toolbarActions">
-            <!-- Density toggle -->
-            <div class="pills">
-                <button class="pill" onclick="setDensity('sparse',this)">大</button>
-                <button class="pill on" onclick="setDensity('medium',this)">中</button>
-                <button class="pill" onclick="setDensity('dense',this)">小</button>
-            </div>
-            <div class="sep"></div>
-            <button class="b b-soft" id="dlAllBtn" onclick="downloadAll()">下载全部</button>
-            <button class="b b-solid" id="batchBtn" onclick="toggleBatch()">批量选择</button>
-
-            <!-- Batch action buttons -->
-            <div class="batch-actions" id="batchBar" style="display:none;">
-                <span class="sel-count" id="selCount">已选 0 项</span>
-                <button class="b b-soft" id="selAllBtn" onclick="selectAll()">全选</button>
-                <button class="b b-soft" onclick="batchDownload()">下载</button>
-            </div>
+        <!-- Batch action buttons -->
+        <div class="batch-actions" id="batchBar" style="display:none;">
+            <span class="sel-count" id="selCount">已选 0 项</span>
+            <button class="b b-soft" id="selAllBtn" onclick="selectAll()">全选</button>
+            <button class="b b-soft" onclick="batchDownload()">下载</button>
         </div>
     </div>
 </div>
 
 <!-- ══════════════════════════════════════════
-     Failure Empty State
+     Image Grid (Justified Layout)
 ══════════════════════════════════════════ -->
-<div class="card failure-state">
-    <div class="failure-state-inner">
-        <div class="failure-title">部分生成失败</div>
-        <div class="failure-desc" id="failureReason">此处显示具体失败原因，具体原因列表见文档。</div>
-        <div class="failure-actions">
-            <button class="b b-solid" onclick="retryTask()">重试失败任务</button>
-        </div>
-    </div>
-</div>
+<div id="grid"></div>
 
 <!-- ══════════════════════════════════════════
      Preview Modal
@@ -864,59 +792,17 @@
 // Page Info (single model)
 // ═══════════════════════════════════════════════════
 const PAGE_INFO = {
-    entry:   '通用生成',          // '通用生成' 或 '工作流：xxx'
-    type:    'image',             // 'image' | 'video'
-    prompt:  '在阳光明媚的草地上奔跑的金毛寻回犬，毛发蓬松，背景虚化，高清写实风格，自然光照',
-    refs:    [
-        { color: '#FF6B6B', name: '参考图 1' },
-        { color: '#4ECDC4', name: '参考图 2' },
-    ],
-    model:   'Seedream 5.0',
-    settings: {
-        ratios:   ['9:16'],
-        clarity:  '2K',     // image only；视频传 null
-        duration: null,     // video only；图片传 null
-    },
-    project: '走路赚金币',  // 无项目时传 null
-    status: '已失败',
-    successCount: 3,
-    failedCount: 4,
-    allStatuses: ['等待中', '生成中', '已成功', '已失败', '已中断'],
-    failureReason: '7 条任务中有 4 条失败，以下展示 3 张成功生成的图片，可继续重试失败任务。'
+    workflowName: 'XXXX工作流',
+    totalLimit: 100,
+    status: '部分失败'
 };
 
 function renderInfo() {
     const p = PAGE_INFO;
-
-    // Row 1: title + subtitle
-    document.getElementById('cardTitle').innerHTML = `已生成:${p.successCount}条 <span class="status-tag">${p.status}</span>`;
-    const parts = [];
-    if (p.project) parts.push(p.project);
-    parts.push(p.entry);
-    parts.push(p.type === 'image' ? '图片' : '视频');
-    if (p.type === 'image' && p.settings.clarity) parts.push(p.settings.clarity);
-    if (p.type === 'video' && p.settings.duration) parts.push('时长 ' + p.settings.duration);
-    document.getElementById('cardSubtitle').textContent = parts.join(' · ');
-    document.getElementById('currentStatus').textContent = '当前状态：' + p.allStatuses.join('、');
-
-    // Row 2: prompt
-    document.getElementById('infoPrompt').textContent = p.prompt;
-    document.getElementById('failureReason').textContent = p.failureReason;
-
-    // Row 2: refs (放到提示词前面，无标题)
-    const refGroup = document.getElementById('refGroup');
-    const refThumbs = document.getElementById('refThumbs');
-    if (p.refs && p.refs.length) {
-        refThumbs.innerHTML = p.refs.map((r, i) =>
-            `<div class="ref-thumb" style="background:${r.color}" title="${r.name}"
-                  onclick="openRefPreview(${i})"></div>`
-        ).join('');
-        refGroup.style.display = '';
-    } else {
-        refGroup.style.display = 'none';
-    }
-
-    document.getElementById('filterRow').style.display = 'none';
+    const totalCount = images.length;
+    document.getElementById('genProgress').textContent = `已生成：${totalCount} / ${p.totalLimit}条`;
+    document.getElementById('statusTag').textContent = p.status;
+    document.getElementById('workflowName').textContent = p.workflowName;
 }
 
 function openRefPreview(idx) {
@@ -936,21 +822,32 @@ function openRefPreview(idx) {
     mask.classList.add('visible');
 }
 
-function retryTask() {
-    alert('重试');
-}
-
 // ═══════════════════════════════════════════════════
-// Mock Data — 7 images, single ratio
+// Mock Data — 16 images, 3 ratio groups
 // ═══════════════════════════════════════════════════
 const COLORS = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#FF8C69'
+    '#FF6B6B','#4ECDC4','#45B7D1','#96CEB4','#FFEAA7','#DDA0DD',
+    '#FF8C69','#6C5CE7','#00B894','#FD79A8','#FDCB6E','#74B9FF',
+    '#A29BFE','#55EFC4','#E17055','#81ECEC'
 ];
 
 let images = [
-    { id: 1, ratio: '9:16', ar: 9 / 16, color: COLORS[0], name: '竖屏-001', model: 'Seedream 5.0' },
-    { id: 2, ratio: '9:16', ar: 9 / 16, color: COLORS[1], name: '竖屏-002', model: 'Seedream 5.0' },
-    { id: 3, ratio: '9:16', ar: 9 / 16, color: COLORS[2], name: '竖屏-003', model: 'Seedream 5.0' },
+    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001', model:'Seedream 5.0' },
+    { id:2,  ratio:'9:16',  ar:9/16,  color:COLORS[1],  name:'竖屏-002', model:'Seedream 5.0' },
+    { id:3,  ratio:'9:16',  ar:9/16,  color:COLORS[2],  name:'竖屏-003', model:'Banana 2' },
+    { id:4,  ratio:'9:16',  ar:9/16,  color:COLORS[3],  name:'竖屏-004', model:'Banana 2' },
+    { id:5,  ratio:'9:16',  ar:9/16,  color:COLORS[4],  name:'竖屏-005', model:'Seedream 5.0' },
+    { id:6,  ratio:'9:16',  ar:9/16,  color:COLORS[5],  name:'竖屏-006', model:'Banana 2' },
+    { id:7,  ratio:'16:9',  ar:16/9,  color:COLORS[6],  name:'横屏-001', model:'Seedream 5.0' },
+    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002', model:'Seedream 5.0' },
+    { id:9,  ratio:'16:9',  ar:16/9,  color:COLORS[8],  name:'横屏-003', model:'Banana 2' },
+    { id:10, ratio:'16:9',  ar:16/9,  color:COLORS[9],  name:'横屏-004', model:'Banana 2' },
+    { id:11, ratio:'16:9',  ar:16/9,  color:COLORS[10], name:'横屏-005', model:'Seedream 5.0' },
+    { id:12, ratio:'16:9',  ar:16/9,  color:COLORS[11], name:'横屏-006', model:'Banana 2' },
+    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001', model:'Seedream 5.0' },
+    { id:14, ratio:'1:1',   ar:1,     color:COLORS[13], name:'方图-002', model:'Banana 2' },
+    { id:15, ratio:'1:1',   ar:1,     color:COLORS[14], name:'方图-003', model:'Seedream 5.0' },
+    { id:16, ratio:'1:1',   ar:1,     color:COLORS[15], name:'方图-004', model:'Banana 2' },
 ];
 
 function previewUrlFor(item) {
@@ -1023,70 +920,11 @@ function filtered() {
 }
 
 function renderModelTabs() {
-    const el = document.getElementById('modelChips');
-    const models = [...new Set(images.map(i => i.model))];
-
-    const sep1 = document.getElementById('filterSep1');
-    if (!models.length) { el.style.display = 'none'; sep1.style.display = 'none'; return; }
-
-    el.style.display = 'flex';
-    sep1.style.display = '';
-    el.innerHTML = '';
-
-    const mk = (text, key, extraClass = '') => {
-        const b = document.createElement('button');
-        b.className = 'chip' + (curModel === key ? ' on' : '') + (extraClass ? ' ' + extraClass : '');
-        b.innerHTML = text;
-        if (!extraClass) b.onclick = () => { curModel = key; curRatio = 'all'; render(); };
-        else b.type = 'button';
-        el.appendChild(b);
-    };
-
-    if (models.length === 1) {
-        curModel = models[0];
-        mk(models[0], models[0], 'pill-single');
-        return;
-    }
-
-    if (curModel !== 'all' && !models.includes(curModel)) curModel = 'all';
-    mk('全部模型', 'all');
-    models.forEach(m => mk(m, m));
+    // 已移除筛选器
 }
 
 function renderTabs() {
-    const el = document.getElementById('ratioTabs');
-    // 按当前模型过滤后，再统计各比例数量
-    const base = curModel === 'all' ? images : images.filter(i => i.model === curModel);
-    const counts = {};
-    base.forEach(i => counts[i.ratio] = (counts[i.ratio] || 0) + 1);
-    const ratios = Object.keys(counts);
-
-    // 只有一个比例时只显示该比例，不显示“全部比例”
-    const sep2 = document.getElementById('filterSep2');
-    if (!ratios.length) { el.style.display = 'none'; if (sep2) sep2.style.display = 'none'; return; }
-
-    el.style.display = 'inline-flex';
-    if (sep2) sep2.style.display = '';
-    el.innerHTML = '';
-
-    const mk = (label, key, extraClass = '') => {
-        const b = document.createElement('button');
-        b.className = 'pill' + (curRatio === key ? ' on' : '') + (extraClass ? ' ' + extraClass : '');
-        b.innerHTML = label;
-        if (!extraClass) b.onclick = () => { curRatio = key; render(); };
-        else b.type = 'button';
-        el.appendChild(b);
-    };
-
-    if (ratios.length === 1) {
-        if (curRatio === 'all') curRatio = ratios[0];
-        mk(`${ratios[0]} <span class="pill-n"></span>`, ratios[0], 'pill-single');
-        return;
-    }
-
-    if (curRatio !== 'all' && !counts[curRatio]) curRatio = 'all';
-    mk(`全部比例`, 'all');
-    ratios.forEach(r => mk(`${r} <span class="pill-n"></span>`, r));
+    // 已移除筛选器
 }
 
 function renderRows(container, list, cw) {
@@ -1351,6 +1189,7 @@ let _rt;
 window.addEventListener('resize', () => { clearTimeout(_rt); _rt = setTimeout(renderGrid, 100); });
 
 renderInfo();
+render();
 </script>
 <script>
 function showToast(msg) { alert(msg); }

@@ -323,7 +323,7 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-1);
       border-radius: var(--r-xl);
-      overflow: hidden;
+      overflow: visible;
     }
 
     .row { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
@@ -479,12 +479,13 @@
 
     .empty {
       display: none;
-      padding: 44px 12px;
+      padding: 120px 24px;
       text-align: center;
       color: var(--text-muted);
       border: 1px dashed var(--border-2);
       border-radius: var(--r-xl);
       background: var(--bg-surface);
+      font-size: var(--text-md);
     }
 
     .toast {
@@ -547,13 +548,26 @@
           <input id="keyword" type="text" placeholder="搜索工作流名称、说明、创建者">
         </div>
         <div class="sep"></div>
-        <div class="search" style="flex: 1; max-width: 200px;">
-          <span class="search-ico"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
-          <input id="creator" type="text" placeholder="按创建者筛选">
+        <div class="sel-wrap" id="creatorWrap" style="flex: 1; max-width: 200px; width: 100%;">
+          <div class="search" style="width: 100%; cursor: pointer; padding-right: var(--space-2);" onclick="toggleCreatorMenu(event)">
+            <span class="search-ico"><svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></span>
+            <input id="creatorDisplay" type="text" placeholder="全部创建者" readonly style="cursor: pointer;">
+            <svg id="creatorChevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" style="width:12px;height:12px;opacity:0.4;transition:transform 120ms ease;flex-shrink:0;margin-left:auto;"><path d="M3 4.5L6 7.5L9 4.5"/></svg>
+          </div>
+          <div class="dropdown" id="creatorMenu" style="width: 100%; left: 0;">
+            <div style="padding: 6px; border-bottom: 1px solid var(--border-1);">
+              <div class="search" style="height: 28px; min-width: 0; border: none; background: var(--bg-subtle);">
+                <input id="creatorSearch" type="text" placeholder="搜索..." onclick="event.stopPropagation()" oninput="renderCreatorList()" style="font-size: var(--text-sm);">
+              </div>
+            </div>
+            <div class="dropdown-list" id="creatorList"></div>
+          </div>
         </div>
         <div class="sep"></div>
-        <div class="search" style="flex: 1; max-width: 160px; padding-right:0;">
-          <input id="createDate" type="date">
+        <div class="search" style="flex: 1; max-width: 260px; padding-right: 0; gap: 4px;">
+          <input id="createDateStart" type="date" style="width: 100%; color: var(--text-hi);" title="开始日期">
+          <span style="color: var(--text-muted); font-size: var(--text-sm);">-</span>
+          <input id="createDateEnd" type="date" style="width: 100%; color: var(--text-hi);" title="结束日期">
         </div>
         <div class="sep"></div>
         <div class="row-end">
@@ -631,9 +645,12 @@
     const empty = document.getElementById('empty');
     const count = document.getElementById('count');
     const keyword = document.getElementById('keyword');
-    const creator = document.getElementById('creator');
-    const createDate = document.getElementById('createDate');
+    const creatorDisplay = document.getElementById('creatorDisplay');
+    const creatorSearch = document.getElementById('creatorSearch');
+    const createDateStart = document.getElementById('createDateStart');
+    const createDateEnd = document.getElementById('createDateEnd');
     const toast = document.getElementById('toast');
+    let selectedCreator = '';
 
     function esc(s) {
       return String(s == null ? '' : s)
@@ -719,17 +736,19 @@
 
     function getFiltered() {
       const term = keyword.value.trim().toLowerCase();
-      const creatorTerm = creator.value.trim().toLowerCase();
-      const dateTerm = createDate.value;
+      const creatorTerm = selectedCreator;
+      const dateStartTerm = createDateStart.value;
+      const dateEndTerm = createDateEnd.value;
 
       return workflows
         .filter(item => item.type === state.activeType)
         .filter(item => !isMineWorkflow(item)) // Only show others' workflows in plaza
         .filter(item => {
           const matchedText = !term || [item.name, item.desc, item.creator, item.project].some(v => String(v).toLowerCase().includes(term));
-          const matchedCreator = !creatorTerm || String(item.creator).toLowerCase().includes(creatorTerm);
-          const matchedDate = !dateTerm || item.createdAt === dateTerm;
-          return matchedText && matchedCreator && matchedDate;
+          const matchedCreator = !creatorTerm || item.creator === creatorTerm;
+          const matchedDateStart = !dateStartTerm || item.createdAt >= dateStartTerm;
+          const matchedDateEnd = !dateEndTerm || item.createdAt <= dateEndTerm;
+          return matchedText && matchedCreator && matchedDateStart && matchedDateEnd;
         })
         .sort((a, b) => {
           switch (state.sortBy) {
@@ -766,7 +785,7 @@
     function useWorkflow(id) {
       const item = findWorkflow(id);
       if (!item) return;
-      parent.postMessage({ action: 'openTab', title: '我的任务', url: 'AI 创作/我的任务.html' }, '*');
+      parent.postMessage({ action: 'openTab', title: '工作流-裂变', url: 'AI 创作/工作流-裂变.html?from=工作流广场' }, '*');
     }
 
     function editWorkflow(id) {
@@ -822,6 +841,54 @@
 
     function closeAllMenus() {
       document.querySelectorAll('.wf-menu.show, .dropdown.show').forEach(menu => menu.classList.remove('show'));
+      const chevron = document.getElementById('creatorChevron');
+      if (chevron) chevron.style.transform = 'rotate(0deg)';
+    }
+
+    function toggleCreatorMenu(e) {
+      e.stopPropagation();
+      const menu = document.getElementById('creatorMenu');
+      const isShow = menu.classList.contains('show');
+      closeAllMenus();
+      if (!isShow) {
+        menu.classList.add('show');
+        const chevron = document.getElementById('creatorChevron');
+        if (chevron) chevron.style.transform = 'rotate(180deg)';
+        renderCreatorList();
+        setTimeout(() => creatorSearch.focus(), 50);
+      }
+    }
+
+    function renderCreatorList() {
+      const listDiv = document.getElementById('creatorList');
+      const searchVal = creatorSearch.value.trim().toLowerCase();
+      // Only show other people's workflows
+      const creators = [...new Set(workflows.filter(w => !isMineWorkflow(w)).map(w => w.creator))];
+      const filtered = creators.filter(c => c.toLowerCase().includes(searchVal));
+      
+      let html = `<button class="dropdown-item" type="button" onclick="selectCreator('', '全部创建者')">
+        <span class="dropdown-item-text" style="color: var(--text-muted);">全部创建者</span>
+      </button>`;
+      
+      filtered.forEach(c => {
+        const isSelected = selectedCreator === c;
+        html += `<button class="dropdown-item" type="button" onclick="selectCreator('${esc(c)}', '${esc(c)}')">
+          <span class="dropdown-item-text" style="${isSelected ? 'color: var(--accent-solid); font-weight: 500;' : ''}">${esc(c)}</span>
+        </button>`;
+      });
+      
+      if (filtered.length === 0) {
+        html += `<div style="padding: 12px 16px; color: var(--text-ghost); font-size: var(--text-sm); text-align: center;">无匹配项</div>`;
+      }
+      
+      listDiv.innerHTML = html;
+    }
+
+    function selectCreator(val, label) {
+      selectedCreator = val;
+      creatorDisplay.value = val ? label : '';
+      closeAllMenus();
+      render();
     }
 
     function toggleSortMenu(e) {
@@ -857,12 +924,15 @@
 
     function resetFilters() {
       keyword.value = '';
-      creator.value = '';
-      createDate.value = '';
+      selectedCreator = '';
+      creatorDisplay.value = '';
+      creatorSearch.value = '';
+      createDateStart.value = '';
+      createDateEnd.value = '';
       render();
     }
 
-    [keyword, creator, createDate].forEach(control => {
+    [keyword, createDateStart, createDateEnd].forEach(control => {
       control.addEventListener('input', render);
       control.addEventListener('change', render);
     });

@@ -1755,24 +1755,15 @@ const VIDEO_MODELS = [
     { id: 'seedance15pro', name: 'Seedance 1.5Pro', desc: '视频模型 · 支持 5 秒 / 10 秒 / 12 秒', durations: ['5秒', '10秒', '12秒'] },
 ];
 
-const CHAT_MODELS = {
-    fast: [
-        { id: 'gpt54mini',        name: 'GPT-5.4 mini',     desc: 'OpenAI · 快速轻量，日常对话首选' },
-        { id: 'claude-haiku-45',  name: 'Claude Haiku 4.5', desc: 'Anthropic · 极速响应，高频调用理想' },
-        { id: 'claude-flash-30',  name: 'Claude 3.0 Flash', desc: 'Anthropic · 低成本快速，综合性价比高' },
-        { id: 'glm-51',           name: 'GLM-5.1',           desc: '智谱 AI · 中文理解优秀，推理高效' },
-        { id: 'qwen3-max',        name: 'Qwen3-Max',         desc: '阿里通义 · 速度质量均衡，中英文兼优' },
-        { id: 'kimi-k25',         name: 'Kimi-K2.5',         desc: '月之暗面 · 超长上下文，速度极快' },
-    ],
-    smart: [
-        { id: 'gpt54',            name: 'GPT-5.4',           desc: 'OpenAI · 旗舰推理，复杂任务首选' },
-        { id: 'gemini-31-pro',    name: 'Gemini 3.1 Pro',    desc: 'Google · 多模态强，百万级上下文' },
-        { id: 'claude-sonnet-46', name: 'Claude Sonnet 4.6', desc: 'Anthropic · 代码与分析突出，速智均衡' },
-        { id: 'claude-opus-46',   name: 'Claude Opus 4.6',   desc: 'Anthropic · 最强推理，深度思考首选' },
-        { id: 'grok4',            name: 'Grok4',             desc: 'xAI · 实时联网，擅长时事分析' },
-        { id: 'deepseek-32',      name: 'DeepSeek 3.2',      desc: '深度求索 · 代码与数学能力强，开源之光' },
-    ],
-};
+const CHAT_MODELS = [
+    { id: 'gemini-31-pro',    name: 'Gemini 3.1 Pro Prview', desc: 'Google · 多模态强，百万级上下文', tags: ['图片', '视频', '音频'] },
+    { id: 'gemini-3-flash',   name: 'Gemini 3 Flash Prview', desc: 'Google · 快速响应', tags: ['图片', '视频', '音频'] },
+    { id: 'deepseek-v4-pro',  name: 'DeepSeek V4 Pro',       desc: '深度求索 · 最强推理' },
+    { id: 'deepseek-v4-flash',name: 'DeepSeek V4 Flash',     desc: '深度求索 · 极速生成' },
+    { id: 'doubao-20',        name: '豆包 2.0',              desc: '字节跳动 · 综合能力强', tags: ['图片'] },
+    { id: 'gpt-54',           name: 'GPT 5.4',               desc: 'OpenAI · 旗舰推理', tags: ['图片'] },
+    { id: 'claude-sonnet-46', name: 'Claude Sonnet 4.6',     desc: 'Anthropic · 综合实力强', tags: ['图片'] },
+];
 
 const PROJECTS = [
     { category: '休闲游戏', products: ['消消乐', '跑酷大冒险', '解谜达人', '塔防英雄'] },
@@ -1828,10 +1819,10 @@ const PLATFORM_PRESETS = {
 
 const OPTS = {
     chat: [
-        { key: 'chat-model', type: 'chat-model' },
-        { key: 'count',     type: 'count', unit: '条',
+        { key: 'model', type: 'model' },
+        { key: 'count', type: 'count', unit: '条',
           values: ['1','5','10','20','50'] },
-        { key: 'project',    type: 'project' },
+        { key: 'project', type: 'project' },
     ],
     image: [
         { key: 'model',     type: 'model' },
@@ -1855,7 +1846,7 @@ const OPTS = {
 
 let curType = 'image';
 const sel = {
-    chat:  { model: 'gpt54mini', count: '1', style: '爆款重写', project: '' },
+    chat:  { models: ['gemini-31-pro'], modelCounts: {}, count: '1', project: '' },
     image: { models: ['banana2'], modelCounts: {}, modelQuality: {}, ratio: '1:1', res: '2K', sizeW: 2048, sizeH: 2048, count: '1', project: '', ratioTab: '常用', platformSize: null, customRatios: [] },
     video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '5秒', project: '', frameFirst: null, frameLast: null },
 };
@@ -2676,6 +2667,16 @@ function renderOpts() {
             // 单模型：模型, 数量, 模式, 比例+时长, 项目
             opts = [base[0], base[1], base[2], base[3], base[4]];
         }
+    } else if (curType === 'chat') {
+        const isMulti = sel.chat.models.length > 1;
+        const base = OPTS.chat;
+        if (isMulti) {
+            // 多模型：模型(含条数), 项目
+            opts = [base[0], base[2]];
+        } else {
+            // 单模型：模型, 条数, 项目
+            opts = [base[0], base[1], base[2]];
+        }
     } else {
         opts = OPTS[curType];
     }
@@ -2688,29 +2689,48 @@ function renderOpts() {
         let pillVal = '', ddInner = '';
 
         if (opt.type === 'model') {
-            const modelList = curType === 'video' ? VIDEO_MODELS : MODELS;
+            const modelList = curType === 'video' ? VIDEO_MODELS : curType === 'chat' ? CHAT_MODELS : MODELS;
             const models = sel[curType].models || [modelList[0].id];
             const isMulti = models.length > 1;
 
-            const countUnit = curType === 'video' ? '个' : '张';
+            const countUnit = curType === 'video' ? '个' : curType === 'chat' ? '条' : '张';
             const firstName = (modelList.find(x => x.id === models[0]) || modelList[0]).name;
             pillVal = isMulti ? `${firstName} 等 ${models.length} 个模型` : firstName;
+            
+            const searchHtml = curType === 'chat' ? `<div class="model-search" style="padding: 0 0 12px 0;"><input type="text" class="model-search-input" placeholder="请输入要搜索的模型名称" oninput="filterModels(event)" onclick="event.stopPropagation()" style="width: 100%; box-sizing: border-box; border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; outline: none; transition: border-color 0.2s;"></div>` : '';
+            
             if (isMulti) {
                 ddInner = `<div class="dd-section">
-                    <div class="dd-section-title">模型配置</div>
+                    ${searchHtml}
+                    ${curType === 'chat' ? '' : '<div class="dd-section-title">模型配置</div>'}
                     <div class="model-list">
                         ${modelList.map(mx => {
                             const checked = models.includes(mx.id);
                             const cnt = checked ? (sel[curType].modelCounts[mx.id] || sel[curType].count || '1') : '';
-                            const paramValues = curType === 'video' ? (mx.durations || []) : (mx.qualities || []);
+                            const paramValues = curType === 'video' ? (mx.durations || []) : curType === 'image' ? (mx.qualities || []) : [];
                             const paramValue = curType === 'video'
                                 ? (sel.video.modelDuration[mx.id] || mx.durations?.[0] || sel.video.dur)
-                                : (sel.image.modelQuality[mx.id] || mx.qualities?.[0] || sel.image.res);
+                                : curType === 'image' ? (sel.image.modelQuality[mx.id] || mx.qualities?.[0] || sel.image.res) : '';
                             const paramLabel = curType === 'video' ? '时长' : '清晰度';
-                            return `<div class="model-opt-row${checked ? ' checked' : ''}" data-desc="${mx.desc}"
+                            
+                            let tagsHtml = '';
+                            if (curType === 'chat' && mx.tags && mx.tags.length > 0) {
+                                tagsHtml = mx.tags.map(t => `<span style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 6px; color: var(--text-2);">${t}</span>`).join('');
+                            }
+                            
+                            let paramSelectHtml = '';
+                            if (curType !== 'chat') {
+                                paramSelectHtml = `<select class="model-param-select"
+                                            onchange="setModelParam(event,'${mx.id}','${curType === 'video' ? 'duration' : 'quality'}')">
+                                        ${paramValues.map(v => `<option value="${v}"${v === paramValue ? ' selected' : ''}>${paramLabel}：${v}</option>`).join('')}
+                                    </select>`;
+                            }
+                            
+                            return `<div class="model-opt-row${checked ? ' checked' : ''}" data-desc="${mx.desc || ''}"
                                          onclick="toggleModel(event,'${mx.id}')">
                                 <div class="model-check${checked ? ' active' : ''}"></div>
                                 <span class="model-opt-name">${mx.name}</span>
+                                ${tagsHtml}
                                 <div class="model-config-wrap" onclick="event.stopPropagation()">
                                     <div class="model-count-wrap">
                                         <input class="model-count-input" type="number" min="1" max="99"
@@ -2720,10 +2740,7 @@ function renderOpts() {
                                                onkeydown="if(event.key==='Enter'){event.target.blur()}">
                                         <span class="model-count-unit">${countUnit}</span>
                                     </div>
-                                    <select class="model-param-select"
-                                            onchange="setModelParam(event,'${mx.id}','${curType === 'video' ? 'duration' : 'quality'}')">
-                                        ${paramValues.map(v => `<option value="${v}"${v === paramValue ? ' selected' : ''}>${paramLabel}：${v}</option>`).join('')}
-                                    </select>
+                                    ${paramSelectHtml}
                                 </div>
                             </div>`;
                         }).join('')}
@@ -2731,14 +2748,20 @@ function renderOpts() {
                 </div>`;
             } else {
                 ddInner = `<div class="dd-section">
-                    <div class="dd-section-title">模型</div>
+                    ${searchHtml}
+                    ${curType === 'chat' ? '' : '<div class="dd-section-title">模型</div>'}
                     <div class="model-list">
                         ${modelList.map(mx => {
                             const checked = models.includes(mx.id);
-                            return `<div class="model-opt-row${checked ? ' checked' : ''}" data-desc="${mx.desc}"
+                            let tagsHtml = '';
+                            if (curType === 'chat' && mx.tags && mx.tags.length > 0) {
+                                tagsHtml = mx.tags.map(t => `<span style="background: rgba(0,0,0,0.06); padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 6px; color: var(--text-2);">${t}</span>`).join('');
+                            }
+                            return `<div class="model-opt-row${checked ? ' checked' : ''}" data-desc="${mx.desc || ''}"
                                          onclick="toggleModel(event,'${mx.id}')">
                                 <div class="model-check${checked ? ' active' : ''}"></div>
                                 <span class="model-opt-name">${mx.name}</span>
+                                ${tagsHtml}
                             </div>`;
                         }).join('')}
                     </div>
@@ -3024,25 +3047,6 @@ function renderOpts() {
             pillVal = val || '项目';
             ddInner = null;
 
-        } else if (opt.type === 'chat-model') {
-            const mid = sel.chat.model;
-            const allModels = [...CHAT_MODELS.fast, ...CHAT_MODELS.smart];
-            const m = allModels.find(x => x.id === mid) || CHAT_MODELS.fast[0];
-            pillVal = m.name;
-            const renderTier = (list) => list.map(mx =>
-                `<div class="model-opt-row" data-desc="${mx.desc}"
-                      onclick="pickChatModel(event,'${mx.id}')">
-                    <div class="model-radio${mx.id === mid ? ' active' : ''}"></div>
-                    <span class="model-opt-name">${mx.name}</span>
-                </div>`
-            ).join('');
-            ddInner = `<div class="dd-section" style="padding-bottom:0">
-                <div class="cm-tier-label">快速</div>
-                <div class="model-list">${renderTier(CHAT_MODELS.fast)}</div>
-                <div class="cm-tier-label">智能</div>
-                <div class="model-list">${renderTier(CHAT_MODELS.smart)}</div>
-            </div>`;
-
         } else if (opt.type === 'toggle') {
             const on = !!sel[curType][opt.key];
             const iconThink = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`;
@@ -3121,11 +3125,17 @@ function renderOpts() {
     });
 }
 
-function pickChatModel(e, id) {
-    e.stopPropagation();
-    sel.chat.model = id;
-    closeAll();
-    renderOpts();
+function filterModels(e) {
+    const q = e.target.value.toLowerCase().trim();
+    const rows = e.target.closest('.dd-section').querySelectorAll('.model-opt-row');
+    rows.forEach(r => {
+        const name = (r.querySelector('.model-opt-name').textContent || '').toLowerCase();
+        if (!q || name.includes(q)) {
+            r.style.display = '';
+        } else {
+            r.style.display = 'none';
+        }
+    });
 }
 
 function confirmCount(e) {
@@ -3147,7 +3157,7 @@ function onCountInput(e) {
     if (!v || v < 1) return;
     sel[curType].count = String(Math.min(99, v));
     const pill = document.getElementById('pill-count');
-    const unit = curType === 'video' ? '个' : '张';
+    const unit = curType === 'video' ? '个' : curType === 'chat' ? '条' : '张';
     if (pill) pill.querySelector('.opt-pill-val').textContent = `${sel[curType].count} ${unit}`;
 }
 
@@ -3160,7 +3170,7 @@ function pickOpt(e, key, val) {
 }
 
 function getModelList(type = curType) {
-    return type === 'video' ? VIDEO_MODELS : MODELS;
+    return type === 'video' ? VIDEO_MODELS : type === 'chat' ? CHAT_MODELS : MODELS;
 }
 
 function getModelMeta(type, modelId) {
@@ -3633,7 +3643,7 @@ function switchType(btn) {
 
 function useWorkflow(type) {
     if (type === 'image') {
-        parent.postMessage({ action: 'openTab', title: '工作流-裂变', url: 'AI 创作/工作流-裂变.html' }, '*');
+        parent.postMessage({ action: 'openTab', title: '工作流-裂变', url: 'AI 创作/工作流-裂变.html?from=通用生成' }, '*');
         return;
     }
     const btn = document.querySelector(`.type-btn[data-type="${type}"]`);
