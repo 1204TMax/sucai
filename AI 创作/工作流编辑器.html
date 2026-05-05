@@ -601,7 +601,7 @@ const PROCESSOR_REGISTRY = {
                 <div class="form-item">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <label style="margin:0;">参考文件</label>
-                        <button class="btn btn-ghost" style="color:var(--accent-solid); font-size:13px; height:24px; padding:0 4px;" onclick="triggerLocalUpload('${node.id}')">上传文件</button>
+                        
                     </div>
                     <div class="ref-selector-trigger" onclick="toggleRefVarDropdown(event, '${node.id}')">
                         点击选择需要参考的文件（如图片、视频）
@@ -728,7 +728,7 @@ const PROCESSOR_REGISTRY = {
                 <div class="form-item">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <label style="margin:0;">参考文件</label>
-                        <button class="btn btn-ghost" style="color:var(--accent-solid); font-size:13px; height:24px; padding:0 4px;" onclick="triggerLocalUpload('${node.id}')">上传文件</button>
+                        
                     </div>
                     <div class="ref-selector-trigger" onclick="toggleRefVarDropdown(event, '${node.id}')">
                         点击选择参考图片
@@ -874,7 +874,7 @@ const PROCESSOR_REGISTRY = {
                 <div class="form-item" style="margin-bottom: 12px;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                         <label style="margin:0; font-size: 12px; color: var(--text-hi); font-weight: 500;">${labelText}</label>
-                        <button class="btn btn-ghost" style="color:var(--accent-solid); font-size:12px; height:22px; padding:0 4px;" onclick="triggerLocalUpload('${node.id}', '${sourceKey}', '${nameKey}', '${tokenKey}')">上传文件</button>
+                        
                     </div>
                     ${!currentRefVar ? `
                     <div class="ref-selector-trigger" onclick="toggleRefVarDropdown(event, '${node.id}', '${tokenKey}', '${sourceKey}')">
@@ -1564,7 +1564,8 @@ function renderRunForm() {
     let html = '<div style="margin-bottom:20px;">';
     html += inputs.map(input => `
         <div class="form-item" style="margin-bottom:16px;">
-            <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:8px; display:block;">${input.label} <span style="color:#ff4d4f">*</span></label>
+            <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:4px; display:block;">${input.label} <span style="color:#ff4d4f">*</span></label>
+            ${input.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:8px; line-height: 1.5;">${input.desc}</div>` : ''}
             ${renderRunInput(input)}
         </div>
     `).join('');
@@ -1631,7 +1632,45 @@ function renderRunResult() {
 }
 
 function publishWorkflow() {
-    alert('发布成功！该工作流已发布至「工作流广场」和「通用生成」页面。');
+    // 简单的 Toast 提示
+    const toast = document.createElement('div');
+    toast.style.position = 'fixed';
+    toast.style.top = '24px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = '#f6ffed';
+    toast.style.border = '1px solid #b7eb8f';
+    toast.style.padding = '10px 24px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '8px';
+    toast.style.zIndex = '9999';
+    toast.style.fontSize = '14px';
+    toast.style.color = 'var(--text-hi)';
+    toast.style.transition = 'all 0.3s ease';
+    toast.style.opacity = '0';
+    
+    toast.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        <span>发布成功！该工作流已发布至「工作流广场」和「通用生成」页面。</span>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.top = '32px';
+    });
+    
+    // Remove after 3s
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.top = '24px';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 function openRunPanel() {
@@ -1880,6 +1919,10 @@ function renderStartInputsEditor(node) {
             <div class="form-item" style="margin-bottom: 12px;">
                 <label style="font-size: 12px; color: var(--text-lo); margin-bottom: 6px; display: block;">选项名称</label>
                 <input type="text" value="${input.label}" oninput="updateStartInput(${idx}, 'label', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 32px; padding: 0 10px; font-size: 13px; color: var(--text-hi); outline: none; transition: 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--accent-solid)'; this.style.boxShadow='0 0 0 2px var(--accent-bg)';" onblur="this.style.borderColor='var(--border-2)'; this.style.boxShadow='inset 0 1px 2px rgba(0,0,0,0.02)';">
+            </div>
+            <div class="form-item" style="margin-bottom: 12px;">
+                <label style="font-size: 12px; color: var(--text-lo); margin-bottom: 6px; display: block;">选项描述</label>
+                <input type="text" placeholder="描述使用该工作流必须输入的内容" value="${input.desc || ''}" oninput="updateStartInput(${idx}, 'desc', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 32px; padding: 0 10px; font-size: 13px; color: var(--text-hi); outline: none; transition: 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--accent-solid)'; this.style.boxShadow='0 0 0 2px var(--accent-bg)';" onblur="this.style.borderColor='var(--border-2)'; this.style.boxShadow='inset 0 1px 2px rgba(0,0,0,0.02)';">
             </div>
             <div class="form-item" style="margin-bottom: 0;">
                 <label style="font-size: 12px; color: var(--text-lo); margin-bottom: 6px; display: block;">输入类型</label>
