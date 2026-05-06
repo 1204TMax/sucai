@@ -1120,6 +1120,18 @@
             z-index: 5;
         }
 
+        .wf-detail-btn {
+            position: absolute; right: 16px; top: 16px;
+            display: inline-flex; align-items: center;
+            padding: 4px; background: transparent;
+            border: none;
+            color: var(--accent-solid); font-size: 13px; font-weight: 500;
+            z-index: 5; transition: all 0.2s;
+        }
+        .wf-detail-btn:hover {
+            opacity: 0.8;
+        }
+
         .wf-card-main { display: flex; gap: 12px; }
         .wf-icon-box {
             width: 60px; height: 60px; background: rgba(74,158,255,0.08); border-radius: 12px;
@@ -3459,6 +3471,7 @@ function renderWorkflows() {
                 `;
             return `
             <div class="wf-card" onclick="useWorkflow('${curType}')">
+                <button class="wf-detail-btn" type="button" onclick="event.stopPropagation();parent.postMessage({ action: 'openTab', title: '工作流详情', url: 'AI 创作/工作流编辑器.html?id=${w.id}' }, '*')">详 &gt;</button>
                 <div class="wf-card-actions">
                     <button class="wf-favorite-trigger${w.isPinned ? ' active' : ''}" type="button" title="${w.isPinned ? '取消收藏' : '收藏'}" aria-label="${w.isPinned ? '取消收藏' : '收藏'}" onclick="event.stopPropagation();toggleWorkflowFavorite('${w.id}')">${w.isPinned ? '★' : '☆'}</button>
                     <button class="wf-more-trigger" type="button" title="更多操作" aria-label="更多操作" onclick="toggleWfMenu(event, this)">...</button>

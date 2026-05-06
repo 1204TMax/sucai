@@ -373,7 +373,7 @@
             <button class="btn btn-ghost" style="padding: 0 4px;" onclick="parent.postMessage({action:'closeCurrentTab'}, '*')">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <span id="head-title">春季女装爆款裂变工作流</span>
+            <span id="head-title">爆款图片裂变</span>
             <button class="title-edit-btn" onclick="openWorkflowMetaModal()" aria-label="编辑工作流基础信息">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
             </button>
@@ -381,7 +381,7 @@
         <div class="nav-right">
             <span style="font-size: 12px; color: var(--text-muted); margin-right: 8px;"></span>
             <span class="save-status" id="auto-save-status">自动保存 --:--</span>
-            <button class="btn btn-primary" onclick="openRunPanel()">▶ 试运行</button>
+            <button class="btn btn-primary" onclick="openRunPanel()">▶ 使用</button>
         </div>
     </div>
 
@@ -429,8 +429,8 @@
 
 <script>
 const PALETTE_CATEGORIES = [
-    { key: 'generate', label: '大模型' },
-    { key: 'control', label: '审核' },
+    { key: 'generate', label: '生成节点' },
+    { key: 'control', label: '逻辑控制' },
     { key: 'processor', label: '智能处理' }
 ];
 
@@ -546,8 +546,10 @@ const PROCESSOR_REGISTRY = {
         createDefaultConfig: () => ({
             name: '开始',
             inputs: [
-                { key: createInputKey(), label: '主提示词', type: 'text', required: true },
-                { key: createInputKey(), label: '参考图片', type: 'image', required: true }
+                { key: createInputKey(), label: '任务名称', type: 'input', required: true, defaultValue: '图片裂变工作流-20260505' },
+                { key: createInputKey(), label: '爆款图片', type: 'image', required: false },
+                { key: createInputKey(), label: '裂变提示词', type: 'text', required: true },
+                { key: createInputKey(), label: '裂变提示词', type: 'text', required: false }
             ]
         }),
         getSummary: (config) => renderSummary([`输入项：${(config.inputs || []).length} 个`]),
@@ -578,7 +580,6 @@ const PROCESSOR_REGISTRY = {
             promptUser: '',
             promptManual: '',
             thinkMode: false,
-            multipleGenerate: true,
             referenceSource: 'upload',
             referenceToken: '',
             referenceUploadName: '',
@@ -623,39 +624,11 @@ const PROCESSOR_REGISTRY = {
 
             const promptText = node.config.promptUser || node.config.promptManual || '';
             const hasVar = /\[.*?\]/.test(promptText) || (node.config.referenceToken && node.config.referenceSource !== 'upload');
-            // Check max count based on multipleGenerate state
-            let maxCount = 100;
-            if (hasVar) {
-                maxCount = 50;
-            } else if (node.config.multipleGenerate === false) {
-                maxCount = 10;
-            }
-            const currentCount = Math.min(node.config.count || 10, maxCount);
+            const maxCount = hasVar ? 50 : 100;
+            const currentCount = node.config.count || 10;
 
             const countHtml = `
             <div class="form-item">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                    <div style="display:flex; align-items:center;">
-                        <label style="margin:0;">多次生成</label>
-                        <div style="display:inline-flex; align-items:center; margin-left:6px; cursor:help; position:relative;" class="tooltip-trigger" onmouseenter="this.querySelector('.tooltip-content').style.display='block'" onmouseleave="this.querySelector('.tooltip-content').style.display='none'">
-                            <span style="display:inline-flex; width:14px; height:14px; border-radius:50%; background:var(--bg-subtle); border:1px solid var(--border-2); align-items:center; justify-content:center; font-size:10px; color:var(--text-muted); font-weight:bold;">?</span>
-                            <div class="tooltip-content" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%); margin-bottom:8px; width:220px; padding:8px 12px; background:#fff; border:1px solid var(--border-1); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); font-size:12px; color:var(--text-hi); z-index:1000; text-align:left; font-weight:normal; line-height:1.5;">
-                                多次生成即按生成数量多次请求大模型，否则将一次请求大模型，后台自动解析成多个结果。
-                            </div>
-                        </div>
-                    </div>
-                    <div style="position:relative;" ${hasVar ? `class="tooltip-trigger" onmouseenter="this.querySelector('.tooltip-content').style.display='block'" onmouseleave="this.querySelector('.tooltip-content').style.display='none'"` : ''}>
-                        <label class="think-switch" style="${hasVar ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
-                            <input type="checkbox" ${node.config.multipleGenerate !== false || hasVar ? 'checked' : ''} ${hasVar ? 'disabled' : ''} onchange="updateConfigAndRefresh('multipleGenerate', this.checked)">
-                            <span class="think-slider"></span>
-                        </label>
-                        ${hasVar ? `
-                        <div class="tooltip-content" style="display:none; position:absolute; bottom:100%; right:0; margin-bottom:8px; width:220px; padding:8px 12px; background:#fff; border:1px solid var(--border-1); border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); font-size:12px; color:var(--text-hi); z-index:1000; text-align:left; font-weight:normal; line-height:1.5; pointer-events: none;">
-                            提示词中含有数组变量，目前仅支持按数组元素逐一轮流生成，暂不支持一次调用模型生成所有结果。
-                        </div>` : ''}
-                    </div>
-                </div>
-
                 <div style="display:flex; align-items:center; margin-bottom:8px;">
                     <label style="margin:0;">生成数量</label>
                     <div id="count-tooltip-wrapper-${node.id}" style="display:${hasVar ? 'inline-flex' : 'none'}; align-items:center; margin-left:6px; cursor:help; position:relative;" class="tooltip-trigger" onmouseenter="this.querySelector('.tooltip-content').style.display='block'" onmouseleave="this.querySelector('.tooltip-content').style.display='none'">
@@ -1109,7 +1082,7 @@ let panelMode = 'config';
 let lastAutoSaveAt = '';
 let runState = { phase: 'idle', values: {}, result: null };
 let workflowMeta = {
-    name: '春季女装爆款裂变工作流',
+    name: '爆款图片裂变',
     description: '',
     coverName: '',
     visibility: 'private'
@@ -1437,7 +1410,7 @@ function renderWorkflowMetaForm() {
     return `
         <div class="form-item">
             <label>名称</label>
-            <input type="text" value="${draft.name || ''}" placeholder="例如：春季女装爆款裂变工作流" oninput="updateWorkflowMetaDraft('name', this.value)">
+            <input type="text" value="${draft.name || ''}" placeholder="例如：爆款图片裂变" oninput="updateWorkflowMetaDraft('name', this.value)">
         </div>
         <div class="form-item">
             <label>描述</label>
@@ -1547,14 +1520,18 @@ function getRunInputs() {
 }
 
 function renderRunInput(input) {
+    let val = runState.values[input.key] !== undefined ? runState.values[input.key] : (input.defaultValue || '');
+    if (input.type === 'input') {
+        return `<input type="text" placeholder="请输入${input.label}" value="${val}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">`;
+    }
     if (input.type === 'text') {
-        return `<textarea rows="3" placeholder="请输入${input.label}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; outline:none; resize:vertical; font-family:inherit;">${runState.values[input.key] || ''}</textarea>`;
+        return `<textarea rows="3" placeholder="请输入${input.label}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; outline:none; resize:vertical; font-family:inherit;">${val}</textarea>`;
     }
     if (input.type === 'count') {
-        return `<input type="number" min="1" placeholder="请输入${input.label}" value="${runState.values[input.key] || ''}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">`;
+        return `<input type="number" min="1" placeholder="请输入${input.label}" value="${val}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">`;
     }
     if (input.type === 'image' || input.type === 'video' || input.type === 'image_array' || input.type === 'video_array') {
-        const fileName = runState.values[input.key] || '';
+        const fileName = val;
         return `
             <div style="display:flex; align-items:center; gap:8px;">
                 <button class="btn btn-default" style="background:#fff; border:1px solid var(--border-2); height:32px; padding:0 12px; border-radius:6px; cursor:pointer; font-family:inherit;" onclick="mockUploadRunFile('${input.key}', '${input.type}')">上传${input.label}</button>
@@ -1576,91 +1553,79 @@ function mockUploadRunFile(key, type) {
     const exts = type.includes('video') ? '.mp4' : '.png';
     const fakeName = '参考文件_' + Math.random().toString(36).slice(2,6) + exts;
     updateRunValue(key, fakeName);
-    openPanel('试运行', renderRunForm());
+    openPanel('运行', renderRunForm());
 }
 
 function renderRunForm() {
     const inputs = getRunInputs();
+    if (!inputs.length) {
+        return `
+            <div style="padding:20px 0; text-align:center; color:var(--text-muted); font-size:13px;">该工作流无需前置输入，可直接运行。</div>
+            <div style="margin-top:20px; display:flex; gap:12px; justify-content:flex-end;">
+                <button class="btn btn-primary" onclick="startRun(this)">提交</button>
+            </div>
+            <div id="run-error-box"></div>
+        `;
+    }
     
     let html = '<div style="margin-bottom:20px;">';
-    
-    // Add default task name field
-    const defaultTaskName = (workflowMeta.name || '工作流') + '-' + new Date().toISOString().slice(0,10).replace(/-/g,'');
-    html += `
+    html += inputs.map(input => `
         <div class="form-item" style="margin-bottom:16px;">
-            <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:4px; display:block;"><span style="color:#ff4d4f">*</span> 任务名称</label>
-            <input type="text" value="${defaultTaskName}" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">
+            <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:4px; display:block;">${input.required ? '<span style="color:#ff4d4f">* </span>' : ''}${input.label}</label>
+            ${input.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:8px; line-height: 1.5;">${input.desc}</div>` : ''}
+            ${renderRunInput(input)}
         </div>
-    `;
-    
-    if (inputs.length) {
-        html += inputs.map(input => `
-            <div class="form-item" style="margin-bottom:16px;">
-                <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:4px; display:block;">${input.label.includes('*') ? input.label : '<span style="color:#ff4d4f">*</span> ' + input.label}</label>
-                ${input.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:8px; line-height: 1.5;">${input.desc}</div>` : ''}
-                ${renderRunInput(input)}
-            </div>
-        `).join('');
-    }
+    `).join('');
     html += '</div>';
     
     html += `
-        <div style="display:flex; gap:12px; border-top:1px solid var(--border-1); padding-top:20px; justify-content: flex-end;">
-            <button class="btn btn-default" style="border: 1px solid var(--border-2); background: #fff; padding: 0 16px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 13px; color: var(--text-hi);" onclick="openRunPanel()">重置</button>
-            <button class="btn btn-primary" style="padding: 0 20px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 13px; background: #4096ff; color: #fff; border: none; min-width: 72px; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;" onclick="mockValidate(this)">提交</button>
+        <div style="display:flex; gap:12px; border-top:1px solid var(--border-1); padding-top:20px; justify-content:flex-end; align-items:center;">
+            <button class="btn btn-default" onclick="openRunPanel()">重置</button>
+            <button class="btn btn-primary" onclick="startRun(this)">提交</button>
         </div>
-        <div id="panel-run-error" style="display:none; margin-top: 16px; text-align: left;">
-            <div style="background: #fff1f0; border: 1px solid #ffccc7; border-radius: 8px; padding: 16px; position: relative;">
-                <button onclick="document.getElementById('panel-run-error').style.display='none'" style="position: absolute; right: 12px; top: 12px; background: none; border: none; cursor: pointer; color: #ff4d4f; font-size: 18px; line-height: 1;">×</button>
-                <div style="color: #f5222d; font-size: 14px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                    校验失败，无法开始任务
-                </div>
-                <div style="color: #f5222d; font-size: 13px; line-height: 1.8;">
-                    <div style="font-weight: 600; margin-top: 8px;">文本生成节点错误：</div>
-                    <div style="padding-left: 8px; color: #ff4d4f;">1. 未设置提示词</div>
-                    <div style="font-weight: 600; margin-top: 8px;">结束节点错误：</div>
-                    <div style="padding-left: 8px; color: #ff4d4f;">1. 未设置输出内容</div>
-                </div>
-            </div>
-        </div>
+        <div id="run-error-box"></div>
     `;
     return html;
 }
 
-function mockValidate(btn) {
-    const originalText = btn.innerHTML;
+function startRun(btn) {
+    if (btn) {
+        btn.innerHTML = `<style>@keyframes btnSpin { 100% { transform: rotate(360deg); } }</style><svg style="animation: btnSpin 1s linear infinite; margin-right: 4px;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="4.93" x2="19.07" y2="7.76"></line></svg>校验中`;
+        btn.disabled = true;
+    }
     
-    // Use an explicit spinning animation and nowrap text for the button
-    btn.innerHTML = '<style>@keyframes btnSpin { to { transform: rotate(360deg); } }</style><div style="width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: btnSpin 0.8s linear infinite; margin-right: 6px; flex-shrink: 0;"></div>校验中';
-    btn.disabled = true;
-    
-    const errEl = document.getElementById('panel-run-error');
-    if (errEl) errEl.style.display = 'none';
+    // 清空之前的错误
+    const errorBox = document.getElementById('run-error-box');
+    if (errorBox) {
+        errorBox.innerHTML = '';
+    }
 
     setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        if (btn) {
+            btn.innerHTML = '提交';
+            btn.disabled = false;
+        }
         
-        if (errEl) errEl.style.display = 'block';
+        if (errorBox) {
+            errorBox.innerHTML = `
+                <div style="margin-top: 16px; padding: 12px; background: #fff2f0; border: 1px solid #ffccc7; border-radius: 8px; color: #ff4d4f; font-size: 13px; line-height: 1.6; position: relative;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #ffccc7;">
+                        <div style="font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            校验失败，无法开始任务
+                        </div>
+                        <button onclick="document.getElementById('run-error-box').innerHTML=''" style="background:none; border:none; color:#ff4d4f; cursor:pointer; padding:0; display:flex; align-items:center; transition: 0.2s;" onmouseover="this.style.opacity=0.7" onmouseout="this.style.opacity=1">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 4px; margin-top: 4px;">文本生成节点错误：</div>
+                    <div style="margin-left: 12px; margin-bottom: 8px;">1. 未设置提示词</div>
+                    <div style="font-weight: 600; margin-bottom: 4px;">结束节点错误：</div>
+                    <div style="margin-left: 12px;">1. 未设置输出内容</div>
+                </div>
+            `;
+        }
     }, 2000);
-}
-
-function startRun() {
-    runState.phase = 'running';
-    runState.result = null;
-    openPanel('试运行', renderRunResult());
-    
-    // Mock processing
-    setTimeout(() => {
-        runState.phase = 'success';
-        runState.result = {
-            id: 'mock_task_id',
-            status: 'success',
-            output: '这是一段生成好的示例产物结果。'
-        };
-        openPanel('试运行', renderRunResult());
-    }, 1500);
 }
 
 function renderRunResult() {
@@ -1688,7 +1653,7 @@ function renderRunResult() {
                     ${runState.result.output}
                 </div>
                 <div style="display:flex; gap:12px; border-top:1px solid var(--border-1); padding-top:20px; align-items:center;">
-                    <button class="btn btn-default" style="flex:1;" onclick="openRunPanel()">再次试运行</button>
+                    <button class="btn btn-default" style="flex:1;" onclick="openRunPanel()">再次运行</button>
                     <button class="btn btn-primary" style="flex:1;" onclick="publishWorkflow()">发布</button>
                 </div>
             </div>
@@ -1744,7 +1709,7 @@ function openRunPanel() {
     panelMode = 'run';
     runState.phase = 'form';
     runState.values = {};
-    openPanel('试运行', renderRunForm());
+    openPanel('运行', renderRunForm());
 }
 
 function updateConfig(key, value) {
@@ -2094,36 +2059,21 @@ function updateCountStatus(nodeId, rawText) {
     const node = nodes.find(n => n.id === nodeId);
     if (!node) return;
     const hasVar = /\[.*?\]/.test(rawText) || (node.config.referenceToken && node.config.referenceSource !== 'upload');
-    if (hasVar && node.config.multipleGenerate === false) {
-        node.config.multipleGenerate = true;
-    }
     const tooltip = document.getElementById('count-tooltip-wrapper-' + nodeId);
     const input = document.getElementById('count-input-' + nodeId);
     
     if (tooltip && input) {
-        let maxCount = 100;
         if (hasVar) {
-            maxCount = 50;
             tooltip.style.display = 'inline-flex';
+            input.max = '50';
+            if (parseInt(input.value) > 50) {
+                input.value = '50';
+                node.config.count = 50;
+            }
         } else {
             tooltip.style.display = 'none';
-            if (node.processorType === 'text.generate' && node.config.multipleGenerate === false) {
-                maxCount = 10;
-            }
+            input.max = '100';
         }
-        input.max = maxCount.toString();
-        if (parseInt(input.value) > maxCount) {
-            input.value = maxCount.toString();
-            node.config.count = maxCount;
-        }
-    }
-    
-    // Also refresh the node config to update switch state if it was forced on
-    if (hasVar) {
-        // Need a slight delay to avoid reacting while user is typing and losing focus
-        setTimeout(() => {
-            if (activeNodeId === nodeId) openConfig(nodeId);
-        }, 10);
     }
 }
 
@@ -2133,14 +2083,7 @@ function updateConfigCount(nodeId, val) {
     if (node) {
         const rawText = node.config.promptUser || node.config.promptManual || '';
         const hasVar = /\[.*?\]/.test(rawText) || (node.config.referenceToken && node.config.referenceSource !== 'upload');
-        let maxCount = 100;
-        if (hasVar) {
-            maxCount = 50;
-        } else if (node.processorType === 'text.generate' && node.config.multipleGenerate === false) {
-            maxCount = 10;
-        }
-        
-        if (num > maxCount) num = maxCount;
+        if (hasVar && num > 50) num = 50;
         node.config.count = num;
         const input = document.getElementById('count-input-' + nodeId);
         if (input && input.value !== num.toString()) input.value = num;
@@ -2247,96 +2190,6 @@ function showRefVarSubmenu(event, source, nodeId, acceptRefStr) {
     sub.classList.add('show');
 }
 
-
-function toggleModelDropdown(event, nodeId) {
-    event.stopPropagation();
-    const el = document.getElementById('global-model-dropdown');
-    if (currentDropdownNodeId === nodeId && el.classList.contains('show')) {
-        hideAllDropdowns();
-        return;
-    }
-    hideAllDropdowns();
-    currentDropdownNodeId = nodeId;
-    
-    const node = nodes.find(n => n.id === nodeId);
-    let models = [];
-    if(node.processorType === 'text.generate') models = TEXT_MODELS;
-    if(node.processorType === 'image.generate') models = IMAGE_MODELS;
-    if(node.processorType === 'video.generate') models = VIDEO_WORKFLOW_MODELS;
-    
-    const currentModelId = node.config.model;
-    
-    let html = `
-        <div class="model-search">
-            <input type="text" placeholder="搜索模型..." oninput="filterModelDropdown(event, '${nodeId}')" onclick="event.stopPropagation()">
-        </div>
-        <div class="model-options">
-            ${models.map(m => `
-                <div class="model-option ${m.id === currentModelId ? 'active' : ''}" style="${m.id === currentModelId ? 'background: var(--bg-subtle); color: var(--accent-solid);' : ''}" onclick="selectModel('${nodeId}', '${m.id}')">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <span>${m.name}</span>
-                        ${m.id === currentModelId ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
-                    </div>
-                    <div class="model-tags">
-                        ${m.tags ? m.tags.map(t => `<span class="model-tag">${t}</span>`).join('') : ''}
-                        ${m.modality ? `<span class="model-tag">${m.modality.split('/')[0]}</span>` : ''}
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-    el.innerHTML = html;
-    
-    const trigger = event.currentTarget;
-    const rect = trigger.getBoundingClientRect();
-    el.style.top = (rect.bottom + 4) + 'px';
-    el.style.left = rect.left + 'px';
-    el.style.width = rect.width + 'px';
-    el.classList.add('show');
-    
-    // Focus search input
-    setTimeout(() => {
-        const searchInput = el.querySelector('input');
-        if (searchInput) searchInput.focus();
-    }, 50);
-}
-
-function filterModelDropdown(event, nodeId) {
-    const val = event.target.value.toLowerCase();
-    const node = nodes.find(n => n.id === nodeId);
-    let models = [];
-    if(node.processorType === 'text.generate') models = TEXT_MODELS;
-    if(node.processorType === 'image.generate') models = IMAGE_MODELS;
-    if(node.processorType === 'video.generate') models = VIDEO_WORKFLOW_MODELS;
-    
-    const filteredModels = models.filter(m => m.name.toLowerCase().includes(val) || (m.tags && m.tags.some(t => t.toLowerCase().includes(val))) || (m.modality && m.modality.toLowerCase().includes(val)));
-    
-    const currentModelId = node.config.model;
-    const optionsContainer = event.target.closest('.model-dropdown').querySelector('.model-options');
-    
-    if (filteredModels.length === 0) {
-        optionsContainer.innerHTML = '<div style="padding:12px; color:var(--text-muted); text-align:center;">暂无匹配模型</div>';
-    } else {
-        optionsContainer.innerHTML = filteredModels.map(m => `
-            <div class="model-option ${m.id === currentModelId ? 'active' : ''}" style="${m.id === currentModelId ? 'background: var(--bg-subtle); color: var(--accent-solid);' : ''}" onclick="selectModel('${nodeId}', '${m.id}')">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span>${m.name}</span>
-                    ${m.id === currentModelId ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}
-                </div>
-                <div class="model-tags">
-                    ${m.tags ? m.tags.map(t => `<span class="model-tag">${t}</span>`).join('') : ''}
-                    ${m.modality ? `<span class="model-tag">${m.modality.split('/')[0]}</span>` : ''}
-                </div>
-            </div>
-        `).join('');
-    }
-}
-
-function selectModel(nodeId, modelId) {
-    activeNodeId = nodeId;
-    updateConfigAndRefresh('model', modelId);
-    hideAllDropdowns();
-}
 
 function hideAllDropdowns() {
     document.querySelectorAll('#global-dropdowns > div').forEach(el => el.classList.remove('show'));

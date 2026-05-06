@@ -701,6 +701,100 @@
       .review-toolbar-actions, .review-batch-bar, .review-bottom-actions { width: 100%; }
       .review-toolbar-btn { flex: 1 1 auto; }
     }
+    
+    /* ── High-Fidelity Design System Components ── */
+    .b {
+      height: var(--h-sm, 28px);
+      padding: 0 var(--space-3);
+      border-radius: var(--r-md);
+      font: 500 var(--text-sm)/1 var(--font);
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-1);
+      white-space: nowrap;
+      transition: all var(--ease);
+      flex-shrink: 0;
+    }
+    .b:focus-visible { outline: 2px solid var(--accent-solid); outline-offset: 1px; }
+    .b-solid { background: var(--accent-solid); color: white; }
+    .b-solid:hover { background: var(--accent-solid-h); }
+    .b-soft { background: var(--bg-subtle); color: var(--text-lo); border-color: var(--border-1); }
+    .b-soft:hover { background: var(--bg-hover); color: var(--text-hi); border-color: var(--border-2); }
+    .b-ghost { background: transparent; color: var(--text-muted); }
+    .b-ghost:hover { background: var(--bg-subtle); color: var(--text-lo); }
+
+    .tabs {
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-5);
+      border-bottom: 1px solid var(--border-1);
+      gap: 0;
+    }
+    .tab {
+      height: 40px;
+      padding: 0 var(--space-3);
+      font: 400 var(--text-sm)/1 var(--font);
+      color: var(--text-muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: color var(--ease);
+      display: inline-flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .tab:hover { color: var(--text-lo); }
+    .tab.on { color: var(--text-hi); font-weight: 500; }
+    .tab.on::after {
+      content: '';
+      position: absolute;
+      left: var(--space-3);
+      right: var(--space-3);
+      bottom: -1px;
+      height: 2px;
+      background: var(--accent-solid);
+      border-radius: 1px 1px 0 0;
+    }
+
+    .pills {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-1);
+      border-radius: var(--r-full);
+      padding: 2px;
+      gap: 1px;
+      flex-shrink: 0;
+    }
+    .pill {
+      height: var(--h-xs, 22px);
+      padding: 0 var(--space-3);
+      border-radius: var(--r-full);
+      font: 500 var(--text-sm)/1 var(--font);
+      color: var(--text-muted);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all var(--ease);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+    .pill:hover { color: var(--text-lo); }
+    .pill.on { background: var(--bg-surface); color: var(--text-hi); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+    .pill-n {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      background: var(--bg-subtle);
+      padding: 0 var(--space-1);
+      border-radius: var(--r-full);
+      margin-left: 1px;
+    }
+    .pill.on .pill-n { background: var(--bg-hover); color: var(--text-lo); }
   </style>
 </head>
 <body>
@@ -1320,6 +1414,7 @@ const state = {
   pageMode: routeParams.get('view') === 'review' ? 'review' : 'list',
   reviewContext: { taskId: routeParams.get('taskId') || '', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
   reviewFilter: 'pending',
+  reviewContentNode: 'node2',
   reviewBatchMode: false,
   reviewSelected: new Set(),
   filters: { status:'', search:'', project:'', dateRange:'', dateStart:'', dateEnd:'', model:'' },
@@ -1429,9 +1524,9 @@ function renderFilterBar() {
   }).join('');
 
   // 状态选择器
-  var statusLabels = {pending:'等待中',generating:'生成中',pending_review:'待审',reviewing:'审查中',completed:'已成功',failed:'已失败',aborted:'已中止'};
+  var statusLabels = {pending:'等待中',generating:'生成中',pending_review:'待人工审核',reviewing:'审查中',completed:'已成功',failed:'已失败',aborted:'已中止'};
   var statusLabel = statusLabels[f.status] || '状态';
-  var statusItems = [{v:'',l:'全部'},{v:'pending',l:'等待中'},{v:'generating',l:'生成中'},{v:'pending_review',l:'待审'},{v:'reviewing',l:'审查中'},{v:'completed',l:'已成功'},{v:'failed',l:'已失败'},{v:'aborted',l:'已中止'}]
+  var statusItems = [{v:'',l:'全部'},{v:'pending',l:'等待中'},{v:'generating',l:'生成中'},{v:'pending_review',l:'待人工审核'},{v:'reviewing',l:'审查中'},{v:'completed',l:'已成功'},{v:'failed',l:'已失败'},{v:'aborted',l:'已中止'}]
     .map(function(o){ return '<button class="dropdown-item'+(f.status===o.v?' on':'')+'" onclick="setFilter(\'status\',\''+o.v+'\');closeFilterDDs()">'+o.l+'</button>'; }).join('');
 
   // 日期选择器
@@ -2194,6 +2289,10 @@ function focusPendingReview() {
   }, 50);
 }
 
+
+
+
+
 function renderReviewPage() {
   const root = document.getElementById('root');
   const task = getReviewRouteTask();
@@ -2202,141 +2301,229 @@ function renderReviewPage() {
     renderReviewBottomBar();
     return;
   }
-  const queue = getWorkflowReviewQueue(task);
-  const reviewTaskId = state.reviewContext.reviewTaskId || (queue && queue.reviewTaskId);
-  const allItems = getReviewRouteItems(task, reviewTaskId);
-  const displayItems = getReviewVisibleItems();
+  
+  // 1. 顶部流程节点 - 使用系统变量和高保真规范
+  const hardcodedNodes = [
+    { id: 'nodeA', title: '审核点A', statusText: '已审核✅', statusColor: 'var(--success)', clickable: true },
+    { id: 'nodeB', title: '审核点B', statusText: '审核中', statusColor: 'var(--accent-solid)', clickable: true },
+    { id: 'nodeC', title: '审核点C', statusText: '准备中', statusColor: 'var(--text-ghost)', clickable: false }
+  ];
+  if (!state.reviewContext.reviewTaskId || state.reviewContext.reviewTaskId === 'undefined') {
+    state.reviewContext.reviewTaskId = 'nodeB';
+  }
+  const reviewTaskId = state.reviewContext.reviewTaskId;
+  
+  const nodesHtml = '<div style="display:flex; align-items:center; justify-content:center; width:100%; padding: 16px 0 12px;">' + hardcodedNodes.map(function(node, i) {
+    const isCurrent = node.id === reviewTaskId;
+    const clickAttr = node.clickable ? ('onclick="state.reviewContext.reviewTaskId=\'' + node.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"') : '';
+    const cursorStyle = !node.clickable ? 'cursor:not-allowed; opacity:0.5;' : 'cursor:pointer;';
+    const bgStyle = isCurrent ? 'var(--bg-surface)' : 'transparent';
+    const borderStyle = isCurrent ? '1px solid var(--accent-border)' : '1px solid transparent';
+    const shadowStyle = isCurrent ? '0 4px 12px rgba(0,0,0,0.05)' : 'none';
+    
+    let tab = '<div ' + clickAttr + ' style="' + cursorStyle + ' display:flex; flex-direction:column; align-items:center; padding: 8px 16px; border-radius: 8px; border: ' + borderStyle + '; background: ' + bgStyle + '; box-shadow: ' + shadowStyle + '; transition: all var(--ease); min-width: 120px;">'
+      + '<span style="font: 600 12px/1 var(--font); color: ' + (isCurrent ? 'var(--text-hi)' : (node.clickable ? 'var(--text-hi)' : 'var(--text-muted)')) + '; margin-bottom: 4px;">' + escHtml(node.title) + '</span>'
+      + '<span style="font: 500 12px/1 var(--font); color:' + node.statusColor + ';">' + escHtml(node.statusText) + '</span>'
+      + '</div>';
+      
+    if (i < hardcodedNodes.length - 1) {
+      tab += '<div style="width: 48px; height: 1px; background: var(--border-2); margin: 0 12px;"></div>';
+    }
+    return tab;
+  }).join('') + '</div>';
+
+  // 2. 内容节点维度 Tab - 使用 design-system 的 .tabs 样式
+  const contentNodeTabsHtml = [
+    { id: 'node1', label: '内容节点1', check: true },
+    { id: 'node2', label: '内容节点2', check: false }
+  ].map(function(tab) {
+    const isActive = state.reviewContentNode === tab.id;
+    const checkHtml = tab.check ? ' <span style="color:var(--success); font-size:12px; margin-left:4px;">✓</span>' : '';
+    return '<button class="tab ' + (isActive ? 'on' : '') + '" style="height: 32px; font-size: 13px; padding: 0 12px;" onclick="state.reviewContentNode=\'' + tab.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">' + tab.label + checkHtml + '</button>';
+  }).join('');
+  const contentNodeHtml = '<div class="tabs" style="justify-content: center; border-bottom: none; margin-bottom: 12px; gap: 8px;">' + contentNodeTabsHtml + '</div>';
+
+  // MOCK DATA 
+  let allItems = [];
+  if (state.reviewContentNode === 'node1') {
+    if (!window.__mockImgStatus) window.__mockImgStatus = {};
+    const defaultImgs = [
+      { id: 'mock-img-01', url: 'https://images.unsplash.com/photo-1682687982501-1e5898cb4700?w=500&h=500&fit=crop', origStatus: 'pending' },
+      { id: 'mock-img-02', url: 'https://images.unsplash.com/photo-1682687220199-d0124f48f95b?w=500&h=500&fit=crop', origStatus: 'pending' },
+      { id: 'mock-img-03', url: 'https://images.unsplash.com/photo-1682687982046-e5e463a812e9?w=500&h=500&fit=crop', origStatus: 'pending' },
+      { id: 'mock-img-1', url: 'https://images.unsplash.com/photo-1682687220742-aba13b6e50ba?w=500&h=500&fit=crop', origStatus: 'approved' },
+      { id: 'mock-img-2', url: 'https://images.unsplash.com/photo-1682687220063-4742bd7fd538?w=500&h=500&fit=crop', origStatus: 'approved' },
+      { id: 'mock-img-3', url: 'https://images.unsplash.com/photo-1682687221038-404cb8830901?w=500&h=500&fit=crop', origStatus: 'rejected' }
+    ];
+    allItems = defaultImgs.map(img => {
+       return {
+         itemId: img.id,
+         url: img.url,
+         reviewStatus: window.__mockImgStatus[img.id] || img.origStatus,
+         type: 'image'
+       };
+    });
+  } else {
+    const MOCK_TEXTS = [
+      "熬夜后的脸色真的很难骗过镜头，这条文案主打“提亮 + 修护”双收益，适合放在小红书种草和详情页首屏。",
+      "通勤女生最怕底妆不服帖，这版文案强调妆前状态、肤感和成分安心感，更适合日常投放。",
+      "如果你需要的是更直接的成交表达，这条会把“价格锚点 + 功效卖点 + 场景代入”放在前两句。",
+      "这条更适合作为工作流审校后的终稿版，节奏更短，口语感更强，适合抖音口播脚本改写。",
+      "内容重点放在“敏感肌也能安心用”，语气更克制，适合品牌官方账号和搜索流量场景。"
+    ];
+    if (!window.__mockTexts) window.__mockTexts = [...MOCK_TEXTS];
+    if (!window.__mockTextStatus) window.__mockTextStatus = {};
+    
+    allItems = window.__mockTexts.map((text, idx) => {
+      const status = window.__mockTextStatus[idx] || 'pending';
+      return {
+        itemId: 'mock-txt-' + idx,
+        content: text,
+        reviewStatus: status,
+        type: 'text',
+        idx: idx
+      };
+    });
+  }
+
+  let displayItems = allItems;
+  if(state.reviewFilter === 'all') state.reviewFilter = 'pending';
+  
+  if (state.reviewFilter !== 'all') {
+    if (state.reviewFilter === 'pending') displayItems = allItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; });
+    else displayItems = allItems.filter(function(it) { return it.reviewStatus === state.reviewFilter; });
+  }
+
   const pendingItems = allItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; });
   const pendingCount = pendingItems.length;
   const approvedCount = allItems.filter(function(it) { return it.reviewStatus === 'approved'; }).length;
   const rejectedCount = allItems.filter(function(it) { return it.reviewStatus === 'rejected'; }).length;
-  const reviewedCount = approvedCount + rejectedCount;
-  const reviewStats = getWorkflowReviewStats(task);
-  const waitingReviewCount = reviewStats.waitingCount || 0;
-  const generatingCount = (task.workflowRun && task.workflowRun.summary) ? task.workflowRun.summary.downstreamRunning : 0;
-  const activeNode = (task.workflowRun.nodes || []).find(function(node) {
-    return node.reviewTaskId === reviewTaskId || node.nodeId === reviewTaskId;
-  });
-  const activeNodeTitle = activeNode && activeNode.title ? activeNode.title : '审查节点';
-  const reviewNodes = (task.workflowRun.nodes || []).filter(function(n) { return n.processorType === 'control.review'; });
-
-  const tabsHtml = reviewNodes.map(function(node, i) {
-    const targetReviewTaskId = node.reviewTaskId || node.nodeId;
-    const isCurrent = node.reviewTaskId === reviewTaskId || node.nodeId === reviewTaskId || (!reviewTaskId && i === 0);
-    const isDone = node.status === 'completed';
-    const statusText = isDone ? '完成审查' : (node.status === 'pending_review' || node.status === 'reviewing' ? '审查中' : '未开始');
-    return '<button class="review-node-tab' + (isCurrent ? ' active' : '') + '" onclick="state.reviewContext.reviewTaskId=\'' + targetReviewTaskId + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">'
-      + '<span class="review-node-tab-title">' + escHtml(node.title || '审查节点') + '</span>'
-      + '<span class="review-node-tab-status">' + escHtml(statusText) + '</span>'
-      + (isDone ? '<span class="review-node-tab-check">✓</span>' : '')
-      + '</button>';
-  }).join('');
-
-  const filterTabs = [
-    { k: 'all', l: '全部', c: allItems.length },
-    { k: 'pending', l: '可审查', c: pendingCount },
+  
+  // 3. 状态筛选栏 - 使用 design-system 的 .pills
+  const filterPillsHtml = [
+    { k: 'pending', l: '可审核', c: pendingCount },
     { k: 'approved', l: '已通过', c: approvedCount },
     { k: 'rejected', l: '已拒绝', c: rejectedCount }
   ].map(function(f) {
-    return '<button class="review-filter-pill' + (state.reviewFilter === f.k ? ' active' : '') + '" onclick="state.reviewFilter=\'' + f.k + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">'
-      + f.l + ' <span style="opacity:0.8;font-weight:normal;margin-left:2px;">' + f.c + '</span>'
+    const isActive = state.reviewFilter === f.k;
+    return '<button class="pill ' + (isActive ? 'on' : '') + '" onclick="state.reviewFilter=\'' + f.k + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">'
+      + f.l + ' <span class="pill-n">' + f.c + '</span>'
       + '</button>';
   }).join('');
+  const pillsHtml = '<div class="pills">' + filterPillsHtml + '</div>';
 
-  let gridHtml = displayItems.map(function(it, idx) {
-    const isFocused = idx === (state.reviewFocusIndex || 0);
-    const isSelected = state.reviewSelected.has(it.itemId);
-    const isPending = it.reviewStatus === 'pending' || !it.reviewStatus;
-    const canRevoke = canRevokeReviewItem(task, it);
-    const listJson = JSON.stringify(displayItems.map(function(item) { return { id: item.itemId, type: 'image', url: item.url, prompt: item.prompt || (task.input && task.input.prompt) || '', status: item.reviewStatus }; }));
-    const previewAction = 'event.stopPropagation(); openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\');';
-    const cardClick = state.reviewBatchMode
-      ? 'toggleReviewSelect(\'' + it.itemId + '\')'
-      : 'openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\')';
-    const downloadAction = 'event.stopPropagation(); const a=document.createElement(\'a\'); a.href=\'' + it.url + '\'; a.download=\'asset.png\'; a.click();';
-    let statusBadge = '';
-    if (it.reviewStatus === 'approved') statusBadge = '<div class="review-card-status approved">已通过</div>';
-    else if (it.reviewStatus === 'rejected') statusBadge = '<div class="review-card-status rejected">已拒绝</div>';
-    let actionsOverlay = '';
-    if (!isPending) {
-      actionsOverlay = '<div class="review-actions-hover">'
-      + '</div>';
-    } else {
-      actionsOverlay = '<div class="review-actions-visible">'
-        + '<div class="review-action-split approve" onclick="event.stopPropagation(); approveReviewItem(\'' + it.itemId + '\');"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
-        + '<div class="review-action-split reject" onclick="event.stopPropagation(); rejectReviewItem(\'' + it.itemId + '\');"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></div>'
-      + '</div>';
-    }
-    return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + (state.reviewBatchMode ? ' is-selectable' : '') + '" data-item-id="' + escHtml(it.itemId) + '"'
-      + (isFocused ? ' style="outline:2px solid var(--primary-6);outline-offset:2px;z-index:1;"' : '')
-      + ' onclick="' + cardClick + '" onmouseenter="state.reviewFocusIndex=' + idx + ';">'
-      + (it.url ? '<div style="width:100%;padding-bottom:177.78%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"></div>' : '')
-      + statusBadge
-      + (state.reviewBatchMode
-          ? '<div class="review-card-check">✓</div><button class="review-preview-btn" onclick="' + previewAction + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>'
-          : '<button class="review-preview-btn" onclick="' + previewAction + '"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg></button>')
-      + actionsOverlay
-      + '</div>';
-  }).join('');
+  window.updateMockText = function(idx, e) {
+    window.__mockTexts[idx] = e.target.value;
+  };
+  window.setMockTextStatus = function(idx, status) {
+    window.__mockTextStatus[idx] = status;
+    renderReviewPage();
+  };
+  window.setMockImageStatus = function(id, status) {
+    window.__mockImgStatus[id] = status;
+    renderReviewPage();
+  };
+  window.mockApproveAll = function(count) {
+    openConfirmModal({
+      title: '全部通过',
+      description: '确定将当前节点的 ' + count + ' 项待审内容全部通过吗？',
+      confirmText: '全部通过',
+      onConfirm: function() {
+        if (state.reviewContentNode === 'node1') {
+           allItems.forEach(it => { if(it.reviewStatus === 'pending') window.__mockImgStatus[it.itemId] = 'approved'; });
+        } else {
+           const p = window.__mockTextStatus;
+           if(p) { Object.keys(p).forEach(k=>p[k]='approved'); window.__mockTexts.forEach((_,i)=>p[i]='approved'); }
+        }
+        renderReviewPage();
+      }
+    });
+  };
+  window.mockRejectAll = function(count) {
+    openConfirmModal({
+      title: '全部拒绝',
+      description: '确定将当前节点的 ' + count + ' 项待审内容全部拒绝吗？此操作不可撤销。',
+      confirmText: '全部拒绝',
+      onConfirm: function() {
+        if (state.reviewContentNode === 'node1') {
+           allItems.forEach(it => { if(it.reviewStatus === 'pending') window.__mockImgStatus[it.itemId] = 'rejected'; });
+        } else {
+           const p = window.__mockTextStatus;
+           if(p) { Object.keys(p).forEach(k=>p[k]='rejected'); window.__mockTexts.forEach((_,i)=>p[i]='rejected'); }
+        }
+        renderReviewPage();
+      }
+    });
+  };
 
-  if (generatingCount > 0 && state.reviewFilter === 'all') {
-    for (let i = 0; i < Math.min(6, generatingCount); i++) {
-      gridHtml += '<div class="review-loading-card"><div class="cc-img-loading-thumb"><div class="cc-img-loading-spinner"></div></div></div>';
-    }
+  let gridHtml = '';
+  if (state.reviewContentNode === 'node2') {
+    gridHtml = '<div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width: 900px; margin: 0 auto; padding: 12px 16px 24px;">' + displayItems.map(function(it, i) {
+      const idx = it.idx;
+      const numStr = (idx + 1).toString().padStart(2, '0');
+      let statusBadge = '';
+      if (it.reviewStatus === 'approved') statusBadge = '<div style="color: var(--success); background: var(--success-bg); border: 1px solid var(--success-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: 16px; flex-shrink: 0;">已通过</div>';
+      else if (it.reviewStatus === 'rejected') statusBadge = '<div style="color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: 16px; flex-shrink: 0;">已拒绝</div>';
+      
+      let actionBtns = '';
+      if (it.reviewStatus === 'pending') {
+        actionBtns = '<div style="display:flex; gap: 8px; margin-left: 16px; flex-shrink: 0;">'
+          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid transparent; background:var(--success); color: #fff; cursor: pointer; transition: all var(--ease);" onmouseover="this.style.filter=\'brightness(1.1)\';" onmouseout="this.style.filter=\'none\';" onclick="setMockTextStatus(' + idx + ', \'approved\')">通过</button>'
+          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--error-border); color:var(--error); background:var(--bg-subtle); cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'var(--error-bg)\';" onmouseout="this.style.background=\'var(--bg-subtle)\';" onclick="setMockTextStatus(' + idx + ', \'rejected\')">未通过</button>'
+          + '</div>';
+      }
+
+      return '<div style="display:flex; align-items:flex-start; padding: 12px 16px; background:var(--bg-surface); border:1px solid var(--border-2); border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: border var(--ease);" onmouseover="this.style.borderColor=\'var(--border-3)\'" onmouseout="this.style.borderColor=\'var(--border-2)\'">'
+        + '<div style="font: 600 18px/1.5 var(--font); color: var(--text-muted); width: 48px; flex-shrink: 0; text-align: left; padding-top: 4px;">' + numStr + '</div>'
+        + '<textarea style="flex:1; border:none; resize:none; font: 400 14px/1.6 var(--font); color:var(--text-hi); outline:none; background:transparent; padding:0; margin:0;" rows="2" oninput="updateMockText(' + idx + ', event)">' + escHtml(it.content) + '</textarea>'
+        + '<div style="display:flex; align-items:center; min-height: 32px; padding-top: 2px;">'
+        + statusBadge
+        + actionBtns
+        + '</div>'
+        + '</div>';
+    }).join('') + '</div>';
+  } else {
+    gridHtml = '<div class="review-grid" style="padding: 0 16px 16px;">' + displayItems.map(function(it, idx) {
+      const isSelected = state.reviewSelected.has(it.itemId);
+      let statusBadge = '';
+      if (it.reviewStatus === 'approved') statusBadge = '<div class="review-card-status approved">已通过</div>';
+      else if (it.reviewStatus === 'rejected') statusBadge = '<div class="review-card-status rejected">已拒绝</div>';
+      
+      let actionOverlay = '';
+      if (it.reviewStatus === 'pending') {
+        actionOverlay = '<div style="position:absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 16px;">'
+          + '<button style="width: 40px; height: 40px; border-radius: 50%; background: var(--success); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform var(--ease);" onmouseover="this.style.transform=\'scale(1.1)\'" onmouseout="this.style.transform=\'scale(1)\'" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'approved\')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>'
+          + '<button style="width: 40px; height: 40px; border-radius: 50%; background: var(--error); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform var(--ease);" onmouseover="this.style.transform=\'scale(1.1)\'" onmouseout="this.style.transform=\'scale(1)\'" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'rejected\')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>'
+          + '</div>';
+      }
+
+      return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + '" data-item-id="' + escHtml(it.itemId) + '">'
+        + '<div style="width:100%;padding-bottom:100%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; border-radius: var(--r-xl);">' + actionOverlay + '</div>'
+        + statusBadge
+        + '</div>';
+    }).join('') + '</div>';
   }
 
-  let emptyTitle = '当前没有可审查项';
-  let emptyDesc = '当前筛选下没有可处理内容。';
-  if (!allItems.length) {
-    emptyTitle = '当前节点暂无产出';
-    emptyDesc = '上游结果回流后，这里会继续出现可审内容。';
-  } else if (state.reviewFilter !== 'all') {
-    emptyTitle = '当前筛选暂无结果';
-    emptyDesc = '你可以切换到其他筛选，或等待新的审查结果回流。';
-  } else if (reviewedCount > 0 && generatingCount > 0 && pendingCount === 0) {
-    emptyTitle = '当前节点已审完';
-    emptyDesc = '已通过内容正在流向下游继续生成。';
-  }
-
-  root.innerHTML = '<div class="review-page" id="reviewPageContainer">'
-    + '<div class="review-header-bar">'
-      + '<div class="review-title-wrap">'
-        + '<div class="review-title-mark"></div>'
-        + '<div class="review-title-main">'
-          + '<div class="review-title">审核-' + escHtml(task.name) + '</div>'
+  root.innerHTML = '<div class="review-page" id="reviewPageContainer" style="background: var(--bg-page); padding: 8px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">'
+    + '<div style="background:var(--bg-surface); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">'
+      + '<div class="review-header-bar" style="border-bottom: 1px solid var(--border-1); padding: 10px 16px; display: flex; align-items: center;">'
+        + '<div style="width: 4px; height: 16px; background: var(--accent-solid); border-radius: 2px; margin-right: var(--space-2);"></div>'
+        + '<div style="font: 600 14px/1 var(--font); color: var(--text-hi);">审核 - ' + escHtml(task.name) + '</div>'
+      + '</div>'
+      + nodesHtml
+      + contentNodeHtml
+    + '</div>'
+    + '<div style="background:var(--bg-surface); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding-bottom: 16px;">'
+      + '<div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 16px; max-width: 948px; margin: 0 auto; width: 100%; box-sizing: border-box;">'
+        + '<div style="display:flex; gap: var(--space-3);">' + pillsHtml + '</div>'
+        + '<div style="display:flex; gap: 8px;">'
+          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border-1); background: var(--bg-subtle); color: var(--text-lo); opacity:' + (pendingCount ? '1' : '0.5') + '; cursor:' + (pendingCount ? 'pointer' : 'not-allowed') + ';" onclick="' + (pendingCount ? 'mockApproveAll(' + pendingCount + ')' : '') + '">全部通过</button>'
+          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid ' + (pendingCount ? 'var(--error-border)' : 'var(--border-1)') + '; background: var(--bg-subtle); color: var(--error); opacity:' + (pendingCount ? '1' : '0.5') + '; cursor:' + (pendingCount ? 'pointer' : 'not-allowed') + ';" onclick="' + (pendingCount ? 'mockRejectAll(' + pendingCount + ')' : '') + '">全部拒绝</button>'
         + '</div>'
       + '</div>'
-    + '</div>'
-    + '<div class="review-node-tabs">' + tabsHtml + '</div>'
-    + '<div class="review-toolbar">'
-      + '<div class="review-toolbar-main">'
-        + '<div class="review-filter-pills">' + filterTabs + '</div>'
-      + '</div>'
-      + '<div class="review-toolbar-actions">'
-        + (state.reviewBatchMode
-            ? '<div class="review-batch-bar"><span class="review-batch-count">已选 ' + state.reviewSelected.size + ' 项</span><button class="review-toolbar-btn" onclick="selectAllVisibleReviewItems()">全选待审</button><button class="review-toolbar-btn primary" ' + (state.reviewSelected.size ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'approved\')">批量通过</button><button class="review-toolbar-btn danger" ' + (state.reviewSelected.size ? '' : 'disabled') + ' onclick="applyBatchReviewAction(\'rejected\')">批量拒绝</button><button class="review-toolbar-btn" onclick="toggleReviewBatch()">取消选择</button></div>'
-            : '<button id="approveAllBtn" class="review-toolbar-btn" ' + (pendingCount ? '' : 'disabled') + ' onclick="confirmApproveAllReviewRoute()">全部通过</button><button id="rejectAllBtn" class="review-toolbar-btn danger" ' + (pendingCount ? '' : 'disabled') + ' onclick="confirmRejectAllReviewRoute()">全部拒绝</button>')
-      + '</div>'
-    + '</div>'
-    + '<div class="review-grid-scroll" id="reviewGridScroll">'
-      + (displayItems.length === 0 && (state.reviewFilter !== 'all' || generatingCount === 0)
-          ? '<div class="review-empty"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" style="opacity:0.5;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><div class="review-empty-title">' + emptyTitle + '</div><div class="review-empty-desc">' + emptyDesc + '</div></div>'
-          : '<div class="review-grid">' + gridHtml + '</div>')
-    + '</div>'
-  + '</div>'
-  + '<div class="modal-mask" id="reviewPreviewModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.8);align-items:center;justify-content:center;" onclick="if(event.target===this)closeReviewPreview()">'
-    + '<div class="review-preview-box" style="display:flex;width:90%;max-width:1200px;height:90vh;background:var(--bg-surface);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.12);">'
-      + '<div class="review-preview-left" style="flex:1;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;">'
-        + '<button class="review-preview-close" style="position:absolute;top:16px;left:16px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;" onclick="closeReviewPreview()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>'
-        + '<div id="reviewPreviewMedia" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;"></div>'
-        + '<button id="reviewPreviewPrev" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;" onclick="navReviewPreview(-1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg></button>'
-        + '<button id="reviewPreviewNext" style="position:absolute;right:16px;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;" onclick="navReviewPreview(1)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>'
-        + '<div style="position:absolute;bottom:20px;left:0;right:0;display:flex;justify-content:center;gap:12px;z-index:10;" id="reviewPreviewControls"></div>'
-      + '</div>'
-      + '<div class="review-preview-right" style="width:320px;background:var(--bg-subtle);border-left:1px solid var(--border-1);display:flex;flex-direction:column;">'
-        + '<div style="padding:16px;border-bottom:1px solid var(--border-1);font-weight:600;font-size:15px;">生成信息</div>'
-        + '<div style="flex:1;overflow-y:auto;padding:16px;font-size:13px;" id="reviewPreviewInfo"></div>'
-      + '</div>'
+      + (displayItems.length === 0
+          ? '<div style="padding: 60px; text-align:center; color:var(--text-ghost); font-size:var(--text-base);">无数据</div>'
+          : gridHtml)
     + '</div>'
   + '</div>';
   renderReviewBottomBar();

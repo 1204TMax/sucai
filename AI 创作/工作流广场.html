@@ -372,6 +372,24 @@
       gap: 4px;
       z-index: 5;
     }
+    .wf-detail-btn {
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      display: inline-flex;
+      align-items: center;
+      padding: 4px;
+      background: transparent;
+      border: none;
+      color: var(--accent-solid);
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 5;
+      transition: all var(--ease);
+    }
+    .wf-detail-btn:hover {
+      opacity: 0.8;
+    }
     .wf-card-main { display: flex; gap: var(--space-3); }
     .wf-icon-box {
       width: 56px;
@@ -708,6 +726,7 @@
       const favored = state.favorites.has(item.id);
       return `
         <div class="wf-card" onclick="useWorkflow('${esc(item.id)}')">
+          <button class="wf-detail-btn" type="button" onclick="event.stopPropagation();editWorkflow('${esc(item.id)}')">详 &gt;</button>
           <div class="wf-card-actions">
             <button class="wf-favorite-trigger${favored ? ' active' : ''}" type="button" title="${favored ? '取消收藏' : '收藏'}" aria-label="${favored ? '取消收藏' : '收藏'}" onclick="event.stopPropagation();toggleWorkflowFavorite('${esc(item.id)}')">${favored ? '★' : '☆'}</button>
             <button class="wf-more-trigger" type="button" title="更多操作" aria-label="更多操作" onclick="toggleWfMenu(event, this)">...</button>
