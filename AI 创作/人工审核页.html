@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我的任务 - 量化投放系统</title>
+  <title>人工审核页 - 量化投放系统</title>
   <link rel="stylesheet" href="../共享样式/components.css">
   <link rel="stylesheet" href="../共享样式/project-picker.css">
   <link rel="stylesheet" href="../共享样式/image-preview.css">
@@ -1411,7 +1411,7 @@ const routeParams = new URLSearchParams(window.location.search);
 const state = {
   contentTab: 'image',
   viewMode: 'expanded',
-  pageMode: routeParams.get('view') === 'review' ? 'review' : 'list',
+  pageMode: 'review',
   reviewContext: { taskId: routeParams.get('taskId') || '', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
   reviewFilter: 'pending',
   reviewContentNode: 'node2',
@@ -2023,7 +2023,7 @@ function openReviewPage(taskId, reviewTaskId) {
   parent.postMessage({
     action: 'openTab',
     title: '人工审核页',
-    url: 'AI 创作/人工审核页.html?taskId=' + encodeURIComponent(taskId) + '&reviewTaskId=' + encodeURIComponent(reviewTaskId)
+    url: 'AI 创作/我的任务.html?view=review&taskId=' + encodeURIComponent(taskId) + '&reviewTaskId=' + encodeURIComponent(reviewTaskId)
   }, '*');
 }
 
