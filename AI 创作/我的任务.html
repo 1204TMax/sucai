@@ -599,7 +599,7 @@
     .progress-done { background: var(--success); }
     .progress-review { background: var(--warning); }
     .progress-pending { background: var(--border-2); }
-    
+
     .workflow-header-tags { display: flex; align-items: center; gap: 8px; margin-left: auto; }
     .wf-tag-outline { padding: 2px 8px; border: 1px solid var(--border-2); border-radius: 4px; font-size: 11px; color: var(--text-lo); background: var(--bg-surface); }
 
@@ -607,18 +607,18 @@
     .stat-item { display: flex; flex-direction: column; }
     .stat-value { font-size: 16px; font-weight: 600; color: var(--text-hi); }
     .stat-label { font-size: 11px; color: var(--text-muted); }
-    
+
     .workflow-step-tag { display: inline-flex; align-items: center; padding: 2px 8px; background: var(--bg-subtle); border-radius: 4px; font-size: 11px; color: var(--text-lo); margin-right: 4px; }
     .workflow-review-btn { background: var(--accent-solid); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 4px; }
     .workflow-review-btn:hover { background: var(--accent-solid-h); }
-    
+
     /* 审查台 (Review Station) Modal */
     .review-modal-mask { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.6); display: none; flex-direction: column; }
     .review-modal-mask.show { display: flex; }
     .review-header { height: 60px; background: #fff; border-bottom: 1px solid var(--border-1); display: flex; align-items: center; padding: 0 24px; justify-content: space-between; }
     .review-body { flex: 1; overflow-y: auto; padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; background: #f8fafc; }
     .review-footer { height: 60px; background: #fff; border-top: 1px solid var(--border-1); display: flex; align-items: center; padding: 0 24px; justify-content: flex-end; gap: 12px; }
-    
+
     .review-item { background: #fff; border-radius: 12px; border: 1px solid var(--border-1); overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
     .review-item:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
     .review-media { aspect-ratio: 1; background: #000; position: relative; }
@@ -627,7 +627,7 @@
     .review-actions { padding: 8px 12px; border-top: 1px solid var(--border-1); display: flex; gap: 8px; }
     .btn-approve { flex: 1; background: #34C759; color: #fff; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 500; }
     .btn-reject { flex: 1; background: #fff; color: #E5484D; border: 1px solid #E5484D; padding: 8px; border-radius: 6px; cursor: pointer; }
-    
+
     .review-badge { position: absolute; top: 12px; left: 12px; background: rgba(0,0,0,0.5); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; backdrop-filter: blur(4px); }
 
     .review-page { height: 100%; display: flex; flex-direction: column; background: var(--bg-page); padding: 8px; overflow: hidden; gap: 12px; }
@@ -662,8 +662,8 @@
     .review-toolbar-btn.danger:hover { border-color: var(--error); background: #fef2f2; color: var(--error); }
     .review-toolbar-btn:disabled { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
     .review-grid-scroll { flex: 1; overflow-y: auto; padding: 0 4px; }
-    .review-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; padding-bottom: 16px; }
-    .review-grid-card { position: relative; width: 100%; aspect-ratio: 1; background: #fff; border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--ease); }
+    .review-grid { display: grid; grid-template-columns: repeat(auto-fill, 180px); justify-content: start; align-content: start; gap: 12px; padding-bottom: 16px; }
+    .review-grid-card { position: relative; width: 180px; aspect-ratio: 1; background: #fff; border: 1px solid var(--border-2); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--ease); }
     .review-grid-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.10); border-color: var(--primary-4); }
     .review-grid-card.selected { border-color: var(--primary-6); box-shadow: 0 0 0 3px rgba(74,158,255,0.12), 0 8px 20px rgba(15,23,42,0.10); }
     .review-grid-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -701,7 +701,7 @@
       .review-toolbar-actions, .review-batch-bar, .review-bottom-actions { width: 100%; }
       .review-toolbar-btn { flex: 1 1 auto; }
     }
-    
+
     /* ── High-Fidelity Design System Components ── */
     .b {
       height: var(--h-sm, 28px);
@@ -1636,7 +1636,7 @@ function renderContentArea() {
   var tab = state.contentTab;
   var chatSidebar = document.getElementById('chatSidebar');
   var contentWrap = document.getElementById('contentWrap');
-  
+
   // 统一任务流模式：文案也使用 Task Feed 渲染，不再使用侧边栏对话模式
   chatSidebar.style.display = 'none';
   contentWrap.style.flexDirection = 'column';
@@ -1815,7 +1815,7 @@ function openWorkflowDetail(taskId) {
   if (!task) return;
   var nodes = task.workflowRun ? task.workflowRun.nodes || [] : [];
   var failedNodes = nodes.filter(function(node) { return node.status === 'failed' || node.status === 'aborted'; });
-  
+
   var errorsByTitle = {};
   failedNodes.forEach(function(node) {
     var title = node.title || node.nodeId;
@@ -1825,11 +1825,11 @@ function openWorkflowDetail(taskId) {
   });
 
   var titles = Object.keys(errorsByTitle);
-  
+
   var html = '<div class="detail-modal-mask show" id="wfRunModalMask" onclick="this.remove()" style="display:flex; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; backdrop-filter:blur(2px);">'
            + '<div class="detail-modal" style="width:400px; padding:40px 32px 32px; max-height:80vh; overflow-y:auto; display:flex; flex-direction:column; background:var(--bg-surface); border-radius:var(--r-xl); box-shadow:var(--shadow-3); cursor:default; transition:all 0.3s;" onclick="event.stopPropagation()">'
            + '<div style="display:flex; flex-direction:column; gap:32px">';
-           
+
   if (titles.length === 0) {
      html += '<div style="color:var(--text-muted); font-size:var(--text-base); text-align:center; padding:40px 0;">暂无失败节点信息</div>';
   } else {
@@ -1845,12 +1845,12 @@ function openWorkflowDetail(taskId) {
        html += '</div>';
      });
   }
-  
+
   html += '</div>'
         + '<div style="display:flex; justify-content:center; margin-top:40px">'
         + '<button style="background:var(--bg-subtle); color:var(--text-lo); padding:0 32px; height:var(--h-md); border-radius:var(--r-full); border:1px solid var(--border-1); cursor:pointer; font-size:var(--text-sm); font-weight:500; transition:all 0.2s;" onmouseover="this.style.background=\'var(--bg-hover)\';this.style.borderColor=\'var(--border-2)\'" onmouseout="this.style.background=\'var(--bg-subtle)\';this.style.borderColor=\'var(--border-1)\'" onclick="document.getElementById(\'wfRunModalMask\').remove()">关闭</button>'
         + '</div></div></div>';
-        
+
   var wrap = document.createElement('div');
   wrap.innerHTML = html;
   document.body.appendChild(wrap.firstElementChild);
@@ -2301,49 +2301,52 @@ function renderReviewPage() {
     renderReviewBottomBar();
     return;
   }
-  
-  // 1. 顶部流程节点 - 使用系统变量和高保真规范
+
+  // 1. 顶部审核点
   const hardcodedNodes = [
-    { id: 'nodeA', title: '审核点A', statusText: '已审核✅', statusColor: 'var(--success)', clickable: true },
-    { id: 'nodeB', title: '审核点B', statusText: '审核中', statusColor: 'var(--accent-solid)', clickable: true },
-    { id: 'nodeC', title: '审核点C', statusText: '准备中', statusColor: 'var(--text-ghost)', clickable: false }
+    { id: 'nodeA', title: '审核点A', statusText: '已审核', statusKind: 'done', clickable: true },
+    { id: 'nodeB', title: '审核点B', statusText: '审核中', statusKind: 'active', clickable: true },
+    { id: 'nodeC', title: '审核点C', statusText: '准备中', statusKind: 'muted', clickable: false }
   ];
-  if (!state.reviewContext.reviewTaskId || state.reviewContext.reviewTaskId === 'undefined') {
+  if (!state.reviewContext.reviewTaskId || state.reviewContext.reviewTaskId === 'undefined' || !hardcodedNodes.some(n => n.id === state.reviewContext.reviewTaskId)) {
     state.reviewContext.reviewTaskId = 'nodeB';
   }
   const reviewTaskId = state.reviewContext.reviewTaskId;
-  
-  const nodesHtml = '<div style="display:flex; align-items:center; justify-content:center; width:100%; padding: 16px 0 12px;">' + hardcodedNodes.map(function(node, i) {
+
+  const nodesHtml = '<div style="display:flex; align-items:center; justify-content:center; width:100%; padding: 10px 0 8px;">' + hardcodedNodes.map(function(node, i) {
     const isCurrent = node.id === reviewTaskId;
     const clickAttr = node.clickable ? ('onclick="state.reviewContext.reviewTaskId=\'' + node.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"') : '';
-    const cursorStyle = !node.clickable ? 'cursor:not-allowed; opacity:0.5;' : 'cursor:pointer;';
-    const bgStyle = isCurrent ? 'var(--bg-surface)' : 'transparent';
-    const borderStyle = isCurrent ? '1px solid var(--accent-border)' : '1px solid transparent';
-    const shadowStyle = isCurrent ? '0 4px 12px rgba(0,0,0,0.05)' : 'none';
-    
-    let tab = '<div ' + clickAttr + ' style="' + cursorStyle + ' display:flex; flex-direction:column; align-items:center; padding: 8px 16px; border-radius: 8px; border: ' + borderStyle + '; background: ' + bgStyle + '; box-shadow: ' + shadowStyle + '; transition: all var(--ease); min-width: 120px;">'
-      + '<span style="font: 600 12px/1 var(--font); color: ' + (isCurrent ? 'var(--text-hi)' : (node.clickable ? 'var(--text-hi)' : 'var(--text-muted)')) + '; margin-bottom: 4px;">' + escHtml(node.title) + '</span>'
-      + '<span style="font: 500 12px/1 var(--font); color:' + node.statusColor + ';">' + escHtml(node.statusText) + '</span>'
+    const statusStyle = node.statusKind === 'done'
+      ? 'background:rgba(52,199,89,0.1);color:var(--success);border:1px solid rgba(52,199,89,0.22);'
+      : (node.statusKind === 'active'
+        ? 'background:var(--accent-bg);color:var(--primary-6);border:1px solid var(--accent-border);'
+        : 'background:var(--bg-subtle);color:var(--text-muted);border:1px solid var(--border-1);');
+    const disabledStyle = !node.clickable ? 'cursor:not-allowed; opacity:0.58;' : 'cursor:pointer;';
+
+    let tab = '<div ' + clickAttr + ' style="' + disabledStyle + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding: 9px 14px; border-radius: 10px; border: 1px solid ' + (isCurrent ? 'var(--primary-6)' : 'var(--border-1)') + '; background: ' + (isCurrent ? 'var(--accent-bg)' : 'var(--bg-surface)') + '; box-shadow: ' + (isCurrent ? '0 0 0 3px rgba(74,158,255,0.12)' : 'none') + '; transition: all var(--ease); min-width: 132px;">'
+      + '<span style="font: 600 13px/1 var(--font); color: ' + (isCurrent ? 'var(--primary-7)' : 'var(--text-hi)') + ';">' + escHtml(node.title) + '</span>'
+      + '<span style="height:20px;padding:0 7px;border-radius:999px;display:inline-flex;align-items:center;font:500 11px/1 var(--font);white-space:nowrap;' + statusStyle + '">' + escHtml(node.statusText) + '</span>'
       + '</div>';
-      
+
     if (i < hardcodedNodes.length - 1) {
-      tab += '<div style="width: 48px; height: 1px; background: var(--border-2); margin: 0 12px;"></div>';
+      tab += '<div style="width: 44px; height: 1px; background: var(--border-2); margin: 0 10px;"></div>';
     }
     return tab;
   }).join('') + '</div>';
 
-  // 2. 内容节点维度 Tab - 使用 design-system 的 .tabs 样式
+  // 2. 内容节点维度 Tab
   const contentNodeTabsHtml = [
     { id: 'node1', label: '内容节点1', check: true },
     { id: 'node2', label: '内容节点2', check: false }
   ].map(function(tab) {
     const isActive = state.reviewContentNode === tab.id;
-    const checkHtml = tab.check ? ' <span style="color:var(--success); font-size:12px; margin-left:4px;">✓</span>' : '';
-    return '<button class="tab ' + (isActive ? 'on' : '') + '" style="height: 32px; font-size: 13px; padding: 0 12px;" onclick="state.reviewContentNode=\'' + tab.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();">' + tab.label + checkHtml + '</button>';
+    const statusText = tab.check ? '已完成' : '待审核';
+    const statusStyle = tab.check ? 'color:var(--success);' : 'color:var(--text-muted);';
+    return '<button class="pill ' + (isActive ? 'on' : '') + '" style="height: 46px; font-size: 13px; padding: 0 18px; border-radius: 10px; border:' + (isActive ? '1px solid var(--primary-6)' : '1px solid transparent') + '; box-shadow:' + (isActive ? '0 0 0 3px rgba(74,158,255,0.10)' : 'none') + '; flex-direction:column; gap:4px; align-items:center; justify-content:center;" onclick="state.reviewContentNode=\'' + tab.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"><span>' + tab.label + '</span><span style="font:500 11px/1 var(--font);' + statusStyle + '">' + statusText + '</span></button>';
   }).join('');
-  const contentNodeHtml = '<div class="tabs" style="justify-content: center; border-bottom: none; margin-bottom: 12px; gap: 8px;">' + contentNodeTabsHtml + '</div>';
+  const contentNodeHtml = '<div style="display: flex; justify-content: center; margin-bottom: 8px;"><div class="pills" style="padding: 3px; border-radius: 12px;">' + contentNodeTabsHtml + '</div></div>';
 
-  // MOCK DATA 
+  // MOCK DATA
   let allItems = [];
   if (state.reviewContentNode === 'node1') {
     if (!window.__mockImgStatus) window.__mockImgStatus = {};
@@ -2366,14 +2369,14 @@ function renderReviewPage() {
   } else {
     const MOCK_TEXTS = [
       "熬夜后的脸色真的很难骗过镜头，这条文案主打“提亮 + 修护”双收益，适合放在小红书种草和详情页首屏。",
-      "通勤女生最怕底妆不服帖，这版文案强调妆前状态、肤感和成分安心感，更适合日常投放。",
+      "通勤女生最怕底妆不服帖，尤其是早上赶时间的时候，护肤步骤一多就容易搓泥，步骤一少又担心底妆撑不到下午。这版文案会把场景放在通勤、空调房、午后补妆和下班约会这些真实使用时刻里，先讲用户最熟悉的卡粉、暗沉、出油和疲惫感，再自然带到产品的肤感、成分安心感和妆前状态管理。它不强调夸张的即时奇效，而是用更可信的语气表达稳定、清爽、细腻和不黏腻的体验，让用户觉得这不是单纯在卖一瓶产品，而是在解决每天都会遇到的小麻烦。文案前半段适合做小红书种草，语气可以更像朋友分享；中段适合承接产品详情页，补充功效逻辑和适用人群；后段可以转成短视频口播，用更短的句子强调早八通勤、午后不脱妆、敏感肌也能安心尝试。整体重点是让用户在阅读时迅速代入自己的早晨流程，并相信这瓶产品可以成为日常妆前状态的稳定底盘。",
       "如果你需要的是更直接的成交表达，这条会把“价格锚点 + 功效卖点 + 场景代入”放在前两句。",
       "这条更适合作为工作流审校后的终稿版，节奏更短，口语感更强，适合抖音口播脚本改写。",
       "内容重点放在“敏感肌也能安心用”，语气更克制，适合品牌官方账号和搜索流量场景。"
     ];
     if (!window.__mockTexts) window.__mockTexts = [...MOCK_TEXTS];
     if (!window.__mockTextStatus) window.__mockTextStatus = {};
-    
+
     allItems = window.__mockTexts.map((text, idx) => {
       const status = window.__mockTextStatus[idx] || 'pending';
       return {
@@ -2388,17 +2391,20 @@ function renderReviewPage() {
 
   let displayItems = allItems;
   if(state.reviewFilter === 'all') state.reviewFilter = 'pending';
-  
+
   if (state.reviewFilter !== 'all') {
     if (state.reviewFilter === 'pending') displayItems = allItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; });
     else displayItems = allItems.filter(function(it) { return it.reviewStatus === state.reviewFilter; });
   }
+  window.__reviewCurrentAllItems = allItems.slice();
+  window.__reviewCurrentDisplayItems = displayItems.slice();
+  window.__reviewCurrentTaskId = task.id;
 
   const pendingItems = allItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; });
   const pendingCount = pendingItems.length;
   const approvedCount = allItems.filter(function(it) { return it.reviewStatus === 'approved'; }).length;
   const rejectedCount = allItems.filter(function(it) { return it.reviewStatus === 'rejected'; }).length;
-  
+
   // 3. 状态筛选栏 - 使用 design-system 的 .pills
   const filterPillsHtml = [
     { k: 'pending', l: '可审核', c: pendingCount },
@@ -2423,6 +2429,13 @@ function renderReviewPage() {
     window.__mockImgStatus[id] = status;
     renderReviewPage();
   };
+  function getCopyReviewBoxHeight(text) {
+    const charsPerLine = 58;
+    const lineHeight = 22;
+    const paddingY = 18;
+    const lines = Math.max(1, Math.min(5, Math.ceil(String(text || '').length / charsPerLine)));
+    return lines * lineHeight + paddingY;
+  }
   window.mockApproveAll = function(count) {
     openConfirmModal({
       title: '全部通过',
@@ -2455,49 +2468,60 @@ function renderReviewPage() {
       }
     });
   };
+  window.__mockNodeSubmitted = window.__mockNodeSubmitted || {};
+  const isSubmitted = window.__mockNodeSubmitted[state.reviewContentNode];
+  window.mockSubmitNode = function() {
+    window.__mockNodeSubmitted[state.reviewContentNode] = true;
+    renderReviewPage();
+  };
 
   let gridHtml = '';
   if (state.reviewContentNode === 'node2') {
-    gridHtml = '<div style="display:flex; flex-direction:column; gap:12px; width:100%; max-width: 900px; margin: 0 auto; padding: 12px 16px 24px;">' + displayItems.map(function(it, i) {
+    gridHtml = '<div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width: 900px; margin: 0 auto; padding: 12px 16px 24px;">' + displayItems.map(function(it, i) {
       const idx = it.idx;
-      const numStr = (idx + 1).toString().padStart(2, '0');
       let statusBadge = '';
-      if (it.reviewStatus === 'approved') statusBadge = '<div style="color: var(--success); background: var(--success-bg); border: 1px solid var(--success-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: 16px; flex-shrink: 0;">已通过</div>';
-      else if (it.reviewStatus === 'rejected') statusBadge = '<div style="color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: 16px; flex-shrink: 0;">已拒绝</div>';
-      
+      if (it.reviewStatus === 'approved') statusBadge = '<div style="color: var(--success); background: var(--success-bg); border: 1px solid var(--success-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: auto; flex-shrink: 0;">已通过</div>';
+      else if (it.reviewStatus === 'rejected') statusBadge = '<div style="color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: auto; flex-shrink: 0;">已拒绝</div>';
+
       let actionBtns = '';
-      if (it.reviewStatus === 'pending') {
-        actionBtns = '<div style="display:flex; gap: 8px; margin-left: 16px; flex-shrink: 0;">'
-          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid transparent; background:var(--success); color: #fff; cursor: pointer; transition: all var(--ease);" onmouseover="this.style.filter=\'brightness(1.1)\';" onmouseout="this.style.filter=\'none\';" onclick="setMockTextStatus(' + idx + ', \'approved\')">通过</button>'
-          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--error-border); color:var(--error); background:var(--bg-subtle); cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'var(--error-bg)\';" onmouseout="this.style.background=\'var(--bg-subtle)\';" onclick="setMockTextStatus(' + idx + ', \'rejected\')">未通过</button>'
-          + '</div>';
+      if (!isSubmitted) {
+        actionBtns = '<div style="display:flex; gap: 8px; flex-shrink: 0; flex-wrap:wrap;">';
+        if (it.reviewStatus !== 'approved') {
+          actionBtns += '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--primary-6); background:#fff; color: var(--primary-6); cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="setMockTextStatus(' + idx + ', \'approved\')">通过</button>';
+        }
+        if (it.reviewStatus !== 'rejected') {
+          actionBtns += '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--error-border); color:var(--error); background:var(--bg-subtle); cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'var(--error-bg)\';" onmouseout="this.style.background=\'var(--bg-subtle)\';" onclick="setMockTextStatus(' + idx + ', \'rejected\')">拒绝</button>';
+        }
+        actionBtns += '</div>';
       }
 
-      return '<div style="display:flex; align-items:flex-start; padding: 12px 16px; background:var(--bg-surface); border:1px solid var(--border-2); border-radius:8px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: border var(--ease);" onmouseover="this.style.borderColor=\'var(--border-3)\'" onmouseout="this.style.borderColor=\'var(--border-2)\'">'
-        + '<div style="font: 600 18px/1.5 var(--font); color: var(--text-muted); width: 48px; flex-shrink: 0; text-align: left; padding-top: 4px;">' + numStr + '</div>'
-        + '<textarea style="flex:1; border:none; resize:none; font: 400 14px/1.6 var(--font); color:var(--text-hi); outline:none; background:transparent; padding:0; margin:0;" rows="2" oninput="updateMockText(' + idx + ', event)">' + escHtml(it.content) + '</textarea>'
-        + '<div style="display:flex; align-items:center; min-height: 32px; padding-top: 2px;">'
-        + statusBadge
-        + actionBtns
+      return '<div style="display:flex; align-items:flex-start; gap:12px; padding: 14px 16px 12px; background:var(--bg-surface); border:1px solid var(--border-2); border-radius:8px; box-shadow: 0 1px 4px rgba(0,0,0,0.025); transition: border var(--ease), box-shadow var(--ease);" onmouseover="this.style.borderColor=\'var(--border-3)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.05)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.boxShadow=\'0 1px 4px rgba(0,0,0,0.025)\'">'
+        + '<div style="width:128px; flex-shrink:0; display:flex; flex-direction:column; align-items:flex-start; gap:8px;">'
+          + actionBtns
+          + statusBadge
+        + '</div>'
+        + '<div style="display:flex; align-items:flex-start; flex:1; min-width:0;">'
+          + '<textarea style="flex:1; height:' + getCopyReviewBoxHeight(it.content) + 'px; max-height:128px; overflow-y:auto; border:0; border-radius:8px; resize:none; font: 400 14px/1.65 var(--font); color:var(--text-hi); outline:none; background:var(--bg-subtle); padding:10px 12px; margin:0; box-shadow:none;" rows="1" onfocus="this.style.background=\'var(--bg-surface)\';this.style.boxShadow=\'0 0 0 2px rgba(74,158,255,0.12)\';" onblur="this.style.background=\'var(--bg-subtle)\';this.style.boxShadow=\'none\';" oninput="updateMockText(' + idx + ', event)">' + escHtml(it.content) + '</textarea>'
         + '</div>'
         + '</div>';
     }).join('') + '</div>';
   } else {
-    gridHtml = '<div class="review-grid" style="padding: 0 16px 16px;">' + displayItems.map(function(it, idx) {
+    gridHtml = '<div class="review-grid" style="padding: 16px 24px 32px; gap: 16px; width: 100%; margin: 0;">' + displayItems.map(function(it, idx) {
       const isSelected = state.reviewSelected.has(it.itemId);
       let statusBadge = '';
       if (it.reviewStatus === 'approved') statusBadge = '<div class="review-card-status approved">已通过</div>';
       else if (it.reviewStatus === 'rejected') statusBadge = '<div class="review-card-status rejected">已拒绝</div>';
-      
+
       let actionOverlay = '';
-      if (it.reviewStatus === 'pending') {
-        actionOverlay = '<div style="position:absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 16px;">'
-          + '<button style="width: 40px; height: 40px; border-radius: 50%; background: var(--success); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform var(--ease);" onmouseover="this.style.transform=\'scale(1.1)\'" onmouseout="this.style.transform=\'scale(1)\'" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'approved\')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></button>'
-          + '<button style="width: 40px; height: 40px; border-radius: 50%; background: var(--error); color: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform var(--ease);" onmouseover="this.style.transform=\'scale(1.1)\'" onmouseout="this.style.transform=\'scale(1)\'" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'rejected\')"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>'
+      {
+        let opacityState = (it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1';
+        actionOverlay = '<div class="action-overlay-hover" style="position:absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; opacity:' + opacityState + '; transition: opacity 0.2s ease;">'
+          + (it.reviewStatus !== 'approved' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--primary-6); border: 1px solid var(--primary-6); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'approved\')">通过</button>' : '')
+          + (it.reviewStatus !== 'rejected' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--error); border: 1px solid var(--error); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(229,72,77,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'rejected\')">拒绝</button>' : '')
           + '</div>';
       }
 
-      return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + '" data-item-id="' + escHtml(it.itemId) + '">'
+      return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + '" data-item-id="' + escHtml(it.itemId) + '" onmouseover="var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'1\';" onmouseout="var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'' + ((it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1') + '\';" onclick="openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\')">'
         + '<div style="width:100%;padding-bottom:100%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; border-radius: var(--r-xl);">' + actionOverlay + '</div>'
         + statusBadge
         + '</div>';
@@ -2508,7 +2532,10 @@ function renderReviewPage() {
     + '<div style="background:var(--bg-surface); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">'
       + '<div class="review-header-bar" style="border-bottom: 1px solid var(--border-1); padding: 10px 16px; display: flex; align-items: center;">'
         + '<div style="width: 4px; height: 16px; background: var(--accent-solid); border-radius: 2px; margin-right: var(--space-2);"></div>'
-        + '<div style="font: 600 14px/1 var(--font); color: var(--text-hi);">审核 - ' + escHtml(task.name) + '</div>'
+        + '<div style="display:flex; flex-direction:column; gap:6px;">'
+          + '<div style="font: 600 16px/1 var(--font); color: var(--text-hi);">工作流名称爆款图片裂变</div>'
+          + '<div style="font: 400 13px/1 var(--font); color: var(--text-muted);">任务名称爆款图片裂变20260444</div>'
+        + '</div>'
       + '</div>'
       + nodesHtml
       + contentNodeHtml
@@ -2519,6 +2546,13 @@ function renderReviewPage() {
         + '<div style="display:flex; gap: 8px;">'
           + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border-1); background: var(--bg-subtle); color: var(--text-lo); opacity:' + (pendingCount ? '1' : '0.5') + '; cursor:' + (pendingCount ? 'pointer' : 'not-allowed') + ';" onclick="' + (pendingCount ? 'mockApproveAll(' + pendingCount + ')' : '') + '">全部通过</button>'
           + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid ' + (pendingCount ? 'var(--error-border)' : 'var(--border-1)') + '; background: var(--bg-subtle); color: var(--error); opacity:' + (pendingCount ? '1' : '0.5') + '; cursor:' + (pendingCount ? 'pointer' : 'not-allowed') + ';" onclick="' + (pendingCount ? 'mockRejectAll(' + pendingCount + ')' : '') + '">全部拒绝</button>'
+          + (isSubmitted
+            ? '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--primary-6); background: var(--primary-6); color: #fff; cursor: not-allowed;">已提交</button>'
+            : (displayItems.length > 0 && pendingCount === 0
+                ? '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--primary-6); background: var(--primary-6); color: #fff; cursor: pointer;" onclick="mockSubmitNode()">提交</button>'
+                : '<button disabled ' + (displayItems.length > 0 ? 'title="请先完成审核" ' : '') + 'style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border-1); background: var(--bg-subtle); color: var(--text-ghost); cursor: not-allowed;">提交</button>'
+              )
+          )
         + '</div>'
       + '</div>'
       + (displayItems.length === 0
@@ -2531,12 +2565,15 @@ function renderReviewPage() {
 
 let __reviewPreviewData = { taskId: '', items: [], currentIndex: 0 };
 function openReviewPreview(taskId, itemId) {
-  const task = ALL_TASKS.find(function(t) { return t.id === taskId; });
+  const task = state.tasks.find(function(t) { return t.id === taskId; });
   if (!task) return;
-  
-  const displayItems = getReviewVisibleItems();
+
+  const currentItems = (window.__reviewCurrentDisplayItems || []).filter(function(item) {
+    return item.type === 'image' || item.assetType === 'image' || item.url;
+  });
+  const displayItems = currentItems.length ? currentItems : getReviewVisibleItems();
   if (displayItems.length === 0) return;
-  
+
   const index = displayItems.findIndex(function(it) { return it.itemId === itemId; });
   __reviewPreviewData = {
     taskId: taskId,
@@ -2544,7 +2581,7 @@ function openReviewPreview(taskId, itemId) {
     currentIndex: index >= 0 ? index : 0,
     task: task
   };
-  
+
   const modal = document.getElementById('reviewPreviewModal');
   if (modal) modal.style.display = 'flex';
   renderReviewPreviewContent();
@@ -2556,6 +2593,7 @@ function closeReviewPreview() {
 }
 
 function navReviewPreview(dir) {
+  if (!__reviewPreviewData.items.length) return;
   let nextIdx = __reviewPreviewData.currentIndex + dir;
   if (nextIdx < 0) nextIdx = __reviewPreviewData.items.length - 1;
   if (nextIdx >= __reviewPreviewData.items.length) nextIdx = 0;
@@ -2568,8 +2606,9 @@ function renderReviewPreviewContent() {
   const items = __reviewPreviewData.items;
   const task = __reviewPreviewData.task;
   const item = items[idx];
-  
+
   const mediaContainer = document.getElementById('reviewPreviewMedia');
+  if (!mediaContainer || !item) return;
   if (item.url) {
     if (item.url.endsWith('.mp4') || item.url.includes('video')) {
       mediaContainer.innerHTML = '<video src="' + escHtml(item.url) + '" controls autoplay style="max-width:100%;max-height:100%;object-fit:contain;"></video>';
@@ -2579,47 +2618,73 @@ function renderReviewPreviewContent() {
   } else {
     mediaContainer.innerHTML = '<div style="color:#fff;opacity:0.5;">暂无媒体内容</div>';
   }
-  
+
   const controlsContainer = document.getElementById('reviewPreviewControls');
-  const isPending = item.reviewStatus === 'pending' || !item.reviewStatus;
-  
-  let controlsHtml = '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#fff;color:#333;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="downloadFromPreview(\'' + escHtml(item.url) + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>下载</button>';
-  
-  if (isPending) {
-    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#10b981;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="approveFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>通过</button>';
-    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#ef4444;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="rejectFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>不通过</button>';
-  } else {
-    controlsHtml += '<div style="height:40px;padding:0 24px;border-radius:20px;background:rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;font-weight:600;">' + (item.reviewStatus === 'approved' ? '已通过' : '已拒绝') + '</div>';
+  if (!controlsContainer) return;
+  let controlsHtml = '';
+  if (item.reviewStatus !== 'approved') {
+    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:var(--primary-6);color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="approveFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>通过</button>';
   }
-  
+  if (item.reviewStatus !== 'rejected') {
+    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#ef4444;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="rejectFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>拒绝</button>';
+  }
+  controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#fff;color:#333;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="downloadFromPreview(\'' + escHtml(item.url) + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>下载</button>';
   controlsContainer.innerHTML = controlsHtml;
-  
-  const infoContainer = document.getElementById('reviewPreviewInfo');
-  const prompt = item.prompt || (task.input && task.input.prompt) || '暂无描述';
-  
-  infoContainer.innerHTML = '<div style="margin-bottom:12px;color:var(--text-muted);">提示词</div>'
-    + '<div style="background:var(--bg-page);padding:12px;border-radius:8px;line-height:1.5;margin-bottom:20px;">' + escHtml(prompt) + '</div>'
-    + '<div style="margin-bottom:12px;color:var(--text-muted);">参考文件</div>'
-    + '<div style="color:var(--text-ghost);font-style:italic;">暂无参考文件</div>';
 }
 
 function approveFromPreview(itemId) {
-  approveReviewItem(itemId);
-  // Automatically go to next if possible
-  setTimeout(function() {
-    const originalItem = __reviewPreviewData.items.find(function(i) { return i.itemId === itemId; });
-    if (originalItem) originalItem.reviewStatus = 'approved';
-    navReviewPreview(1);
-  }, 100);
+  applyPreviewReviewStatus(itemId, 'approved');
 }
 
 function rejectFromPreview(itemId) {
-  rejectReviewItem(itemId);
-  setTimeout(function() {
-    const originalItem = __reviewPreviewData.items.find(function(i) { return i.itemId === itemId; });
-    if (originalItem) originalItem.reviewStatus = 'rejected';
-    navReviewPreview(1);
-  }, 100);
+  applyPreviewReviewStatus(itemId, 'rejected');
+}
+
+function applyPreviewReviewStatus(itemId, status) {
+  const currentIndex = __reviewPreviewData.currentIndex;
+  const currentItem = __reviewPreviewData.items[currentIndex];
+  const currentStatus = currentItem && currentItem.itemId === itemId ? currentItem.reviewStatus : '';
+  const toastText = status === 'approved' ? '已通过' : '已拒绝';
+
+  if (window.__mockImgStatus && itemId.indexOf('mock-img') === 0) {
+    window.__mockImgStatus[itemId] = status;
+    showToast(toastText);
+  } else {
+    const task = getReviewRouteTask();
+    const item = task && task.output && task.output.items ? task.output.items.find(function(it) { return it.itemId === itemId; }) : null;
+    if (!item) return;
+    item.reviewStatus = status;
+    updateWorkflowStatusAfterReview(task);
+    showToast(toastText);
+  }
+
+  renderReviewPage();
+
+  const refreshed = (window.__reviewCurrentDisplayItems || []).filter(function(item) {
+    return item.type === 'image' || item.assetType === 'image' || item.url;
+  });
+
+  if (!refreshed.length) {
+    closeReviewPreview();
+    return;
+  }
+
+  let nextIndex = currentIndex;
+  if (state.reviewFilter === 'approved' && status === 'approved') {
+    nextIndex = refreshed.findIndex(function(item) { return item.itemId === itemId; });
+  } else if (state.reviewFilter === 'rejected' && status === 'rejected') {
+    nextIndex = refreshed.findIndex(function(item) { return item.itemId === itemId; });
+  } else if (state.reviewFilter !== 'pending' && currentStatus === status) {
+    nextIndex = refreshed.findIndex(function(item) { return item.itemId === itemId; });
+  }
+  if (nextIndex < 0 || nextIndex >= refreshed.length) {
+    nextIndex = Math.min(currentIndex, refreshed.length - 1);
+  }
+
+  __reviewPreviewData.items = refreshed;
+  __reviewPreviewData.currentIndex = nextIndex;
+  __reviewPreviewData.task = getReviewRouteTask() || __reviewPreviewData.task;
+  renderReviewPreviewContent();
 }
 
 function downloadFromPreview(url) {
@@ -3703,6 +3768,19 @@ setTimeout(function(){
   }
 }, 100);
 </script>
+
+<div class="review-modal-mask" id="reviewPreviewModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;display:none;flex-direction:column;">
+  <div style="height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;">
+    <div style="color:#fff;font-size:16px;">内容预览与审核</div>
+    <div style="color:#fff;font-size:24px;cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="closeReviewPreview()">✕</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:16px 88px 28px;gap:16px;position:relative;">
+    <button style="position:absolute;left:24px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;z-index:2;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'" onclick="navReviewPreview(-1)">‹</button>
+    <div style="flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;" id="reviewPreviewMedia"></div>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;flex-shrink:0;" id="reviewPreviewControls"></div>
+    <button style="position:absolute;right:24px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;z-index:2;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'" onclick="navReviewPreview(1)">›</button>
+  </div>
+</div>
 
 </body>
 </html>
