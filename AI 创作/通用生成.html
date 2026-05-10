@@ -3462,7 +3462,7 @@ function renderWorkflows() {
         let html = data.map(w => {
             const menuHtml = w.isMine
                 ? `
-                    <div class="wf-menu-item" onclick="event.stopPropagation();closeAllMenus();parent.postMessage({ action: 'openTab', title: '编辑工作流', url: 'AI 创作/工作流编辑器.html?id=${w.id}' }, '*')">编辑</div>
+                    <div class="wf-menu-item" onclick="event.stopPropagation();openWorkflowEditChoice('${w.id}')">编辑</div>
                     <div class="wf-menu-item" onclick="event.stopPropagation();closeAllMenus();showToast('副本已创建')">创建副本</div>
                     <div class="wf-menu-item danger" onclick="event.stopPropagation();deleteWorkflow('${w.id}')">删除</div>
                 `
@@ -3512,6 +3512,38 @@ function renderWorkflows() {
                 </button>
             </div>
         `
+    });
+}
+
+function openWorkflowEditorTab(id, mode) {
+    const params = new URLSearchParams();
+    if (id) params.set('id', id);
+    if (mode === 'draft') {
+        params.set('draft', '1');
+    } else if (mode === 'published') {
+        params.set('mode', 'published');
+    }
+    parent.postMessage({
+        action: 'openTab',
+        title: '编辑工作流',
+        url: 'AI 创作/工作流编辑器.html' + (params.toString() ? '?' + params.toString() : '')
+    }, '*');
+}
+
+function openWorkflowEditChoice(id) {
+    closeAllMenus();
+    openConfirmModal({
+        title: '是否继续上次编辑？',
+        description: '继续将进入上次自动保存的编辑状态；放弃将进入当前已发布的工作流状态。',
+        cancelText: '放弃',
+        confirmText: '继续',
+        onConfirm: function () {
+            openWorkflowEditorTab(id, 'draft');
+        },
+        onCancel: function () {
+            try { localStorage.removeItem('has_workflow_draft'); } catch(e) {}
+            openWorkflowEditorTab(id, 'published');
+        }
     });
 }
 
