@@ -1820,7 +1820,7 @@ function openWorkflowDetail(taskId) {
   failedNodes.forEach(function(node) {
     var title = node.title || node.nodeId;
     if (!errorsByTitle[title]) errorsByTitle[title] = new Set();
-    var reason = node.status === 'aborted' ? '已中止' : '敏感词问题XXXXXXXXX';
+    var reason = node.status === 'aborted' ? '已中止' : (node.errorMessage || 'ComfyUI 原始报错：PromptParsingException: Invalid syntax');
     errorsByTitle[title].add(reason);
   });
 
@@ -1835,11 +1835,10 @@ function openWorkflowDetail(taskId) {
   } else {
      titles.forEach(function(title) {
        html += '<div style="display:flex; flex-direction:column; gap:6px">';
-       html += '<div style="font-size:var(--text-lg); font-weight:600; color:var(--text-hi); letter-spacing:-0.01em;">' + escHtml(title) + '</div>';
        errorsByTitle[title].forEach(function(reason) {
          html += '<div style="display:flex; align-items:flex-start; gap:8px; font-size:var(--text-md); color:var(--text-muted); line-height:1.5;">'
                + '<span style="color:var(--error); margin-top:2px;">•</span>'
-               + '<span>发生错误：' + escHtml(reason) + '</span>'
+               + '<span>' + escHtml(title) + '错误：' + escHtml(reason) + '</span>'
                + '</div>';
        });
        html += '</div>';

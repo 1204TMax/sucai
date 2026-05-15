@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>节点类型管理 - 量化投放系统</title>
+  <link rel="stylesheet" href="../共享样式/workflow-admin.css">
+</head>
+<body>
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <div class="page-title">节点类型管理</div>
+        <div class="page-desc">维护节点类型配置，供节点封装和主站节点库分组使用。</div>
+      </div>
+      <button class="btn primary" onclick="openTypeModal()">新增类型</button>
+    </div>
+    <table class="table" style="margin-top:8px">
+      <thead>
+        <tr>
+          <th>类型名称</th>
+          <th>类型描述</th>
+          <th>创建人</th>
+          <th>最近编辑时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="typeRows"></tbody>
+    </table>
+  </section>
+
+  <div id="typeModal" class="modal-mask">
+    <div class="modal" style="width:560px">
+      <div class="modal-head">
+        <div class="modal-title" id="typeModalTitle">新增类型</div>
+        <button class="btn text" onclick="closeTypeModal()">关闭</button>
+      </div>
+      <div class="modal-body">
+        <label class="field">
+          <span class="label">类型名称</span>
+          <input id="typeName" class="input" placeholder="例如：图片处理">
+        </label>
+        <label class="field" style="margin-top:12px">
+          <span class="label">类型描述</span>
+          <textarea id="typeDesc" class="textarea desc" placeholder="说明该类型下节点的用途"></textarea>
+        </label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeTypeModal()">取消</button>
+        <button class="btn primary" onclick="saveType()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-mask">
+    <div class="modal" style="width:420px">
+      <div class="modal-head"><div class="modal-title">确认删除</div></div>
+      <div class="modal-body" id="confirmText"></div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeConfirm()">取消</button>
+        <button class="btn danger" onclick="runConfirm()">删除</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    var types = [
+      { id: 1, name: '图片处理', desc: '图片生成、扩图、重绘等节点', creator: '管理员', updated: '2026-05-10 09:20' },
+      { id: 2, name: '视频生成', desc: '图生视频、文生视频等节点', creator: '管理员', updated: '2026-05-09 17:10' },
+      { id: 3, name: '文案处理', desc: '提示词扩写、脚本生成等节点', creator: '管理员', updated: '2026-05-08 14:35' },
+      { id: 4, name: '素材合成', desc: '多素材组合、主图合成等节点', creator: '管理员', updated: '2026-05-08 11:22' }
+    ]
+    var editingId = null
+    var confirmAction = null
+    var usedTypeNames = ['图片处理', '视频生成', '文案处理', '素材合成']
+
+    function renderTypes() {
+      document.getElementById('typeRows').innerHTML = types.map(function (type) {
+        return '<tr>' +
+          '<td><strong>' + type.name + '</strong></td>' +
+          '<td>' + type.desc + '</td>' +
+          '<td>' + type.creator + '</td>' +
+          '<td>' + type.updated + '</td>' +
+          '<td class="table-actions"><button class="btn text" onclick="openTypeModal(' + type.id + ')">编辑</button><button class="btn text danger" onclick="confirmDelete(' + type.id + ')">删除</button></td>' +
+        '</tr>'
+      }).join('')
+    }
+
+    function openTypeModal(id) {
+      editingId = id || null
+      var type = types.find(function (item) { return item.id === id }) || { name: '', desc: '' }
+      document.getElementById('typeModalTitle').textContent = editingId ? '编辑类型' : '新增类型'
+      document.getElementById('typeName').value = type.name
+      document.getElementById('typeDesc').value = type.desc
+      document.getElementById('typeModal').classList.add('show')
+    }
+
+    function closeTypeModal() { document.getElementById('typeModal').classList.remove('show') }
+
+    function saveType() {
+      var name = document.getElementById('typeName').value.trim()
+      var desc = document.getElementById('typeDesc').value.trim()
+      var errors = validateType(name, desc)
+      if (errors.length) {
+        alert(errors.join('\n'))
+        return
+      }
+      if (editingId) {
+        var type = types.find(function (item) { return item.id === editingId })
+        Object.assign(type, { name: name, desc: desc, updated: '2026-05-10 现在' })
+      } else {
+        types.unshift({ id: Date.now(), name: name, desc: desc, creator: '当前用户', updated: '2026-05-10 现在' })
+      }
+      closeTypeModal()
+      renderTypes()
+      showToast(editingId ? '编辑成功' : '新增成功')
+    }
+
+    function validateType(name, desc) {
+      var errors = []
+      if (!name) errors.push('类型名称不能为空。')
+      if (name.length > 10) errors.push('类型名称不能超过 10 个字。')
+      if (desc.length > 50) errors.push('类型描述不能超过 50 个字。')
+      if (['审核', '开始', '结束'].indexOf(name) >= 0) errors.push('类型名称不合法，请更换。')
+      var duplicated = types.some(function (item) { return item.name === name && item.id !== editingId })
+      if (duplicated) errors.push('类型名称不能重复。')
+      return errors
+    }
+
+    function confirmDelete(id) {
+      var type = types.find(function (item) { return item.id === id })
+      if (usedTypeNames.indexOf(type.name) >= 0) {
+        alert('当前类型已被节点使用，无法删除')
+        return
+      }
+      document.getElementById('confirmText').textContent = '确认删除类型“' + type.name + '”？删除后不会再出现在节点类型下拉中。'
+      confirmAction = function () {
+        types = types.filter(function (item) { return item.id !== id })
+        renderTypes()
+        showToast('删除成功')
+      }
+      document.getElementById('confirmModal').classList.add('show')
+    }
+
+    function closeConfirm() { document.getElementById('confirmModal').classList.remove('show') }
+    function runConfirm() { if (confirmAction) confirmAction(); closeConfirm() }
+    function showToast(text) {
+      var toast = document.getElementById('toast')
+      toast.textContent = text
+      toast.classList.add('show')
+      setTimeout(function () { toast.classList.remove('show') }, 1800)
+    }
+    renderTypes()
+  </script>
+</body>
+</html>

@@ -627,12 +627,21 @@
                 section.className = 'submenu-section';
 
                 module.children.forEach((child, childIndex) => {
+                    if (child.type === 'divider') {
+                        const divider = document.createElement('div');
+                        divider.className = 'menu-divider';
+                        section.appendChild(divider);
+                        return;
+                    }
+
                     const item = document.createElement('div');
                     item.className = 'submenu-item' + (moduleIndex === 0 && childIndex === 0 ? ' active' : '');
                     item.dataset.page = child.page;
+                    if (child.isExternal) {
+                        item.dataset.isExternal = "true";
+                    }
 
-                    if (child.badge) {
-                        item.innerHTML = (child.icon ? svgIcon(child.icon) : '')
+                    if (child.badge) {                        item.innerHTML = (child.icon ? svgIcon(child.icon) : '')
                             + `<span class="menu-item-label">${child.name}</span>`
                             + `<span class="menu-badges">`
                             + `<span class="menu-badge generating"><img src="icon/生成中 2.svg">${child.badge.generating}</span>`
@@ -724,6 +733,10 @@
 
         // ---------- 侧边栏菜单点击 ----------
         function onSubmenuClick(item) {
+            if (item.dataset.isExternal === "true") {
+                window.open(item.dataset.page, '_blank');
+                return;
+            }
             document.querySelectorAll('.submenu-item, .shortcut-item').forEach(i => i.classList.remove('active'));
             item.classList.add('active');
             var label = item.querySelector('.menu-item-label');

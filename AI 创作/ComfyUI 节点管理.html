@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ComfyUI 节点管理 - 量化投放系统</title>
+  <link rel="stylesheet" href="../共享样式/workflow-admin.css">
+</head>
+<body>
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <div class="page-title">ComfyUI 节点管理</div>
+      </div>
+      <button class="btn primary" onclick="openNodeModal('new')">新建节点</button>
+    </div>
+    <div class="toolbar">
+      <input id="keyword" class="input" placeholder="搜索节点名称 / 描述" oninput="renderTable()">
+      <select id="typeFilter" class="select" onchange="renderTable()">
+        <option value="">全部类型</option>
+        <option>图片处理</option>
+        <option>视频生成</option>
+        <option>文案处理</option>
+        <option>素材合成</option>
+      </select>
+      <select id="statusFilter" class="select" onchange="renderTable()">
+        <option value="">全部状态</option>
+        <option>已上线</option>
+        <option>已下线</option>
+      </select>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>封面</th>
+          <th>名称</th>
+          <th>描述</th>
+          <th>节点类型</th>
+          <th>状态</th>
+          <th>创建人</th>
+          <th>最近编辑时间</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="nodeRows"></tbody>
+    </table>
+  </section>
+
+  <div id="nodeModal" class="modal-mask">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle">新建节点</div>
+        <button class="btn text" onclick="closeNodeModal()">关闭</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <label class="field">
+            <span class="label">节点名称</span>
+            <input id="nodeName" class="input" maxlength="10" placeholder="不超过10个字">
+          </label>
+          <label class="field">
+            <span class="label">节点类型</span>
+            <select id="nodeType" class="select">
+              <option>图片处理</option>
+              <option>视频生成</option>
+              <option>文案处理</option>
+              <option>素材合成</option>
+            </select>
+          </label>
+          <label class="field full">
+            <span class="label">节点描述</span>
+            <textarea id="nodeDesc" class="textarea node-desc" maxlength="50" placeholder="不超过50个字"></textarea>
+          </label>
+          <div class="field full">
+            <span class="label">节点封面图</span>
+            <div class="cover-uploader">
+              <div id="coverPreview" class="cover-preview">封面</div>
+              <div class="cover-meta">
+                <input id="coverImageInput" type="file" accept="image/png,image/jpeg,image/webp" style="display:none" onchange="handleCoverFile(this)">
+                <div class="cover-actions">
+                  <button class="btn" onclick="document.getElementById('coverImageInput').click()">上传封面</button>
+                  <button id="randomCoverBtn" class="btn" onclick="randomizeCover()" type="button">随机</button>
+                </div>
+                <div id="coverText" class="hint">支持 PNG、JPG、WEBP，图片比例必须为 1:1</div>
+                <div id="coverError" class="hint" style="display:none;color:var(--ant-error-6)"></div>
+              </div>
+            </div>
+          </div>
+          <div class="field full">
+            <div class="input-line" style="justify-content:space-between; margin-bottom: 4px;">
+              <span class="label">ComfyUI JSON</span>
+              <button class="btn" style="padding: 2px 8px; font-size: 12px; height: 24px;" onclick="mockUploadFail()">模拟失败</button>
+            </div>
+            <div class="upload-box" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 32px 20px; cursor:pointer; text-align:center; transition:all 0.2s ease;" onmouseover="this.style.borderColor='var(--ant-primary-5)';this.style.background='var(--surface)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--surface-soft)'" onclick="document.getElementById('jsonFileInput').click()">
+              <input id="jsonFileInput" type="file" accept=".json,application/json" style="display:none" onchange="handleJsonFile(this)">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--ant-primary-5); margin-bottom:12px">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              <div id="uploadText" class="file-name" style="font-size:15px; margin-bottom:4px; font-weight: 500;">点击或拖拽文件到此处上传</div>
+              <div class="hint">仅支持 ComfyUI 导出的 .json 文件，不超过 100M</div>
+            </div>
+            <div id="uploadError" class="hint" style="display:none;color:var(--ant-error-6);margin-top:4px"></div>
+          </div>
+          <div class="field full">
+            <div class="input-line" style="justify-content:space-between">
+              <span class="label">输入项</span>
+              <button class="btn" onclick="addInputItem()">新增输入项</button>
+            </div>
+            <div id="inputItems"></div>
+          </div>
+          <div class="field full">
+            <div class="input-line" style="justify-content:space-between">
+              <span class="label">输出结果</span>
+              <button class="btn" onclick="addOutputItem()">新增输出结果</button>
+            </div>
+            <div id="outputItems"></div>
+          </div>
+          <div id="formError" class="field full" style="display:none">
+            <div class="upload-box" style="border-color:var(--ant-error-2);background:var(--ant-error-1);color:var(--ant-error-6)"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeNodeModal()">取消</button>
+        <button class="btn primary" onclick="saveNode()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-mask">
+    <div class="modal" style="width:420px">
+      <div class="modal-head"><div class="modal-title">确认操作</div></div>
+      <div class="modal-body" id="confirmText"></div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeConfirm()">取消</button>
+        <button class="btn danger" onclick="runConfirm()">确认</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="structureGuardModal" class="modal-mask">
+    <div class="modal" style="width:460px">
+      <div class="modal-head"><div class="modal-title">无法保存</div></div>
+      <div class="modal-body">该节点已经有工作流使用，无法修改输入/输出。</div>
+      <div class="modal-foot">
+        <button class="btn" onclick="closeStructureGuard()">取消</button>
+        <button class="btn primary" onclick="saveAsNewNodeFromGuard()">另存为新节点</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    var comfyNodes = [
+      { id: '12', title: '主参考视频', type: 'LoadVideo', inputs: [{ name: 'video', type: 'VIDEO' }], outputs: [{ name: 'video', type: 'VIDEO' }] },
+      { id: '18', title: '镜头提示词', type: 'TextInput', inputs: [{ name: 'text', type: 'STRING' }], outputs: [{ name: 'text', type: 'STRING' }] },
+      { id: '24', title: '视频生成器', type: 'VideoGenerator', inputs: [{ name: 'reference_video', type: 'VIDEO' }, { name: 'prompt', type: 'STRING' }], outputs: [{ name: 'result_video', type: 'VIDEO' }] },
+      { id: '31', title: '最终图片', type: 'SaveImage', inputs: [{ name: 'image', type: 'IMAGE' }], outputs: [{ name: 'images', type: 'IMAGE[]' }] }
+    ]
+    var nodes = [
+      { id: 1, name: '爆款扩写', desc: '基于爆款素材生成多组提示词', type: '文案处理', cover: { type: 'icon', icon: 'message-text', color: '#1677FF' }, status: '已上线', usedByWorkflows: 2, creator: '张强', updated: '2026-05-10 10:24', inputs: [{ nodeId: '18', field: 'text', rawType: 'STRING', productType: '文本', label: '爆款文案', desc: '输入爆款原文' }], outputs: [{ nodeId: '18', field: 'text', rawType: 'STRING', productType: '文本', label: '文案结果', desc: '扩写后的文案内容' }] },
+      { id: 2, name: '图生短片', desc: '输入图片生成高质量短视频素材', type: '视频生成', cover: { type: 'icon', icon: 'film', color: '#F59E0B' }, status: '已下线', usedByWorkflows: 0, creator: '李娜', updated: '2026-05-09 18:12', inputs: [{ nodeId: '12', field: 'video', rawType: 'VIDEO', productType: '视频', label: '参考视频', desc: '主参考视频' }, { nodeId: '24', field: 'prompt', rawType: 'STRING', productType: '文本', label: '镜头描述', desc: '生成视频的文字描述' }], outputs: [{ nodeId: '24', field: 'result_video', rawType: 'VIDEO', productType: '视频', label: '成片视频', desc: '生成后的短视频' }, { nodeId: '18', field: 'text', rawType: 'STRING', productType: '文本', label: '提示词', desc: '生成时使用的提示词' }] },
+      { id: 3, name: '素材合成', desc: '组合多张素材并输出商品主图', type: '素材合成', cover: { type: 'icon', icon: 'layers', color: '#52C41A' }, status: '已上线', usedByWorkflows: 1, creator: '王磊', updated: '2026-05-08 15:40', inputs: [{ nodeId: '31', field: 'image', rawType: 'IMAGE', productType: '图片', label: '商品图', desc: '待合成商品图' }], outputs: [{ nodeId: '31', field: 'images', rawType: 'IMAGE[]', productType: '图片', label: '商品主图', desc: '合成后的商品主图' }] }
+    ]
+    var coverIconKeys = ['document', 'file-text', 'message-text', 'flow', 'image', 'layers', 'crop', 'database', 'video', 'film', 'play', 'chat', 'shield-check', 'checklist', 'user-check']
+    var coverColors = ['#2F80ED', '#1677FF', '#52C41A', '#39B54A', '#FAAD14', '#F59E0B', '#13C2C2', '#08979C', '#F5222D', '#722ED1']
+    var coverIconSvg = {
+      document: '<rect x="6" y="4" width="12" height="16" rx="2"></rect><path d="M9 8h6"></path><path d="M9 12h6"></path><path d="M9 16h4"></path>',
+      'file-text': '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path><path d="M9 13h6"></path><path d="M9 17h4"></path>',
+      'message-text': '<path d="M5 5h14v10H8l-3 3z"></path><path d="M8 9h8"></path><path d="M8 12h5"></path>',
+      flow: '<rect x="4" y="5" width="6" height="6" rx="2"></rect><rect x="14" y="5" width="6" height="6" rx="2"></rect><rect x="9" y="15" width="6" height="6" rx="2"></rect><path d="M10 8h4"></path><path d="M12 11v4"></path>',
+      image: '<rect x="5" y="5" width="14" height="14" rx="2"></rect><path d="M8 15l3-3 3 3 2-2 3 3"></path><circle cx="9" cy="9" r="1"></circle>',
+      layers: '<path d="M12 3l8 4-8 4-8-4z"></path><path d="M4 12l8 4 8-4"></path><path d="M4 17l8 4 8-4"></path>',
+      crop: '<path d="M6 3v15h15"></path><path d="M3 6h15v15"></path>',
+      database: '<ellipse cx="12" cy="6" rx="7" ry="3"></ellipse><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"></path><path d="M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"></path>',
+      video: '<rect x="4" y="6" width="12" height="12" rx="2"></rect><path d="M16 10l4-2v8l-4-2z"></path>',
+      film: '<rect x="4" y="5" width="16" height="14" rx="2"></rect><path d="M8 5v14"></path><path d="M16 5v14"></path><path d="M4 9h4"></path><path d="M16 9h4"></path><path d="M4 15h4"></path><path d="M16 15h4"></path>',
+      play: '<circle cx="12" cy="12" r="8"></circle><path d="M10 9l5 3-5 3z"></path>',
+      chat: '<path d="M5 6.5A7.5 7.5 0 0 1 12.5 4h.5a7 7 0 0 1 7 7v.2a7 7 0 0 1-7 6.8H9l-4 2v-4.2A7.2 7.2 0 0 1 5 6.5z"></path><path d="M9 11h6"></path><path d="M9 14h3"></path>',
+      'shield-check': '<path d="M12 3l7 3v5c0 4-2.5 7-7 10-4.5-3-7-6-7-10V6z"></path><path d="M9 12l2 2 4-4"></path>',
+      checklist: '<path d="M9 6h11"></path><path d="M9 12h11"></path><path d="M9 18h11"></path><path d="M4 6l1 1 2-2"></path><path d="M4 12l1 1 2-2"></path><path d="M4 18l1 1 2-2"></path>',
+      'user-check': '<path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"></path><circle cx="9.5" cy="7" r="4"></circle><path d="M16 11l2 2 4-4"></path>'
+    }
+    var editingId = null
+    var originalStructureSignature = ''
+    var pendingSavePayload = null
+    var confirmAction = null
+    var uploadParsed = false
+    var currentCover = null
+    var draggingItem = null
+
+    function renderTable() {
+      var keyword = document.getElementById('keyword').value.trim()
+      var type = document.getElementById('typeFilter').value
+      var status = document.getElementById('statusFilter').value
+      var rows = nodes.filter(function (node) {
+        return (!keyword || node.name.includes(keyword) || node.desc.includes(keyword)) &&
+          (!type || node.type === type) &&
+          (!status || node.status === status)
+      }).map(function (node) {
+        var stateClass = node.status === '已上线' ? 'online' : 'offline'
+        var toggle = node.status === '已上线' ? '下线' : '上线'
+        return '<tr>' +
+          '<td>' + coverHtml(node) + '</td>' +
+          '<td><strong>' + node.name + '</strong></td>' +
+          '<td>' + node.desc + '</td>' +
+          '<td>' + node.type + '</td>' +
+          '<td><span class="tag ' + stateClass + '">' + node.status + '</span></td>' +
+          '<td>' + node.creator + '</td>' +
+          '<td>' + node.updated + '</td>' +
+          '<td class="table-actions"><button class="btn text" onclick="openNodeModal(&quot;edit&quot;,' + node.id + ')">编辑</button><button class="btn text" onclick="toggleNode(' + node.id + ')">' + toggle + '</button><button class="btn text danger" onclick="confirmDelete(' + node.id + ')">删除</button></td>' +
+        '</tr>'
+      }).join('')
+      document.getElementById('nodeRows').innerHTML = rows || '<tr><td colspan="8" class="hint">暂无数据</td></tr>'
+    }
+
+    function coverHtml(node) {
+      if (node.cover && node.cover.type === 'image') return '<img class="cover-thumb" src="' + node.cover.url + '" alt="' + node.name + '封面">'
+      if (node.cover && node.cover.type === 'icon') return coverIconHtml(node.cover, 'cover-thumb node-cover-icon')
+      return '<div class="cover-thumb cover-empty">' + node.name.slice(0, 1) + '</div>'
+    }
+
+    function coverIconHtml(preset, className) {
+      var icon = preset && preset.icon ? preset.icon : 'flow'
+      var color = preset && preset.color ? preset.color : '#1677FF'
+      return '<span class="' + className + '" style="background:' + color + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' + (coverIconSvg[icon] || coverIconSvg.flow) + '</svg>' +
+      '</span>'
+    }
+
+    function getNodeOutputs(node) {
+      if (node.outputs && node.outputs.length) return node.outputs
+      return node.output ? [node.output] : []
+    }
+
+    function openNodeModal(mode, id) {
+      editingId = mode === 'edit' ? id : null
+      document.getElementById('modalTitle').textContent = editingId ? '编辑节点' : '新建节点'
+      clearFormError()
+      var node = nodes.find(function (item) { return item.id === id }) || { name: '', desc: '', type: '图片处理', cover: null, inputs: [{ nodeId: '12', field: 'video', label: '参考视频', desc: '' }], outputs: [{ nodeId: '24', field: 'result_video', label: '成片视频', desc: '' }] }
+      document.getElementById('nodeName').value = node.name
+      document.getElementById('nodeDesc').value = node.desc
+      document.getElementById('nodeType').value = node.type
+      currentCover = node.cover || null
+      document.getElementById('coverImageInput').value = ''
+      renderCoverPreview()
+      document.getElementById('uploadText').textContent = editingId ? '已解析：workflow.json' : '点击或拖拽文件到此处上传'
+      setUploadError('')
+      uploadParsed = !!editingId
+      renderInputItems(node.inputs)
+      renderOutputItems(getNodeOutputs(node))
+      originalStructureSignature = getStructureSignature(node.inputs || [], getNodeOutputs(node))
+      pendingSavePayload = null
+      document.getElementById('nodeModal').classList.add('show')
+    }
+
+    function closeNodeModal() { document.getElementById('nodeModal').classList.remove('show') }
+
+    function nodeOptionHtml(selectedId) {
+      return comfyNodes.map(function (node) {
+        var selected = node.id === selectedId ? ' selected' : ''
+        return '<option value="' + node.id + '"' + selected + '>#' + node.id + ' ' + node.title + ' · ' + node.type + '</option>'
+      }).join('')
+    }
+
+    function normalizeType(rawType) {
+      if (!rawType) return '文件'
+      if (rawType.indexOf('STRING') >= 0 || rawType.indexOf('TEXT') >= 0) return '文本'
+      if (rawType.indexOf('IMAGE') >= 0) return '图片'
+      if (rawType.indexOf('VIDEO') >= 0) return '视频'
+      return '文件'
+    }
+
+    function findField(nodeId, direction, fieldName) {
+      var node = comfyNodes.find(function (item) { return item.id === nodeId }) || comfyNodes[0]
+      return (node[direction] || []).find(function (field) { return field.name === fieldName }) || (node[direction] || [])[0] || { name: '', type: '' }
+    }
+
+    function fieldOptionHtml(nodeId, direction, selectedField) {
+      var node = comfyNodes.find(function (item) { return item.id === nodeId }) || comfyNodes[0]
+      return node[direction].map(function (field) {
+        var selected = field.name === selectedField ? ' selected' : ''
+        return '<option value="' + field.name + '"' + selected + '>' + field.name + ' / ' + field.type + '</option>'
+      }).join('')
+    }
+
+    function productTypeOptionHtml(selectedType) {
+      var selected = selectedType || '文本'
+      return ['文本', '图片', '视频'].map(function (type) {
+        return '<option value="' + type + '"' + (type === selected ? ' selected' : '') + '>' + type + '</option>'
+      }).join('')
+    }
+
+    function renderInputItems(inputs) {
+      document.getElementById('inputItems').innerHTML = inputs.map(function (item, index) {
+        return inputItemHtml(index, item)
+      }).join('')
+      updateSortableIndexes()
+    }
+
+    function inputItemHtml(index, item) {
+      var nodeId = item.nodeId || comfyNodes[0].id
+      var field = item.field || comfyNodes[0].inputs[0].name
+      var productType = item.productType || normalizeType(findField(nodeId, 'inputs', field).type)
+      var label = item.label || '新增输入'
+      var desc = item.desc || ''
+      return '<div class="input-item sortable-item" ondragover="handleSortDragOver(event)" ondrop="handleSortDrop(event)">' +
+        '<div class="item-head"><span class="item-index"></span><button class="sort-handle" type="button" draggable="true" ondragstart="handleSortDragStart(event)" ondragend="handleSortDragEnd(event)" title="拖拽排序" aria-label="拖拽排序"></button></div>' +
+        '<div class="form-grid">' +
+        '<label class="field"><span class="label">ComfyUI 节点</span><select class="select input-node" onchange="refreshInputFields(this)">' + nodeOptionHtml(nodeId) + '</select></label>' +
+        '<label class="field"><span class="label">输入字段</span><select class="select input-field">' + fieldOptionHtml(nodeId, 'inputs', field) + '</select></label>' +
+        '<label class="field"><span class="label">输入类型</span><select class="select input-product-type">' + productTypeOptionHtml(productType) + '</select></label>' +
+        '<label class="field"><span class="label">展示名称</span><input class="input input-name" maxlength="10" value="' + label + '"></label>' +
+        '<label class="field"><span class="label">描述</span><input class="input input-desc" maxlength="50" value="' + desc + '"></label>' +
+        '<div class="field full input-line" style="justify-content:flex-end"><button class="btn text danger" onclick="removeInputItem(this)">删除输入项</button></div>' +
+        '</div>' +
+      '</div>'
+    }
+
+    function addInputItem() {
+      document.getElementById('inputItems').insertAdjacentHTML('beforeend', inputItemHtml(Date.now(), { nodeId: '12', field: 'video', label: '新增输入', desc: '' }))
+      updateSortableIndexes()
+    }
+
+    function refreshInputFields(select) {
+      var wrapper = select.closest('.input-item')
+      var fieldSelect = wrapper.querySelector('.input-field')
+      fieldSelect.innerHTML = fieldOptionHtml(select.value, 'inputs', '')
+    }
+
+    function removeInputItem(button) {
+      button.closest('.input-item').remove()
+      updateSortableIndexes()
+    }
+
+    function renderOutputItems(outputs) {
+      document.getElementById('outputItems').innerHTML = outputs.map(function (item, index) {
+        return outputItemHtml(index, item)
+      }).join('')
+      updateSortableIndexes()
+    }
+
+    function outputItemHtml(index, item) {
+      var nodeId = item.nodeId || '24'
+      var field = item.field || findField(nodeId, 'outputs', '').name
+      var productType = item.productType || normalizeType(findField(nodeId, 'outputs', field).type)
+      var label = item.label || '新增输出'
+      var desc = item.desc || ''
+      return '<div class="input-item output-item sortable-item" ondragover="handleSortDragOver(event)" ondrop="handleSortDrop(event)">' +
+        '<div class="item-head"><span class="item-index"></span><button class="sort-handle" type="button" draggable="true" ondragstart="handleSortDragStart(event)" ondragend="handleSortDragEnd(event)" title="拖拽排序" aria-label="拖拽排序"></button></div>' +
+        '<div class="form-grid">' +
+        '<label class="field"><span class="label">ComfyUI 节点</span><select class="select output-node" onchange="refreshOutputFields(this)">' + nodeOptionHtml(nodeId) + '</select></label>' +
+        '<label class="field"><span class="label">输出字段</span><select class="select output-field">' + fieldOptionHtml(nodeId, 'outputs', field) + '</select></label>' +
+        '<label class="field"><span class="label">输出类型</span><select class="select output-product-type">' + productTypeOptionHtml(productType) + '</select></label>' +
+        '<label class="field"><span class="label">输出展示名称</span><input class="input output-label" maxlength="10" value="' + label + '" placeholder="例如：成片视频"></label>' +
+        '<label class="field full"><span class="label">描述</span><input class="input output-desc" maxlength="50" value="' + desc + '" placeholder="说明该输出结果用途"></label>' +
+        '<div class="field full input-line" style="justify-content:flex-end"><button class="btn text danger" onclick="removeOutputItem(this)">删除输出结果</button></div>' +
+        '</div>' +
+      '</div>'
+    }
+
+    function addOutputItem() {
+      document.getElementById('outputItems').insertAdjacentHTML('beforeend', outputItemHtml(Date.now(), { nodeId: '24', field: 'result_video', label: '新增输出', desc: '' }))
+      updateSortableIndexes()
+    }
+
+    function refreshOutputFields(select) {
+      var wrapper = select.closest('.output-item')
+      var fieldSelect = wrapper.querySelector('.output-field')
+      fieldSelect.innerHTML = fieldOptionHtml(select.value, 'outputs', '')
+    }
+
+    function removeOutputItem(button) {
+      button.closest('.output-item').remove()
+      updateSortableIndexes()
+    }
+
+    function handleSortDragStart(event) {
+      draggingItem = event.target.closest('.sortable-item')
+      if (!draggingItem) return
+      event.dataTransfer.effectAllowed = 'move'
+      event.dataTransfer.setData('text/plain', 'sort')
+      draggingItem.classList.add('dragging')
+    }
+
+    function handleSortDragOver(event) {
+      if (!draggingItem) return
+      var target = event.currentTarget
+      if (!target || target === draggingItem || target.parentElement !== draggingItem.parentElement) return
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+      var rect = target.getBoundingClientRect()
+      var shouldPlaceAfter = event.clientY > rect.top + rect.height / 2
+      target.parentElement.insertBefore(draggingItem, shouldPlaceAfter ? target.nextSibling : target)
+      updateSortableIndexes()
+    }
+
+    function handleSortDrop(event) {
+      if (draggingItem) event.preventDefault()
+      updateSortableIndexes()
+    }
+
+    function handleSortDragEnd() {
+      if (draggingItem) draggingItem.classList.remove('dragging')
+      draggingItem = null
+      updateSortableIndexes()
+    }
+
+    function updateSortableIndexes() {
+      Array.from(document.querySelectorAll('#inputItems .input-item')).forEach(function (item, index) {
+        var indexNode = item.querySelector('.item-index')
+        if (indexNode) indexNode.textContent = '输入项 ' + (index + 1)
+      })
+      Array.from(document.querySelectorAll('#outputItems .output-item')).forEach(function (item, index) {
+        var indexNode = item.querySelector('.item-index')
+        if (indexNode) indexNode.textContent = '输出结果 ' + (index + 1)
+      })
+    }
+
+    function handleJsonFile(input) {
+      clearFormError()
+      var file = input.files && input.files[0]
+      if (!file) return
+      if (!file.name.toLowerCase().endsWith('.json')) {
+        uploadParsed = false
+        document.getElementById('uploadText').textContent = '上传失败'
+        setUploadError('文件格式错误：仅支持上传 .json 文件。')
+        input.value = ''
+        return
+      }
+      if (file.size > 100 * 1024 * 1024) {
+        uploadParsed = false
+        document.getElementById('uploadText').textContent = '上传失败'
+        setUploadError('文件超过 100M，请重新选择。')
+        input.value = ''
+        return
+      }
+      var reader = new FileReader()
+      reader.onload = function () {
+        try {
+          JSON.parse(reader.result)
+          mockUpload(file.name)
+        } catch (error) {
+          uploadParsed = false
+          document.getElementById('uploadText').textContent = '上传失败'
+          setUploadError('JSON 解析失败：' + error.message)
+        }
+      }
+      reader.onerror = function () {
+        uploadParsed = false
+        document.getElementById('uploadText').textContent = '上传失败'
+        setUploadError('上传中断：文件读取失败。')
+      }
+      reader.readAsText(file)
+    }
+
+    function mockUpload(fileName) {
+      clearFormError()
+      setUploadError('')
+      var text = document.getElementById('uploadText')
+      text.textContent = '解析成功：' + (fileName || 'mock-workflow.json')
+      uploadParsed = true
+      renderInputItems([{ nodeId: '12', field: 'video', label: '参考视频', desc: '' }])
+      renderOutputItems([{ nodeId: '24', field: 'result_video', label: '成片视频', desc: '生成后的短视频' }, { nodeId: '18', field: 'text', label: '提示词', desc: '生成时使用的提示词' }])
+    }
+
+    function mockUploadFail() {
+      uploadParsed = false
+      document.getElementById('uploadText').textContent = '上传失败'
+      setUploadError('JSON 解析失败：文件结构不符合 ComfyUI 工作流格式。')
+    }
+
+    function handleCoverFile(input) {
+      var file = input.files && input.files[0]
+      if (!file) return
+      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) {
+        currentCover = null
+        renderCoverPreview('仅支持 PNG、JPG、WEBP 图片。')
+        input.value = ''
+        return
+      }
+      var reader = new FileReader()
+      reader.onload = function () {
+        var image = new Image()
+        image.onload = function () {
+          if (image.naturalWidth !== image.naturalHeight) {
+            currentCover = null
+            renderCoverPreview('封面图必须为 1:1，请重新上传。')
+            input.value = ''
+            return
+          }
+          currentCover = { type: 'image', url: reader.result }
+          renderCoverPreview()
+        }
+        image.onerror = function () {
+          currentCover = null
+          renderCoverPreview('图片读取失败，请重新上传。')
+          input.value = ''
+        }
+        image.src = reader.result
+      }
+      reader.onerror = function () {
+        currentCover = null
+        renderCoverPreview('图片读取失败，请重新上传。')
+        input.value = ''
+      }
+      reader.readAsDataURL(file)
+    }
+
+    function renderCoverPreview(errorText) {
+      var preview = document.getElementById('coverPreview')
+      var text = document.getElementById('coverText')
+      var error = document.getElementById('coverError')
+      var randomButton = document.getElementById('randomCoverBtn')
+      if (currentCover && currentCover.type === 'image') {
+        preview.innerHTML = '<img src="' + currentCover.url + '" alt="节点封面预览">'
+        text.textContent = '已上传 1:1 封面图'
+        randomButton.style.display = 'none'
+      } else if (currentCover && currentCover.type === 'icon') {
+        preview.innerHTML = coverIconHtml(currentCover, 'node-cover-icon preview-icon')
+        text.textContent = '已随机生成图标封面；上传图片后可替换'
+        randomButton.style.display = ''
+      } else {
+        preview.textContent = '封面'
+        text.textContent = '支持 PNG、JPG、WEBP，图片比例必须为 1:1'
+        randomButton.style.display = ''
+      }
+      error.textContent = errorText || ''
+      error.style.display = errorText ? 'block' : 'none'
+    }
+
+    function randomizeCover() {
+      document.getElementById('coverImageInput').value = ''
+      currentCover = {
+        type: 'icon',
+        icon: coverIconKeys[Math.floor(Math.random() * coverIconKeys.length)],
+        color: coverColors[Math.floor(Math.random() * coverColors.length)]
+      }
+      renderCoverPreview()
+    }
+
+    function collectNodeForm() {
+      var name = document.getElementById('nodeName').value.trim()
+      var desc = document.getElementById('nodeDesc').value.trim()
+      var type = document.getElementById('nodeType').value
+      var inputs = Array.from(document.querySelectorAll('.input-item')).filter(function (item) {
+        return item.querySelector('.input-node')
+      }).map(function (item) {
+        return {
+          nodeId: item.querySelector('.input-node').value,
+          field: item.querySelector('.input-field').value,
+          rawType: findField(item.querySelector('.input-node').value, 'inputs', item.querySelector('.input-field').value).type,
+          productType: item.querySelector('.input-product-type').value,
+          label: item.querySelector('.input-name').value.trim(),
+          desc: item.querySelector('.input-desc').value.trim()
+        }
+      })
+      var outputs = Array.from(document.querySelectorAll('.output-item')).map(function (item) {
+        var outputField = findField(item.querySelector('.output-node').value, 'outputs', item.querySelector('.output-field').value)
+        return {
+          nodeId: item.querySelector('.output-node').value,
+          field: item.querySelector('.output-field').value,
+          rawType: outputField.type,
+          productType: item.querySelector('.output-product-type').value,
+          label: item.querySelector('.output-label').value.trim(),
+          desc: item.querySelector('.output-desc').value.trim()
+        }
+      })
+      return { name: name, desc: desc, type: type, inputs: inputs, outputs: outputs, cover: currentCover }
+    }
+
+    function saveNode() {
+      clearFormError()
+      var payload = collectNodeForm()
+      var name = payload.name
+      var desc = payload.desc
+      var type = payload.type
+      var inputs = payload.inputs
+      var outputs = payload.outputs
+      var errors = validateNodeForm(name, desc, type, inputs, outputs)
+      if (errors.length) {
+        showFormError(errors)
+        return
+      }
+      if (shouldBlockStructureChange(inputs, outputs)) {
+        pendingSavePayload = payload
+        document.getElementById('structureGuardModal').classList.add('show')
+        return
+      }
+      commitNodeSave(payload)
+    }
+
+    function commitNodeSave(payload) {
+      if (editingId) {
+        var node = nodes.find(function (item) { return item.id === editingId })
+        Object.assign(node, { name: payload.name, desc: payload.desc, type: payload.type, cover: payload.cover, outputs: payload.outputs, inputs: payload.inputs, updated: '2026-05-10 现在' })
+        delete node.output
+      } else {
+        nodes.unshift({ id: Date.now(), name: payload.name, desc: payload.desc, type: payload.type, cover: payload.cover, status: '已下线', usedByWorkflows: 0, creator: '当前用户', updated: '2026-05-10 现在', inputs: payload.inputs, outputs: payload.outputs })
+      }
+      closeNodeModal()
+      renderTable()
+      showToast(editingId ? '保存成功' : '新增成功')
+    }
+
+    function validateNodeForm(name, desc, type, inputs, outputs) {
+      var errors = []
+      if (!name) errors.push('节点名称不能为空。')
+      if (name.length > 10) errors.push('节点名称不能超过 10 个字。')
+      var duplicatedName = nodes.some(function (node) { return node.name === name && node.id !== editingId })
+      if (duplicatedName) errors.push('节点名称不允许重复。')
+      if (['审核', '开始', '结束'].indexOf(name) >= 0) errors.push('名称不合法，请更换。')
+      if (desc.length > 50) errors.push('节点描述不能超过 50 个字。')
+      if (!type) errors.push('必须选择节点类型。')
+      if (!uploadParsed) errors.push('必须上传并解析 ComfyUI JSON。')
+      if (!inputs.length) errors.push('至少需要配置 1 个输入项。')
+      var labels = {}
+      inputs.forEach(function (item, index) {
+        var inputLabel = item.label || ''
+        var inputDesc = item.desc || ''
+        if (!item.nodeId) errors.push('第 ' + (index + 1) + ' 个输入项必须选择 ComfyUI 节点。')
+        if (!item.field) errors.push('第 ' + (index + 1) + ' 个输入项必须选择输入字段。')
+        if (!item.productType) errors.push('第 ' + (index + 1) + ' 个输入项必须选择输入类型。')
+        if (!inputLabel) errors.push('第 ' + (index + 1) + ' 个输入项必须填写展示名称。')
+        if (inputLabel.length > 10) errors.push('第 ' + (index + 1) + ' 个输入项展示名称不能超过 10 个字。')
+        if (inputDesc.length > 50) errors.push('第 ' + (index + 1) + ' 个输入项描述不能超过 50 个字。')
+        if (inputLabel) labels[inputLabel] = (labels[inputLabel] || 0) + 1
+      })
+      Object.keys(labels).forEach(function (label) {
+        if (labels[label] > 1) errors.push('输入项展示名称“' + label + '”重复，不允许保存。')
+      })
+      if (!outputs.length) errors.push('至少需要配置 1 个输出项。')
+      var outputLabels = {}
+      outputs.forEach(function (item, index) {
+        var outputLabel = item.label || ''
+        if (!item.nodeId) errors.push('第 ' + (index + 1) + ' 个输出项必须选择 ComfyUI 节点。')
+        if (!item.field) errors.push('第 ' + (index + 1) + ' 个输出项必须选择输出字段。')
+        if (!item.productType) errors.push('第 ' + (index + 1) + ' 个输出项必须选择输出类型。')
+        if (!outputLabel) errors.push('第 ' + (index + 1) + ' 个输出项必须填写输出展示名称。')
+        if (outputLabel.length > 10) errors.push('第 ' + (index + 1) + ' 个输出项展示名称不能超过 10 个字。')
+        if ((item.desc || '').length > 50) errors.push('第 ' + (index + 1) + ' 个输出项描述不能超过 50 个字。')
+        if (outputLabel) outputLabels[outputLabel] = (outputLabels[outputLabel] || 0) + 1
+      })
+      Object.keys(outputLabels).forEach(function (label) {
+        if (outputLabels[label] > 1) errors.push('输出项展示名称“' + label + '”重复，不允许保存。')
+      })
+      return errors
+    }
+
+    function getStructureSignature(inputs, outputs) {
+      function typeList(items) {
+        return (items || []).map(function (item) {
+          return item.productType || normalizeType(item.rawType || '')
+        }).sort().join(',')
+      }
+      return 'I' + (inputs || []).length + ':' + typeList(inputs) + '|O' + (outputs || []).length + ':' + typeList(outputs)
+    }
+
+    function shouldBlockStructureChange(inputs, outputs) {
+      if (!editingId) return false
+      var node = nodes.find(function (item) { return item.id === editingId })
+      if (!node || node.status !== '已上线' || !node.usedByWorkflows) return false
+      return getStructureSignature(inputs, outputs) !== originalStructureSignature
+    }
+
+    function closeStructureGuard() {
+      document.getElementById('structureGuardModal').classList.remove('show')
+      pendingSavePayload = null
+    }
+
+    function saveAsNewNodeFromGuard() {
+      if (!pendingSavePayload) pendingSavePayload = collectNodeForm()
+      var nextName = getUniqueNodeName(pendingSavePayload.name)
+      pendingSavePayload.name = nextName
+      document.getElementById('nodeName').value = nextName
+      editingId = null
+      originalStructureSignature = ''
+      document.getElementById('modalTitle').textContent = '新建节点'
+      document.getElementById('structureGuardModal').classList.remove('show')
+      clearFormError()
+      showToast('已转为新建节点，请确认后保存')
+    }
+
+    function getUniqueNodeName(name) {
+      var base = (name || '新节点').replace(/副本\d*$/, '')
+      if (base.length > 8) base = base.slice(0, 8)
+      var candidate = base + '副本'
+      var index = 2
+      while (nodes.some(function (node) { return node.name === candidate })) {
+        candidate = base.slice(0, 8) + index
+        index += 1
+      }
+      return candidate.slice(0, 10)
+    }
+
+    function showFormError(errors) {
+      var box = document.getElementById('formError')
+      box.style.display = 'flex'
+      box.firstElementChild.innerHTML = errors.map(function (error) { return '<div>' + error + '</div>' }).join('')
+    }
+
+    function clearFormError() {
+      var box = document.getElementById('formError')
+      box.style.display = 'none'
+      box.firstElementChild.innerHTML = ''
+    }
+
+    function setUploadError(text) {
+      var error = document.getElementById('uploadError')
+      error.textContent = text
+      error.style.display = text ? 'block' : 'none'
+    }
+
+    function toggleNode(id) {
+      var node = nodes.find(function (item) { return item.id === id })
+      var next = node.status === '已上线' ? '下线' : '上线'
+      document.getElementById('confirmText').textContent = '确认' + next + '节点“' + node.name + '”？操作后将影响后续新任务和节点库展示。'
+      confirmAction = function () {
+        node.status = node.status === '已上线' ? '已下线' : '已上线'
+        node.updated = '2026-05-10 现在'
+        renderTable()
+        showToast(next + '成功')
+      }
+      document.getElementById('confirmModal').classList.add('show')
+    }
+
+    function confirmDelete(id) {
+      var node = nodes.find(function (item) { return item.id === id })
+      document.getElementById('confirmText').textContent = '确认删除节点“' + node.name + '”？已开始的任务不会受影响。'
+      confirmAction = function () {
+        nodes = nodes.filter(function (item) { return item.id !== id })
+        renderTable()
+        showToast('删除成功')
+      }
+      document.getElementById('confirmModal').classList.add('show')
+    }
+
+    function closeConfirm() { document.getElementById('confirmModal').classList.remove('show') }
+    function runConfirm() { if (confirmAction) confirmAction(); closeConfirm() }
+    function showToast(text) {
+      var toast = document.getElementById('toast')
+      toast.textContent = text
+      toast.classList.add('show')
+      setTimeout(function () { toast.classList.remove('show') }, 1800)
+    }
+    renderTable()
+  </script>
+</body>
+</html>

@@ -13,6 +13,7 @@
  *     - name：侧边栏显示的名称
  *     - page：对应的 HTML 文件路径（相对于本文件所在目录）
  *     - icon：菜单图标（SVG 路径）
+ *     - type: 'divider'：侧边栏分割线
  *   - shortcuts：快捷入口分组（可选，带独立标题显示在 children 下方）
  */
 
@@ -58,6 +59,19 @@ const MENU_CONFIG = [
         name: '项目管理',
         page: 'AI 创作/项目管理.html',
         icon: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>'
+      },
+      {
+        type: 'divider'
+      },
+      {
+        name: 'ComfyUI 节点管理',
+        page: 'AI 创作/ComfyUI 节点管理.html',
+        icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path>'
+      },
+      {
+        name: '节点类型管理',
+        page: 'AI 创作/节点类型管理.html',
+        icon: '<circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h2a3 3 0 0 1 3 3v6"></path><path d="M6 9v2a3 3 0 0 0 3 3h1"></path>'
       }
     ]
   },
