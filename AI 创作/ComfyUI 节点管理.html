@@ -113,7 +113,6 @@
           <div class="field full">
             <div class="input-line" style="justify-content:space-between">
               <span class="label">输出结果</span>
-              <button class="btn" onclick="addOutputItem()">新增输出结果</button>
             </div>
             <div id="outputItems"></div>
           </div>
@@ -162,7 +161,7 @@
     ]
     var nodes = [
       { id: 1, name: '爆款扩写', desc: '基于爆款素材生成多组提示词', type: '文案处理', cover: { type: 'icon', icon: 'message-text', color: '#1677FF' }, status: '已上线', usedByWorkflows: 2, creator: '张强', updated: '2026-05-10 10:24', inputs: [{ nodeId: '18', field: 'text', rawType: 'STRING', productType: '文本', label: '爆款文案', desc: '输入爆款原文' }], outputs: [{ nodeId: '18', field: 'text', rawType: 'STRING', productType: '文本', label: '文案结果', desc: '扩写后的文案内容' }] },
-      { id: 2, name: '图生短片', desc: '输入图片生成高质量短视频素材', type: '视频生成', cover: { type: 'icon', icon: 'film', color: '#F59E0B' }, status: '已下线', usedByWorkflows: 0, creator: '李娜', updated: '2026-05-09 18:12', inputs: [{ nodeId: '12', field: 'video', rawType: 'VIDEO', productType: '视频', label: '参考视频', desc: '主参考视频' }, { nodeId: '24', field: 'prompt', rawType: 'STRING', productType: '文本', label: '镜头描述', desc: '生成视频的文字描述' }], outputs: [{ nodeId: '24', field: 'result_video', rawType: 'VIDEO', productType: '视频', label: '成片视频', desc: '生成后的短视频' }, { nodeId: '18', field: 'text', rawType: 'STRING', productType: '文本', label: '提示词', desc: '生成时使用的提示词' }] },
+      { id: 2, name: '图生短片', desc: '输入图片生成高质量短视频素材', type: '视频生成', cover: { type: 'icon', icon: 'film', color: '#F59E0B' }, status: '已下线', usedByWorkflows: 0, creator: '李娜', updated: '2026-05-09 18:12', inputs: [{ nodeId: '12', field: 'video', rawType: 'VIDEO', productType: '视频', label: '参考视频', desc: '主参考视频' }, { nodeId: '24', field: 'prompt', rawType: 'STRING', productType: '文本', label: '镜头描述', desc: '生成视频的文字描述' }], outputs: [{ nodeId: '24', field: 'result_video', rawType: 'VIDEO', productType: '视频', label: '成片视频', desc: '生成后的短视频' }] },
       { id: 3, name: '素材合成', desc: '组合多张素材并输出商品主图', type: '素材合成', cover: { type: 'icon', icon: 'layers', color: '#52C41A' }, status: '已上线', usedByWorkflows: 1, creator: '王磊', updated: '2026-05-08 15:40', inputs: [{ nodeId: '31', field: 'image', rawType: 'IMAGE', productType: '图片', label: '商品图', desc: '待合成商品图' }], outputs: [{ nodeId: '31', field: 'images', rawType: 'IMAGE[]', productType: '图片', label: '商品主图', desc: '合成后的商品主图' }] }
     ]
     var coverIconKeys = ['document', 'file-text', 'message-text', 'flow', 'image', 'layers', 'crop', 'database', 'video', 'film', 'play', 'chat', 'shield-check', 'checklist', 'user-check']
@@ -232,7 +231,7 @@
     }
 
     function getNodeOutputs(node) {
-      if (node.outputs && node.outputs.length) return node.outputs
+      if (node.outputs && node.outputs.length) return [node.outputs[0]]
       return node.output ? [node.output] : []
     }
 
@@ -274,9 +273,25 @@
       return '文件'
     }
 
+    function findComfyNode(nodeId) {
+      return comfyNodes.find(function (item) { return item.id === String(nodeId || '').trim() })
+    }
+
     function findField(nodeId, direction, fieldName) {
-      var node = comfyNodes.find(function (item) { return item.id === nodeId }) || comfyNodes[0]
+      var node = findComfyNode(nodeId) || comfyNodes[0]
       return (node[direction] || []).find(function (field) { return field.name === fieldName }) || (node[direction] || [])[0] || { name: '', type: '' }
+    }
+
+    function getOutputRawType(nodeId) {
+      var node = findComfyNode(nodeId)
+      var output = node && node.outputs && node.outputs[0]
+      return output ? output.type : ''
+    }
+
+    function getOutputFieldName(nodeId) {
+      var node = findComfyNode(nodeId)
+      var output = node && node.outputs && node.outputs[0]
+      return output ? output.name : ''
     }
 
     function fieldOptionHtml(nodeId, direction, selectedField) {
@@ -337,45 +352,23 @@
     }
 
     function renderOutputItems(outputs) {
-      document.getElementById('outputItems').innerHTML = outputs.map(function (item, index) {
-        return outputItemHtml(index, item)
-      }).join('')
+      document.getElementById('outputItems').innerHTML = outputItemHtml((outputs && outputs[0]) || { nodeId: '24', label: '成片视频', desc: '' })
       updateSortableIndexes()
     }
 
-    function outputItemHtml(index, item) {
+    function outputItemHtml(item) {
       var nodeId = item.nodeId || '24'
-      var field = item.field || findField(nodeId, 'outputs', '').name
-      var productType = item.productType || normalizeType(findField(nodeId, 'outputs', field).type)
+      var productType = item.productType || normalizeType(getOutputRawType(nodeId))
       var label = item.label || '新增输出'
       var desc = item.desc || ''
-      return '<div class="input-item output-item sortable-item" ondragover="handleSortDragOver(event)" ondrop="handleSortDrop(event)">' +
-        '<div class="item-head"><span class="item-index"></span><button class="sort-handle" type="button" draggable="true" ondragstart="handleSortDragStart(event)" ondragend="handleSortDragEnd(event)" title="拖拽排序" aria-label="拖拽排序"></button></div>' +
+      return '<div class="input-item output-item">' +
         '<div class="form-grid">' +
-        '<label class="field"><span class="label">ComfyUI 节点</span><select class="select output-node" onchange="refreshOutputFields(this)">' + nodeOptionHtml(nodeId) + '</select></label>' +
-        '<label class="field"><span class="label">输出字段</span><select class="select output-field">' + fieldOptionHtml(nodeId, 'outputs', field) + '</select></label>' +
+        '<label class="field"><span class="label">ComfyUI 节点</span><input class="input output-node" value="' + nodeId + '" placeholder="请输入输出节点编号，例如：24"></label>' +
         '<label class="field"><span class="label">输出类型</span><select class="select output-product-type">' + productTypeOptionHtml(productType) + '</select></label>' +
         '<label class="field"><span class="label">输出展示名称</span><input class="input output-label" maxlength="10" value="' + label + '" placeholder="例如：成片视频"></label>' +
         '<label class="field full"><span class="label">描述</span><input class="input output-desc" maxlength="50" value="' + desc + '" placeholder="说明该输出结果用途"></label>' +
-        '<div class="field full input-line" style="justify-content:flex-end"><button class="btn text danger" onclick="removeOutputItem(this)">删除输出结果</button></div>' +
         '</div>' +
       '</div>'
-    }
-
-    function addOutputItem() {
-      document.getElementById('outputItems').insertAdjacentHTML('beforeend', outputItemHtml(Date.now(), { nodeId: '24', field: 'result_video', label: '新增输出', desc: '' }))
-      updateSortableIndexes()
-    }
-
-    function refreshOutputFields(select) {
-      var wrapper = select.closest('.output-item')
-      var fieldSelect = wrapper.querySelector('.output-field')
-      fieldSelect.innerHTML = fieldOptionHtml(select.value, 'outputs', '')
-    }
-
-    function removeOutputItem(button) {
-      button.closest('.output-item').remove()
-      updateSortableIndexes()
     }
 
     function handleSortDragStart(event) {
@@ -416,7 +409,7 @@
       })
       Array.from(document.querySelectorAll('#outputItems .output-item')).forEach(function (item, index) {
         var indexNode = item.querySelector('.item-index')
-        if (indexNode) indexNode.textContent = '输出结果 ' + (index + 1)
+        if (indexNode) indexNode.textContent = '输出结果'
       })
     }
 
@@ -464,7 +457,7 @@
       text.textContent = '解析成功：' + (fileName || 'mock-workflow.json')
       uploadParsed = true
       renderInputItems([{ nodeId: '12', field: 'video', label: '参考视频', desc: '' }])
-      renderOutputItems([{ nodeId: '24', field: 'result_video', label: '成片视频', desc: '生成后的短视频' }, { nodeId: '18', field: 'text', label: '提示词', desc: '生成时使用的提示词' }])
+      renderOutputItems([{ nodeId: '24', field: 'result_video', label: '成片视频', desc: '生成后的短视频' }])
     }
 
     function mockUploadFail() {
@@ -559,11 +552,13 @@
         }
       })
       var outputs = Array.from(document.querySelectorAll('.output-item')).map(function (item) {
-        var outputField = findField(item.querySelector('.output-node').value, 'outputs', item.querySelector('.output-field').value)
+        var outputNodeId = item.querySelector('.output-node').value.trim()
+        var outputField = getOutputFieldName(outputNodeId)
+        var rawType = getOutputRawType(outputNodeId)
         return {
-          nodeId: item.querySelector('.output-node').value,
-          field: item.querySelector('.output-field').value,
-          rawType: outputField.type,
+          nodeId: outputNodeId,
+          field: outputField,
+          rawType: rawType,
           productType: item.querySelector('.output-product-type').value,
           label: item.querySelector('.output-label').value.trim(),
           desc: item.querySelector('.output-desc').value.trim()
@@ -632,20 +627,15 @@
       Object.keys(labels).forEach(function (label) {
         if (labels[label] > 1) errors.push('输入项展示名称“' + label + '”重复，不允许保存。')
       })
-      if (!outputs.length) errors.push('至少需要配置 1 个输出项。')
-      var outputLabels = {}
-      outputs.forEach(function (item, index) {
+      if (outputs.length !== 1) errors.push('必须且只能配置 1 个输出结果。')
+      outputs.forEach(function (item) {
         var outputLabel = item.label || ''
-        if (!item.nodeId) errors.push('第 ' + (index + 1) + ' 个输出项必须选择 ComfyUI 节点。')
-        if (!item.field) errors.push('第 ' + (index + 1) + ' 个输出项必须选择输出字段。')
-        if (!item.productType) errors.push('第 ' + (index + 1) + ' 个输出项必须选择输出类型。')
-        if (!outputLabel) errors.push('第 ' + (index + 1) + ' 个输出项必须填写输出展示名称。')
-        if (outputLabel.length > 10) errors.push('第 ' + (index + 1) + ' 个输出项展示名称不能超过 10 个字。')
-        if ((item.desc || '').length > 50) errors.push('第 ' + (index + 1) + ' 个输出项描述不能超过 50 个字。')
-        if (outputLabel) outputLabels[outputLabel] = (outputLabels[outputLabel] || 0) + 1
-      })
-      Object.keys(outputLabels).forEach(function (label) {
-        if (outputLabels[label] > 1) errors.push('输出项展示名称“' + label + '”重复，不允许保存。')
+        if (!item.nodeId) errors.push('输出结果必须填写 ComfyUI 输出节点编号。')
+        if (!/^\d+$/.test(item.nodeId || '')) errors.push('输出结果的 ComfyUI 节点必须为数字编号。')
+        if (!item.productType) errors.push('输出结果必须选择输出类型。')
+        if (!outputLabel) errors.push('输出结果必须填写输出展示名称。')
+        if (outputLabel.length > 10) errors.push('输出结果展示名称不能超过 10 个字。')
+        if ((item.desc || '').length > 50) errors.push('输出结果描述不能超过 50 个字。')
       })
       return errors
     }

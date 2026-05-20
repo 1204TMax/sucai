@@ -850,12 +850,12 @@ const PALETTE_CATEGORIES = [
 const START_INPUT_TYPES = [
     { value: 'text', label: '文本' },
     { value: 'image', label: '图片' },
-    { value: 'image_array', label: '图片数组' },
     { value: 'video', label: '视频' },
-    { value: 'video_array', label: '视频数组' },
-    { value: 'audio', label: '音频' },
-    { value: 'count', label: '数量' }
+    { value: 'resolution', label: '分辨率' },
+    { value: 'number', label: '数值' }
 ];
+const UPLOAD_COUNT_INPUT_TYPES = ['image', 'video'];
+const TEXT_LIKE_INPUT_TYPES = ['text', 'number', 'resolution', 'count', 'text.generate'];
 const OUTPUT_TYPE_OPTIONS = [
     { value: 'text', label: '文本' },
     { value: 'image', label: '图片' },
@@ -864,6 +864,16 @@ const OUTPUT_TYPE_OPTIONS = [
 
 function createInputKey() {
     return 'input_' + Math.random().toString(36).slice(2, 8);
+}
+
+function isUploadCountConfigurableInput(type) {
+    return UPLOAD_COUNT_INPUT_TYPES.includes(type);
+}
+
+function normalizeMaxUploadCount(value) {
+    const num = parseInt(value, 10);
+    if (!Number.isFinite(num)) return 1;
+    return Math.min(99, Math.max(1, num));
 }
 
 
@@ -878,7 +888,7 @@ function renderWrapperConfig(node, inputDefs, outputPreview) {
         let selectorHtml = '';
         let actionHtml = '';
         if (!currentRefVar) {
-            selectorHtml = `<div class="ref-selector-trigger" style="margin-top: 4px;" onclick="toggleRefVarDropdown(event, '${node.id}', '${def.key}', 'wrapper_input', '${def.type === 'text' ? 'text,count' : (def.type === 'image' ? 'image,image_array' : 'video,video_array')}')">点击选择来源</div>`;
+            selectorHtml = `<div class="ref-selector-trigger" style="margin-top: 4px;" onclick="toggleRefVarDropdown(event, '${node.id}', '${def.key}', 'wrapper_input', '${def.type === 'text' ? 'text,number,resolution,count' : (def.type === 'image' ? 'image,image_array' : 'video,video_array')}')">点击选择来源</div>`;
         } else {
             selectorHtml = `
                 <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-subtle); border-radius: 4px; color: var(--text-hi); font-size: 11px; font-weight: 500;">
@@ -1123,7 +1133,7 @@ const PROCESSOR_REGISTRY = {
             name: '开始',
             inputs: [
                 { key: createInputKey(), label: '主提示词', type: 'text', required: true },
-                { key: createInputKey(), label: '参考图片', type: 'image', required: true }
+                { key: createInputKey(), label: '参考图片', type: 'image', required: true, maxUploadCount: 1 }
             ]
         }),
         getSummary: (config) => renderSummary([`输入项：${(config.inputs || []).length} 个`]),
@@ -1392,7 +1402,9 @@ function getNodeIconPath(name) {
 function getOutputBadgeTypeLabel(type) {
     const map = {
         text: '文本',
-        count: '数量',
+        count: '数值',
+        number: '数值',
+        resolution: '分辨率',
         image: '图片',
         image_array: '图片数组',
         video: '视频',
@@ -1894,6 +1906,10 @@ function deleteNode(e, id) {
 }
 
 function openPanel(title, desc, content) {
+    if (content === undefined) {
+        content = desc;
+        desc = '';
+    }
     document.getElementById('config-title').innerText = title;
     const descEl = document.getElementById('config-desc');
     if (desc) {
@@ -1928,18 +1944,22 @@ function getRunInputs() {
 }
 
 function renderRunInput(input) {
+    const maxUploadCount = normalizeMaxUploadCount(input.maxUploadCount);
     if (input.type === 'text') {
         return `<textarea rows="3" placeholder="请输入${input.label}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; outline:none; resize:vertical; font-family:inherit;">${runState.values[input.key] || ''}</textarea>`;
     }
-    if (input.type === 'count') {
+    if (input.type === 'number' || input.type === 'count') {
         return `<input type="number" min="1" placeholder="请输入${input.label}" value="${runState.values[input.key] || ''}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">`;
+    }
+    if (input.type === 'resolution') {
+        return `<input type="text" placeholder="例如 1080×1920" value="${runState.values[input.key] || ''}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">`;
     }
     if (input.type === 'image' || input.type === 'video' || input.type === 'image_array' || input.type === 'video_array') {
         const fileName = runState.values[input.key] || '';
         return `
             <div style="display:flex; align-items:center; gap:8px;">
                 <button class="btn btn-default" style="background:#fff; border:1px solid var(--border-2); height:32px; padding:0 12px; border-radius:6px; cursor:pointer; font-family:inherit;" onclick="mockUploadRunFile('${input.key}', '${input.type}')">上传${input.label}</button>
-                <span style="font-size:12px; color:var(--text-muted);">${fileName || '未上传'}</span>
+                <span style="font-size:12px; color:var(--text-muted);">${fileName || `未上传 · 最多 ${maxUploadCount} 个`}</span>
             </div>
         `;
     }
@@ -1977,7 +1997,7 @@ function renderRunForm() {
     if (inputs.length) {
         html += inputs.map(input => `
             <div class="form-item" style="margin-bottom:16px;">
-                <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:4px; display:block;">${input.label.includes('*') ? input.label : '<span style="color:#ff4d4f">*</span> ' + input.label}</label>
+                <label style="font-weight:600; font-size:13px; color:var(--text-hi); margin-bottom:4px; display:block;">${input.required !== false ? '<span style="color:#ff4d4f">*</span> ' : ''}${input.label}</label>
                 ${input.desc ? `<div style="font-size:12px; color:var(--text-muted); margin-bottom:8px; line-height: 1.5;">${input.desc}</div>` : ''}
                 ${renderRunInput(input)}
             </div>
@@ -2177,11 +2197,11 @@ function getOutputTypeLabel(value) {
 
 function getAcceptTypesByOutputType(type) {
     const map = {
-        text: ['text', 'count'],
+        text: ['text', 'number', 'resolution', 'count'],
         image: ['image', 'image_array'],
         video: ['video', 'video_array']
     };
-    return map[type] || ['text', 'image', 'video', 'image_array', 'video_array', 'count'];
+    return map[type] || ['text', 'image', 'video', 'number', 'resolution', 'image_array', 'video_array', 'count'];
 }
 
 function getNodeNameById(id) {
@@ -2348,8 +2368,7 @@ function renderVariablePicker(nodeId, fieldKey) {
     let variables = getAvailableNodeInputs(nodeId);
     
     // 仅保留文本类相关的变量用于插入提示词
-    const textTypes = ['text', 'count', 'text.generate'];
-    variables = variables.filter(v => textTypes.includes(v.type));
+    variables = variables.filter(v => TEXT_LIKE_INPUT_TYPES.includes(v.type));
 
     if (!variables.length) {
         return '';
@@ -2515,6 +2534,19 @@ function renderStartInputsEditor(node) {
                     ${renderSelectOptions(START_INPUT_TYPES, input.type)}
                 </select>
             </div>
+            ${isUploadCountConfigurableInput(input.type) ? `
+            <div class="form-item" style="margin: 12px 0 0;">
+                <label style="font-size: 12px; color: var(--text-lo); margin-bottom: 6px; display: block;">最大上传数量</label>
+                <input type="number" min="1" max="99" value="${normalizeMaxUploadCount(input.maxUploadCount)}" oninput="this.value = normalizeMaxUploadCount(this.value); updateStartInput(${idx}, 'maxUploadCount', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 32px; padding: 0 10px; font-size: 13px; color: var(--text-hi); outline: none; transition: 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--accent-solid)'; this.style.boxShadow='0 0 0 2px var(--accent-bg)';" onblur="this.style.borderColor='var(--border-2)'; this.style.boxShadow='inset 0 1px 2px rgba(0,0,0,0.02)';">
+            </div>
+            ` : ''}
+            <div class="form-item" style="margin: 12px 0 0;">
+                <label style="font-size: 12px; color: var(--text-lo); margin-bottom: 6px; display: block;">是否必填</label>
+                <label style="display:flex; align-items:center; gap:8px; margin:0; color:var(--text-hi); font-size:13px; font-weight:500;">
+                    <input type="checkbox" ${input.required !== false ? 'checked' : ''} onchange="updateStartInput(${idx}, 'required', this.checked)" style="width:16px; height:16px; margin:0;">
+                    <span>必填</span>
+                </label>
+            </div>
         </div>
     `).join('');
 }
@@ -2523,8 +2555,23 @@ function updateStartInput(index, key, value) {
     const node = nodes.find(n => n.id === activeNodeId);
     if (!node || node.processorType !== 'system.start') return;
     if (!node.config.inputs || !node.config.inputs[index]) return;
-    node.config.inputs[index][key] = value;
+    const input = node.config.inputs[index];
+    if (key === 'required') {
+        input.required = value === true || value === 'true';
+    } else if (key === 'maxUploadCount') {
+        input.maxUploadCount = normalizeMaxUploadCount(value);
+    } else if (key === 'type') {
+        input.type = value;
+        if (isUploadCountConfigurableInput(value)) {
+            input.maxUploadCount = normalizeMaxUploadCount(input.maxUploadCount);
+        } else {
+            delete input.maxUploadCount;
+        }
+    } else {
+        input[key] = value;
+    }
     touchAutoSave();
+    if (key === 'type') openConfig(activeNodeId);
     renderBoard();
 }
 
@@ -2734,7 +2781,7 @@ function toggleRefVarDropdown(event, nodeId, tokenKey = 'referenceToken', source
     currentRefTargetToken = tokenKey;
     currentRefTargetSource = sourceKey;
     
-    let acceptRef = acceptTypes ? acceptTypes.split(',') : ['text', 'image', 'video', 'image_array', 'video_array', 'count'];
+    let acceptRef = acceptTypes ? acceptTypes.split(',') : ['text', 'image', 'video', 'number', 'resolution', 'image_array', 'video_array', 'count'];
     el.innerHTML = renderRefVarDropdownOptions(nodeId, acceptRef);
     const trigger = event.currentTarget;
     const rect = trigger.getBoundingClientRect();
@@ -2749,14 +2796,14 @@ function renderVarDropdownOptions(nodeId) {
     const nodesInWorkflow = Array.from(new Set(variables.map(v => v.source)));
     if (!nodesInWorkflow.length) return '<div style="padding:12px; color:var(--text-muted); text-align:center;">无可用的文本变量</div>';
     return nodesInWorkflow.map(source => {
-        const hasTextVars = variables.some(v => v.source === source && ['text', 'count', 'text.generate'].includes(v.type));
+        const hasTextVars = variables.some(v => v.source === source && TEXT_LIKE_INPUT_TYPES.includes(v.type));
         return `<div class="cascader-item ${!hasTextVars ? 'disabled' : ''}" onmouseenter="showVarSubmenu(event, '${source}', '${nodeId}')" onclick="showVarSubmenu(event, '${source}', '${nodeId}')">${source} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`;
     }).join('');
 }
 
 function showVarSubmenu(event, source, nodeId) {
     const sub = document.getElementById('global-var-submenu');
-    const variables = getAvailableNodeInputs(nodeId).filter(v => v.source === source && ['text', 'count', 'text.generate'].includes(v.type));
+    const variables = getAvailableNodeInputs(nodeId).filter(v => v.source === source && TEXT_LIKE_INPUT_TYPES.includes(v.type));
     if (!variables.length) { sub.classList.remove('show'); return; }
     let html = '';
     variables.forEach(v => {
