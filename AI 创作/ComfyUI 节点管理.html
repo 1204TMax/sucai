@@ -322,12 +322,14 @@
       var productType = item.productType || normalizeType(findField(nodeId, 'inputs', field).type)
       var label = item.label || '新增输入'
       var desc = item.desc || ''
+      var required = item.required !== false
       return '<div class="input-item sortable-item" ondragover="handleSortDragOver(event)" ondrop="handleSortDrop(event)">' +
         '<div class="item-head"><span class="item-index"></span><button class="sort-handle" type="button" draggable="true" ondragstart="handleSortDragStart(event)" ondragend="handleSortDragEnd(event)" title="拖拽排序" aria-label="拖拽排序"></button></div>' +
         '<div class="form-grid">' +
         '<label class="field"><span class="label">ComfyUI 节点</span><select class="select input-node" onchange="refreshInputFields(this)">' + nodeOptionHtml(nodeId) + '</select></label>' +
         '<label class="field"><span class="label">输入字段</span><select class="select input-field">' + fieldOptionHtml(nodeId, 'inputs', field) + '</select></label>' +
         '<label class="field"><span class="label">输入类型</span><select class="select input-product-type">' + productTypeOptionHtml(productType) + '</select></label>' +
+        '<label class="field"><span class="label">是否必填</span><select class="select input-required"><option value="true"' + (required ? ' selected' : '') + '>必填</option><option value="false"' + (!required ? ' selected' : '') + '>非必填</option></select></label>' +
         '<label class="field"><span class="label">展示名称</span><input class="input input-name" maxlength="10" value="' + label + '"></label>' +
         '<label class="field"><span class="label">描述</span><input class="input input-desc" maxlength="50" value="' + desc + '"></label>' +
         '<div class="field full input-line" style="justify-content:flex-end"><button class="btn text danger" onclick="removeInputItem(this)">删除输入项</button></div>' +
@@ -547,6 +549,7 @@
           field: item.querySelector('.input-field').value,
           rawType: findField(item.querySelector('.input-node').value, 'inputs', item.querySelector('.input-field').value).type,
           productType: item.querySelector('.input-product-type').value,
+          required: item.querySelector('.input-required').value === 'true',
           label: item.querySelector('.input-name').value.trim(),
           desc: item.querySelector('.input-desc').value.trim()
         }

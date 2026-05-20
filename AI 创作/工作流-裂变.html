@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片裂变工作流 - 量化投放系统</title>
+    <title>视频裂变工作流 - 量化投放系统</title>
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -28,45 +28,181 @@
         }
 
         .page-container {
-            max-width: 800px;
+            max-width: 960px;
             margin: 0 auto;
             background: #ffffff;
-            padding: 32px;
+            padding: 0;
             border-radius: 8px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             min-height: calc(100vh - 16px);
         }
 
         .page-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 600;
             color: #1a1a1a;
-            margin-bottom: 32px;
+            padding: 28px 32px 22px;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        .form-section-title {
+        .workflow-form {
+            padding: 0;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 230px minmax(0, 1fr);
+            gap: 28px;
+            padding: 28px 32px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .field-meta {
+            padding-top: 5px;
+        }
+
+        .field-title-line {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .field-title {
             font-size: 16px;
-            font-weight: 500;
-            color: #1a1a1a;
+            font-weight: 600;
+            color: #1f1f1f;
+            line-height: 1.4;
         }
-        
-        /* 定制 Dragger 样式以符合低保真原型 */
+
+        .required {
+            color: #ff4d4f;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .field-description {
+            margin: 0;
+            color: #8c8c8c;
+            line-height: 1.6;
+        }
+
+        .field-control .ant-form-item {
+            margin-bottom: 0;
+        }
+
         .custom-dragger .ant-upload-drag {
-            background-color: #f0f0f0 !important;
-            border: none !important;
-            border-radius: 8px !important;
+            background-color: #fafafa !important;
+            border-radius: 6px !important;
         }
+
         .custom-dragger .ant-upload-drag:hover {
-            background-color: #e8e8e8 !important;
+            border-color: #4a9eff !important;
         }
+
         .custom-dragger .ant-upload-text {
             color: #333 !important;
-            font-size: 14px !important;
+            font-size: 15px !important;
             margin-top: 8px !important;
         }
-        .custom-dragger .anticon {
-            font-size: 20px !important;
-            color: #333 !important;
+
+        .custom-dragger .ant-upload-hint {
+            color: #8c8c8c !important;
+        }
+
+        .upload-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            color: #8c8c8c;
+            font-size: 13px;
+        }
+
+        .resolution-field {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .resolution-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .resolution-control .ant-input-number {
+            width: 180px;
+        }
+
+        .resolution-separator {
+            color: #8c8c8c;
+            font-size: 18px;
+        }
+
+        .minutes-control {
+            width: 240px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            padding: 24px 32px 32px;
+        }
+
+        .preview-media {
+            display: block;
+            width: 100%;
+            max-height: 70vh;
+            border-radius: 6px;
+        }
+
+        .preview-empty {
+            margin: 0;
+            padding: 24px;
+            color: #8c8c8c;
+            text-align: center;
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 0;
+            }
+
+            .page-container {
+                min-height: 100vh;
+                border-radius: 0;
+            }
+
+            .page-title {
+                padding: 24px 20px 18px;
+            }
+
+            .field-row {
+                grid-template-columns: 1fr;
+                gap: 14px;
+                padding: 24px 20px;
+            }
+
+            .resolution-control {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .resolution-control .ant-input-number,
+            .minutes-control {
+                width: 100%;
+            }
+
+            .resolution-separator {
+                display: none;
+            }
+
+            .actions {
+                align-items: stretch;
+                flex-direction: column-reverse;
+                padding: 24px 20px;
+            }
         }
     </style>
 </head>
@@ -74,16 +210,97 @@
     <div id="root"></div>
     <script type="text/babel">
         const { useState } = React;
-        const { Input, Upload, Button, Form, message, ConfigProvider } = antd;
-        const { UploadOutlined } = icons;
-        const { TextArea } = Input;
+        const { Input, Upload, Button, Form, InputNumber, Radio, Modal, message, ConfigProvider } = antd;
+        const { CheckOutlined, UploadOutlined } = icons;
         const { Dragger } = Upload;
+
+        const CUSTOM_RESOLUTION = 'custom';
+        const MAX_IMAGE_MATERIALS = 100;
+        const resolutionPresets = [
+            { label: '竖屏 9:16', value: 'vertical-9-16', width: 1080, height: 1920 },
+            { label: '横屏 16:9', value: 'horizontal-16-9', width: 1920, height: 1080 },
+            { label: '方图 1:1', value: 'square-1-1', width: 1080, height: 1080 },
+            { label: '自定义', value: CUSTOM_RESOLUTION },
+        ];
+
+        const fieldSchema = [
+            {
+                key: 'taskName',
+                title: '任务名称',
+                description: '用于标识本次内容生成任务。',
+                required: true,
+            },
+            {
+                key: 'imageMaterials',
+                title: '爆款图片素材',
+                description: '上传图片文件作为素材来源，最多 100 个。',
+                required: true,
+            },
+            {
+                key: 'videoMaterials',
+                title: '爆款视频素材',
+                description: '上传视频文件作为素材来源。',
+                required: false,
+            },
+            {
+                key: 'resolution',
+                title: '输出分辨率（px）',
+                description: '可选择常用比例，也可手动输入图片或视频的宽度和高度。',
+                required: false,
+            },
+            {
+                key: 'maxMinutes',
+                title: '最大分钟数（分钟）',
+                description: '设置生成内容允许的最长时长。',
+                required: false,
+            },
+        ];
+
+        const normalizeFileList = event => {
+            if (Array.isArray(event)) {
+                return event;
+            }
+            return event?.fileList || [];
+        };
+
+        const getRawFile = file => file.originFileObj || file;
+
+        const getMediaType = file => {
+            const rawFile = getRawFile(file);
+            const type = (file.type || rawFile.type || '').toLowerCase();
+            const name = (file.name || '').toLowerCase();
+
+            if (type.startsWith('image/') || /\.(avif|bmp|gif|jpe?g|png|svg|webp)$/.test(name)) {
+                return 'image';
+            }
+
+            if (type.startsWith('video/') || /\.(avi|m4v|mkv|mov|mp4|mpeg|ogg|webm)$/.test(name)) {
+                return 'video';
+            }
+
+            return '';
+        };
+
+        const formatFiles = files => (files || []).map(file => ({
+            name: file.name,
+            size: file.size,
+            type: file.type || getRawFile(file).type || '',
+        }));
 
         const App = () => {
             const [form] = Form.useForm();
+            const [imageFiles, setImageFiles] = useState([]);
+            const [videoFiles, setVideoFiles] = useState([]);
+            const [resolutionPreset, setResolutionPreset] = useState(CUSTOM_RESOLUTION);
+            const [preview, setPreview] = useState({ open: false, title: '', url: '', type: '' });
 
             const onFinish = (values) => {
-                console.log('Success:', values);
+                const payload = {
+                    ...values,
+                    imageMaterials: formatFiles(values.imageMaterials),
+                    videoMaterials: formatFiles(values.videoMaterials),
+                };
+                console.log('Success:', payload);
                 
                 // 解析 URL 参数获取来源
                 const urlParams = new URLSearchParams(window.location.search);
@@ -103,21 +320,84 @@
                 }, 1500);
             };
 
-            const uploadProps = {
-                name: 'file',
-                multiple: false,
-                action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload', // Mock api
-                onChange(info) {
-                    const { status } = info.file;
-                    if (status === 'done') {
-                        message.success(`${info.file.name} 上传成功`);
-                    } else if (status === 'error') {
-                        message.error(`${info.file.name} 上传失败`);
-                    }
-                },
-                onDrop(e) {
-                    console.log('Dropped files', e.dataTransfer.files);
-                },
+            const beforeUpload = (file, mediaType, maxCount) => {
+                if (getMediaType(file) !== mediaType) {
+                    message.error(`${file.name} 文件类型不符合要求`);
+                    return Upload.LIST_IGNORE;
+                }
+
+                const currentFiles = mediaType === 'image' ? imageFiles : videoFiles;
+                if (maxCount && currentFiles.length >= maxCount) {
+                    message.warning(`最多上传 ${maxCount} 个文件`);
+                    return Upload.LIST_IGNORE;
+                }
+
+                return false;
+            };
+
+            const handleUploadChange = (info, mediaType, maxCount) => {
+                const nextFiles = info.fileList
+                    .filter(file => getMediaType(file) === mediaType)
+                    .slice(0, maxCount || info.fileList.length)
+                    .map(file => ({ ...file, status: 'done' }));
+
+                if (mediaType === 'image') {
+                    setImageFiles(nextFiles);
+                    form.setFieldsValue({ imageMaterials: nextFiles });
+                } else {
+                    setVideoFiles(nextFiles);
+                    form.setFieldsValue({ videoMaterials: nextFiles });
+                }
+            };
+
+            const handlePreview = async file => {
+                const mediaType = getMediaType(file);
+                if (!mediaType) {
+                    message.warning('当前文件暂不支持预览');
+                    return;
+                }
+
+                const rawFile = getRawFile(file);
+                const url = file.url || file.thumbUrl || URL.createObjectURL(rawFile);
+                setPreview({
+                    open: true,
+                    title: file.name || '素材预览',
+                    url,
+                    type: mediaType,
+                });
+            };
+
+            const handleResolutionPresetChange = event => {
+                const value = event.target.value;
+                setResolutionPreset(value);
+
+                const preset = resolutionPresets.find(item => item.value === value);
+                if (preset && preset.value !== CUSTOM_RESOLUTION) {
+                    form.setFieldsValue({
+                        resolutionWidth: preset.width,
+                        resolutionHeight: preset.height,
+                    });
+                }
+            };
+
+            const markCustomResolution = () => {
+                setResolutionPreset(CUSTOM_RESOLUTION);
+                form.setFieldsValue({ resolutionPreset: CUSTOM_RESOLUTION });
+            };
+
+            const resetForm = () => {
+                form.resetFields();
+                setImageFiles([]);
+                setVideoFiles([]);
+                setResolutionPreset(CUSTOM_RESOLUTION);
+                form.setFieldsValue({
+                    imageMaterials: [],
+                    videoMaterials: [],
+                    resolutionPreset: CUSTOM_RESOLUTION,
+                    resolutionWidth: null,
+                    resolutionHeight: null,
+                    maxMinutes: null,
+                });
             };
 
             return (
@@ -130,61 +410,195 @@
                     }}
                 >
                     <div className="page-container">
-                        <div className="page-title">图片裂变工作流</div>
+                        <div className="page-title">视频裂变工作流</div>
                         
                         <Form 
                             form={form} 
                             layout="vertical" 
                             onFinish={onFinish}
+                            className="workflow-form"
                             initialValues={{ 
-                                taskName: '图片裂变工作流-20260505'
+                                taskName: '',
+                                imageMaterials: [],
+                                videoMaterials: [],
+                                resolutionPreset: CUSTOM_RESOLUTION,
+                                resolutionWidth: null,
+                                resolutionHeight: null,
+                                maxMinutes: null,
                             }}
                         >
-                            <Form.Item 
-                                label={<span className="form-section-title">任务名称</span>} 
-                                name="taskName"
-                                rules={[{ required: true, message: '请输入任务名称' }]}
-                            >
-                                <Input size="large" />
-                            </Form.Item>
-
-                            <Form.Item 
-                                label={<span className="form-section-title">爆款图片</span>} 
-                                name="referenceImage"
-                            >
-                                <div className="custom-dragger">
-                                    <Dragger {...uploadProps}>
-                                        <p className="ant-upload-drag-icon">
-                                            <UploadOutlined />
-                                        </p>
-                                        <p className="ant-upload-text">点击选择参考图</p>
-                                    </Dragger>
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldSchema[0].title}</span>
+                                        <span className="required">*</span>
+                                    </div>
+                                    <p className="field-description">{fieldSchema[0].description}</p>
                                 </div>
-                            </Form.Item>
+                                <div className="field-control">
+                                    <Form.Item name="taskName" rules={[{ required: true, message: '请输入任务名称' }]}>
+                                        <Input size="large" placeholder="请输入任务名称" allowClear />
+                                    </Form.Item>
+                                </div>
+                            </div>
 
-                            <Form.Item 
-                                label={<span className="form-section-title">裂变提示词</span>} 
-                                name="prompt1"
-                                rules={[{ required: true, message: '请输入裂变提示词' }]}
-                            >
-                                <TextArea rows={4} size="large" />
-                            </Form.Item>
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldSchema[1].title}</span>
+                                        <span className="required">*</span>
+                                    </div>
+                                    <p className="field-description">{fieldSchema[1].description}</p>
+                                </div>
+                                <div className="field-control">
+                                    <Form.Item
+                                        name="imageMaterials"
+                                        valuePropName="fileList"
+                                        getValueFromEvent={normalizeFileList}
+                                        rules={[{
+                                            validator: (_, value) => value?.length ? Promise.resolve() : Promise.reject(new Error('请上传至少 1 个爆款图片素材')),
+                                        }]}
+                                    >
+                                        <Dragger
+                                            className="custom-dragger"
+                                            accept="image/*"
+                                            multiple
+                                            maxCount={MAX_IMAGE_MATERIALS}
+                                            fileList={imageFiles}
+                                            beforeUpload={file => beforeUpload(file, 'image', MAX_IMAGE_MATERIALS)}
+                                            onChange={info => handleUploadChange(info, 'image', MAX_IMAGE_MATERIALS)}
+                                            onPreview={handlePreview}
+                                        >
+                                            <p className="ant-upload-drag-icon"><UploadOutlined /></p>
+                                            <p className="ant-upload-text">点击或拖拽上传图片素材</p>
+                                            <p className="ant-upload-hint">支持 JPG、PNG、WEBP、GIF 等图片文件，上传后可预览。</p>
+                                        </Dragger>
+                                    </Form.Item>
+                                    <div className="upload-summary">
+                                        <span>已选择 {imageFiles.length} 个文件</span>
+                                        <span>最多 {MAX_IMAGE_MATERIALS} 个</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <Form.Item 
-                                label={<span className="form-section-title">裂变提示词</span>} 
-                                name="prompt2"
-                            >
-                                <TextArea rows={4} size="large" />
-                            </Form.Item>
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldSchema[2].title}</span>
+                                    </div>
+                                    <p className="field-description">{fieldSchema[2].description}</p>
+                                </div>
+                                <div className="field-control">
+                                    <Form.Item name="videoMaterials" valuePropName="fileList" getValueFromEvent={normalizeFileList}>
+                                        <Dragger
+                                            className="custom-dragger"
+                                            accept="video/*"
+                                            multiple
+                                            fileList={videoFiles}
+                                            beforeUpload={file => beforeUpload(file, 'video')}
+                                            onChange={info => handleUploadChange(info, 'video')}
+                                            onPreview={handlePreview}
+                                        >
+                                            <p className="ant-upload-drag-icon"><UploadOutlined /></p>
+                                            <p className="ant-upload-text">点击或拖拽上传视频素材</p>
+                                            <p className="ant-upload-hint">支持 MP4、MOV、WEBM 等视频文件，上传后可预览。</p>
+                                        </Dragger>
+                                    </Form.Item>
+                                    <div className="upload-summary">
+                                        <span>已选择 {videoFiles.length} 个文件</span>
+                                    </div>
+                                </div>
+                            </div>
 
-                            <Form.Item style={{ marginTop: '40px', paddingTop: '20px', borderTop: '1px solid #f0f0f0', textAlign: 'right' }}>
-                                <Button size="large" onClick={() => form.resetFields()} style={{ marginRight: '16px' }}>重置</Button>
-                                <Button type="primary" htmlType="submit" size="large">
-                                    提交
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldSchema[3].title}</span>
+                                    </div>
+                                    <p className="field-description">{fieldSchema[3].description}</p>
+                                </div>
+                                <div className="field-control">
+                                    <div className="resolution-field">
+                                        <Form.Item name="resolutionPreset">
+                                            <Radio.Group
+                                                optionType="button"
+                                                buttonStyle="solid"
+                                                value={resolutionPreset}
+                                                onChange={handleResolutionPresetChange}
+                                            >
+                                                {resolutionPresets.map(preset => (
+                                                    <Radio.Button key={preset.value} value={preset.value}>{preset.label}</Radio.Button>
+                                                ))}
+                                            </Radio.Group>
+                                        </Form.Item>
+                                        <div className="resolution-control">
+                                            <Form.Item name="resolutionWidth">
+                                                <InputNumber
+                                                    size="large"
+                                                    min={1}
+                                                    precision={0}
+                                                    placeholder="宽度"
+                                                    addonAfter="px"
+                                                    onChange={markCustomResolution}
+                                                />
+                                            </Form.Item>
+                                            <span className="resolution-separator">×</span>
+                                            <Form.Item name="resolutionHeight">
+                                                <InputNumber
+                                                    size="large"
+                                                    min={1}
+                                                    precision={0}
+                                                    placeholder="高度"
+                                                    addonAfter="px"
+                                                    onChange={markCustomResolution}
+                                                />
+                                            </Form.Item>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldSchema[4].title}</span>
+                                    </div>
+                                    <p className="field-description">{fieldSchema[4].description}</p>
+                                </div>
+                                <div className="field-control">
+                                    <Form.Item name="maxMinutes">
+                                        <InputNumber
+                                            size="large"
+                                            min={1}
+                                            precision={0}
+                                            placeholder="请输入分钟数"
+                                            addonAfter="分钟"
+                                            className="minutes-control"
+                                        />
+                                    </Form.Item>
+                                </div>
+                            </div>
+
+                            <div className="actions">
+                                <Button size="large" onClick={resetForm}>取消</Button>
+                                <Button type="primary" htmlType="submit" size="large" icon={<CheckOutlined />}>
+                                    提交表单
                                 </Button>
-                            </Form.Item>
+                            </div>
                         </Form>
                     </div>
+                    <Modal
+                        open={preview.open}
+                        title={preview.title}
+                        footer={null}
+                        width={720}
+                        destroyOnClose
+                        onCancel={() => setPreview({ open: false, title: '', url: '', type: '' })}
+                    >
+                        {preview.type === 'image' && <img src={preview.url} alt={preview.title} className="preview-media" />}
+                        {preview.type === 'video' && <video src={preview.url} className="preview-media" controls />}
+                        {!preview.type && <p className="preview-empty">当前文件暂不支持预览</p>}
+                    </Modal>
                 </ConfigProvider>
             );
         };

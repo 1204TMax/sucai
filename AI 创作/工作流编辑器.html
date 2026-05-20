@@ -442,12 +442,43 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-hi);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            min-width: 0;
+            flex: 1;
+        }
+        .config-io-title-text {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .required-star {
+            color: #ff4d4f;
+            flex-shrink: 0;
+            line-height: 1;
         }
         .config-io-desc {
             font-size: 11px;
             color: var(--text-muted);
             margin-top: 4px;
             line-height: 1.4;
+        }
+        .hover-tooltip {
+            position: fixed;
+            z-index: 10000;
+            display: none;
+            max-width: 320px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.82);
+            color: #fff;
+            font-size: 12px;
+            line-height: 1.5;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+            pointer-events: none;
+            white-space: normal;
         }
         .config-io-actions {
             display: flex;
@@ -906,13 +937,16 @@ function renderWrapperConfig(node, inputDefs, outputPreview) {
             <div class="config-index">${index + 1}</div>
             <div class="config-io-info">
                 <div class="config-io-row-main">
-                    <div class="config-io-title">${def.label}</div>
+                    <div class="config-io-title" data-tooltip="${escapeAttr(def.label)}">
+                        <span class="config-io-title-text">${def.label}</span>
+                        <span class="required-star">*</span>
+                    </div>
                     <div class="config-io-actions">
                         <span class="config-type-tag">${getOutputTypeLabel(def.type)}</span>
                         ${actionHtml}
                     </div>
                 </div>
-                ${def.desc ? `<div class="config-io-desc" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;" title="${def.desc}">${def.desc}</div>` : ''}
+                ${def.desc ? `<div class="config-io-desc" data-tooltip="${escapeAttr(def.desc)}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;">${def.desc}</div>` : ''}
                 ${selectorHtml}
             </div>
         </div>`;
@@ -1058,7 +1092,7 @@ const WRAPPER_NODES = {
             return renderSummary([`输入项：2 个`, `输出：文案数组`]);
         },
         renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '爆款文案', label: '爆款文案', type: 'text', desc: '用于提取产品卖点和营销文案结构的参考文本' },
+            { key: '爆款文案', label: 'xx品类xx产品xx功能xx文案中最后一段的最后一个小节', type: 'text', desc: '用于提取产品卖点、营销文案结构、叙事节奏、转化钩子、用户痛点表达和最后一段里最末尾小节的关键信息，作为后续扩写节点生成多组投放文案时的主要参考依据。' },
             { key: '参考图', label: '参考图', type: 'image', desc: '用于分析和提取原素材视觉特征和排版结构的参考图片' }
         ], '文案数组')
     },
@@ -1533,6 +1567,14 @@ function renderNodeIconSVGOnly(name) {
 }
 function filterPalette(val) {
     renderPalette(val);
+}
+
+function escapeAttr(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
 }
 
 function onPaletteDragStart(e, type) {
@@ -2880,13 +2922,63 @@ function hideAllDropdowns() {
     currentWrapperOutputId = '';
 }
 
+function getHoverTooltip() {
+    let tooltip = document.getElementById('hover-tooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'hover-tooltip';
+        tooltip.className = 'hover-tooltip';
+        document.body.appendChild(tooltip);
+    }
+    return tooltip;
+}
+
+function positionHoverTooltip(event) {
+    const tooltip = document.getElementById('hover-tooltip');
+    if (!tooltip || tooltip.style.display === 'none') return;
+    const margin = 12;
+    const width = tooltip.offsetWidth || 280;
+    const height = tooltip.offsetHeight || 40;
+    let left = event.clientX + margin;
+    let top = event.clientY + margin;
+    if (left + width > window.innerWidth - margin) left = event.clientX - width - margin;
+    if (top + height > window.innerHeight - margin) top = event.clientY - height - margin;
+    tooltip.style.left = Math.max(margin, left) + 'px';
+    tooltip.style.top = Math.max(margin, top) + 'px';
+}
+
+function showHoverTooltip(event) {
+    const target = event.target.closest('[data-tooltip]');
+    if (!target) return;
+    const text = target.getAttribute('data-tooltip');
+    if (!text) return;
+    const tooltip = getHoverTooltip();
+    tooltip.textContent = text;
+    tooltip.style.display = 'block';
+    positionHoverTooltip(event);
+}
+
+function hideHoverTooltip() {
+    const tooltip = document.getElementById('hover-tooltip');
+    if (tooltip) tooltip.style.display = 'none';
+}
+
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.custom-model-select') && !e.target.closest('#global-dropdowns') && !e.target.closest('[onclick*="toggle"]')) {
         hideAllDropdowns();
     }
 });
 
-document.querySelector('.config-body')?.addEventListener('scroll', hideAllDropdowns);
+document.addEventListener('mouseover', showHoverTooltip);
+document.addEventListener('mousemove', positionHoverTooltip);
+document.addEventListener('mouseout', function(e) {
+    if (e.target.closest('[data-tooltip]')) hideHoverTooltip();
+});
+
+document.querySelector('.config-body')?.addEventListener('scroll', function() {
+    hideAllDropdowns();
+    hideHoverTooltip();
+});
 // --- End Helpers ---
 
 function mockPublishValidation(btn) {
