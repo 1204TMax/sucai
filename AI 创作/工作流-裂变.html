@@ -139,8 +139,20 @@
             font-size: 18px;
         }
 
-        .minutes-control {
-            width: 240px;
+        .duration-range-control {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .duration-input {
+            width: 180px;
+        }
+
+        .duration-separator {
+            color: #8c8c8c;
+            font-size: 18px;
+            line-height: 40px;
         }
 
         .actions {
@@ -190,8 +202,17 @@
             }
 
             .resolution-control .ant-input-number,
-            .minutes-control {
+            .duration-input {
                 width: 100%;
+            }
+
+            .duration-range-control {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .duration-separator {
+                display: none;
             }
 
             .resolution-separator {
@@ -209,7 +230,7 @@
 <body>
     <div id="root"></div>
     <script type="text/babel">
-        const { useState } = React;
+        const { useState, useEffect, useCallback } = React;
         const { Input, Upload, Button, Form, InputNumber, Radio, Modal, message, ConfigProvider } = antd;
         const { CheckOutlined, UploadOutlined } = icons;
         const { Dragger } = Upload;
@@ -222,7 +243,6 @@
             { label: '方图 1:1', value: 'square-1-1', width: 1080, height: 1080 },
             { label: '自定义', value: CUSTOM_RESOLUTION },
         ];
-
         const fieldSchema = [
             {
                 key: 'taskName',
@@ -249,12 +269,13 @@
                 required: false,
             },
             {
-                key: 'maxMinutes',
-                title: '最大分钟数（分钟）',
-                description: '设置生成内容允许的最长时长。',
+                key: 'durationRange',
+                title: '时长范围（秒）',
+                description: '填写生成视频的最小时间和最大时间，单位为秒。',
                 required: false,
             },
         ];
+        const fieldMeta = Object.fromEntries(fieldSchema.map(field => [field.key, field]));
 
         const normalizeFileList = event => {
             if (Array.isArray(event)) {
@@ -293,6 +314,61 @@
             const [videoFiles, setVideoFiles] = useState([]);
             const [resolutionPreset, setResolutionPreset] = useState(CUSTOM_RESOLUTION);
             const [preview, setPreview] = useState({ open: false, title: '', url: '', type: '' });
+
+            const handlePaste = useCallback((e) => {
+                const clipboardFiles = e.clipboardData?.files;
+                if (!clipboardFiles || clipboardFiles.length === 0) return;
+
+                const newImages = [];
+                const newVideos = [];
+
+                Array.from(clipboardFiles).forEach(file => {
+                    const mediaType = getMediaType(file);
+                    if (!mediaType) return;
+
+                    const rcFile = {
+                        uid: `rc-upload-paste-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        originFileObj: file,
+                        status: 'done'
+                    };
+
+                    if (mediaType === 'image') {
+                        newImages.push(rcFile);
+                    } else if (mediaType === 'video') {
+                        newVideos.push(rcFile);
+                    }
+                });
+
+                if (newImages.length === 0 && newVideos.length === 0) {
+                    return;
+                }
+
+                e.preventDefault();
+
+                if (newImages.length > 0) {
+                    const combinedImages = [...imageFiles, ...newImages].slice(0, MAX_IMAGE_MATERIALS);
+                    setImageFiles(combinedImages);
+                    form.setFieldsValue({ imageMaterials: combinedImages });
+                }
+
+                if (newVideos.length > 0) {
+                    const combinedVideos = [...videoFiles, ...newVideos];
+                    setVideoFiles(combinedVideos);
+                    form.setFieldsValue({ videoMaterials: combinedVideos });
+                }
+
+                message.success(`成功从剪贴板粘贴添加 ${newImages.length + newVideos.length} 个文件`);
+            }, [imageFiles, videoFiles, form]);
+
+            useEffect(() => {
+                document.addEventListener('paste', handlePaste);
+                return () => {
+                    document.removeEventListener('paste', handlePaste);
+                };
+            }, [handlePaste]);
 
             const onFinish = (values) => {
                 const payload = {
@@ -396,7 +472,8 @@
                     resolutionPreset: CUSTOM_RESOLUTION,
                     resolutionWidth: null,
                     resolutionHeight: null,
-                    maxMinutes: null,
+                    durationMinSeconds: null,
+                    durationMaxSeconds: null,
                 });
             };
 
@@ -424,16 +501,17 @@
                                 resolutionPreset: CUSTOM_RESOLUTION,
                                 resolutionWidth: null,
                                 resolutionHeight: null,
-                                maxMinutes: null,
+                                durationMinSeconds: null,
+                                durationMaxSeconds: null,
                             }}
                         >
                             <div className="field-row">
                                 <div className="field-meta">
                                     <div className="field-title-line">
-                                        <span className="field-title">{fieldSchema[0].title}</span>
+                                        <span className="field-title">{fieldMeta.taskName.title}</span>
                                         <span className="required">*</span>
                                     </div>
-                                    <p className="field-description">{fieldSchema[0].description}</p>
+                                    <p className="field-description">{fieldMeta.taskName.description}</p>
                                 </div>
                                 <div className="field-control">
                                     <Form.Item name="taskName" rules={[{ required: true, message: '请输入任务名称' }]}>
@@ -445,10 +523,10 @@
                             <div className="field-row">
                                 <div className="field-meta">
                                     <div className="field-title-line">
-                                        <span className="field-title">{fieldSchema[1].title}</span>
+                                        <span className="field-title">{fieldMeta.imageMaterials.title}</span>
                                         <span className="required">*</span>
                                     </div>
-                                    <p className="field-description">{fieldSchema[1].description}</p>
+                                    <p className="field-description">{fieldMeta.imageMaterials.description}</p>
                                 </div>
                                 <div className="field-control">
                                     <Form.Item
@@ -484,9 +562,9 @@
                             <div className="field-row">
                                 <div className="field-meta">
                                     <div className="field-title-line">
-                                        <span className="field-title">{fieldSchema[2].title}</span>
+                                        <span className="field-title">{fieldMeta.videoMaterials.title}</span>
                                     </div>
-                                    <p className="field-description">{fieldSchema[2].description}</p>
+                                    <p className="field-description">{fieldMeta.videoMaterials.description}</p>
                                 </div>
                                 <div className="field-control">
                                     <Form.Item name="videoMaterials" valuePropName="fileList" getValueFromEvent={normalizeFileList}>
@@ -513,9 +591,9 @@
                             <div className="field-row">
                                 <div className="field-meta">
                                     <div className="field-title-line">
-                                        <span className="field-title">{fieldSchema[3].title}</span>
+                                        <span className="field-title">{fieldMeta.resolution.title}</span>
                                     </div>
-                                    <p className="field-description">{fieldSchema[3].description}</p>
+                                    <p className="field-description">{fieldMeta.resolution.description}</p>
                                 </div>
                                 <div className="field-control">
                                     <div className="resolution-field">
@@ -561,21 +639,46 @@
                             <div className="field-row">
                                 <div className="field-meta">
                                     <div className="field-title-line">
-                                        <span className="field-title">{fieldSchema[4].title}</span>
+                                        <span className="field-title">{fieldMeta.durationRange.title}</span>
                                     </div>
-                                    <p className="field-description">{fieldSchema[4].description}</p>
+                                    <p className="field-description">{fieldMeta.durationRange.description}</p>
                                 </div>
                                 <div className="field-control">
-                                    <Form.Item name="maxMinutes">
-                                        <InputNumber
-                                            size="large"
-                                            min={1}
-                                            precision={0}
-                                            placeholder="请输入分钟数"
-                                            addonAfter="分钟"
-                                            className="minutes-control"
-                                        />
-                                    </Form.Item>
+                                    <div className="duration-range-control">
+                                        <Form.Item name="durationMinSeconds">
+                                            <InputNumber
+                                                size="large"
+                                                min={0}
+                                                precision={0}
+                                                placeholder="最小时间"
+                                                addonAfter="秒"
+                                                className="duration-input"
+                                            />
+                                        </Form.Item>
+                                        <span className="duration-separator">-</span>
+                                        <Form.Item
+                                            name="durationMaxSeconds"
+                                            dependencies={['durationMinSeconds']}
+                                            rules={[({ getFieldValue }) => ({
+                                                validator(_, value) {
+                                                    const min = getFieldValue('durationMinSeconds');
+                                                    if (value == null || min == null || value >= min) {
+                                                        return Promise.resolve();
+                                                    }
+                                                    return Promise.reject(new Error('最大时间需大于或等于最小时间'));
+                                                },
+                                            })]}
+                                        >
+                                            <InputNumber
+                                                size="large"
+                                                min={0}
+                                                precision={0}
+                                                placeholder="最大时间"
+                                                addonAfter="秒"
+                                                className="duration-input"
+                                            />
+                                        </Form.Item>
+                                    </div>
                                 </div>
                             </div>
 

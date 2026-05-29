@@ -53,6 +53,12 @@
         }
         .type-btn.active { background: #fff; color: #1a1a1a; box-shadow: 0 1px 6px rgba(0,0,0,0.1); }
         .type-btn svg { flex-shrink: 0; }
+        .type-btn-icon {
+            width: 14px; height: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .type-btn-icon svg { width: 14px; height: 14px; display: block; }
 
         /* ── 大输入框 ── */
         .input-box {
@@ -177,6 +183,12 @@
             font-weight: 500; color: #333;
             display: inline-flex; align-items: center; gap: 5px;
         }
+        .type-opt-icon {
+            width: 14px; height: 14px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: currentColor; flex-shrink: 0;
+        }
+        .type-opt-icon svg { width: 14px; height: 14px; display: block; }
         .opt-pill.open .opt-pill-val { color: #1a1a1a; }
         .arr { display: none; }
         .opt-pill.open .arr { display: none; }
@@ -494,6 +506,15 @@
         .gen-btn.has-text:hover { background: #4096ff; transform: scale(1.03); }
         .gen-btn.has-text:active{ background: #0958d9; transform: scale(0.97); }
         .gen-btn.loading        { background: #1677ff; color: #fff; opacity: 0.8; cursor: not-allowed; }
+        #genText {
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .gen-btn-icon {
+            width: 15px; height: 15px;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .gen-btn-icon svg { width: 15px; height: 15px; display: block; }
 
         .spin {
             width: 14px; height: 14px;
@@ -1325,19 +1346,13 @@
     <div class="toggle-row">
         <div class="type-toggle">
             <button class="type-btn" data-type="chat" onclick="switchType(this)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>文案
+                <span class="type-btn-icon" data-type-icon="chat" aria-hidden="true"></span>文案
             </button>
             <button class="type-btn active" data-type="image" onclick="switchType(this)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
-                </svg>图像
+                <span class="type-btn-icon" data-type-icon="image" aria-hidden="true"></span>图像
             </button>
             <button class="type-btn" data-type="video" onclick="switchType(this)">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                    <polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>
-                </svg>视频
+                <span class="type-btn-icon" data-type-icon="video" aria-hidden="true"></span>视频
             </button>
         </div>
     </div>
@@ -1378,7 +1393,7 @@
             </div>
             <textarea class="prompt" id="prompt" rows="3"
                 placeholder="尝试描述您想要创建的图像"
-                oninput="onInput()"></textarea>
+                oninput="onInput();autoGrowTextarea(this,108,5)"></textarea>
         </div>
 
         <!-- 参考图缩略图 -->
@@ -1407,7 +1422,7 @@
                 </button>
             </div>
             <button class="gen-btn" id="genBtn" onclick="doGenerate()">
-                <span id="genText">生成</span>
+                <span id="genText"><span class="gen-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg></span><span>生成</span></span>
                 <div class="spin" id="genSpin"></div>
             </button>
         </div>
@@ -1749,6 +1764,52 @@ if (createWfModal) {
 </script>
 
 <script>
+// Paste to upload files
+document.addEventListener('paste', function(e) {
+    if (!e.clipboardData || !e.clipboardData.items) return;
+    var files = [];
+    for (var i = 0; i < e.clipboardData.items.length; i++) {
+        var item = e.clipboardData.items[i];
+        if (item.kind === 'file') {
+            files.push(item.getAsFile());
+        }
+    }
+    if (files.length > 0) {
+        var validFiles = files.filter(f => f.type.startsWith('image/') || f.type.startsWith('video/'));
+        if (validFiles.length > 0) {
+            e.preventDefault();
+            var dt = new DataTransfer();
+            validFiles.forEach(f => dt.items.add(f));
+            if (curType === 'chat') {
+                var input = document.getElementById('chatMediaInput');
+                input.files = dt.files;
+                onChatMedia({ target: input });
+            } else {
+                var input = document.getElementById('uploadInput');
+                input.files = dt.files;
+                onUpload({ target: input });
+            }
+        }
+    }
+});
+
+// 输入框随内容自动增高，最多额外增高 5 行，内容减少时自动回缩。
+function autoGrowTextarea(textarea, defaultH, extraRows) {
+    if (!textarea) return;
+    const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 24;
+    const maxH = defaultH + lineHeight * extraRows;
+    textarea.style.height = defaultH + 'px';
+    const nextH = Math.min(textarea.scrollHeight, maxH);
+    textarea.style.height = Math.max(defaultH, nextH) + 'px';
+    textarea.style.overflowY = textarea.scrollHeight > maxH ? 'auto' : 'hidden';
+}
+
+setTimeout(function() {
+    autoGrowTextarea(document.getElementById('prompt'), 108, 5);
+}, 0);
+</script>
+
+<script>
 const RATIO_SIZES = {
     '1:1':[16,16], '2:3':[11,16], '3:2':[16,11],
     '3:4':[12,16], '4:3':[16,12],
@@ -1862,6 +1923,58 @@ const sel = {
     image: { models: ['banana2'], modelCounts: {}, modelQuality: {}, ratio: '1:1', res: '2K', sizeW: 2048, sizeH: 2048, count: '1', project: '', ratioTab: '常用', platformSize: null, customRatios: [] },
     video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '5秒', project: '', frameFirst: null, frameLast: null },
 };
+
+const TYPE_ICONS = {
+    chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+    video: '<svg class="lucide lucide-square-play" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z" /></svg>'
+};
+
+// Parameter icons from lucide-static v1.16.0 (ISC): layers-2, sliders-horizontal, ratio, folder, send-horizontal.
+const OPTION_ICONS = {
+    count: '<svg class="lucide lucide-layers-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74z" /><path d="m20 14.285 1.5.845a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74l1.5-.845" /></svg>',
+    mode: '<svg class="lucide lucide-sliders-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3" /><path d="M12 19H3" /><path d="M14 3v4" /><path d="M16 17v4" /><path d="M21 12h-9" /><path d="M21 19h-5" /><path d="M21 5h-7" /><path d="M8 10v4" /><path d="M8 12H3" /></svg>',
+    ratio: '<svg class="lucide lucide-ratio" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="12" height="20" x="6" y="2" rx="2" /><rect width="20" height="12" x="2" y="6" rx="2" /></svg>',
+    project: '<svg class="lucide lucide-folder" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg>'
+};
+const GENERATE_ICON = '<svg class="lucide lucide-send-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" /><path d="M6 12h16" /></svg>';
+
+function getOptionIconKey(opt) {
+    if (opt.type === 'ratio-res' || opt.type === 'ratio-dur' || opt.type === 'ratio') return 'ratio';
+    if (opt.type === 'chips' && opt.key === 'mode') return 'mode';
+    return OPTION_ICONS[opt.key] ? opt.key : opt.type;
+}
+
+function optionIconHtml(opt) {
+    const icon = opt.type === 'model'
+        ? (TYPE_ICONS[curType] || TYPE_ICONS.image)
+        : (OPTION_ICONS[getOptionIconKey(opt)] || TYPE_ICONS.image);
+    return '<span class="type-opt-icon" aria-hidden="true">' + icon + '</span>';
+}
+
+function withOptionIcon(opt, content) {
+    return optionIconHtml(opt) + content;
+}
+
+function hasInlinePillIcon(opt) {
+    return opt.type === 'ratio-res' || opt.type === 'ratio-dur' || opt.type === 'ratio';
+}
+
+function ratioPillIconHtml(width, height) {
+    return `<span class="pill-ratio-box" style="width:${width}px;height:${height}px;"></span>`;
+}
+
+function setGenerateButtonLabel() {
+    const genText = document.getElementById('genText');
+    if (genText) genText.innerHTML = '<span class="gen-btn-icon" aria-hidden="true">' + GENERATE_ICON + '</span><span>生成</span>';
+}
+
+function renderTypeIcons() {
+    document.querySelectorAll('[data-type-icon]').forEach(el => {
+        const type = el.dataset.typeIcon || 'image';
+        el.innerHTML = TYPE_ICONS[type] || TYPE_ICONS.image;
+    });
+}
 
 function onInput() {
     const has = document.getElementById('prompt').value.trim().length > 0;
@@ -2805,11 +2918,13 @@ function renderOpts() {
             const sc = 11 / Math.max(rw, rh);
             const iw = Math.round(rw * sc), ih = Math.round(rh * sc);
 
+            let ratioText;
             if (ratioTab !== '常用' && ps) {
-                pillVal = sel[curType].models.length > 1 ? `${ps.w}×${ps.h}` : `${ps.w}×${ps.h} · ${resLabel}`;
+                ratioText = sel[curType].models.length > 1 ? `${ps.w}×${ps.h}` : `${ps.w}×${ps.h} · ${resLabel}`;
             } else {
-                pillVal = sel[curType].models.length > 1 ? `${ratio}` : `${ratio} · ${resLabel}`;
+                ratioText = sel[curType].models.length > 1 ? `${ratio}` : `${ratio} · ${resLabel}`;
             }
+            pillVal = ratioPillIconHtml(iw, ih) + ratioText;
 
             // Platform tab bar
             const tabBar = `<div class="ratio-platform-tabs">
@@ -2920,7 +3035,8 @@ function renderOpts() {
             const iw = Math.round(rw * sc), ih = Math.round(rh * sc);
             const ratioDisplay = (ratioTab !== '常用' && ps) ? `${ps.w}×${ps.h}` : ratio;
             const dur = sel[curType].dur || '5秒';
-            pillVal = sel[curType].models.length > 1 ? `${ratioDisplay}` : `${ratioDisplay} · ${dur}`;
+            const ratioDurText = sel[curType].models.length > 1 ? `${ratioDisplay}` : `${ratioDisplay} · ${dur}`;
+            pillVal = ratioPillIconHtml(iw, ih) + ratioDurText;
 
             // 平台 tab bar
             const tabBar = `<div class="ratio-platform-tabs">
@@ -3096,18 +3212,21 @@ function renderOpts() {
         const hasProject = Array.isArray(sel[curType].project) ? sel[curType].project.length > 0 : !!sel[curType].project;
         const clearBtn = (opt.type === 'project' && hasProject)
             ? `<button class="pill-clear" onclick="event.stopPropagation();onProjectConfirm('')">✕</button>` : '';
+        const decoratedPillVal = (opt.type === 'toggle' || opt.type === 'upload-btn' || hasInlinePillIcon(opt))
+            ? pillVal
+            : withOptionIcon(opt, pillVal);
 
         if (ddInner === null) {
             if (opt.type === 'project') {
                 // project pill：无下拉，有清除按钮
-                pill.innerHTML = `<span class="opt-pill-val">${pillVal}</span>${clearBtn}`;
+                pill.innerHTML = `<span class="opt-pill-val">${decoratedPillVal}</span>${clearBtn}`;
             } else {
                 // toggle pill — no dropdown, no arrow
-                pill.innerHTML = `<span class="opt-pill-val">${pillVal}</span>`;
+                pill.innerHTML = `<span class="opt-pill-val">${decoratedPillVal}</span>`;
             }
         } else {
             pill.innerHTML = `
-                <span class="opt-pill-val">${pillVal}</span>${clearBtn}
+                <span class="opt-pill-val">${decoratedPillVal}</span>${clearBtn}
                 <span class="arr">▾</span>
                 <div class="opt-dd" id="dd-${opt.key}">${ddInner}</div>`;
         }
@@ -3445,11 +3564,7 @@ function renderWorkflows() {
     const pinned = [...squareFavorites, ...list.filter(w => w.isPinned)];
     const mine = list.filter(w => w.isMine);
 
-    const getWfIcon = (type) => {
-        if (type === 'chat') return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-        if (type === 'image') return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
-        return `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>`;
-    };
+    const getWfIcon = (type) => TYPE_ICONS[type] || TYPE_ICONS.image;
 
     const renderGrid = (containerId, data, options = {}) => {
         const grid = document.getElementById(containerId);
@@ -3668,9 +3783,8 @@ function switchType(btn) {
 
     // 发送/生成按钮外观
     const genBtn = document.getElementById('genBtn');
-    const genText = document.getElementById('genText');
     genBtn.classList.remove('send-mode');
-    genText.innerHTML = '生成';
+    setGenerateButtonLabel();
 
     // placeholder
     const ph = { chat: '尝试描述你想要的文案内容，或上传图片让 AI 识图写文', image: '尝试描述您想要创建的图像', video: '尝试描述您想要创建的视频' };
@@ -3746,7 +3860,9 @@ function hideNotif() {
 document.addEventListener('click', closeAll);
 
 updateSize(sel.image.ratio, sel.image.res);
+renderTypeIcons();
 renderOpts();
+setGenerateButtonLabel();
 renderWorkflows();
 syncToolboxParseState();
 syncToolboxFormatState();

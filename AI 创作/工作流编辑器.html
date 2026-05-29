@@ -332,13 +332,79 @@
         .var-submenu { z-index: 220; }
         .var-dropdown-menu.show, .var-submenu.show { display: block; }
         .cascader-group-title { padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-1); margin-bottom: 4px; }
-        .cascader-item { display: flex; align-items: center; padding: 8px 12px; font-size: 13px; color: var(--text-hi); cursor: pointer; transition: 0.2s; border-radius: 8px; }
-        .cascader-item:hover:not(.disabled) { background: var(--bg-subtle); color: var(--accent-solid); }
+        .cascader-item { display: flex; align-items: center; padding: 7px 12px; font-size: 13px; color: var(--text-lo); cursor: pointer; transition: 0.2s; border-radius: 6px; }
+        .cascader-item:hover:not(.disabled) { background: var(--bg-subtle); color: var(--text-hi); }
+        .cascader-item.selected { background: var(--accent-bg); color: var(--accent-solid); font-weight: 500; }
         .cascader-item.disabled { color: var(--text-muted); cursor: not-allowed; }
         .cascader-item.disabled svg { color: #e8e8e8; }
 
-        .ref-selector-trigger { width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border: 1px dashed var(--border-1); border-radius: 8px; color: var(--text-hi); font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .ref-selector-trigger:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: #fafafa; }
+        .ref-selector-trigger {
+            width: 100%;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid var(--border-2);
+            border-radius: 6px;
+            color: var(--text-hi);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+            padding: 0 11px;
+        }
+        .ref-selector-trigger:hover { border-color: var(--accent-solid); }
+        .ref-selector-trigger.empty { color: var(--text-muted); }
+        .config-io-info .ref-selector-trigger { margin-top: 4px; }
+        .ref-selector-value {
+            min-width: 0;
+            flex: 1 1 auto;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .ref-selector-value .source {
+            color: var(--text-muted);
+            flex: 0 0 auto;
+        }
+        .ref-selector-value .separator {
+            color: var(--border-2);
+            margin: 0 4px;
+            flex: 0 0 auto;
+        }
+        .ref-selector-value .label {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .ref-selector-actions {
+            flex: 0 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 8px;
+        }
+        .ref-selector-clear {
+            width: 14px;
+            height: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.06);
+            color: #999;
+            font-size: 10px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.2s;
+        }
+        .ref-selector-clear:hover { background: rgba(0,0,0,0.15); color: #fff; }
+        .ref-selector-chevron { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
         
         .ref-remove-btn { color: var(--text-muted); background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: 0.2s; }
         .ref-remove-btn:hover { background: #f0f0f0; color: #ff4d4f; }
@@ -619,8 +685,6 @@
         .cascader-item { padding: 8px 12px; font-size: 13px; color: var(--text-hi); cursor: pointer; transition: 0.2s; }
         .cascader-item:hover { background: #f5f5f5; }
 
-        .ref-selector-trigger { width: 100%; height: 36px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; border: 1px dashed var(--border-1); border-radius: 8px; color: var(--text-hi); font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .ref-selector-trigger:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: #fafafa; }
         
         .ref-remove-btn { color: var(--text-muted); background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: 0.2s; }
         .ref-remove-btn:hover { background: #f0f0f0; color: #ff4d4f; }
@@ -907,6 +971,28 @@ function normalizeMaxUploadCount(value) {
     return Math.min(99, Math.max(1, num));
 }
 
+function renderRefSelectorControl({ nodeId, tokenKey, sourceKey, acceptTypes, currentRefVar, placeholder = '点击选择', clearAction = '' }) {
+    const selected = !!currentRefVar;
+    const valueHtml = selected
+        ? `<span class="source">${escapeAttr(currentRefVar.source)}</span><span class="separator">/</span><span class="label">${escapeAttr(currentRefVar.label)}</span>`
+        : `<span class="label">${escapeAttr(placeholder)}</span>`;
+    const clearHtml = selected && clearAction
+        ? `<button class="ref-selector-clear" type="button" onclick="event.stopPropagation(); ${clearAction}" title="清除当前值">×</button>`
+        : '';
+
+    return `
+        <div class="ref-selector-trigger ${selected ? '' : 'empty'}" onclick="toggleRefVarDropdown(event, '${nodeId}', '${tokenKey}', '${sourceKey}', '${acceptTypes}')">
+            <span class="ref-selector-value">${valueHtml}</span>
+            <span class="ref-selector-actions">
+                ${clearHtml}
+                <span class="ref-selector-chevron">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </span>
+            </span>
+        </div>
+    `;
+}
+
 
 function renderWrapperConfig(node, inputDefs, outputPreview) {
     const outputsHtml = renderWrapperOutputsEditor(node);
@@ -916,21 +1002,16 @@ function renderWrapperConfig(node, inputDefs, outputPreview) {
         const variables = getAvailableNodeInputs(node.id);
         const currentRefVar = variables.find(v => v.token === currentToken);
         
-        let selectorHtml = '';
-        let actionHtml = '';
-        if (!currentRefVar) {
-            selectorHtml = `<div class="ref-selector-trigger" style="margin-top: 4px;" onclick="toggleRefVarDropdown(event, '${node.id}', '${def.key}', 'wrapper_input', '${def.type === 'text' ? 'text,number,resolution,count' : (def.type === 'image' ? 'image,image_array' : 'video,video_array')}')">点击选择来源</div>`;
-        } else {
-            selectorHtml = `
-                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-subtle); border-radius: 4px; color: var(--text-hi); font-size: 11px; font-weight: 500;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    ${currentRefVar.source} · ${currentRefVar.label}
-                </div>
-            `;
-            actionHtml = `
-                <button class="config-danger-icon" onclick="updateWrapperInput('${node.id}', '${def.key}', '');" title="移除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-            `;
-        }
+        const acceptTypes = def.type === 'text' ? 'text,number,resolution,count' : (def.type === 'image' ? 'image,image_array' : 'video,video_array');
+        const selectorHtml = renderRefSelectorControl({
+            nodeId: node.id,
+            tokenKey: def.key,
+            sourceKey: 'wrapper_input',
+            acceptTypes,
+            currentRefVar,
+            placeholder: '请选择来源',
+            clearAction: `updateWrapperInput('${node.id}', '${def.key}', '')`
+        });
         
         return `
         <div class="config-io-item">
@@ -943,7 +1024,6 @@ function renderWrapperConfig(node, inputDefs, outputPreview) {
                     </div>
                     <div class="config-io-actions">
                         <span class="config-type-tag">${getOutputTypeLabel(def.type)}</span>
-                        ${actionHtml}
                     </div>
                 </div>
                 ${def.desc ? `<div class="config-io-desc" data-tooltip="${escapeAttr(def.desc)}" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:4px;">${def.desc}</div>` : ''}
@@ -1236,34 +1316,27 @@ const PROCESSOR_REGISTRY = {
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                     <label style="margin:0;">输出内容</label>
                 </div>
-                ${!currentRefVar ? `
                 <div class="config-io-item">
                     <div class="config-io-info">
                         <div class="config-io-row-main">
-                            <div class="config-io-title" style="color:var(--text-muted);font-weight:normal;">选择输出内容</div>
-                        </div>
-                        <div class="ref-selector-trigger" style="margin-top: 4px;" onclick="toggleRefVarDropdown(event, '${node.id}', 'outputNodeId', 'outputNodeSource', '${getAcceptTypesByOutputType(node.config.outputType).join(',')}')">
-                            点击选择
-                        </div>
-                    </div>
-                </div>
-                ` : `
-                <div class="config-io-item">
-                    <div class="config-io-info">
-                        <div class="config-io-row-main">
-                            <div class="config-io-title">${currentRefVar.label}</div>
+                            <div class="config-io-title" style="${currentRefVar ? '' : 'color:var(--text-muted);font-weight:normal;'}">选择输出内容</div>
+                            ${currentRefVar ? `
                             <div class="config-io-actions">
                                 <span class="config-type-tag">${getOutputTypeLabel(currentRefVar.type)}</span>
-                                <button class="config-danger-icon" onclick="updateConfigAndRefresh('outputNodeId', '');" title="移除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                             </div>
+                            ` : ''}
                         </div>
-                        <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-subtle); border-radius: 4px; color: var(--text-hi); font-size: 11px; font-weight: 500;">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                            ${currentRefVar.source}
-                        </div>
+                        ${renderRefSelectorControl({
+                            nodeId: node.id,
+                            tokenKey: 'outputNodeId',
+                            sourceKey: 'outputNodeSource',
+                            acceptTypes: getAcceptTypesByOutputType(node.config.outputType).join(','),
+                            currentRefVar,
+                            placeholder: '请选择输出内容',
+                            clearAction: `updateConfigAndRefresh('outputNodeId', '')`
+                        })}
                     </div>
                 </div>
-                `}
                 <div class="form-hint" style="margin-top: 8px;">从之前节点输出的内容中，选择一个作为最终结果。</div>
             </div>
             <div class="form-hint">结果默认进入我的任务。</div>
@@ -2472,32 +2545,24 @@ function renderReviewItemsEditor(node) {
     return items.map((item, index) => {
         const currentRefVar = variables.find(v => v.token === item.token);
         
-        let contentHtml = '';
-        if (currentRefVar) {
-            contentHtml = `
-                <div class="config-io-row-main">
-                    <div class="config-io-title">${currentRefVar.label}</div>
-                    <div class="config-io-actions">
-                        <span class="config-type-tag">${getOutputTypeLabel(currentRefVar.type)}</span>
-                        <button class="config-danger-icon" onclick="removeReviewItem('${node.id}', '${item.id}')" title="移除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                    </div>
+        const contentHtml = `
+            <div class="config-io-row-main">
+                <div class="config-io-title" style="${currentRefVar ? '' : 'color:var(--text-muted);font-weight:normal;'}">选择审核内容</div>
+                <div class="config-io-actions">
+                    ${currentRefVar ? `<span class="config-type-tag">${getOutputTypeLabel(currentRefVar.type)}</span>` : ''}
+                    <button class="config-danger-icon" onclick="removeReviewItem('${node.id}', '${item.id}')" title="移除输入项"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
                 </div>
-                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: var(--bg-subtle); border-radius: 4px; color: var(--text-hi); font-size: 11px; font-weight: 500;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                    ${currentRefVar.source}
-                </div>
-            `;
-        } else {
-            contentHtml = `
-                <div class="config-io-row-main">
-                    <div class="config-io-title" style="color:var(--text-muted);font-weight:normal;">选择审核内容</div>
-                    <div class="config-io-actions">
-                        <button class="config-danger-icon" onclick="removeReviewItem('${node.id}', '${item.id}')" title="移除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
-                    </div>
-                </div>
-                <div class="ref-selector-trigger" style="margin-top: 4px;" onclick="toggleRefVarDropdown(event, '${node.id}', '${item.id}', 'review_item', '')">点击选择</div>
-            `;
-        }
+            </div>
+            ${renderRefSelectorControl({
+                nodeId: node.id,
+                tokenKey: item.id,
+                sourceKey: 'review_item',
+                acceptTypes: '',
+                currentRefVar,
+                placeholder: '请选择审核内容',
+                clearAction: `updateReviewItem('${node.id}', '${item.id}', '')`
+            })}
+        `;
 
         return `
             <div class="config-io-item">
@@ -2794,6 +2859,7 @@ function updateConfigCount(nodeId, val) {
 let currentDropdownNodeId = null;
 let currentRefTargetToken = 'referenceToken';
 let currentRefTargetSource = 'referenceSource';
+let currentSelectedRefToken = '';
 
 function toggleVarDropdown(event, nodeId) {
     event.stopPropagation();
@@ -2822,6 +2888,14 @@ function toggleRefVarDropdown(event, nodeId, tokenKey = 'referenceToken', source
     currentDropdownNodeId = nodeId;
     currentRefTargetToken = tokenKey;
     currentRefTargetSource = sourceKey;
+    const currentNode = nodes.find(n => n.id === nodeId);
+    if (sourceKey === 'wrapper_input') {
+        currentSelectedRefToken = currentNode?.config?.inputs?.[tokenKey]?.token || '';
+    } else if (sourceKey === 'review_item') {
+        currentSelectedRefToken = (currentNode?.config?.reviewItems || []).find(item => item.id === tokenKey)?.token || '';
+    } else {
+        currentSelectedRefToken = currentNode?.config?.[tokenKey] || '';
+    }
     
     let acceptRef = acceptTypes ? acceptTypes.split(',') : ['text', 'image', 'video', 'number', 'resolution', 'image_array', 'video_array', 'count'];
     el.innerHTML = renderRefVarDropdownOptions(nodeId, acceptRef);
@@ -2865,7 +2939,8 @@ function renderRefVarDropdownOptions(nodeId, acceptRef) {
     if (!nodesInWorkflow.length) return '<div style="padding:12px; color:var(--text-muted); text-align:center;">无可用的文件变量</div>';
     return nodesInWorkflow.map(source => {
         const hasValidVars = variables.some(v => v.source === source && (acceptRef.includes(v.type) || acceptRef.includes(v.type === 'video.generate' ? 'video' : v.type)));
-        return `<div class="cascader-item ${!hasValidVars ? 'disabled' : ''}" onmouseenter="showRefVarSubmenu(event, '${source}', '${nodeId}', '${acceptRef.join(',')}')" onclick="showRefVarSubmenu(event, '${source}', '${nodeId}', '${acceptRef.join(',')}')">${source} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`;
+        const hasSelected = variables.some(v => v.source === source && v.token === currentSelectedRefToken);
+        return `<div class="cascader-item ${!hasValidVars ? 'disabled' : ''} ${hasSelected ? 'selected' : ''}" onmouseenter="showRefVarSubmenu(event, '${source}', '${nodeId}', '${acceptRef.join(',')}')" onclick="showRefVarSubmenu(event, '${source}', '${nodeId}', '${acceptRef.join(',')}')">${source} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:auto"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`;
     }).join('');
 }
 
@@ -2877,7 +2952,8 @@ function showRefVarSubmenu(event, source, nodeId, acceptRefStr) {
     if (!variables.length) { sub.classList.remove('show'); return; }
     let html = '';
     variables.forEach(v => {
-        html += `<div class="cascader-item" onclick="selectRefVariable('${v.token}')">${v.label}</div>`;
+        const selected = v.token === currentSelectedRefToken;
+        html += `<div class="cascader-item ${selected ? 'selected' : ''}" onclick="selectRefVariable('${v.token}')">${v.label}${selected ? '<span style="margin-left:auto;">✓</span>' : ''}</div>`;
     });
     sub.innerHTML = html;
     const rect = event.currentTarget.getBoundingClientRect();

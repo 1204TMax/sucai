@@ -123,10 +123,11 @@
 
     /* 标签页 */
     .ds-tabs { display: flex; align-items: center; padding: 0 var(--space-5); border-bottom: 1px solid var(--border-1); gap: 0; }
-    .ds-tab { height: 40px; padding: 0 var(--space-3); font: 400 var(--text-sm)/1 var(--font); color: var(--text-muted); background: none; border: none; cursor: pointer; position: relative; transition: color var(--ease); display: inline-flex; align-items: center; flex-shrink: 0; }
+    .ds-tab { height: 40px; padding: 0 var(--space-3); font: 400 var(--text-sm)/1 var(--font); color: var(--text-muted); background: none; border: none; cursor: pointer; position: relative; transition: color var(--ease); display: inline-flex; align-items: center; gap: var(--space-1); flex-shrink: 0; }
     .ds-tab:hover { color: var(--text-lo); }
     .ds-tab.on { color: var(--text-hi); font-weight: 500; }
     .ds-tab.on::after { content: ''; position: absolute; left: var(--space-3); right: var(--space-3); bottom: 0; height: 2px; background: var(--accent-solid); border-radius: 1px; }
+    .ds-tab-badge { min-width: 16px; height: 16px; padding: 0 5px; border-radius: var(--r-full); background: var(--accent-solid); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 600 10px/1 var(--font); font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2px var(--bg-surface); }
 
     /* 选择器 */
     .sel-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
@@ -431,7 +432,10 @@
     .opt-pill { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-1) var(--space-3); border: 1px solid var(--border-1); border-radius: var(--r-full); font-size: var(--text-sm); color: var(--text-lo); cursor: pointer; position: relative; white-space: nowrap; transition: border-color var(--ease), background var(--ease); user-select: none; }
     .opt-pill:hover { border-color: var(--text-hi); background: rgba(0,0,0,0.02); }
     .opt-pill.open { border-color: var(--text-hi); background: rgba(0,0,0,0.03); color: var(--text-hi); }
-    .opt-pill .arr { font-size: 8px; color: var(--text-muted); }
+    .opt-pill-val { display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-hi); }
+    .type-opt-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; color: currentColor; flex-shrink: 0; }
+    .type-opt-icon svg { width: 14px; height: 14px; display: block; }
+    .opt-pill .arr { display: none; }
     .pill-ratio-box { display: inline-block; border: 1.2px solid currentColor; border-radius: 1.5px; vertical-align: middle; margin-right: 2px; }
     .opt-dd { position: absolute; top: calc(100% + var(--space-2)); left: 0; min-width: 200px; background: var(--bg-surface); border-radius: var(--r-xl); box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 12px 36px rgba(0,0,0,0.1); padding: var(--space-3) var(--space-4); z-index: 400; display: none; }
     .opt-dd.show { display: block; }
@@ -481,6 +485,8 @@
 
     /* ═══ 生成按钮 ═══ */
     .gen-btn { background: var(--bg-hover); color: #fff; border: none; padding: var(--space-2) var(--space-5); border-radius: var(--r-lg); font-size: var(--text-base); cursor: not-allowed; display: flex; align-items: center; gap: var(--space-1); transition: background var(--ease); }
+    .gen-btn-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .gen-btn-icon svg { width: 14px; height: 14px; display: block; }
     .gen-btn.has-text { background: var(--accent-solid); cursor: pointer; }
     .gen-btn.has-text:hover { background: var(--accent-solid-h); }
 
@@ -942,7 +948,7 @@
 
 <script>
 // ═══ 常量 ═══
-const MODELS_MAP = { seedream5: 'seedream 5.0', banana2: 'banana 2', minimax1: 'MiniMax-01' };
+const MODELS_MAP = { seedream5: 'seedream 5.0', banana2: 'Banana 2', seedream5lite: 'Seedream 5.0 Lite', seedream46: 'Seedream 4.6', minimax1: 'MiniMax-01', seedance2: 'Seedance 2.0', seedance2fast: 'Seedance 2.0 Fast', seedance15pro: 'Seedance 1.5Pro' };
 const VIDEO_GRADIENTS = [['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140']];
 const GEN_SOURCES = { universal:'通用生成', poster:'大字报衍生', workflow:'工作流生成' };
 const STORAGE_TARGETS = ['素材库','物料库','原料库'];
@@ -1426,7 +1432,7 @@ const state = {
   detailActiveModel: null,
   reviewTaskId: null,
   cardModels: {},
-  noticeExpanded: { generating: false, unread: false, pending_review: false },
+  noticeExpanded: { generating: false, unread: false, reviewing: false },
   noticeSeen: { '2': false, '5': false },
 };
 INITIAL_TASKS.forEach(function(t){ state.cardModels[t.id] = t.input.models[0]; });
@@ -1520,7 +1526,11 @@ function renderFilterBar() {
   var tabBtns = [
     {k:'chat',l:'文案'},{k:'image',l:'图像'},{k:'video',l:'视频'}
   ].map(function(t){
-    return '<button class="ds-tab'+(tab===t.k?' on':'')+'" onclick="switchContentTab(\''+t.k+'\')">'+t.l+'</button>';
+    var attentionCount = getAttentionCountForTab(t.k);
+    var badge = attentionCount > 0
+      ? '<span class="ds-tab-badge" aria-label="'+t.l+'待处理任务 '+attentionCount+'">'+formatBadgeCount(attentionCount)+'</span>'
+      : '';
+    return '<button class="ds-tab'+(tab===t.k?' on':'')+'" onclick="switchContentTab(\''+t.k+'\')">'+t.l+badge+'</button>';
   }).join('');
 
   // 状态选择器
@@ -1667,11 +1677,7 @@ function selectChat(id) { state.activeChat = id; renderChatSidebar(); }
 function getFilteredTasks() {
   var f = state.filters, tab = state.contentTab;
   return state.tasks.filter(function(t) {
-    var taskType = t.taskType || (t.type === 'workflow' ? 'workflow_run' : 'direct_generate');
-    var resultType = t.resultType || (t.type === 'chat' ? 'text' : t.type);
-    if (tab === 'chat' && resultType !== 'text' && resultType !== 'mixed') return false;
-    if (tab === 'image' && resultType !== 'image' && resultType !== 'mixed') return false;
-    if (tab === 'video' && resultType !== 'video' && resultType !== 'mixed') return false;
+    if (!taskMatchesContentTab(t, tab)) return false;
     if (f.status && t.status !== f.status) return false;
     if (f.search && t.input.prompt.indexOf(f.search) < 0 && t.name.indexOf(f.search) < 0) return false;
     if (f.project && (Array.isArray(f.project) ? f.project.length > 0 && f.project.indexOf(t.project) < 0 : t.project !== f.project)) return false;
@@ -1696,21 +1702,53 @@ function getSourceLabel(source) {
   return '通用生成';
 }
 
+function getTaskLifecycleStatus(task) {
+  return task.type === 'workflow' ? getWorkflowDisplayStatus(task) : task.status;
+}
+
+function taskMatchesContentTab(task, tab) {
+  var resultType = normalizeTaskResultType(task.resultType || task.type);
+  if (tab === 'chat') return resultType === 'text' || resultType === 'mixed';
+  if (tab === 'image') return resultType === 'image' || resultType === 'mixed';
+  if (tab === 'video') return resultType === 'video' || resultType === 'mixed';
+  return true;
+}
+
+function isTaskInProgress(task) {
+  var status = getTaskLifecycleStatus(task);
+  return status === 'pending' || status === 'generating';
+}
+
+function isTaskUnreadCompleted(task) {
+  return getTaskLifecycleStatus(task) === 'completed' && state.noticeSeen[task.id] === false;
+}
+
+function getAttentionCountForTab(tab) {
+  return state.tasks.filter(function(task) {
+    return taskMatchesContentTab(task, tab) && (isTaskInProgress(task) || isTaskUnreadCompleted(task));
+  }).length;
+}
+
+function formatBadgeCount(count) {
+  return count > 99 ? '99+' : String(count);
+}
+
 function getNoticeTasks(kind, tasks) {
   var pool = tasks || getFilteredTasks();
   if (kind === 'generating') {
     return pool.filter(function(t) {
-      return t.status === 'generating' || t.status === 'pending';
-    }).slice(0, 5);
+      return isTaskInProgress(t);
+    });
   }
   if (kind === 'reviewing') {
     return pool.filter(function(t) {
-      return t.status === 'pending_review' || t.status === 'reviewing';
-    }).slice(0, 5);
+      var status = getTaskLifecycleStatus(t);
+      return status === 'pending_review' || status === 'reviewing';
+    });
   }
   return pool.filter(function(t) {
-    return t.status === 'completed' && state.noticeSeen[t.id] === false && (t.id === '2' || t.id === '5');
-  }).slice(0, 2);
+    return isTaskUnreadCompleted(t);
+  });
 }
 
 function renderNoticeCard(kind, tasks) {
@@ -1722,7 +1760,7 @@ function renderNoticeCard(kind, tasks) {
     ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>'
     : (kind === 'reviewing' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>');
-  var listHtml = items.map(function(task) {
+  var listHtml = items.slice(0, 5).map(function(task) {
     var statusText = kind === 'generating'
       ? (task.status === 'pending' ? '排队中' : '生成中')
       : (kind === 'reviewing' ? '待审核' : '待查看');
@@ -1813,6 +1851,7 @@ function renderBottomCountMeta(task, vm) {
 function openWorkflowDetail(taskId) {
   var task = getTaskById(taskId);
   if (!task) return;
+  markTaskViewed(taskId);
   var nodes = task.workflowRun ? task.workflowRun.nodes || [] : [];
   var failedNodes = nodes.filter(function(node) { return node.status === 'failed' || node.status === 'aborted'; });
 
@@ -1855,10 +1894,24 @@ function openWorkflowDetail(taskId) {
   document.body.appendChild(wrap.firstElementChild);
 }
 function openWorkflowResult(taskId) {
+  openTaskResult(taskId);
+}
+
+function markTaskViewed(taskId, refresh) {
+  if (state.noticeSeen[taskId] !== false) return;
+  state.noticeSeen[taskId] = true;
+  if (refresh !== false) {
+    renderFilterBar();
+    renderTaskFeed(false);
+  }
+}
+
+function openTaskResult(taskId) {
   var task = getTaskById(taskId);
   if (!task) return;
   var vm = getTaskCardViewModel(task, state.cardModels[task.id] || task.input.models[0]);
   var target = getViewAllTarget(task, vm);
+  markTaskViewed(taskId);
   parent.postMessage({ action:'openTab', title:target.title, url:target.url }, '*');
 }
 function openWorkflowReview(taskId) {
@@ -2752,14 +2805,13 @@ function renderChatOutputRow(task, output, collapsed, vm) {
   }
 
   var completedCount = vm.producedCount || (output.items || []).length;
-  var target = getViewAllTarget(task, vm);
 
   return ''
     + '<div class="output-row copy-output-list ' + (collapsed ? 'collapsed' : 'expanded') + '">'
       + rows.join('')
       + '<div class="copy-output-footer" style="justify-content: flex-end; gap: 8px;">'
         + '<span style="font-size: 13px; color: var(--text-muted);">' + completedCount + ' / ' + total + '</span>'
-        + (total > items.length ? '<button class="copy-more-link" style="margin-left: 4px;" onclick="event.stopPropagation();parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>' : '')
+        + (total > items.length ? '<button class="copy-more-link" style="margin-left: 4px;" onclick="event.stopPropagation();openTaskResult(\''+task.id+'\')">查看全部</button>' : '')
       + '</div>'
     + '</div>';
 }
@@ -2896,8 +2948,7 @@ function getViewAllTarget(task, vm) {
 }
 
 function renderViewAllCard(task, remaining, vm) {
-  var target = getViewAllTarget(task, vm);
-  return '<div class="o-thumb view-all-card" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')"><div class="view-all-num">+'+remaining+'</div><span>查看全部</span></div>';
+  return '<div class="o-thumb view-all-card" onclick="event.stopPropagation();openTaskResult(\''+task.id+'\')"><div class="view-all-num">+'+remaining+'</div><span>查看全部</span></div>';
 }
 
 
@@ -2966,11 +3017,10 @@ function renderCardActions(task, vm) {
     }
   }
   if (s === 'completed' || s === 'aborted') {
-    var target = getViewAllTarget(task, vm);
     return '<div class="card-actions">'
       +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
       +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
-      +'<button class="card-act-more" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>'
+      +'<button class="card-act-more" onclick="openTaskResult(\''+id+'\')">查看全部</button>'
       +'</div>';
   }
   if (s === 'pending_review') {
@@ -3026,8 +3076,11 @@ function toggleNoticeCheck(event, kind, id) {
   renderTaskFeed();
 }
 function focusTaskCard(id, kind) {
-  if (kind === 'unread') state.noticeSeen[id] = true;
-  renderTaskFeed();
+  if (kind === 'unread') {
+    markTaskViewed(id, false);
+    renderFilterBar();
+  }
+  renderTaskFeed(false);
   var scrollArea = document.getElementById('taskScrollArea');
   var card = document.getElementById('task-card-' + id);
   if (!scrollArea || !card) return;
@@ -3113,16 +3166,23 @@ window.addEventListener('taskCreated', function(e) {
   var task = Object.assign({}, e.detail, {_new:true});
   state.tasks = state.tasks.concat([task]);
   state.cardModels[task.id] = task.input.models[0];
+  if (getTaskLifecycleStatus(task) === 'completed') state.noticeSeen[task.id] = false;
+  renderFilterBar();
   renderTaskFeed();
   setTimeout(function(){ var el=document.getElementById('taskScrollArea'); if(el) el.scrollTop=el.scrollHeight; }, 100);
 });
 
 window.addEventListener('taskUpdated', function(e) {
+  var prevTask = getTaskById(e.detail.id);
+  if (e.detail.status === 'completed' && (!prevTask || getTaskLifecycleStatus(prevTask) !== 'completed')) {
+    state.noticeSeen[e.detail.id] = false;
+  }
   state.tasks = state.tasks.map(function(t){ return t.id===e.detail.id ? Object.assign({},t,e.detail) : t; });
   if (state.pageMode === 'review') {
     renderReviewPage();
     return;
   }
+  renderFilterBar();
   renderTaskFeed();
 });
 
@@ -3143,10 +3203,16 @@ if (state.pageMode === 'review') {
 
 <script>
 // ══════════════════════════════════════
-const RATIO_SIZES = {'1:1':[16,16],'2:3':[11,16],'3:2':[16,11],'3:4':[12,16],'4:3':[16,12],'9:16':[9,16],'16:9':[16,9]};
+const RATIO_SIZES = {'1:1':[16,16],'2:3':[11,16],'3:2':[16,11],'3:4':[12,16],'4:3':[16,12],'9:16':[9,16],'16:9':[16,9],'21:9':[16,7]};
 const MODELS_DATA = [
-  { id:'seedream5', name:'seedream5.0', desc:'字节最强大的图像模型，对中文字体支持友好' },
-  { id:'banana2', name:'banana2', desc:'谷歌的图像模型，对提示词的理解能力很强大' },
+  { id:'seedream5', name:'seedream5.0', desc:'字节最强大的图像模型，对中文字体支持友好', types:['image'], qualities:['1K','2K','3K','4K'] },
+  { id:'banana2', name:'Banana 2', desc:'图像模型 · 支持 1K / 2K / 4K 清晰度', types:['image'], qualities:['1K','2K','4K'] },
+  { id:'seedream5lite', name:'Seedream 5.0 Lite', desc:'图像模型 · 支持 2K / 3K 清晰度', types:['image'], qualities:['2K','3K'] },
+  { id:'seedream46', name:'Seedream 4.6', desc:'图像模型 · 支持 2K / 4K 清晰度', types:['image'], qualities:['2K','4K'] },
+  { id:'seedance2', name:'Seedance 2.0', desc:'视频模型 · 支持 4 秒到 15 秒', types:['video'], durations:['4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒'] },
+  { id:'seedance2fast', name:'Seedance 2.0 Fast', desc:'视频模型 · 支持 4 秒到 15 秒', types:['video'], durations:['4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒'] },
+  { id:'seedance15pro', name:'Seedance 1.5Pro', desc:'视频模型 · 支持 5 秒 / 10 秒 / 12 秒', types:['video'], durations:['5秒','10秒','12秒'] },
+  { id:'minimax1', name:'MiniMax-01', desc:'视频生成模型，适合广告短片和素材动效', types:['video'], durations:['5秒','10秒'] },
 ];
 const CHAT_MODELS = {
   fast: [
@@ -3166,11 +3232,34 @@ const CHAT_MODELS = {
     { id:'deepseek-32', name:'DeepSeek 3.2', desc:'深度求索 · 代码与数学能力强，开源之光' },
   ],
 };
+const TYPE_ICONS = {
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+  image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
+  video: '<svg class="lucide lucide-square-play" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z" /></svg>'
+};
+const OPTION_ICONS = {
+  count: '<svg class="lucide lucide-layers-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74z" /><path d="m20 14.285 1.5.845a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74l1.5-.845" /></svg>',
+  mode: '<svg class="lucide lucide-sliders-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3" /><path d="M12 19H3" /><path d="M14 3v4" /><path d="M16 17v4" /><path d="M21 12h-9" /><path d="M21 19h-5" /><path d="M21 5h-7" /><path d="M8 10v4" /><path d="M8 12H3" /></svg>'
+};
+const GENERATE_ICON = '<svg class="lucide lucide-send-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" /><path d="M6 12h16" /></svg>';
+const INPUT_OPTS = {
+  chat: { countValues: ['1','5','10','20','50'] },
+  image: {
+    ratioValues: ['21:9','16:9','3:2','4:3','1:1','3:4','2:3','9:16'],
+    countValues: ['1','2','3','4','5','6','7','8','9','10']
+  },
+  video: {
+    ratioValues: ['16:9','4:3','1:1','3:4','9:16'],
+    countValues: ['1','2','3','4','5','6','7','8','9','10'],
+    modeValues: ['智能参考','首尾帧']
+  }
+};
+
 let curType = 'image';
 const sel = {
-  chat:  { model:'gpt54mini', think:false, search:false },
+  chat:  { model:'gpt54mini', count:'1', think:false, search:false },
   image: { models:['seedream5'], activeModel:'seedream5', modelConfigs:{ seedream5:{ count:'1', ratio:'1:1', res:'2K' } } },
-  video: { models:['seedream5'], activeModel:'seedream5', modelConfigs:{ seedream5:{ count:'1', ratio:'16:9', dur:'5秒', mode:'智能参考' } } },
+  video: { models:['seedance2'], activeModel:'seedance2', modelConfigs:{ seedance2:{ count:'1', ratio:'16:9', dur:'5秒', mode:'智能参考' } } },
 };
 
 function ensureInputModelConfig(type, modelId) {
@@ -3194,6 +3283,48 @@ function getInputActiveModelId(type = curType) {
 
 function getInputActiveConfig(type = curType) {
   return ensureInputModelConfig(type, getInputActiveModelId(type));
+}
+
+function getInputModelName(id) {
+  return (MODELS_DATA.find(m => m.id === id) || { name: MODELS_MAP[id] || id }).name;
+}
+
+function inputOptionIconHtml(kind, type = curType) {
+  const icon = kind === 'model'
+    ? (TYPE_ICONS[type] || TYPE_ICONS.image)
+    : (OPTION_ICONS[kind] || TYPE_ICONS.image);
+  return '<span class="type-opt-icon" aria-hidden="true">' + icon + '</span>';
+}
+
+function ratioPillIconHtml(width, height) {
+  return `<span class="pill-ratio-box" style="width:${width}px;height:${height}px;"></span>`;
+}
+
+function getRatioIconSize(ratio) {
+  let rw = 14, rh = 14;
+  if (RATIO_SIZES[ratio]) {
+    [rw, rh] = RATIO_SIZES[ratio];
+  } else {
+    const nums = String(ratio || '').split(':').map(Number);
+    if (nums.length === 2 && nums[0] && nums[1]) {
+      const mx = 16;
+      if (nums[0] >= nums[1]) { rw = mx; rh = Math.round(mx * nums[1] / nums[0]); }
+      else { rh = mx; rw = Math.round(mx * nums[0] / nums[1]); }
+    }
+  }
+  const sc = 11 / Math.max(rw, rh);
+  return [Math.max(2, Math.round(rw * sc)), Math.max(2, Math.round(rh * sc))];
+}
+
+function getResolutionLabel(res) {
+  return res === '4K' ? '超清 4K' : res === '3K' ? '高清 3K' : res === '1K' ? '1K' : '高清 2K';
+}
+
+function renderGenerateButtonLabel() {
+  const btn = document.getElementById('inputGenBtn');
+  if (!btn) return;
+  const label = curType === 'chat' ? '发送' : '生成';
+  btn.innerHTML = '<span class="gen-btn-icon" aria-hidden="true">' + GENERATE_ICON + '</span><span>' + label + '</span>';
 }
 
 function getTaskModelConfig(task, modelId) {
@@ -3263,21 +3394,35 @@ function getTaskDisplayMeta(task, modelId, resultTypeOverride) {
           </div>
           <textarea class="input-textarea" id="inputPrompt" rows="3"
             placeholder="描述您想要生成的内容..."
-            oninput="onInputChange()"></textarea>
+            oninput="onInputChange();autoGrowTextarea(this,80,5)"></textarea>
         </div>
         <div class="input-ref-strip" id="inputRefStrip"></div>
         <div class="input-toolbar" id="inputToolbar">
           <div id="inputOptArea" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></div>
           <div class="input-toolbar-spacer"></div>
           <button class="gen-btn" id="inputGenBtn" onclick="doGenerate()">
-            <span>生成</span>
+            <span class="gen-btn-icon" aria-hidden="true">${GENERATE_ICON}</span><span>生成</span>
           </button>
         </div>
       </div>
     </div>
   </div>`;
-  setTimeout(function(){ if (typeof renderInputOpts === 'function') renderInputOpts(); }, 0);
+  setTimeout(function(){
+    renderGenerateButtonLabel();
+    if (typeof renderInputOpts === 'function') renderInputOpts();
+    autoGrowTextarea(document.getElementById('inputPrompt'), 80, 5);
+  }, 0);
 })();
+
+function autoGrowTextarea(textarea, defaultH, extraRows) {
+  if (!textarea) return;
+  const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 21;
+  const maxH = defaultH + lineHeight * extraRows;
+  textarea.style.height = defaultH + 'px';
+  const nextH = Math.min(textarea.scrollHeight, maxH);
+  textarea.style.height = Math.max(defaultH, nextH) + 'px';
+  textarea.style.overflowY = textarea.scrollHeight > maxH ? 'auto' : 'hidden';
+}
 
 function expandInputBox() {
   document.getElementById('inputBox').classList.add('expanded');
@@ -3318,21 +3463,21 @@ window.addEventListener('contentTabChanged', function(e) {
     if (placeholder) placeholder.textContent = '输入文本内容...';
     if (uploadBlock) uploadBlock.style.display = 'none';
     if (optArea) optArea.style.display = '';
-    genBtn.innerHTML = '<span>发送</span>';
+    renderGenerateButtonLabel();
     renderInputOpts();
   } else if (tab === 'video') {
     prompt.placeholder = '描述您想要生成的视频...';
     if (placeholder) placeholder.textContent = '描述您想要生成的视频...';
     if (uploadBlock) uploadBlock.style.display = '';
     if (optArea) optArea.style.display = '';
-    genBtn.innerHTML = '<span>生成</span>';
+    renderGenerateButtonLabel();
     renderInputOpts();
   } else {
     prompt.placeholder = '描述您想要生成的图像...';
     if (placeholder) placeholder.textContent = '描述您想要生成的图像...';
     if (uploadBlock) uploadBlock.style.display = '';
     if (optArea) optArea.style.display = '';
-    genBtn.innerHTML = '<span>生成</span>';
+    renderGenerateButtonLabel();
     renderInputOpts();
   }
 });
@@ -3499,26 +3644,51 @@ document.addEventListener('click', function(e) {
 // ══════════════════════════════════════
 // Option Pills + 生成 + Asset Modal
 // ══════════════════════════════════════
+function inputPillHtml(key, valueHtml, ddInner) {
+  const ddHtml = ddInner ? `<div class="opt-dd" id="dd-${key}">${ddInner}</div>` : '';
+  const clickAttr = ddInner ? ` onclick="togglePill(event,'${key}')"` : '';
+  return `<div class="opt-pill" id="pill-${key}"${clickAttr}><span class="opt-pill-val">${valueHtml}</span>${ddHtml}</div>`;
+}
+
+function renderInputModelDropdown(activeId, type) {
+  const list = MODELS_DATA.filter(m => Array.isArray(m.types) ? m.types.includes(type) : (type === 'video' ? (m.durations && m.durations.length) : (m.qualities && m.qualities.length)));
+  return `<div class="dd-section">
+    <div class="dd-section-title">模型</div>
+    <div class="model-list">
+      ${list.map(mx => `<div class="model-opt-row" data-desc="${mx.desc || ''}" onclick="pickModel(event,'${mx.id}')">
+        <div class="model-radio${mx.id===activeId?' active':''}"></div>
+        <span class="model-opt-name">${mx.name}</span>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderInputCountDropdown(active, values, picker) {
+  return `<div class="dd-section">
+    <div class="dd-section-title">生成数量</div>
+    <div class="dd-chips">
+      ${values.map(v => `<span class="dd-chip${v===active?' active':''}" onclick="${picker}(event,'${v}')">${v}</span>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderInputRatioChips(values, active) {
+  return `<div class="ratio-row">
+    ${values.map(v => {
+      const [w, h] = RATIO_SIZES[v] || [14, 14];
+      return `<div class="ratio-chip${v===active?' active':''}" onclick="pickRatio(event,'${v}')">
+        <div class="ratio-box" style="width:${w}px;height:${h}px;"></div>
+        <span class="ratio-lbl">${v}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
 function renderInputOpts() {
   const area = document.getElementById('inputOptArea');
   if (!area) return;
+  renderGenerateButtonLabel();
   area.innerHTML = '';
-
-  if (curType !== 'chat') {
-    const models = sel[curType].models || [];
-    const activeId = getInputActiveModelId();
-    const activeCfg = getInputActiveConfig();
-    const modelNames = models.map(id => (MODELS_DATA.find(m=>m.id===id)||{name:id}).name).join('、');
-    area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>${models.length > 1 ? `${models.length} 个模型` : modelNames}</span></div>`;
-    if (models.length > 1) {
-      area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>当前：${(MODELS_DATA.find(m=>m.id===activeId)||{name:activeId}).name}</span></div>`;
-    }
-    if (curType === 'video') {
-      area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>${activeCfg.ratio || '16:9'} · ${activeCfg.dur || '5秒'} · ${activeCfg.count || '1'} 个</span></div>`;
-    } else {
-      area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>${activeCfg.ratio || '1:1'} · ${activeCfg.res || '2K'} · ${activeCfg.count || '1'} 张</span></div>`;
-    }
-  }
 
   if (curType === 'chat') {
     // ── 对话模型选择 ──
@@ -3532,7 +3702,7 @@ function renderInputOpts() {
       </div>`
     ).join('');
     area.innerHTML += `<div class="opt-pill" id="pill-chat-model" onclick="togglePill(event,'chat-model')">
-      <span>${cm.name}</span><span class="arr">▼</span>
+      <span class="opt-pill-val">${inputOptionIconHtml('model','chat')}${cm.name}</span>
       <div class="opt-dd" id="dd-chat-model" style="min-width:220px">
         <div class="cm-tier-label">快速</div>
         <div class="model-list">${renderTier(CHAT_MODELS.fast)}</div>
@@ -3540,6 +3710,13 @@ function renderInputOpts() {
         <div class="model-list">${renderTier(CHAT_MODELS.smart)}</div>
       </div>
     </div>`;
+
+    const chatCount = sel.chat.count || '1';
+    area.innerHTML += inputPillHtml(
+      'chat-count',
+      inputOptionIconHtml('count') + `${chatCount} 条`,
+      renderInputCountDropdown(chatCount, INPUT_OPTS.chat.countValues, 'pickChatCount')
+    );
 
     // ── 思考模式 ──
     const thinkOn = sel.chat.think;
@@ -3557,9 +3734,80 @@ function renderInputOpts() {
     area.innerHTML += `<div class="opt-pill toggle-pill" onclick="void(0)">
       <span class="opt-pill-val"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> 上传文件</span>
     </div>`;
+    return;
+  }
 
+  const models = sel[curType].models || [];
+  const activeId = getInputActiveModelId();
+  const activeCfg = getInputActiveConfig();
+  const activeModel = MODELS_DATA.find(m => m.id === activeId) || {};
+  const modelLabel = models.length > 1
+    ? `${getInputModelName(models[0])} 等 ${models.length} 个模型`
+    : getInputModelName(activeId);
+  area.innerHTML += inputPillHtml(
+    'input-model',
+    inputOptionIconHtml('model', curType) + modelLabel,
+    renderInputModelDropdown(activeId, curType)
+  );
+
+  const countUnit = curType === 'video' ? '个' : '张';
+  const countVal = activeCfg.count || '1';
+  area.innerHTML += inputPillHtml(
+    'input-count',
+    inputOptionIconHtml('count') + `${countVal} ${countUnit}`,
+    renderInputCountDropdown(countVal, INPUT_OPTS[curType].countValues, 'pickCount')
+  );
+
+  if (curType === 'video') {
+    const modeVal = activeCfg.mode || '智能参考';
+    area.innerHTML += inputPillHtml(
+      'input-mode',
+      inputOptionIconHtml('mode') + modeVal,
+      `<div class="dd-section">
+        <div class="dd-section-title">生成模式</div>
+        <div class="dd-chips">
+          ${INPUT_OPTS.video.modeValues.map(v => `<span class="dd-chip${v===modeVal?' active':''}" onclick="pickMode(event,'${v}')">${v}</span>`).join('')}
+        </div>
+      </div>`
+    );
+
+    const ratio = activeCfg.ratio || '16:9';
+    const dur = activeCfg.dur || '5秒';
+    const [iw, ih] = getRatioIconSize(ratio);
+    const durations = activeModel.durations && activeModel.durations.includes(dur) ? activeModel.durations : [dur].concat(activeModel.durations || []);
+    area.innerHTML += inputPillHtml(
+      'input-ratio-dur',
+      ratioPillIconHtml(iw, ih) + `${ratio} · ${dur}`,
+      `<div class="dd-section">
+        <div class="dd-section-title">比例</div>
+        ${renderInputRatioChips(INPUT_OPTS.video.ratioValues, ratio)}
+      </div>
+      <div class="dd-section">
+        <div class="dd-section-title">时长</div>
+        <div class="dd-chips">
+          ${durations.map(v => `<span class="dd-chip${v===dur?' active':''}" onclick="pickDur(event,'${v}')">${v}</span>`).join('')}
+        </div>
+      </div>`
+    );
   } else {
-    // 我的任务页底部输入区先展示摘要，不再提供逐模型编辑，避免误改丢配置
+    const ratio = activeCfg.ratio || '1:1';
+    const res = activeCfg.res || '2K';
+    const [iw, ih] = getRatioIconSize(ratio);
+    const qualities = activeModel.qualities && activeModel.qualities.includes(res) ? activeModel.qualities : [res].concat(activeModel.qualities || []);
+    area.innerHTML += inputPillHtml(
+      'input-ratio-res',
+      ratioPillIconHtml(iw, ih) + `${ratio} · ${getResolutionLabel(res)}`,
+      `<div class="dd-section">
+        <div class="dd-section-title">比例</div>
+        ${renderInputRatioChips(INPUT_OPTS.image.ratioValues, ratio)}
+      </div>
+      <div class="dd-section">
+        <div class="dd-section-title">质量</div>
+        <div class="dd-chips">
+          ${qualities.map(v => `<span class="dd-chip${v===res?' active':''}" onclick="pickRes(event,'${v}')">${getResolutionLabel(v)}</span>`).join('')}
+        </div>
+      </div>`
+    );
   }
 }
 
@@ -3579,11 +3827,18 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function pickModel(e,id){ e.stopPropagation(); sel[curType].activeModel=id; ensureInputModelConfig(curType, id); renderInputOpts(); }
+function pickModel(e,id){
+  e.stopPropagation();
+  sel[curType].models = [id];
+  sel[curType].activeModel = id;
+  ensureInputModelConfig(curType, id);
+  renderInputOpts();
+}
 function pickRatio(e,r){ e.stopPropagation(); getInputActiveConfig().ratio=r; renderInputOpts(); }
 function pickRes(e,r){ e.stopPropagation(); getInputActiveConfig().res=r; renderInputOpts(); }
 function pickCount(e,n){ e.stopPropagation(); getInputActiveConfig().count=n; renderInputOpts(); }
 function pickChatModel(e,id){ e.stopPropagation(); sel.chat.model=id; renderInputOpts(); }
+function pickChatCount(e,n){ e.stopPropagation(); sel.chat.count=n; renderInputOpts(); }
 function toggleChatOpt(key){ sel.chat[key]=!sel.chat[key]; renderInputOpts(); }
 function pickMode(e,v){ e.stopPropagation(); getInputActiveConfig().mode=v; renderInputOpts(); }
 function pickDur(e,v){ e.stopPropagation(); getInputActiveConfig().dur=v; renderInputOpts(); }
@@ -3593,13 +3848,40 @@ function doGenerate() {
   if (!txt) { document.getElementById('inputPrompt').focus(); return; }
   const refImgs = [];
   document.querySelectorAll('#inputRefStrip .input-ref-item img').forEach(img => refImgs.push({ thumb: img.src, url: img.src }));
+  if (curType === 'chat') {
+    const modelId = sel.chat.model || CHAT_MODELS.fast[0].id;
+    const count = parseInt(sel.chat.count || '1', 10) || 1;
+    const newTask = {
+      id: String(Date.now()), name: txt.length>30?txt.substring(0,30)+'...':txt,
+      type:'chat', taskType:'direct_generate', resultType:'text', status:'generating',
+      createdTime: new Date().toISOString().replace('T',' ').substring(0,16),
+      creator:'我', source:'universal',
+      input: { prompt:txt, refImages:[], inputType:'text', models:[modelId], count:count, think:sel.chat.think, search:sel.chat.search },
+      output: { byModel: { [modelId]: { total:0, items:[] } } }
+    };
+    window.dispatchEvent(new CustomEvent('taskCreated', { detail: newTask }));
+    collapseInputBox();
+    document.getElementById('inputPrompt').value = '';
+    onInputChange();
+    showToast('任务已提交');
+    setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('taskUpdated', {
+        detail: {
+          id: newTask.id,
+          status:'completed',
+          output: { byModel: { [modelId]: { total:count, items:Array.from({length:count}, (_,i) => ({ type:'text', content:`${txt} · 候选文案 ${i + 1}` })) } } }
+        }
+      }));
+    }, 3000);
+    return;
+  }
   const models = (sel[curType].models && sel[curType].models.length) ? sel[curType].models.slice() : [getInputActiveModelId()];
   const modelConfigs = {};
   models.forEach(function(id){ modelConfigs[id] = Object.assign({}, ensureInputModelConfig(curType, id)); });
   const firstCfg = modelConfigs[models[0]] || {};
   const newTask = {
     id: String(Date.now()), name: txt.length>30?txt.substring(0,30)+'...':txt,
-    type: curType==='video'?'video':'image', status:'generating',
+    type: curType==='video'?'video':'image', taskType:'direct_generate', resultType:curType==='video'?'video':'image', status:'generating',
     createdTime: new Date().toISOString().replace('T',' ').substring(0,16),
     creator:'我', source:'universal',
     input: { prompt:txt, refImages:refImgs, inputType:refImgs.length>1?'multi_image':refImgs.length===1?'image':'text', models:models, modelConfigs:modelConfigs, ratio:firstCfg.ratio, res:firstCfg.res, dur:firstCfg.dur, count:parseInt(firstCfg.count)||1, mode:firstCfg.mode },
