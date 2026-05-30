@@ -240,6 +240,124 @@
         .form-item textarea { height: auto; padding: 8px 12px; resize: vertical; }
         .form-item input:focus, .form-item textarea:focus, .form-item select:focus { border-color: var(--accent-solid); box-shadow: 0 0 0 2px var(--accent-bg); }
         .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+
+        .start-required-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 32px;
+            margin: 12px 0 0;
+        }
+        .start-required-label {
+            color: var(--text-lo);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .start-required-row .ant-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            flex: 0 0 auto;
+            min-width: 28px;
+            width: 28px;
+            height: 16px;
+            border: 0;
+            border-radius: 999px;
+            background: var(--border-2);
+            cursor: pointer;
+            padding: 0;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+        .start-required-row .ant-switch-checked {
+            background: var(--accent-solid);
+            box-shadow: 0 0 0 2px var(--accent-bg);
+        }
+        .start-required-row .ant-switch-handle {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
+            transition: left 0.2s ease;
+        }
+        .start-required-row .ant-switch-checked .ant-switch-handle {
+            left: 14px;
+        }
+        .start-required-row .ant-switch-inner {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .start-control-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 36px;
+            margin: 12px 0 0;
+        }
+        .start-control-label {
+            color: var(--text-lo);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .start-control-switch {
+            position: relative;
+            width: 132px;
+            height: 34px;
+            border: 1px solid var(--border-2);
+            border-radius: 999px;
+            background: var(--bg-page);
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0;
+            font: 600 12px var(--font);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+        .start-control-switch:hover {
+            border-color: var(--accent-border);
+        }
+        .start-control-switch.select {
+            border-color: var(--accent-border);
+            background: var(--accent-bg);
+            box-shadow: 0 0 0 2px var(--accent-bg);
+        }
+        .start-control-switch-handle {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 62px;
+            height: 26px;
+            border-radius: 999px;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+            transition: left 0.2s ease;
+        }
+        .start-control-switch.select .start-control-switch-handle {
+            left: 65px;
+        }
+        .start-control-switch-text {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            height: 100%;
+        }
+        .start-control-switch-text span {
+            text-align: center;
+            transition: color 0.2s ease;
+        }
+        .start-control-switch.input .start-control-input-label,
+        .start-control-switch.select .start-control-select-label {
+            color: var(--accent-text);
+        }
         
         .var-tag { 
             display: inline-block; margin: 4px 4px 0 0; background: var(--accent-bg); 
@@ -276,6 +394,48 @@
         .modal-title { font-size: 15px; font-weight: 600; color: var(--text-hi); }
         .modal-close { border: none; background: transparent; color: var(--text-muted); font-size: 20px; cursor: pointer; }
         .modal-body { padding: 20px; max-height: 70vh; overflow-y: auto; }
+        .start-options-modal-panel { width: 720px; max-width: calc(100vw - 48px); }
+        .start-options-modal-panel .modal-body { max-height: min(68vh, 640px); }
+        .start-options-summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            min-height: 36px;
+            margin: 12px 0 0;
+            padding: 0 0 12px;
+            border-bottom: 1px dashed var(--border-2);
+        }
+        .start-options-summary-count {
+            color: var(--text-lo);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .start-options-summary-action {
+            height: 30px;
+            padding: 0 12px;
+            border: 1px solid var(--border-2);
+            border-radius: 6px;
+            background: #fff;
+            color: var(--accent-text);
+            font: 600 12px var(--font);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .start-options-summary-action:hover {
+            border-color: var(--accent-solid);
+            background: var(--accent-bg);
+        }
+        .start-options-empty {
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px dashed var(--border-2);
+            border-radius: 8px;
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            font-size: 13px;
+            text-align: center;
+        }
         .cover-editor { display: flex; gap: 16px; align-items: flex-start; }
         .cover-preview { width: 110px; height: 150px; border-radius: 12px; background: linear-gradient(180deg, #3aa0ff 0%, #1677ff 100%); color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; line-height: 1.4; }
         .radio-row { display: flex; flex-wrap: wrap; gap: 16px; }
@@ -334,27 +494,30 @@
         .cascader-group-title { padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--text-lo); text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border-1); margin-bottom: 4px; }
         .cascader-item { display: flex; align-items: center; padding: 7px 12px; font-size: 13px; color: var(--text-lo); cursor: pointer; transition: 0.2s; border-radius: 6px; }
         .cascader-item:hover:not(.disabled) { background: var(--bg-subtle); color: var(--text-hi); }
-        .cascader-item.selected { background: var(--accent-bg); color: var(--accent-solid); font-weight: 500; }
+        .cascader-item.selected { background: var(--accent-bg); color: var(--accent-solid); font-weight: 400; }
         .cascader-item.disabled { color: var(--text-muted); cursor: not-allowed; }
         .cascader-item.disabled svg { color: #e8e8e8; }
 
         .ref-selector-trigger {
             width: 100%;
-            height: 32px;
+            height: 40px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             background: #fff;
-            border: 1px solid var(--border-2);
-            border-radius: 6px;
+            border: 1px solid var(--border-1);
+            border-radius: var(--r-lg);
             color: var(--text-hi);
             font-size: 13px;
             cursor: pointer;
             transition: all 0.2s;
             overflow: hidden;
-            padding: 0 11px;
+            padding: 0 12px;
         }
-        .ref-selector-trigger:hover { border-color: var(--accent-solid); }
+        .ref-selector-trigger:hover {
+            border-color: var(--accent-solid);
+            box-shadow: 0 0 0 2px var(--accent-bg);
+        }
         .ref-selector-trigger.empty { color: var(--text-muted); }
         .config-io-info .ref-selector-trigger { margin-top: 4px; }
         .ref-selector-value {
@@ -371,40 +534,49 @@
             flex: 0 0 auto;
         }
         .ref-selector-value .separator {
-            color: var(--border-2);
-            margin: 0 4px;
+            color: var(--text-muted);
+            margin: 0 6px;
             flex: 0 0 auto;
         }
         .ref-selector-value .label {
             min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: 400;
         }
         .ref-selector-actions {
             flex: 0 0 auto;
             display: flex;
             align-items: center;
-            gap: 4px;
-            margin-left: 8px;
+            gap: 6px;
+            margin-left: 10px;
         }
         .ref-selector-clear {
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             border: 0;
             border-radius: 50%;
-            background: rgba(0,0,0,0.06);
-            color: #999;
-            font-size: 10px;
+            background: var(--bg-subtle);
+            color: var(--text-muted);
+            font-size: 14px;
             line-height: 1;
             cursor: pointer;
             padding: 0;
             transition: all 0.2s;
         }
-        .ref-selector-clear:hover { background: rgba(0,0,0,0.15); color: #fff; }
-        .ref-selector-chevron { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; justify-content: center; }
+        .ref-selector-clear:hover { background: var(--accent-bg); color: var(--accent-solid); }
+        .ref-selector-chevron {
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            color: var(--accent-solid);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         
         .ref-remove-btn { color: var(--text-muted); background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: 0.2s; }
         .ref-remove-btn:hover { background: #f0f0f0; color: #ff4d4f; }
@@ -926,6 +1098,19 @@
     </div>
 </div>
 
+<div class="modal-mask" id="start-options-modal" onclick="onStartOptionsModalMaskClick(event)">
+    <div class="modal-panel start-options-modal-panel">
+        <div class="modal-header">
+            <div class="modal-title">设置选项</div>
+            <button class="modal-close" onclick="closeStartInputOptionsModal()">×</button>
+        </div>
+        <div class="modal-body" id="start-options-modal-body"></div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" onclick="submitStartInputOptionsModal()">完成</button>
+        </div>
+    </div>
+</div>
+
 <script>
 const PALETTE_CATEGORIES = [
     { key: 'control', label: '审核' },
@@ -950,6 +1135,7 @@ const START_INPUT_TYPES = [
     { value: 'number', label: '数值' }
 ];
 const UPLOAD_COUNT_INPUT_TYPES = ['image', 'video'];
+const SELECT_CONTROL_INPUT_TYPES = ['text', 'number'];
 const TEXT_LIKE_INPUT_TYPES = ['text', 'number', 'resolution', 'count', 'text.generate'];
 const OUTPUT_TYPE_OPTIONS = [
     { value: 'text', label: '文本' },
@@ -965,6 +1151,34 @@ function isUploadCountConfigurableInput(type) {
     return UPLOAD_COUNT_INPUT_TYPES.includes(type);
 }
 
+function isSelectControlConfigurableInput(type) {
+    return SELECT_CONTROL_INPUT_TYPES.includes(type);
+}
+
+function normalizeStartInputConfig(input) {
+    if (!input) return input;
+    if (input.type === 'select') {
+        input.type = 'text';
+        input.control = 'select';
+    }
+    if (!isSelectControlConfigurableInput(input.type)) {
+        delete input.control;
+        delete input.options;
+        return input;
+    }
+    if (input.control !== 'select') {
+        input.control = 'input';
+    }
+    if (input.control === 'select' && (!input.options || input.options.length === 0)) {
+        input.options = [{ name: '', desc: '' }];
+    }
+    return input;
+}
+
+function getConfiguredOptionCount(input) {
+    return (input.options || []).filter(option => String(option.name || '').trim()).length;
+}
+
 function normalizeMaxUploadCount(value) {
     const num = parseInt(value, 10);
     if (!Number.isFinite(num)) return 1;
@@ -974,7 +1188,7 @@ function normalizeMaxUploadCount(value) {
 function renderRefSelectorControl({ nodeId, tokenKey, sourceKey, acceptTypes, currentRefVar, placeholder = '点击选择', clearAction = '' }) {
     const selected = !!currentRefVar;
     const valueHtml = selected
-        ? `<span class="source">${escapeAttr(currentRefVar.source)}</span><span class="separator">/</span><span class="label">${escapeAttr(currentRefVar.label)}</span>`
+        ? `<span class="source">${escapeAttr(currentRefVar.source)}</span><span class="separator">·</span><span class="label">${escapeAttr(currentRefVar.label)}</span>`
         : `<span class="label">${escapeAttr(placeholder)}</span>`;
     const clearHtml = selected && clearAction
         ? `<button class="ref-selector-clear" type="button" onclick="event.stopPropagation(); ${clearAction}" title="清除当前值">×</button>`
@@ -1246,7 +1460,7 @@ const PROCESSOR_REGISTRY = {
         createDefaultConfig: () => ({
             name: '开始',
             inputs: [
-                { key: createInputKey(), label: '主提示词', type: 'text', required: true },
+                { key: createInputKey(), label: '主提示词', type: 'text', control: 'input', required: true },
                 { key: createInputKey(), label: '参考图片', type: 'image', required: true, maxUploadCount: 1 }
             ]
         }),
@@ -1430,6 +1644,8 @@ let workflowMeta = {
     visibility: 'private'
 };
 let workflowMetaDraft = null;
+let activeStartInputOptionsNodeId = null;
+let activeStartInputOptionsIndex = null;
 
 const canvasEl = document.getElementById('canvas');
 const canvasContent = document.getElementById('canvas-content');
@@ -2055,11 +2271,32 @@ function closeConfig() {
 
 function getRunInputs() {
     const startNode = nodes.find(node => node.processorType === 'system.start');
-    return startNode?.config?.inputs || [];
+    return (startNode?.config?.inputs || []).map(normalizeStartInputConfig);
 }
 
 function renderRunInput(input) {
+    normalizeStartInputConfig(input);
     const maxUploadCount = normalizeMaxUploadCount(input.maxUploadCount);
+    if (input.control === 'select' && isSelectControlConfigurableInput(input.type)) {
+        const options = (input.options || []).filter(opt => String(opt.name || '').trim());
+        if (!options.length) {
+            return `<select disabled style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit; background:#fff; color:var(--text-muted);">
+                <option>请先设置选项</option>
+            </select>`;
+        }
+        const optionsHtml = options.map(opt => {
+            const name = String(opt.name || '').trim();
+            const displayLabel = opt.desc ? `${escapeAttr(name)}（${escapeAttr(opt.desc)}）` : escapeAttr(name);
+            const isSelected = runState.values[input.key] === name;
+            return `<option value="${escapeAttr(name)}" ${isSelected ? 'selected' : ''}>${displayLabel}</option>`;
+        }).join('');
+        if (!runState.values[input.key] && options.length > 0) {
+            runState.values[input.key] = String(options[0].name || '').trim();
+        }
+        return `<select onchange="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit; background:#fff;">
+            ${optionsHtml}
+        </select>`;
+    }
     if (input.type === 'text') {
         return `<textarea rows="3" placeholder="请输入${input.label}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; outline:none; resize:vertical; font-family:inherit;">${runState.values[input.key] || ''}</textarea>`;
     }
@@ -2337,7 +2574,7 @@ function getNodeOutputItems(node) {
     const def = PROCESSOR_REGISTRY[node.processorType];
 
     if (node.processorType === 'system.start') {
-        return (node.config.inputs || []).map(input => ({
+        return (node.config.inputs || []).map(normalizeStartInputConfig).map(input => ({
             key: input.key,
             label: input.label,
             token: `{{start.${input.key}}}`,
@@ -2618,7 +2855,10 @@ function getReviewSelectedTokens(nodeId, excludeItemId = '') {
 }
 
 function renderStartInputsEditor(node) {
-    return (node.config.inputs || []).map((input, idx) => `
+    return (node.config.inputs || []).map((rawInput, idx) => {
+        const input = normalizeStartInputConfig(rawInput);
+        const canConfigureControl = isSelectControlConfigurableInput(input.type);
+        return `
         <div class="config-card" style="background: var(--bg-subtle); border: 1px solid var(--border-1); border-radius: 10px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: 0.2s;">
             <div class="config-card-header" style="padding: 0; margin-bottom: 14px; border: none; display: flex; justify-content: space-between; align-items: center;">
                 <div class="config-card-title" style="font-size: 13px; font-weight: 600; color: var(--text-hi); display: flex; align-items: center; gap: 6px;">
@@ -2647,38 +2887,256 @@ function renderStartInputsEditor(node) {
                 <input type="number" min="1" max="99" value="${normalizeMaxUploadCount(input.maxUploadCount)}" oninput="this.value = normalizeMaxUploadCount(this.value); updateStartInput(${idx}, 'maxUploadCount', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 32px; padding: 0 10px; font-size: 13px; color: var(--text-hi); outline: none; transition: 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--accent-solid)'; this.style.boxShadow='0 0 0 2px var(--accent-bg)';" onblur="this.style.borderColor='var(--border-2)'; this.style.boxShadow='inset 0 1px 2px rgba(0,0,0,0.02)';">
             </div>
             ` : ''}
-            <div class="form-item" style="margin: 12px 0 0;">
-                <label style="font-size: 12px; color: var(--text-lo); margin-bottom: 6px; display: block;">是否必填</label>
-                <label style="display:flex; align-items:center; gap:8px; margin:0; color:var(--text-hi); font-size:13px; font-weight:500;">
-                    <input type="checkbox" ${input.required !== false ? 'checked' : ''} onchange="updateStartInput(${idx}, 'required', this.checked)" style="width:16px; height:16px; margin:0;">
-                    <span>必填</span>
-                </label>
+            ${canConfigureControl ? renderStartInputControlSwitch(input, idx) : ''}
+            ${canConfigureControl && input.control === 'select' ? renderStartInputSelectOptionsSummary(input, idx) : ''}
+            <div class="start-required-row">
+                <span class="start-required-label">是否必填</span>
+                <button class="ant-switch ant-switch-small${input.required !== false ? ' ant-switch-checked' : ''}" type="button" role="switch" aria-checked="${input.required !== false ? 'true' : 'false'}" aria-label="是否必填" onclick="updateStartInput(${idx}, 'required', ${input.required === false ? 'true' : 'false'})">
+                    <span class="ant-switch-handle"></span>
+                    <span class="ant-switch-inner">
+                        <span class="ant-switch-inner-checked">必填</span>
+                        <span class="ant-switch-inner-unchecked">选填</span>
+                    </span>
+                </button>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
+}
+
+function renderStartInputControlSwitch(input, inputIdx) {
+    const mode = input.control === 'select' ? 'select' : 'input';
+    return `
+        <div class="start-control-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-2);">
+            <span class="start-control-label">填写方式</span>
+            <div style="display: inline-flex; font-size: 12px; line-height: 26px;">
+                <div style="padding: 0 16px; cursor: pointer; border: 1px solid ${mode !== 'select' ? '#1677ff' : '#d9d9d9'}; background: #fff; color: ${mode !== 'select' ? '#1677ff' : 'var(--text-hi)'}; z-index: ${mode !== 'select' ? 1 : 0}; transition: all 0.2s; border-radius: 6px 0 0 6px; position: relative;" onclick="updateStartInput(${inputIdx}, 'control', 'input')">输入框</div>
+                <div style="padding: 0 16px; cursor: pointer; border: 1px solid ${mode === 'select' ? '#1677ff' : '#d9d9d9'}; margin-left: -1px; background: #fff; color: ${mode === 'select' ? '#1677ff' : 'var(--text-hi)'}; z-index: ${mode === 'select' ? 1 : 0}; transition: all 0.2s; border-radius: 0 6px 6px 0; position: relative;" onclick="updateStartInput(${inputIdx}, 'control', 'select')">下拉菜单</div>
+            </div>
+        </div>
+    `;
+}
+
+function renderStartInputSelectOptionsSummary(input, inputIdx) {
+    return `
+        <div class="start-options-summary-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
+            <span class="start-options-summary-count" style="color: var(--text-lo); font-size: 12px;">已设置${getConfiguredOptionCount(input)}个选项</span>
+            <button type="button" style="height: 28px; padding: 0 12px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-2); background: #fff; color: var(--text-hi); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='var(--primary-color, #1677ff)'; this.style.borderColor='var(--primary-color, #1677ff)';" onmouseout="this.style.color='var(--text-hi)'; this.style.borderColor='var(--border-2)';" onclick="openStartInputOptionsModal(${inputIdx})">设置选项</button>
+        </div>
+    `;
+}
+
+function renderStartInputSelectOptions(input, inputIdx) {
+    if (!input.options || input.options.length === 0) input.options = [{ name: '', value: '', desc: '' }];
+    let html = '';
+
+    input.options.forEach((opt, optIdx) => {
+        html += `
+            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border-2);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text-hi);">选项 ${optIdx + 1}</div>
+                    <button class="btn btn-ghost" style="color: var(--text-muted); padding: 0 4px; height: 24px; border-radius: 4px; ${input.options.length <= 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''}" onclick="removeStartInputOption(${inputIdx}, ${optIdx})" ${input.options.length <= 1 ? 'disabled' : ''}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <input type="text" placeholder="选项名称（必填）" value="${escapeAttr(opt.name)}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'name', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
+                    <input type="text" placeholder="绑定值（必填）" value="${escapeAttr(opt.value || '')}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'value', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
+                    <input type="text" placeholder="描述（可选）" value="${escapeAttr(opt.desc)}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'desc', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
+                </div>
+            </div>
+        `;
+    });
+
+    if (input.options.length < 20) {
+        html += `<button class="btn btn-ghost" style="width: 100%; height: 28px; font-size: 12px; border: 1px dashed var(--border-2); margin-top: 4px;" onclick="addStartInputOption(${inputIdx})">+ 添加选项 (${input.options.length}/20)</button>`;
+    } else {
+        html += `<div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 4px;">已达到最大选项数量 (20/20)</div>`;
+    }
+
+    return html;
+}
+
+function getActiveStartInputOptionsContext() {
+    const node = nodes.find(n => n.id === activeStartInputOptionsNodeId);
+    if (!node || node.processorType !== 'system.start') return null;
+    if (!node.config.inputs || !node.config.inputs[activeStartInputOptionsIndex]) return null;
+    const input = normalizeStartInputConfig(node.config.inputs[activeStartInputOptionsIndex]);
+    return { node, input, inputIdx: activeStartInputOptionsIndex };
+}
+
+function renderStartInputOptionsModal() {
+    const body = document.getElementById('start-options-modal-body');
+    const context = getActiveStartInputOptionsContext();
+    if (!body || !context) return;
+    body.innerHTML = renderStartInputSelectOptions(context.input, context.inputIdx);
+}
+
+function openStartInputOptionsModal(inputIdx) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    if (!node.config.inputs || !node.config.inputs[inputIdx]) return;
+    activeStartInputOptionsNodeId = node.id;
+    activeStartInputOptionsIndex = inputIdx;
+    normalizeStartInputConfig(node.config.inputs[inputIdx]);
+    renderStartInputOptionsModal();
+    document.getElementById('start-options-modal').classList.add('open');
+}
+
+function showToastMessage(message, type = 'error') {
+    const toast = document.createElement('div');
+    toast.style.position = 'fixed';
+    toast.style.top = '24px';
+    toast.style.left = '50%';
+    toast.style.transform = 'translateX(-50%)';
+    toast.style.background = type === 'error' ? '#fff2f0' : '#f6ffed';
+    toast.style.border = `1px solid ${type === 'error' ? '#ffccc7' : '#b7eb8f'}`;
+    toast.style.padding = '10px 24px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+    toast.style.display = 'flex';
+    toast.style.alignItems = 'center';
+    toast.style.gap = '8px';
+    toast.style.zIndex = '10000';
+    toast.style.fontSize = '14px';
+    toast.style.color = 'var(--text-hi)';
+    toast.style.transition = 'all 0.3s ease';
+    toast.style.opacity = '0';
+
+    const icon = type === 'error'
+        ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ff4d4f" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>'
+        : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+    toast.innerHTML = `${icon}<span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.top = '32px';
+    });
+
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.top = '24px';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function submitStartInputOptionsModal() {
+    const context = getActiveStartInputOptionsContext();
+    if (!context) {
+        closeStartInputOptionsModal();
+        return;
+    }
+    const input = context.input;
+    if (input.options && input.options.length > 0) {
+        for (let i = 0; i < input.options.length; i++) {
+            const opt = input.options[i];
+            if (!opt.name || !opt.name.trim()) {
+                showToastMessage(`第 ${i + 1} 个选项名称不能为空`);
+                return;
+            }
+            if (!opt.value || !opt.value.trim()) {
+                showToastMessage(`第 ${i + 1} 个选项绑定值不能为空`);
+                return;
+            }
+        }
+    }
+    closeStartInputOptionsModal();
+    showToastMessage('保存成功', 'success');
+}
+
+function closeStartInputOptionsModal() {
+    document.getElementById('start-options-modal').classList.remove('open');
+    const nodeId = activeStartInputOptionsNodeId;
+    activeStartInputOptionsNodeId = null;
+    activeStartInputOptionsIndex = null;
+    if (nodeId && activeNodeId === nodeId) {
+        openConfig(nodeId);
+    }
+}
+
+function onStartOptionsModalMaskClick(event) {
+    if (event.target.id === 'start-options-modal') closeStartInputOptionsModal();
+}
+
+function updateStartInputOption(inputIdx, optIdx, key, value) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    if (!node.config.inputs || !node.config.inputs[inputIdx]) return;
+    const input = normalizeStartInputConfig(node.config.inputs[inputIdx]);
+    if (input && input.options && input.options[optIdx]) {
+        input.options[optIdx][key] = value;
+        touchAutoSave();
+        openConfig(activeNodeId);
+    }
+}
+
+function removeStartInputOption(inputIdx, optIdx) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    if (!node.config.inputs || !node.config.inputs[inputIdx]) return;
+    const input = normalizeStartInputConfig(node.config.inputs[inputIdx]);
+    if (input && input.options && input.options.length > 1) {
+        input.options.splice(optIdx, 1);
+        touchAutoSave();
+        openConfig(activeNodeId);
+        if (document.getElementById('start-options-modal')?.classList.contains('open')) {
+            renderStartInputOptionsModal();
+        }
+    }
+}
+
+function addStartInputOption(inputIdx) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    if (!node.config.inputs || !node.config.inputs[inputIdx]) return;
+    const input = normalizeStartInputConfig(node.config.inputs[inputIdx]);
+    if (input && (!input.options || input.options.length < 20)) {
+        if (!input.options) input.options = [];
+        input.options.push({ name: '', value: '', desc: '' });
+        touchAutoSave();
+        openConfig(activeNodeId);
+        if (document.getElementById('start-options-modal')?.classList.contains('open')) {
+            renderStartInputOptionsModal();
+        }
+    }
 }
 
 function updateStartInput(index, key, value) {
     const node = nodes.find(n => n.id === activeNodeId);
     if (!node || node.processorType !== 'system.start') return;
     if (!node.config.inputs || !node.config.inputs[index]) return;
-    const input = node.config.inputs[index];
+    const input = normalizeStartInputConfig(node.config.inputs[index]);
     if (key === 'required') {
         input.required = value === true || value === 'true';
     } else if (key === 'maxUploadCount') {
         input.maxUploadCount = normalizeMaxUploadCount(value);
+    } else if (key === 'control') {
+        if (isSelectControlConfigurableInput(input.type)) {
+            input.control = value === 'select' ? 'select' : 'input';
+            if (input.control === 'select' && (!input.options || input.options.length === 0)) {
+                input.options = [{ name: '', desc: '' }];
+            }
+        }
     } else if (key === 'type') {
-        input.type = value;
+        input.type = value === 'select' ? 'text' : value;
         if (isUploadCountConfigurableInput(value)) {
             input.maxUploadCount = normalizeMaxUploadCount(input.maxUploadCount);
         } else {
             delete input.maxUploadCount;
         }
+        if (!isSelectControlConfigurableInput(input.type)) {
+            delete input.control;
+            delete input.options;
+        } else {
+            input.control = 'input';
+        }
     } else {
         input[key] = value;
     }
     touchAutoSave();
-    if (key === 'type') openConfig(activeNodeId);
+    if (key === 'type' || key === 'control') openConfig(activeNodeId);
     renderBoard();
 }
 
@@ -2690,6 +3148,7 @@ function addStartInput() {
         key: createInputKey(),
         label: `输入项 ${node.config.inputs.length + 1}`,
         type: 'text',
+        control: 'input',
         required: true
     });
     touchAutoSave();
