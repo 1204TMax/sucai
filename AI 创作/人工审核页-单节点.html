@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>我的任务 - 量化投放系统</title>
+  <title>人工审核页 - 量化投放系统</title>
   <link rel="stylesheet" href="../共享样式/components.css">
   <link rel="stylesheet" href="../共享样式/project-picker.css">
   <link rel="stylesheet" href="../共享样式/image-preview.css">
@@ -123,11 +123,10 @@
 
     /* 标签页 */
     .ds-tabs { display: flex; align-items: center; padding: 0 var(--space-5); border-bottom: 1px solid var(--border-1); gap: 0; }
-    .ds-tab { height: 40px; padding: 0 var(--space-3); font: 400 var(--text-sm)/1 var(--font); color: var(--text-muted); background: none; border: none; cursor: pointer; position: relative; transition: color var(--ease); display: inline-flex; align-items: center; gap: var(--space-1); flex-shrink: 0; }
+    .ds-tab { height: 40px; padding: 0 var(--space-3); font: 400 var(--text-sm)/1 var(--font); color: var(--text-muted); background: none; border: none; cursor: pointer; position: relative; transition: color var(--ease); display: inline-flex; align-items: center; flex-shrink: 0; }
     .ds-tab:hover { color: var(--text-lo); }
     .ds-tab.on { color: var(--text-hi); font-weight: 500; }
     .ds-tab.on::after { content: ''; position: absolute; left: var(--space-3); right: var(--space-3); bottom: 0; height: 2px; background: var(--accent-solid); border-radius: 1px; }
-    .ds-tab-badge { min-width: 16px; height: 16px; padding: 0 5px; border-radius: var(--r-full); background: var(--accent-solid); color: #fff; display: inline-flex; align-items: center; justify-content: center; font: 600 10px/1 var(--font); font-variant-numeric: tabular-nums; box-shadow: 0 0 0 2px var(--bg-surface); }
 
     /* 选择器 */
     .sel-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
@@ -432,10 +431,7 @@
     .opt-pill { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-1) var(--space-3); border: 1px solid var(--border-1); border-radius: var(--r-full); font-size: var(--text-sm); color: var(--text-lo); cursor: pointer; position: relative; white-space: nowrap; transition: border-color var(--ease), background var(--ease); user-select: none; }
     .opt-pill:hover { border-color: var(--text-hi); background: rgba(0,0,0,0.02); }
     .opt-pill.open { border-color: var(--text-hi); background: rgba(0,0,0,0.03); color: var(--text-hi); }
-    .opt-pill-val { display: inline-flex; align-items: center; gap: 5px; font-weight: 500; color: var(--text-hi); }
-    .type-opt-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; color: currentColor; flex-shrink: 0; }
-    .type-opt-icon svg { width: 14px; height: 14px; display: block; }
-    .opt-pill .arr { display: none; }
+    .opt-pill .arr { font-size: 8px; color: var(--text-muted); }
     .pill-ratio-box { display: inline-block; border: 1.2px solid currentColor; border-radius: 1.5px; vertical-align: middle; margin-right: 2px; }
     .opt-dd { position: absolute; top: calc(100% + var(--space-2)); left: 0; min-width: 200px; background: var(--bg-surface); border-radius: var(--r-xl); box-shadow: 0 4px 8px rgba(0,0,0,0.04), 0 12px 36px rgba(0,0,0,0.1); padding: var(--space-3) var(--space-4); z-index: 400; display: none; }
     .opt-dd.show { display: block; }
@@ -485,8 +481,6 @@
 
     /* ═══ 生成按钮 ═══ */
     .gen-btn { background: var(--bg-hover); color: #fff; border: none; padding: var(--space-2) var(--space-5); border-radius: var(--r-lg); font-size: var(--text-base); cursor: not-allowed; display: flex; align-items: center; gap: var(--space-1); transition: background var(--ease); }
-    .gen-btn-icon { width: 14px; height: 14px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .gen-btn-icon svg { width: 14px; height: 14px; display: block; }
     .gen-btn.has-text { background: var(--accent-solid); cursor: pointer; }
     .gen-btn.has-text:hover { background: var(--accent-solid-h); }
 
@@ -594,44 +588,6 @@
     .detail-modal-footer button:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
     .detail-modal-footer .dm-primary { background: var(--accent-solid); border-color: var(--accent-solid); color: #fff; }
     .detail-modal-footer .dm-primary:hover { background: var(--accent-solid-h); border-color: var(--accent-solid-h); color: #fff; }
-    .wf-error-modal-mask { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,0.45); }
-    .wf-error-modal { width: min(640px, calc(100vw - 32px)); max-height: min(85vh, 800px); background: var(--bg-surface); border-radius: var(--r-xl); box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; cursor: default; }
-    .wf-error-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-1); flex-shrink: 0; background: var(--bg-surface); }
-    .wf-error-title { font-size: var(--text-lg); font-weight: 600; color: var(--text-hi); }
-    .wf-error-close { width: 32px; height: 32px; border: 0; border-radius: var(--r-md); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all var(--ease); line-height: 1; }
-    .wf-error-close:hover { background: var(--bg-subtle); color: var(--text-hi); }
-    .wf-error-body { padding: var(--space-5) var(--space-6); overflow-y: auto; background: var(--bg-page); display: flex; flex-direction: column; gap: var(--space-4); user-select: text; }
-    .wf-error-block { background: var(--bg-surface); border: 1px solid var(--border-1); border-radius: var(--r-lg); padding: var(--space-4) var(--space-5); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-    .wf-error-block-title { margin: 0 0 var(--space-4); padding-bottom: var(--space-2); border-bottom: 1px solid var(--border-1); font-size: var(--text-md); font-weight: 600; color: var(--text-hi); display: flex; align-items: center; gap: var(--space-2); }
-    .wf-error-block-title::before { content: ''; width: 3px; height: 14px; background: var(--accent-solid); border-radius: 2px; }
-    .wf-error-info { display: grid; grid-template-columns: 112px 1fr; gap: var(--space-3) var(--space-4); }
-    .wf-error-label { color: var(--text-muted); font-size: var(--text-sm); white-space: nowrap; }
-    .wf-error-value { color: var(--text-hi); font-size: var(--text-sm); font-weight: 500; word-break: break-word; min-width: 0; }
-    .wf-error-id-cell { display: inline-flex; align-items: center; gap: var(--space-2); }
-    .wf-error-copy-btn { width: 22px; height: 22px; border: 1px solid var(--border-2); border-radius: var(--r-sm); background: var(--bg-surface); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--ease); flex-shrink: 0; }
-    .wf-error-copy-btn svg { width: 12px; height: 12px; }
-    .wf-error-copy-btn:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: var(--accent-bg); }
-    .wf-error-subtitle { margin: var(--space-4) 0 var(--space-3); font-size: var(--text-sm); font-weight: 600; color: var(--text-hi); }
-    .wf-error-subtitle:first-child { margin-top: 0; }
-    .wf-error-global-group { padding: var(--space-3) var(--space-4); background: var(--bg-subtle); border: 1px solid var(--border-1); border-radius: var(--r-md); margin-bottom: var(--space-4); }
-    .wf-error-list { margin: 0; padding-left: 1.4em; color: var(--text-hi); font-size: var(--text-sm); line-height: 1.6; }
-    .wf-error-list li { margin-bottom: var(--space-1); word-break: break-word; }
-    .wf-error-node-list { display: flex; flex-direction: column; gap: var(--space-3); }
-    .wf-error-node-item { padding: var(--space-3) var(--space-4); background: var(--bg-surface); border: 1px solid var(--border-1); border-radius: var(--r-md); }
-    .wf-error-node-title { font-weight: 600; color: var(--text-hi); margin-bottom: var(--space-2); font-size: var(--text-sm); border-bottom: 1px dashed var(--border-1); padding-bottom: var(--space-1); }
-    .wf-error-node-summary { margin: 0; color: var(--text-lo); font-size: var(--text-sm); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
-    .wf-error-empty { color: var(--text-ghost); font-style: italic; font-size: var(--text-sm); margin: var(--space-2) 0; }
-    .wf-error-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-1); display: flex; justify-content: flex-end; background: var(--bg-surface); flex-shrink: 0; }
-    .wf-error-footer button { height: var(--h-lg); padding: 0 var(--space-6); border-radius: var(--r-md); border: 1px solid var(--border-2); background: var(--bg-surface); color: var(--text-hi); font-size: var(--text-base); font-weight: 500; cursor: pointer; transition: all var(--ease); }
-    .wf-error-footer button:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: var(--accent-bg); }
-    @media (max-width: 560px) {
-      .wf-error-modal-mask { padding: 0; align-items: flex-end; }
-      .wf-error-modal { width: 100%; max-height: 90vh; border-radius: var(--r-xl) var(--r-xl) 0 0; }
-      .wf-error-header { padding: var(--space-4) var(--space-5); }
-      .wf-error-body { padding: var(--space-4) var(--space-5); }
-      .wf-error-footer { padding: var(--space-3) var(--space-5) var(--space-6); }
-      .wf-error-info { grid-template-columns: 96px 1fr; gap: var(--space-2) var(--space-3); }
-    }
     .dm-pagination { display: flex; align-items: center; justify-content: center; gap: var(--space-1); margin-top: var(--space-4); }
     .dm-pg-btn { padding: var(--space-1) var(--space-3); border-radius: var(--r-sm); border: 1px solid var(--border-2); background: var(--bg-surface); font-size: var(--text-base); cursor: pointer; color: var(--text-hi); transition: all var(--ease); min-width: 32px; text-align: center; }
     .dm-pg-btn:hover:not(:disabled) { border-color: var(--accent-solid); color: var(--accent-solid); }
@@ -986,7 +942,7 @@
 
 <script>
 // ═══ 常量 ═══
-const MODELS_MAP = { seedream5: 'seedream 5.0', banana2: 'Banana 2', seedream5lite: 'Seedream 5.0 Lite', seedream46: 'Seedream 4.6', minimax1: 'MiniMax-01', seedance2: 'Seedance 2.0', seedance2fast: 'Seedance 2.0 Fast', seedance15pro: 'Seedance 1.5Pro' };
+const MODELS_MAP = { seedream5: 'seedream 5.0', banana2: 'banana 2', minimax1: 'MiniMax-01' };
 const VIDEO_GRADIENTS = [['#667eea','#764ba2'],['#f093fb','#f5576c'],['#4facfe','#00f2fe'],['#43e97b','#38f9d7'],['#fa709a','#fee140']];
 const GEN_SOURCES = { universal:'通用生成', poster:'大字报衍生', workflow:'工作流生成' };
 const STORAGE_TARGETS = ['素材库','物料库','原料库'];
@@ -1037,7 +993,6 @@ function makeWorkflowDemoTask(cfg) {
     resultType: 'image',
     status,
     createdTime: cfg.createdTime,
-    finishedTime: cfg.finishedTime || '',
     creator: '我',
     source: 'workflow',
     project: cfg.project || '护肤品推广',
@@ -1047,12 +1002,9 @@ function makeWorkflowDemoTask(cfg) {
       currentNodeId: isReviewing ? 'review-1' : (isCompleted ? 'end' : (isFailed ? 'failed-node' : (isAborted ? 'aborted-node' : 'image-1'))),
       endBehavior: { destination: 'task_system' },
       summary: { total: 50, generated: cfg.generated || 0, pendingReview: isReviewing ? 5 : 0, approved: isCompleted ? 50 : 0, downstreamRunning: status === 'generating' ? 18 : 0 },
-      globalErrors: cfg.globalErrors || [],
-      errorMessage: cfg.errorMessage || '',
-      nodeSummaries: cfg.nodeSummaries || [],
       nodes: [
         { nodeId: 'start', processorType: 'system.start', title: '开始', status: status === 'pending' ? 'pending' : 'completed' },
-        { nodeId: 'image-1', processorType: 'image.generate', title: cfg.activeTitle || '图片生产', status: status === 'pending' ? 'pending' : (isFailed ? 'failed' : (isAborted ? 'aborted' : (isReviewing || isCompleted ? 'completed' : 'generating'))), errorMessage: isFailed ? (cfg.nodeErrorMessage || 'ComfyUI 原始报错：PromptParsingException: Invalid syntax') : '' },
+        { nodeId: 'image-1', processorType: 'image.generate', title: cfg.activeTitle || '图片生产', status: status === 'pending' ? 'pending' : (isFailed ? 'failed' : (isAborted ? 'aborted' : (isReviewing || isCompleted ? 'completed' : 'generating'))) },
         { nodeId: 'review-1', processorType: 'control.review', title: cfg.reviewTitle || '审查A', status: reviewStatus, reviewTaskId: 'rv-' + cfg.id },
         { nodeId: 'review-2', processorType: 'control.review', title: '视频初审', status: waitingReviewCount > 0 ? 'pending' : 'completed', reviewTaskId: 'rv-' + cfg.id + '-2' },
         { nodeId: 'review-3', processorType: 'control.review', title: '成片终审', status: waitingReviewCount > 1 ? 'pending' : 'completed', reviewTaskId: 'rv-' + cfg.id + '-3' }
@@ -1107,28 +1059,7 @@ const INITIAL_TASKS = [
     }
   },
   makeWorkflowDemoTask({ id:'wf-completed-demo', name:'工作流状态样例：已完成', status:'completed', createdTime:'2026-04-27 10:20', seed:'wf-completed', generated:50 }),
-  makeWorkflowDemoTask({
-    id:'wf-failed-demo',
-    name:'工作流状态样例：已失败',
-    status:'failed',
-    createdTime:'2026-04-27 10:32',
-    finishedTime:'2026-04-27 10:48',
-    seed:'wf-failed',
-    activeTitle:'图像生成节点',
-    generated:22,
-    globalErrors:[
-      '调度失败：部分节点重试后仍未返回有效结果。',
-      '超时：当前视频模型的所有可用渠道均响应超时。'
-    ],
-    nodeSummaries:[
-      { title:'拆分节点', text:'共处理 50 个，成功 48 个，失败 2 个。' },
-      { title:'混编节点', text:'共接收 48 个片段，12 个前贴、12 个开头、12 个中间、8 个结尾、4 个操作演示，符合条件的为 22 个。' },
-      { title:'合成节点', text:'共接收 22 个视频合成请求，成功 18 个，失败 4 个。' },
-      { title:'图片大小压缩节点', text:'共接收 18 个文件压缩请求，成功 18 个，失败 0 个。' },
-      { title:'视频生成节点', text:'共接受 18 个文本生成请求，成功 16 个，失败 2 个。\n视频生成失败：当前视频模型的所有可用渠道均响应超时。' },
-      { title:'图像生成节点', text:'共接受 50 个请求，失败 2 个请求。' }
-    ]
-  }),
+  makeWorkflowDemoTask({ id:'wf-failed-demo', name:'工作流状态样例：已失败', status:'failed', createdTime:'2026-04-27 10:32', seed:'wf-failed', activeTitle:'图像生成节点', generated:22 }),
   makeWorkflowDemoTask({ id:'wf-aborted-demo', name:'工作流状态样例：已中止', status:'aborted', createdTime:'2026-04-27 10:45', seed:'wf-aborted', activeTitle:'已中止', generated:13 }),
   { id:'21', name:'小红书美妆文案裂变', type:'chat', taskType:'direct_generate', resultType:'text', status:'completed', createdTime:'2026-04-03 09:20', creator:'我',
     source:'universal', project:'护肤品推广',
@@ -1459,7 +1390,6 @@ const SVG = {
   err:      '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>',
   play:     '<polygon points="6 3 20 12 6 21"/>',
   txt:      '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
-  copy:     '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   chevDown: '<polyline points="6 9 12 15 18 9"/>',
 };
 
@@ -1481,8 +1411,8 @@ const routeParams = new URLSearchParams(window.location.search);
 const state = {
   contentTab: 'image',
   viewMode: 'expanded',
-  pageMode: routeParams.get('view') === 'review' ? 'review' : 'list',
-  reviewContext: { taskId: routeParams.get('taskId') || '', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
+  pageMode: 'review',
+  reviewContext: { taskId: routeParams.get('taskId') || 'wf-1', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
   reviewFilter: 'pending',
   reviewContentNode: 'node2',
   reviewBatchMode: false,
@@ -1496,7 +1426,7 @@ const state = {
   detailActiveModel: null,
   reviewTaskId: null,
   cardModels: {},
-  noticeExpanded: { generating: false, unread: false, reviewing: false },
+  noticeExpanded: { generating: false, unread: false, pending_review: false },
   noticeSeen: { '2': false, '5': false },
 };
 INITIAL_TASKS.forEach(function(t){ state.cardModels[t.id] = t.input.models[0]; });
@@ -1590,11 +1520,7 @@ function renderFilterBar() {
   var tabBtns = [
     {k:'chat',l:'文案'},{k:'image',l:'图像'},{k:'video',l:'视频'}
   ].map(function(t){
-    var attentionCount = getAttentionCountForTab(t.k);
-    var badge = attentionCount > 0
-      ? '<span class="ds-tab-badge" aria-label="'+t.l+'待处理任务 '+attentionCount+'">'+formatBadgeCount(attentionCount)+'</span>'
-      : '';
-    return '<button class="ds-tab'+(tab===t.k?' on':'')+'" onclick="switchContentTab(\''+t.k+'\')">'+t.l+badge+'</button>';
+    return '<button class="ds-tab'+(tab===t.k?' on':'')+'" onclick="switchContentTab(\''+t.k+'\')">'+t.l+'</button>';
   }).join('');
 
   // 状态选择器
@@ -1741,7 +1667,11 @@ function selectChat(id) { state.activeChat = id; renderChatSidebar(); }
 function getFilteredTasks() {
   var f = state.filters, tab = state.contentTab;
   return state.tasks.filter(function(t) {
-    if (!taskMatchesContentTab(t, tab)) return false;
+    var taskType = t.taskType || (t.type === 'workflow' ? 'workflow_run' : 'direct_generate');
+    var resultType = t.resultType || (t.type === 'chat' ? 'text' : t.type);
+    if (tab === 'chat' && resultType !== 'text' && resultType !== 'mixed') return false;
+    if (tab === 'image' && resultType !== 'image' && resultType !== 'mixed') return false;
+    if (tab === 'video' && resultType !== 'video' && resultType !== 'mixed') return false;
     if (f.status && t.status !== f.status) return false;
     if (f.search && t.input.prompt.indexOf(f.search) < 0 && t.name.indexOf(f.search) < 0) return false;
     if (f.project && (Array.isArray(f.project) ? f.project.length > 0 && f.project.indexOf(t.project) < 0 : t.project !== f.project)) return false;
@@ -1766,53 +1696,21 @@ function getSourceLabel(source) {
   return '通用生成';
 }
 
-function getTaskLifecycleStatus(task) {
-  return task.type === 'workflow' ? getWorkflowDisplayStatus(task) : task.status;
-}
-
-function taskMatchesContentTab(task, tab) {
-  var resultType = normalizeTaskResultType(task.resultType || task.type);
-  if (tab === 'chat') return resultType === 'text' || resultType === 'mixed';
-  if (tab === 'image') return resultType === 'image' || resultType === 'mixed';
-  if (tab === 'video') return resultType === 'video' || resultType === 'mixed';
-  return true;
-}
-
-function isTaskInProgress(task) {
-  var status = getTaskLifecycleStatus(task);
-  return status === 'pending' || status === 'generating';
-}
-
-function isTaskUnreadCompleted(task) {
-  return getTaskLifecycleStatus(task) === 'completed' && state.noticeSeen[task.id] === false;
-}
-
-function getAttentionCountForTab(tab) {
-  return state.tasks.filter(function(task) {
-    return taskMatchesContentTab(task, tab) && (isTaskInProgress(task) || isTaskUnreadCompleted(task));
-  }).length;
-}
-
-function formatBadgeCount(count) {
-  return count > 99 ? '99+' : String(count);
-}
-
 function getNoticeTasks(kind, tasks) {
   var pool = tasks || getFilteredTasks();
   if (kind === 'generating') {
     return pool.filter(function(t) {
-      return isTaskInProgress(t);
-    });
+      return t.status === 'generating' || t.status === 'pending';
+    }).slice(0, 5);
   }
   if (kind === 'reviewing') {
     return pool.filter(function(t) {
-      var status = getTaskLifecycleStatus(t);
-      return status === 'pending_review' || status === 'reviewing';
-    });
+      return t.status === 'pending_review' || t.status === 'reviewing';
+    }).slice(0, 5);
   }
   return pool.filter(function(t) {
-    return isTaskUnreadCompleted(t);
-  });
+    return t.status === 'completed' && state.noticeSeen[t.id] === false && (t.id === '2' || t.id === '5');
+  }).slice(0, 2);
 }
 
 function renderNoticeCard(kind, tasks) {
@@ -1824,7 +1722,7 @@ function renderNoticeCard(kind, tasks) {
     ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>'
     : (kind === 'reviewing' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>'
     : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>');
-  var listHtml = items.slice(0, 5).map(function(task) {
+  var listHtml = items.map(function(task) {
     var statusText = kind === 'generating'
       ? (task.status === 'pending' ? '排队中' : '生成中')
       : (kind === 'reviewing' ? '待审核' : '待查看');
@@ -1912,177 +1810,56 @@ function renderBottomCountMeta(task, vm) {
   if (!vm.displayMeta.countProgressText) return '';
   return '<span class="card-bottom-count">' + escHtml(vm.displayMeta.countProgressText) + '</span>';
 }
-function normalizeWorkflowErrorList(value) {
-  if (!value) return [];
-  if (Array.isArray(value)) return value.map(function(item) {
-    if (item && typeof item === 'object') {
-      var prefix = item.type || item.title || item.name || '';
-      var message = item.message || item.reason || item.error || '';
-      return (prefix && message ? prefix + '：' + message : (message || prefix));
-    }
-    return String(item || '').trim();
-  }).filter(Boolean);
-  return [String(value).trim()].filter(Boolean);
-}
-function getWorkflowGlobalErrors(run) {
-  var errors = []
-    .concat(normalizeWorkflowErrorList(run && run.errorMessage))
-    .concat(normalizeWorkflowErrorList(run && run.globalErrors));
-  return Array.from(new Set(errors));
-}
-function getWorkflowNodeErrorReasons(node) {
-  var reasons = []
-    .concat(normalizeWorkflowErrorList(node.errorMessage))
-    .concat(normalizeWorkflowErrorList(node.errors))
-    .concat(normalizeWorkflowErrorList(node.warnings));
-  if (node.status === 'aborted' && reasons.length === 0) reasons.push('已中止');
-  if (node.status === 'failed' && reasons.length === 0) reasons.push('ComfyUI 原始报错：PromptParsingException: Invalid syntax');
-  return Array.from(new Set(reasons));
-}
-function getWorkflowNodeErrorGroups(nodes) {
-  var groups = [];
-  var indexByKey = {};
-  (nodes || []).forEach(function(node, idx) {
-    var reasons = getWorkflowNodeErrorReasons(node);
-    var hasErrorStatus = node.status === 'failed' || node.status === 'aborted';
-    if (!hasErrorStatus && reasons.length === 0) return;
-    var title = node.title || node.nodeId || ('节点 ' + (idx + 1));
-    var key = (node.nodeId || ('node-' + idx)) + '::' + title;
-    if (indexByKey[key] === undefined) {
-      indexByKey[key] = groups.length;
-      groups.push({
-        nodeId: node.nodeId || '',
-        title: title,
-        processorType: node.processorType || '',
-        status: node.status || '',
-        reasons: new Set()
-      });
-    }
-    reasons.forEach(function(reason) {
-      groups[indexByKey[key]].reasons.add(reason);
-    });
-  });
-  return groups.map(function(group) {
-    return {
-      nodeId: group.nodeId,
-      title: group.title,
-      processorType: group.processorType,
-      status: group.status,
-      reasons: Array.from(group.reasons)
-    };
-  });
-}
-function normalizeWorkflowNodeSummaries(value) {
-  if (!Array.isArray(value)) return [];
-  return value.map(function(item) {
-    if (!item) return null;
-    if (typeof item === 'string') return { title: '节点名称', text: item };
-    var title = item.title || item.nodeName || item.name || item.nodeId || '节点名称';
-    var text = item.text || item.summary || item.message || '';
-    return text ? { title: title, text: text } : null;
-  }).filter(Boolean);
-}
-function buildFallbackWorkflowNodeSummaries(nodeGroups) {
-  return (nodeGroups || []).map(function(group) {
-    var failureCount = Math.max(group.reasons.length, 1);
-    var text = '共接受 ' + failureCount + ' 个请求，失败 ' + failureCount + ' 个请求。';
-    if (group.reasons.length) text += '\n' + group.reasons.join('\n');
-    return { title: group.title || '节点名称', text: text };
-  });
-}
-function getWorkflowNodeSummaries(run, nodeGroups) {
-  var summaries = normalizeWorkflowNodeSummaries(run && run.nodeSummaries);
-  return summaries.length ? summaries : buildFallbackWorkflowNodeSummaries(nodeGroups);
-}
-function getWorkflowFinishedTime(task, run) {
-  return task.finishedTime || task.completedTime || task.endTime || (run && (run.finishedTime || run.completedTime || run.endTime)) || '-';
-}
-function copyWorkflowTaskId(taskId) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(taskId).then(function(){ showToast('已复制任务 ID'); }).catch(function(){ showToast('复制失败，请手动选择'); });
-  } else {
-    showToast('当前浏览器不支持自动复制');
-  }
-}
 function openWorkflowDetail(taskId) {
   var task = getTaskById(taskId);
   if (!task) return;
-  markTaskViewed(taskId);
-  var run = task.workflowRun || {};
-  var nodes = run.nodes || [];
-  var globalErrors = getWorkflowGlobalErrors(run);
-  var nodeGroups = getWorkflowNodeErrorGroups(nodes);
-  var nodeSummaries = getWorkflowNodeSummaries(run, nodeGroups);
-  var encodedTaskId = encodeURIComponent(task.id || '');
+  var nodes = task.workflowRun ? task.workflowRun.nodes || [] : [];
+  var failedNodes = nodes.filter(function(node) { return node.status === 'failed' || node.status === 'aborted'; });
 
-  var html = '<div class="wf-error-modal-mask" id="wfRunModalMask" onclick="if(event.target===this)this.remove()">'
-           + '<div class="wf-error-modal" onclick="event.stopPropagation()">'
-           + '<div class="wf-error-header">'
-           + '<div class="wf-error-title">错误详情</div>'
-           + '<button class="wf-error-close" onclick="document.getElementById(\'wfRunModalMask\').remove()">×</button>'
-           + '</div>'
-           + '<div class="wf-error-body">'
-           + '<div class="wf-error-block">'
-           + '<div class="wf-error-block-title">基础信息</div>'
-           + '<div class="wf-error-info">'
-           + '<div class="wf-error-label">任务名称</div><div class="wf-error-value">' + escHtml(task.name || '-') + '</div>'
-           + '<div class="wf-error-label">任务 ID</div><div class="wf-error-value wf-error-id-cell"><span>' + escHtml(task.id || '-') + '</span><button class="wf-error-copy-btn" title="复制 ID" onclick="event.stopPropagation();copyWorkflowTaskId(decodeURIComponent(\'' + encodedTaskId + '\'))">' + icon(SVG.copy, 12) + '</button></div>'
-           + '<div class="wf-error-label">任务开始时间</div><div class="wf-error-value">' + escHtml(task.createdTime || '-') + '</div>'
-           + '<div class="wf-error-label">任务结束时间</div><div class="wf-error-value">' + escHtml(getWorkflowFinishedTime(task, run)) + '</div>'
-           + '</div></div>';
+  var errorsByTitle = {};
+  failedNodes.forEach(function(node) {
+    var title = node.title || node.nodeId;
+    if (!errorsByTitle[title]) errorsByTitle[title] = new Set();
+    var reason = node.status === 'aborted' ? '已中止' : '敏感词问题XXXXXXXXX';
+    errorsByTitle[title].add(reason);
+  });
 
-  html += '<div class="wf-error-block"><div class="wf-error-block-title">异常说明</div>'
-        + '<div class="wf-error-subtitle">全局错误</div>';
-  if (globalErrors.length) {
-    html += '<div class="wf-error-global-group"><ol class="wf-error-list">';
-    globalErrors.forEach(function(reason) {
-      html += '<li>' + escHtml(reason) + '</li>';
-    });
-    html += '</ol></div>';
+  var titles = Object.keys(errorsByTitle);
+
+  var html = '<div class="detail-modal-mask show" id="wfRunModalMask" onclick="this.remove()" style="display:flex; align-items:center; justify-content:center; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; backdrop-filter:blur(2px);">'
+           + '<div class="detail-modal" style="width:400px; padding:40px 32px 32px; max-height:80vh; overflow-y:auto; display:flex; flex-direction:column; background:var(--bg-surface); border-radius:var(--r-xl); box-shadow:var(--shadow-3); cursor:default; transition:all 0.3s;" onclick="event.stopPropagation()">'
+           + '<div style="display:flex; flex-direction:column; gap:32px">';
+
+  if (titles.length === 0) {
+     html += '<div style="color:var(--text-muted); font-size:var(--text-base); text-align:center; padding:40px 0;">暂无失败节点信息</div>';
   } else {
-    html += '<p class="wf-error-empty">无全局异常信息</p>';
+     titles.forEach(function(title) {
+       html += '<div style="display:flex; flex-direction:column; gap:6px">';
+       html += '<div style="font-size:var(--text-lg); font-weight:600; color:var(--text-hi); letter-spacing:-0.01em;">' + escHtml(title) + '</div>';
+       errorsByTitle[title].forEach(function(reason) {
+         html += '<div style="display:flex; align-items:flex-start; gap:8px; font-size:var(--text-md); color:var(--text-muted); line-height:1.5;">'
+               + '<span style="color:var(--error); margin-top:2px;">•</span>'
+               + '<span>发生错误：' + escHtml(reason) + '</span>'
+               + '</div>';
+       });
+       html += '</div>';
+     });
   }
 
-  html += '<div class="wf-error-subtitle">节点明细</div>';
-  if (nodeSummaries.length === 0) {
-    html += '<p class="wf-error-empty">暂无节点说明信息</p>';
-  } else {
-    html += '<div class="wf-error-node-list">';
-    nodeSummaries.forEach(function(summary) {
-      html += '<div class="wf-error-node-item">'
-        + '<div class="wf-error-node-title">' + escHtml(summary.title) + '</div>'
-        + '<p class="wf-error-node-summary">' + escHtml(summary.text) + '</p>'
-        + '</div>';
-    });
-    html += '</div>';
-  }
-  html += '</div></div>'
-        + '<div class="wf-error-footer"><button onclick="document.getElementById(\'wfRunModalMask\').remove()">关闭</button></div>'
-        + '</div></div>';
+  html += '</div>'
+        + '<div style="display:flex; justify-content:center; margin-top:40px">'
+        + '<button style="background:var(--bg-subtle); color:var(--text-lo); padding:0 32px; height:var(--h-md); border-radius:var(--r-full); border:1px solid var(--border-1); cursor:pointer; font-size:var(--text-sm); font-weight:500; transition:all 0.2s;" onmouseover="this.style.background=\'var(--bg-hover)\';this.style.borderColor=\'var(--border-2)\'" onmouseout="this.style.background=\'var(--bg-subtle)\';this.style.borderColor=\'var(--border-1)\'" onclick="document.getElementById(\'wfRunModalMask\').remove()">关闭</button>'
+        + '</div></div></div>';
 
   var wrap = document.createElement('div');
   wrap.innerHTML = html;
   document.body.appendChild(wrap.firstElementChild);
 }
 function openWorkflowResult(taskId) {
-  openTaskResult(taskId);
-}
-
-function markTaskViewed(taskId, refresh) {
-  if (state.noticeSeen[taskId] !== false) return;
-  state.noticeSeen[taskId] = true;
-  if (refresh !== false) {
-    renderFilterBar();
-    renderTaskFeed(false);
-  }
-}
-
-function openTaskResult(taskId) {
   var task = getTaskById(taskId);
   if (!task) return;
   var vm = getTaskCardViewModel(task, state.cardModels[task.id] || task.input.models[0]);
   var target = getViewAllTarget(task, vm);
-  markTaskViewed(taskId);
   parent.postMessage({ action:'openTab', title:target.title, url:target.url }, '*');
 }
 function openWorkflowReview(taskId) {
@@ -2246,7 +2023,7 @@ function openReviewPage(taskId, reviewTaskId) {
   parent.postMessage({
     action: 'openTab',
     title: '人工审核页',
-    url: 'AI 创作/人工审核页.html?taskId=' + encodeURIComponent(taskId) + '&reviewTaskId=' + encodeURIComponent(reviewTaskId)
+    url: 'AI 创作/我的任务.html?view=review&taskId=' + encodeURIComponent(taskId) + '&reviewTaskId=' + encodeURIComponent(reviewTaskId)
   }, '*');
 }
 
@@ -2527,47 +2304,54 @@ function renderReviewPage() {
 
   // 1. 顶部审核点
   const hardcodedNodes = [
-    { id: 'nodeA', title: '审核点A', statusText: '已审核', statusKind: 'done', clickable: true },
-    { id: 'nodeB', title: '审核点B', statusText: '审核中', statusKind: 'active', clickable: true },
-    { id: 'nodeC', title: '审核点C', statusText: '准备中', statusKind: 'muted', clickable: false }
+    { id: 'nodeB', title: '审核点B', statusText: '审核中', statusKind: 'active', clickable: true }
   ];
   if (!state.reviewContext.reviewTaskId || state.reviewContext.reviewTaskId === 'undefined' || !hardcodedNodes.some(n => n.id === state.reviewContext.reviewTaskId)) {
     state.reviewContext.reviewTaskId = 'nodeB';
   }
   const reviewTaskId = state.reviewContext.reviewTaskId;
 
-  const nodesHtml = '<div style="display:flex; align-items:center; justify-content:center; width:100%; padding: 10px 0 8px;">' + hardcodedNodes.map(function(node, i) {
-    const isCurrent = node.id === reviewTaskId;
-    const clickAttr = node.clickable ? ('onclick="state.reviewContext.reviewTaskId=\'' + node.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"') : '';
-    const statusStyle = node.statusKind === 'done'
-      ? 'background:rgba(52,199,89,0.1);color:var(--success);border:1px solid rgba(52,199,89,0.22);'
-      : (node.statusKind === 'active'
-        ? 'background:var(--accent-bg);color:var(--primary-6);border:1px solid var(--accent-border);'
-        : 'background:var(--bg-subtle);color:var(--text-muted);border:1px solid var(--border-1);');
-    const disabledStyle = !node.clickable ? 'cursor:not-allowed; opacity:0.58;' : 'cursor:pointer;';
+  const contentNodeTabs = [
+    { id: 'node1', label: '内容节点1', check: true }
+  ];
 
-    let tab = '<div ' + clickAttr + ' style="' + disabledStyle + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding: 9px 14px; border-radius: 10px; border: 1px solid ' + (isCurrent ? 'var(--primary-6)' : 'var(--border-1)') + '; background: ' + (isCurrent ? 'var(--accent-bg)' : 'var(--bg-surface)') + '; box-shadow: ' + (isCurrent ? '0 0 0 3px rgba(74,158,255,0.12)' : 'none') + '; transition: all var(--ease); min-width: 132px;">'
-      + '<span style="font: 600 13px/1 var(--font); color: ' + (isCurrent ? 'var(--primary-7)' : 'var(--text-hi)') + ';">' + escHtml(node.title) + '</span>'
-      + '<span style="height:20px;padding:0 7px;border-radius:999px;display:inline-flex;align-items:center;font:500 11px/1 var(--font);white-space:nowrap;' + statusStyle + '">' + escHtml(node.statusText) + '</span>'
-      + '</div>';
+  const isSingleNodeAndSource = hardcodedNodes.length === 1 && contentNodeTabs.length === 1;
 
-    if (i < hardcodedNodes.length - 1) {
-      tab += '<div style="width: 44px; height: 1px; background: var(--border-2); margin: 0 10px;"></div>';
-    }
-    return tab;
-  }).join('') + '</div>';
+  let nodesHtml = '';
+  if (!isSingleNodeAndSource) {
+    nodesHtml = '<div style="display:flex; align-items:center; justify-content:center; width:100%; padding: 10px 0 8px;">' + hardcodedNodes.map(function(node, i) {
+      const isCurrent = node.id === reviewTaskId;
+      const clickAttr = node.clickable ? ('onclick="state.reviewContext.reviewTaskId=\'' + node.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"') : '';
+      const statusStyle = node.statusKind === 'done'
+        ? 'background:rgba(52,199,89,0.1);color:var(--success);border:1px solid rgba(52,199,89,0.22);'
+        : (node.statusKind === 'active'
+          ? 'background:var(--accent-bg);color:var(--primary-6);border:1px solid var(--accent-border);'
+          : 'background:var(--bg-subtle);color:var(--text-muted);border:1px solid var(--border-1);');
+      const disabledStyle = !node.clickable ? 'cursor:not-allowed; opacity:0.58;' : 'cursor:pointer;';
+
+      let tab = '<div ' + clickAttr + ' style="' + disabledStyle + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding: 9px 14px; border-radius: 10px; border: 1px solid ' + (isCurrent ? 'var(--primary-6)' : 'var(--border-1)') + '; background: ' + (isCurrent ? 'var(--accent-bg)' : 'var(--bg-surface)') + '; box-shadow: ' + (isCurrent ? '0 0 0 3px rgba(74,158,255,0.12)' : 'none') + '; transition: all var(--ease); min-width: 132px;">'
+        + '<span style="font: 600 13px/1 var(--font); color: ' + (isCurrent ? 'var(--primary-7)' : 'var(--text-hi)') + ';">' + escHtml(node.title) + '</span>'
+        + '<span style="height:20px;padding:0 7px;border-radius:999px;display:inline-flex;align-items:center;font:500 11px/1 var(--font);white-space:nowrap;' + statusStyle + '">' + escHtml(node.statusText) + '</span>'
+        + '</div>';
+
+      if (i < hardcodedNodes.length - 1) {
+        tab += '<div style="width: 44px; height: 1px; background: var(--border-2); margin: 0 10px;"></div>';
+      }
+      return tab;
+    }).join('') + '</div>';
+  }
 
   // 2. 内容节点维度 Tab
-  const contentNodeTabsHtml = [
-    { id: 'node1', label: '内容节点1', check: true },
-    { id: 'node2', label: '内容节点2', check: false }
-  ].map(function(tab) {
-    const isActive = state.reviewContentNode === tab.id;
-    const statusText = tab.check ? '已完成' : '待审核';
-    const statusStyle = tab.check ? 'color:var(--success);' : 'color:var(--text-muted);';
-    return '<button class="pill ' + (isActive ? 'on' : '') + '" style="height: 46px; font-size: 13px; padding: 0 18px; border-radius: 10px; border:' + (isActive ? '1px solid var(--primary-6)' : '1px solid transparent') + '; box-shadow:' + (isActive ? '0 0 0 3px rgba(74,158,255,0.10)' : 'none') + '; flex-direction:column; gap:4px; align-items:center; justify-content:center;" onclick="state.reviewContentNode=\'' + tab.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"><span>' + tab.label + '</span><span style="font:500 11px/1 var(--font);' + statusStyle + '">' + statusText + '</span></button>';
-  }).join('');
-  const contentNodeHtml = '<div style="display: flex; justify-content: center; margin-bottom: 8px;"><div class="pills" style="padding: 3px; border-radius: 12px;">' + contentNodeTabsHtml + '</div></div>';
+  let contentNodeHtml = '';
+  if (!isSingleNodeAndSource) {
+    const contentNodeTabsHtml = contentNodeTabs.map(function(tab) {
+      const isActive = state.reviewContentNode === tab.id;
+      const statusText = tab.check ? '已完成' : '待审核';
+      const statusStyle = tab.check ? 'color:var(--success);' : 'color:var(--text-muted);';
+      return '<button class="pill ' + (isActive ? 'on' : '') + '" style="height: 46px; font-size: 13px; padding: 0 18px; border-radius: 10px; border:' + (isActive ? '1px solid var(--primary-6)' : '1px solid transparent') + '; box-shadow:' + (isActive ? '0 0 0 3px rgba(74,158,255,0.10)' : 'none') + '; flex-direction:column; gap:4px; align-items:center; justify-content:center;" onclick="state.reviewContentNode=\'' + tab.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"><span>' + tab.label + '</span><span style="font:500 11px/1 var(--font);' + statusStyle + '">' + statusText + '</span></button>';
+    }).join('');
+    contentNodeHtml = '<div style="display: flex; justify-content: center; margin-bottom: 8px;"><div class="pills" style="padding: 3px; border-radius: 12px;">' + contentNodeTabsHtml + '</div></div>';
+  }
 
   // MOCK DATA
   let allItems = [];
@@ -2691,6 +2475,7 @@ function renderReviewPage() {
       }
     });
   };
+
   window.__mockNodeSubmitted = window.__mockNodeSubmitted || {};
   const isSubmitted = window.__mockNodeSubmitted[state.reviewContentNode];
   window.mockSubmitNode = function() {
@@ -2700,88 +2485,127 @@ function renderReviewPage() {
 
   let gridHtml = '';
   if (state.reviewContentNode === 'node2') {
-    gridHtml = '<div style="display:flex; flex-direction:column; gap:10px; width:100%; max-width: 900px; margin: 0 auto; padding: 12px 16px 24px;">' + displayItems.map(function(it, i) {
+    gridHtml = '<div style="display:flex; flex-direction:column; gap:10px; width:100%; margin: 0 auto; padding: 12px 16px 24px;">' + displayItems.map(function(it, i) {
       const idx = it.idx;
       let statusBadge = '';
-      if (it.reviewStatus === 'approved') statusBadge = '<div style="color: var(--success); background: var(--success-bg); border: 1px solid var(--success-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: auto; flex-shrink: 0;">已通过</div>';
-      else if (it.reviewStatus === 'rejected') statusBadge = '<div style="color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); padding: 2px 8px; border-radius: 4px; font: 500 12px/1 var(--font); margin-left: auto; flex-shrink: 0;">已拒绝</div>';
+      let cardBg = 'var(--bg-surface)';
+      let cardBorder = 'var(--border-1)';
+
+      if (it.reviewStatus === 'approved') {
+        statusBadge = '<div style="color: var(--success); background: rgba(52,199,89,0.1); border: 1px solid rgba(52,199,89,0.2); padding: 4px 10px; border-radius: 20px; font: 500 12px/1 var(--font); margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">已通过</div>';
+      } else if (it.reviewStatus === 'rejected') {
+        statusBadge = '<div style="color: var(--error); background: rgba(229,72,77,0.1); border: 1px solid rgba(229,72,77,0.2); padding: 4px 10px; border-radius: 20px; font: 500 12px/1 var(--font); margin-left: auto; flex-shrink: 0; display: flex; align-items: center; gap: 4px;">已拒绝</div>';
+      }
 
       let actionBtns = '';
       if (!isSubmitted) {
         actionBtns = '<div style="display:flex; gap: 8px; flex-shrink: 0; flex-wrap:wrap;">';
         if (it.reviewStatus !== 'approved') {
-          actionBtns += '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--primary-6); background:#fff; color: var(--primary-6); cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="setMockTextStatus(' + idx + ', \'approved\')">通过</button>';
+          actionBtns += '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--primary-6); background: #fff; color: var(--primary-6); cursor: pointer; transition: all var(--ease); display: flex; align-items: center; gap: 4px;" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="setMockTextStatus(' + idx + ', \'approved\')">通过</button>';
         }
         if (it.reviewStatus !== 'rejected') {
-          actionBtns += '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--error-border); color:var(--error); background:var(--bg-subtle); cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'var(--error-bg)\';" onmouseout="this.style.background=\'var(--bg-subtle)\';" onclick="setMockTextStatus(' + idx + ', \'rejected\')">拒绝</button>';
+          actionBtns += '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--error); color:var(--error); background:#fff; cursor: pointer; transition: all var(--ease); display: flex; align-items: center; gap: 4px;" onmouseover="this.style.background=\'rgba(229,72,77,0.05)\';" onmouseout="this.style.background=\'#fff\';" onclick="setMockTextStatus(' + idx + ', \'rejected\')">拒绝</button>';
         }
         actionBtns += '</div>';
       }
 
-      return '<div style="display:flex; align-items:flex-start; gap:12px; padding: 14px 16px 12px; background:var(--bg-surface); border:1px solid var(--border-2); border-radius:8px; box-shadow: 0 1px 4px rgba(0,0,0,0.025); transition: border var(--ease), box-shadow var(--ease);" onmouseover="this.style.borderColor=\'var(--border-3)\';this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.05)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.boxShadow=\'0 1px 4px rgba(0,0,0,0.025)\'">'
-        + '<div style="width:128px; flex-shrink:0; display:flex; flex-direction:column; align-items:flex-start; gap:8px;">'
+      return '<div style="display:flex; align-items:flex-start; gap: 12px; padding: 14px 16px 12px; background:' + cardBg + '; border:1px solid ' + cardBorder + '; border-radius:10px; box-shadow: 0 1px 3px rgba(0,0,0,0.035); transition: all 0.2s ease; position: relative; overflow: hidden;" onmouseover="this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.06)\';" onmouseout="this.style.boxShadow=\'0 1px 3px rgba(0,0,0,0.035)\';">'
+        + '<div style="width: 128px; flex-shrink:0; display:flex; flex-direction:column; align-items:flex-start; gap:8px;">'
           + actionBtns
           + statusBadge
         + '</div>'
-        + '<div style="display:flex; align-items:flex-start; flex:1; min-width:0;">'
-          + '<textarea style="flex:1; height:' + getCopyReviewBoxHeight(it.content) + 'px; max-height:128px; overflow-y:auto; border:0; border-radius:8px; resize:none; font: 400 14px/1.65 var(--font); color:var(--text-hi); outline:none; background:var(--bg-subtle); padding:10px 12px; margin:0; box-shadow:none;" rows="1" onfocus="this.style.background=\'var(--bg-surface)\';this.style.boxShadow=\'0 0 0 2px rgba(74,158,255,0.12)\';" onblur="this.style.background=\'var(--bg-subtle)\';this.style.boxShadow=\'none\';" oninput="updateMockText(' + idx + ', event)">' + escHtml(it.content) + '</textarea>'
+        + '<div style="display:flex; align-items: flex-start; flex:1; min-width:0;">'
+          + '<textarea ' + (isSubmitted ? 'disabled ' : '') + 'style="flex:1; height:' + getCopyReviewBoxHeight(it.content) + 'px; max-height:128px; overflow-y:auto; border:0; border-radius:8px; resize:none; font: 400 14px/1.65 var(--font); color:var(--text-hi); outline:none; background:var(--bg-subtle); padding:10px 12px; margin:0; box-shadow:none;" rows="1" onfocus="this.style.background=\'var(--bg-surface)\';this.style.boxShadow=\'0 0 0 2px rgba(74,158,255,0.12)\';" onblur="this.style.background=\'var(--bg-subtle)\';this.style.boxShadow=\'none\';" oninput="updateMockText(' + idx + ', event)">' + escHtml(it.content) + '</textarea>'
         + '</div>'
         + '</div>';
     }).join('') + '</div>';
   } else {
     gridHtml = '<div class="review-grid" style="padding: 16px 24px 32px; gap: 16px; width: 100%; margin: 0;">' + displayItems.map(function(it, idx) {
       const isSelected = state.reviewSelected.has(it.itemId);
+      let statusOverlay = '';
       let statusBadge = '';
-      if (it.reviewStatus === 'approved') statusBadge = '<div class="review-card-status approved">已通过</div>';
-      else if (it.reviewStatus === 'rejected') statusBadge = '<div class="review-card-status rejected">已拒绝</div>';
+      let borderStyle = '1px solid var(--border-2)';
+
+      if (it.reviewStatus === 'approved') {
+        borderStyle = '1px solid var(--success)';
+        statusOverlay = '<div style="position:absolute; inset:0; background: rgba(74,158,255,0.08); pointer-events:none; border-radius: 7px;"></div>';
+        statusBadge = '<div style="position:absolute; top: 8px; right: 8px; background: var(--primary-6); color: #fff; padding: 2px 8px; border-radius: 12px; font: 500 11px/1 var(--font); display: flex; align-items: center; gap: 4px;">已通过</div>';
+      } else if (it.reviewStatus === 'rejected') {
+        borderStyle = '1px solid var(--error)';
+        statusOverlay = '<div style="position:absolute; inset:0; background: rgba(229,72,77,0.05); pointer-events:none; border-radius: 7px;"></div>';
+        statusBadge = '<div style="position:absolute; top: 8px; right: 8px; background: var(--error); color: #fff; padding: 2px 8px; border-radius: 12px; font: 500 11px/1 var(--font); display: flex; align-items: center; gap: 4px;">已拒绝</div>';
+      }
 
       let actionOverlay = '';
-      {
+      if (!isSubmitted) {
         let opacityState = (it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1';
-        actionOverlay = '<div class="action-overlay-hover" style="position:absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; opacity:' + opacityState + '; transition: opacity 0.2s ease;">'
+        actionOverlay = '<div class="action-overlay-hover" style="position:absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; opacity: ' + opacityState + '; transition: opacity 0.2s ease;">'
           + (it.reviewStatus !== 'approved' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--primary-6); border: 1px solid var(--primary-6); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'approved\')">通过</button>' : '')
           + (it.reviewStatus !== 'rejected' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--error); border: 1px solid var(--error); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(229,72,77,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'rejected\')">拒绝</button>' : '')
           + '</div>';
       }
 
-      return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + '" data-item-id="' + escHtml(it.itemId) + '" onmouseover="var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'1\';" onmouseout="var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'' + ((it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1') + '\';" onclick="openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\')">'
-        + '<div style="width:100%;padding-bottom:100%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; border-radius: var(--r-xl);">' + actionOverlay + '</div>'
+      return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + '" data-item-id="' + escHtml(it.itemId) + '" style="border: ' + borderStyle + '; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); transition: transform 0.2s ease, box-shadow 0.2s ease; background: var(--bg-surface);" onmouseover="this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 8px 16px rgba(0,0,0,0.08)\';var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'1\';" onmouseout="this.style.transform=\'translateY(0)\';this.style.boxShadow=\'0 1px 3px rgba(0,0,0,0.04)\';var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'' + ((it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1') + '\';" onclick="openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\')">'
+        + '<div style="width:100%;padding-bottom:100%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; border-radius: 7px;">' + statusOverlay + actionOverlay + '</div>'
         + statusBadge
         + '</div>';
     }).join('') + '</div>';
   }
 
-  root.innerHTML = '<div class="review-page" id="reviewPageContainer" style="background: var(--bg-page); padding: 8px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">'
-    + '<div style="background:var(--bg-surface); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">'
-      + '<div class="review-header-bar" style="border-bottom: 1px solid var(--border-1); padding: 10px 16px; display: flex; align-items: center;">'
-        + '<div style="width: 4px; height: 16px; background: var(--accent-solid); border-radius: 2px; margin-right: var(--space-2);"></div>'
-        + '<div style="display:flex; flex-direction:column; gap:6px;">'
-          + '<div style="font: 600 16px/1 var(--font); color: var(--text-hi);">工作流名称爆款图片裂变</div>'
-          + '<div style="font: 400 13px/1 var(--font); color: var(--text-muted);">任务名称爆款图片裂变20260444</div>'
+  let singleNodeTagHtml = '';
+  if (isSingleNodeAndSource) {
+    const node = hardcodedNodes[0];
+    const sourceNode = contentNodeTabs[0];
+    singleNodeTagHtml = '<div style="display: inline-flex; align-items: center; gap: 8px; margin-left: 12px;">'
+      + '<span style="font-size: 12px; font-weight: normal; background: #e6f4ff; color: #1677ff; border: 1px solid #91caff; padding: 2px 8px; border-radius: 4px;">' + escHtml(node.title) + '</span>'
+      + '<span style="font-size: 12px; color: var(--text-muted);">来源节点：' + escHtml(sourceNode.label) + '</span>'
+      + '</div>';
+  }
+
+  root.innerHTML = '<div class="review-page" id="reviewPageContainer" style="background: var(--bg-page); padding: 24px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; align-items: center; overflow-y: auto; font-family: var(--font);">'
+    + '<div style="width: 100%; display: flex; flex-direction: column; gap: 16px;">'
+      + '<div style="background:var(--bg-surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid var(--border-1); padding: 20px 24px; display: flex; flex-direction: column; gap: 16px;">'
+        + '<div style="display: flex; align-items: flex-start; justify-content: space-between;">'
+          + '<div style="display: flex; align-items: flex-start; gap: 12px;">'
+            + '<div style="width: 4px; height: 16px; background: var(--primary-6); border-radius: 2px; margin-top: 2px;"></div>'
+            + '<div style="display:flex; flex-direction:column; gap:6px;">'
+              + '<div style="font: 600 16px/1 var(--font); color: var(--text-hi); display: flex; align-items: center;">工作流名称爆款图片裂变' + singleNodeTagHtml + '</div>'
+              + '<div style="font: 400 13px/1 var(--font); color: var(--text-muted);">任务名称爆款图片裂变20260444</div>'
+            + '</div>'
+          + '</div>'
+          + '<button style="height: 32px; padding: 0 16px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); cursor: pointer; transition: all var(--ease); display: flex; align-items: center; gap: 6px;" onmouseover="this.style.borderColor=\'var(--primary-6)\';this.style.color=\'var(--primary-6)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.color=\'var(--text-lo)\'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>导出内容</button>'
         + '</div>'
+        + (isSingleNodeAndSource ? '' : (
+          '<div style="height: 1px; background: var(--border-1); margin: 4px 0;"></div>'
+          + '<div style="padding: 4px 0;">'
+            + nodesHtml.replace(/var\(--bg-surface\)/g, '#fff').replace(/border: 1px solid transparent/g, 'border: 1px solid var(--border-1)')
+          + '</div>'
+          + '<div style="display: flex; justify-content: center; margin-top: 8px;">'
+            + contentNodeHtml
+          + '</div>'
+        ))
       + '</div>'
-      + nodesHtml
-      + contentNodeHtml
-    + '</div>'
-    + '<div style="background:var(--bg-surface); border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); padding-bottom: 16px;">'
-      + '<div style="display:flex; justify-content:space-between; align-items:center; padding: 10px 16px; max-width: 948px; margin: 0 auto; width: 100%; box-sizing: border-box;">'
-        + '<div style="display:flex; gap: var(--space-3);">' + pillsHtml + '</div>'
-        + '<div style="display:flex; gap: 8px;">'
-          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border-1); background: var(--bg-subtle); color: var(--text-lo); opacity:' + (pendingCount ? '1' : '0.5') + '; cursor:' + (pendingCount ? 'pointer' : 'not-allowed') + ';" onclick="' + (pendingCount ? 'mockApproveAll(' + pendingCount + ')' : '') + '">全部通过</button>'
-          + '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid ' + (pendingCount ? 'var(--error-border)' : 'var(--border-1)') + '; background: var(--bg-subtle); color: var(--error); opacity:' + (pendingCount ? '1' : '0.5') + '; cursor:' + (pendingCount ? 'pointer' : 'not-allowed') + ';" onclick="' + (pendingCount ? 'mockRejectAll(' + pendingCount + ')' : '') + '">全部拒绝</button>'
-          + (isSubmitted
-            ? '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--primary-6); background: var(--primary-6); color: #fff; cursor: not-allowed;">已提交</button>'
-            : (displayItems.length > 0 && pendingCount === 0
-                ? '<button style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--primary-6); background: var(--primary-6); color: #fff; cursor: pointer;" onclick="mockSubmitNode()">提交</button>'
-                : '<button disabled ' + (displayItems.length > 0 ? 'title="请先完成审核" ' : '') + 'style="height: 32px; padding: 0 12px; font-size: 13px; border-radius: 4px; border: 1px solid var(--border-1); background: var(--bg-subtle); color: var(--text-ghost); cursor: not-allowed;">提交</button>'
-              )
-          )
+      + '<div style="background:var(--bg-surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid var(--border-1); padding-bottom: 24px; display: flex; flex-direction: column;">'
+        + '<div style="display:flex; justify-content:space-between; align-items:center; padding: 16px 24px; border-bottom: 1px solid var(--border-1);">'
+          + '<div style="display:flex; gap: 8px;">' + pillsHtml.replace(/border-radius: var\(--r-full\)/g, 'border-radius: 16px;') + '</div>'
+          + '<div style="display:flex; gap: 12px; align-items: center;">'
+            + '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); opacity:' + (pendingCount && !isSubmitted ? '1' : '0.5') + '; cursor:' + (pendingCount && !isSubmitted ? 'pointer' : 'not-allowed') + '; transition: all var(--ease);" ' + (pendingCount && !isSubmitted ? 'onmouseover="this.style.borderColor=\'var(--success)\';this.style.color=\'var(--success)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.color=\'var(--text-lo)\'"' : '') + ' onclick="mockApproveAll(' + pendingCount + ')">全部通过</button>'
+            + '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); opacity:' + (pendingCount && !isSubmitted ? '1' : '0.5') + '; cursor:' + (pendingCount && !isSubmitted ? 'pointer' : 'not-allowed') + '; transition: all var(--ease);" ' + (pendingCount && !isSubmitted ? 'onmouseover="this.style.borderColor=\'var(--error)\';this.style.color=\'var(--error)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.color=\'var(--text-lo)\'"' : '') + ' onclick="mockRejectAll(' + pendingCount + ')">全部拒绝</button>'
+            + (isSubmitted
+              ? '<button style="height: 32px; padding: 0 16px; font-size: 13px; border-radius: 16px; border: 1px solid var(--success); background: var(--primary-6); color: #fff; cursor: not-allowed; display: flex; align-items: center; gap: 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>已提交</button>'
+              : (displayItems.length > 0 && pendingCount === 0
+                  ? '<button style="height: 32px; padding: 0 16px; font-size: 13px; border-radius: 16px; border: 1px solid var(--primary-6); background: var(--primary-6); color: #fff; cursor: pointer; transition: all var(--ease);" onmouseover="this.style.background=\'var(--primary-5)\';" onmouseout="this.style.background=\'var(--primary-6)\';" onclick="mockSubmitNode()">提交</button>'
+                  : '<button disabled ' + (displayItems.length > 0 ? 'title="请先完成审核" ' : '') + 'style="height: 32px; padding: 0 16px; font-size: 13px; border-radius: 16px; border: 1px solid var(--border-2); background: var(--bg-subtle); color: var(--text-ghost); cursor: not-allowed;">提交</button>'
+                )
+            )
+          + '</div>'
         + '</div>'
+        + (displayItems.length === 0
+            ? '<div style="padding: 80px; text-align:center; color:var(--text-ghost); font: 400 14px/1 var(--font);">暂无数据</div>'
+            : gridHtml)
       + '</div>'
-      + (displayItems.length === 0
-          ? '<div style="padding: 60px; text-align:center; color:var(--text-ghost); font-size:var(--text-base);">无数据</div>'
-          : gridHtml)
     + '</div>'
+    + '<style>.pill { font-family: var(--font); font-weight: 400; background: transparent; color: var(--text-lo); height: 32px; padding: 0 16px; cursor: pointer; border: 1px solid transparent; border-radius: 16px; margin-right: 4px; transition: all var(--ease); } .pill:hover { background: var(--bg-subtle); } .pill.on { background: var(--bg-surface); color: var(--text-hi); font-weight: 500; border: 1px solid var(--border-1); box-shadow: 0 1px 2px rgba(0,0,0,0.05); } .pill-n { font-size: 12px; background: var(--bg-subtle); padding: 2px 6px; border-radius: 10px; margin-left: 4px; color: var(--text-muted); } .pill.on .pill-n { background: var(--bg-hover); color: var(--text-lo); }</style>'
   + '</div>';
   renderReviewBottomBar();
 }
@@ -2976,13 +2800,14 @@ function renderChatOutputRow(task, output, collapsed, vm) {
   }
 
   var completedCount = vm.producedCount || (output.items || []).length;
+  var target = getViewAllTarget(task, vm);
 
   return ''
     + '<div class="output-row copy-output-list ' + (collapsed ? 'collapsed' : 'expanded') + '">'
       + rows.join('')
       + '<div class="copy-output-footer" style="justify-content: flex-end; gap: 8px;">'
         + '<span style="font-size: 13px; color: var(--text-muted);">' + completedCount + ' / ' + total + '</span>'
-        + (total > items.length ? '<button class="copy-more-link" style="margin-left: 4px;" onclick="event.stopPropagation();openTaskResult(\''+task.id+'\')">查看全部</button>' : '')
+        + (total > items.length ? '<button class="copy-more-link" style="margin-left: 4px;" onclick="event.stopPropagation();parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>' : '')
       + '</div>'
     + '</div>';
 }
@@ -3023,118 +2848,15 @@ function renderOutputRow(task, output, collapsed, vm) {
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+viewAll+'</div>';
 }
 
-function createLoadingSeededRandom(seedText) {
-  var seed = 2166136261;
-  seedText = String(seedText || 'generative-loading');
-  for (var i = 0; i < seedText.length; i++) {
-    seed ^= seedText.charCodeAt(i);
-    seed = Math.imul(seed, 16777619);
-  }
-  return function() {
-    seed += 0x6D2B79F5;
-    var t = seed;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function loadingCssRange(rand, min, max, decimals, unit) {
-  return (min + (max - min) * rand()).toFixed(decimals == null ? 2 : decimals) + (unit || '');
-}
-
-function addLoadingLayerVars(vars, rand, prefix, stepCount, config) {
-  vars.push('--' + prefix + '-duration:' + loadingCssRange(rand, config.durationMin, config.durationMax, 2, 's'));
-  vars.push('--' + prefix + '-delay:-' + loadingCssRange(rand, config.delayMin, config.delayMax, 2, 's'));
-  for (var i = 0; i < stepCount; i++) {
-    vars.push('--' + prefix + '-x' + i + ':' + loadingCssRange(rand, config.xMin, config.xMax, 2, '%'));
-    vars.push('--' + prefix + '-y' + i + ':' + loadingCssRange(rand, config.yMin, config.yMax, 2, '%'));
-    vars.push('--' + prefix + '-r' + i + ':' + loadingCssRange(rand, config.rotateMin, config.rotateMax, 2, 'deg'));
-    vars.push('--' + prefix + '-s' + i + ':' + loadingCssRange(rand, config.scaleMin, config.scaleMax, 3, ''));
-    vars.push('--' + prefix + '-o' + i + ':' + loadingCssRange(rand, config.opacityMin, config.opacityMax, 3, ''));
-  }
-}
-
-function buildGenerativeLoadingStyle(task, slotIndex) {
-  var seedKey = [
-    task && task.id,
-    task && task.createdTime,
-    task && task.name,
-    slotIndex
-  ].join(':');
-  var rand = createLoadingSeededRandom(seedKey);
-  var vars = [];
-
-  vars.push('--base-cyan-x:' + loadingCssRange(rand, 10, 30, 1, '%'));
-  vars.push('--base-cyan-y:' + loadingCssRange(rand, 12, 34, 1, '%'));
-  vars.push('--base-pink-x:' + loadingCssRange(rand, 68, 88, 1, '%'));
-  vars.push('--base-pink-y:' + loadingCssRange(rand, 12, 30, 1, '%'));
-
-  vars.push('--vapor-a-x:' + loadingCssRange(rand, 10, 26, 1, '%'));
-  vars.push('--vapor-a-y:' + loadingCssRange(rand, 30, 52, 1, '%'));
-  vars.push('--vapor-b-x:' + loadingCssRange(rand, 66, 84, 1, '%'));
-  vars.push('--vapor-b-y:' + loadingCssRange(rand, 18, 38, 1, '%'));
-  vars.push('--vapor-c-x:' + loadingCssRange(rand, 42, 64, 1, '%'));
-  vars.push('--vapor-c-y:' + loadingCssRange(rand, 70, 88, 1, '%'));
-
-  vars.push('--wash-a-x:' + loadingCssRange(rand, 34, 56, 1, '%'));
-  vars.push('--wash-a-y:' + loadingCssRange(rand, 40, 58, 1, '%'));
-  vars.push('--wash-b-x:' + loadingCssRange(rand, 56, 76, 1, '%'));
-  vars.push('--wash-b-y:' + loadingCssRange(rand, 48, 70, 1, '%'));
-
-  vars.push('--field-a-x:' + loadingCssRange(rand, 12, 30, 1, '%'));
-  vars.push('--field-a-y:' + loadingCssRange(rand, 18, 36, 1, '%'));
-  vars.push('--field-b-x:' + loadingCssRange(rand, 70, 88, 1, '%'));
-  vars.push('--field-b-y:' + loadingCssRange(rand, 14, 30, 1, '%'));
-  vars.push('--field-c-x:' + loadingCssRange(rand, 64, 82, 1, '%'));
-  vars.push('--field-c-y:' + loadingCssRange(rand, 72, 88, 1, '%'));
-  vars.push('--field-d-x:' + loadingCssRange(rand, 20, 38, 1, '%'));
-  vars.push('--field-d-y:' + loadingCssRange(rand, 68, 86, 1, '%'));
-
-  addLoadingLayerVars(vars, rand, 'vapor', 4, {
-    durationMin: 10.8, durationMax: 15.6, delayMin: 0.4, delayMax: 10.2,
-    xMin: -18, xMax: 20, yMin: -14, yMax: 18,
-    rotateMin: -13, rotateMax: 13, scaleMin: 1.10, scaleMax: 1.23,
-    opacityMin: 0.56, opacityMax: 0.78
-  });
-  addLoadingLayerVars(vars, rand, 'wash', 4, {
-    durationMin: 12.2, durationMax: 17.4, delayMin: 0.8, delayMax: 12.6,
-    xMin: -18, xMax: 16, yMin: -10, yMax: 16,
-    rotateMin: -9, rotateMax: 9, scaleMin: 1.08, scaleMax: 1.20,
-    opacityMin: 0.42, opacityMax: 0.64
-  });
-  addLoadingLayerVars(vars, rand, 'field', 5, {
-    durationMin: 8.8, durationMax: 12.8, delayMin: 0.2, delayMax: 8.4,
-    xMin: -14, xMax: 16, yMin: -12, yMax: 20,
-    rotateMin: -24, rotateMax: 28, scaleMin: 1.04, scaleMax: 1.14,
-    opacityMin: 0.72, opacityMax: 0.88
-  });
-
-  return vars.join(';');
-}
-
-function renderGenerativeLoadingThumb(task, slotIndex) {
-  var loadingStyle = buildGenerativeLoadingStyle(task, slotIndex);
-  return ''
-    + '<div class="cc-img-loading-thumb" aria-hidden="true" style="' + loadingStyle + '">'
-      + '<span class="generative-loading__field"></span>'
-      + '<span class="generative-loading__label">生成中<span class="generative-loading__dots"></span></span>'
-    + '</div>';
-}
-
 function renderGeneratingOutputRow(task, output, collapsed, vm) {
   var MAX = collapsed ? 8 : 4;
   var baseSlots = Math.max(MAX - 1, 0);
-  var showLimit = Math.max(baseSlots - 1, 0);
-  var showItems = output.items.slice(0, showLimit);
+  var showItems = output.items.slice(0, baseSlots);
   var thumbs = showItems.map(function(item, i){
     return item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
   }).join('');
-  var loadingCount = Math.max(baseSlots - showItems.length, 1);
-  var loadingHtml = '';
-  for (var loadingIndex = 0; loadingIndex < loadingCount; loadingIndex++) {
-    loadingHtml += renderGenerativeLoadingThumb(task, showItems.length + loadingIndex);
-  }
+  var loadingCount = Math.max(baseSlots - showItems.length, 0);
+  var loadingHtml = Array(loadingCount + 1).join('<div class="cc-img-loading-thumb"><div class="cc-img-loading-spinner"></div></div>');
   var remaining = Math.max((vm.expectedCount || getTaskRequestedCount(task, state.cardModels[task.id] || task.input.models[0])) - showItems.length, 0);
   var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+loadingHtml+viewAll+'</div>';
@@ -3222,7 +2944,8 @@ function getViewAllTarget(task, vm) {
 }
 
 function renderViewAllCard(task, remaining, vm) {
-  return '<div class="o-thumb view-all-card" onclick="event.stopPropagation();openTaskResult(\''+task.id+'\')"><div class="view-all-num">+'+remaining+'</div><span>查看全部</span></div>';
+  var target = getViewAllTarget(task, vm);
+  return '<div class="o-thumb view-all-card" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')"><div class="view-all-num">+'+remaining+'</div><span>查看全部</span></div>';
 }
 
 
@@ -3285,17 +3008,17 @@ function renderCardActions(task, vm) {
     }
     if (s === 'failed' || task.status === 'failed') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'</div>';
     }
   }
   if (s === 'completed' || s === 'aborted') {
+    var target = getViewAllTarget(task, vm);
     return '<div class="card-actions">'
       +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
       +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
-      +'<button class="card-act-more" onclick="openTaskResult(\''+id+'\')">查看全部</button>'
+      +'<button class="card-act-more" onclick="parent.postMessage({action:\'openTab\',title:\''+target.title+'\',url:\''+target.url+'\'},\'*\')">查看全部</button>'
       +'</div>';
   }
   if (s === 'pending_review') {
@@ -3351,11 +3074,8 @@ function toggleNoticeCheck(event, kind, id) {
   renderTaskFeed();
 }
 function focusTaskCard(id, kind) {
-  if (kind === 'unread') {
-    markTaskViewed(id, false);
-    renderFilterBar();
-  }
-  renderTaskFeed(false);
+  if (kind === 'unread') state.noticeSeen[id] = true;
+  renderTaskFeed();
   var scrollArea = document.getElementById('taskScrollArea');
   var card = document.getElementById('task-card-' + id);
   if (!scrollArea || !card) return;
@@ -3441,23 +3161,16 @@ window.addEventListener('taskCreated', function(e) {
   var task = Object.assign({}, e.detail, {_new:true});
   state.tasks = state.tasks.concat([task]);
   state.cardModels[task.id] = task.input.models[0];
-  if (getTaskLifecycleStatus(task) === 'completed') state.noticeSeen[task.id] = false;
-  renderFilterBar();
   renderTaskFeed();
   setTimeout(function(){ var el=document.getElementById('taskScrollArea'); if(el) el.scrollTop=el.scrollHeight; }, 100);
 });
 
 window.addEventListener('taskUpdated', function(e) {
-  var prevTask = getTaskById(e.detail.id);
-  if (e.detail.status === 'completed' && (!prevTask || getTaskLifecycleStatus(prevTask) !== 'completed')) {
-    state.noticeSeen[e.detail.id] = false;
-  }
   state.tasks = state.tasks.map(function(t){ return t.id===e.detail.id ? Object.assign({},t,e.detail) : t; });
   if (state.pageMode === 'review') {
     renderReviewPage();
     return;
   }
-  renderFilterBar();
   renderTaskFeed();
 });
 
@@ -3478,16 +3191,10 @@ if (state.pageMode === 'review') {
 
 <script>
 // ══════════════════════════════════════
-const RATIO_SIZES = {'1:1':[16,16],'2:3':[11,16],'3:2':[16,11],'3:4':[12,16],'4:3':[16,12],'9:16':[9,16],'16:9':[16,9],'21:9':[16,7]};
+const RATIO_SIZES = {'1:1':[16,16],'2:3':[11,16],'3:2':[16,11],'3:4':[12,16],'4:3':[16,12],'9:16':[9,16],'16:9':[16,9]};
 const MODELS_DATA = [
-  { id:'seedream5', name:'seedream5.0', desc:'字节最强大的图像模型，对中文字体支持友好', types:['image'], qualities:['1K','2K','3K','4K'] },
-  { id:'banana2', name:'Banana 2', desc:'图像模型 · 支持 1K / 2K / 4K 清晰度', types:['image'], qualities:['1K','2K','4K'] },
-  { id:'seedream5lite', name:'Seedream 5.0 Lite', desc:'图像模型 · 支持 2K / 3K 清晰度', types:['image'], qualities:['2K','3K'] },
-  { id:'seedream46', name:'Seedream 4.6', desc:'图像模型 · 支持 2K / 4K 清晰度', types:['image'], qualities:['2K','4K'] },
-  { id:'seedance2', name:'Seedance 2.0', desc:'视频模型 · 支持 4 秒到 15 秒', types:['video'], durations:['4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒'] },
-  { id:'seedance2fast', name:'Seedance 2.0 Fast', desc:'视频模型 · 支持 4 秒到 15 秒', types:['video'], durations:['4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒'] },
-  { id:'seedance15pro', name:'Seedance 1.5Pro', desc:'视频模型 · 支持 5 秒 / 10 秒 / 12 秒', types:['video'], durations:['5秒','10秒','12秒'] },
-  { id:'minimax1', name:'MiniMax-01', desc:'视频生成模型，适合广告短片和素材动效', types:['video'], durations:['5秒','10秒'] },
+  { id:'seedream5', name:'seedream5.0', desc:'字节最强大的图像模型，对中文字体支持友好' },
+  { id:'banana2', name:'banana2', desc:'谷歌的图像模型，对提示词的理解能力很强大' },
 ];
 const CHAT_MODELS = {
   fast: [
@@ -3507,34 +3214,11 @@ const CHAT_MODELS = {
     { id:'deepseek-32', name:'DeepSeek 3.2', desc:'深度求索 · 代码与数学能力强，开源之光' },
   ],
 };
-const TYPE_ICONS = {
-  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
-  image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>',
-  video: '<svg class="lucide lucide-square-play" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M9 9.003a1 1 0 0 1 1.517-.859l4.997 2.997a1 1 0 0 1 0 1.718l-4.997 2.997A1 1 0 0 1 9 14.996z" /></svg>'
-};
-const OPTION_ICONS = {
-  count: '<svg class="lucide lucide-layers-2" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 13.74a2 2 0 0 1-2 0L2.5 8.87a1 1 0 0 1 0-1.74L11 2.26a2 2 0 0 1 2 0l8.5 4.87a1 1 0 0 1 0 1.74z" /><path d="m20 14.285 1.5.845a1 1 0 0 1 0 1.74L13 21.74a2 2 0 0 1-2 0l-8.5-4.87a1 1 0 0 1 0-1.74l1.5-.845" /></svg>',
-  mode: '<svg class="lucide lucide-sliders-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5H3" /><path d="M12 19H3" /><path d="M14 3v4" /><path d="M16 17v4" /><path d="M21 12h-9" /><path d="M21 19h-5" /><path d="M21 5h-7" /><path d="M8 10v4" /><path d="M8 12H3" /></svg>'
-};
-const GENERATE_ICON = '<svg class="lucide lucide-send-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" /><path d="M6 12h16" /></svg>';
-const INPUT_OPTS = {
-  chat: { countValues: ['1','5','10','20','50'] },
-  image: {
-    ratioValues: ['21:9','16:9','3:2','4:3','1:1','3:4','2:3','9:16'],
-    countValues: ['1','2','3','4','5','6','7','8','9','10']
-  },
-  video: {
-    ratioValues: ['16:9','4:3','1:1','3:4','9:16'],
-    countValues: ['1','2','3','4','5','6','7','8','9','10'],
-    modeValues: ['智能参考','首尾帧']
-  }
-};
-
 let curType = 'image';
 const sel = {
-  chat:  { model:'gpt54mini', count:'1', think:false, search:false },
+  chat:  { model:'gpt54mini', think:false, search:false },
   image: { models:['seedream5'], activeModel:'seedream5', modelConfigs:{ seedream5:{ count:'1', ratio:'1:1', res:'2K' } } },
-  video: { models:['seedance2'], activeModel:'seedance2', modelConfigs:{ seedance2:{ count:'1', ratio:'16:9', dur:'5秒', mode:'智能参考' } } },
+  video: { models:['seedream5'], activeModel:'seedream5', modelConfigs:{ seedream5:{ count:'1', ratio:'16:9', dur:'5秒', mode:'智能参考' } } },
 };
 
 function ensureInputModelConfig(type, modelId) {
@@ -3558,48 +3242,6 @@ function getInputActiveModelId(type = curType) {
 
 function getInputActiveConfig(type = curType) {
   return ensureInputModelConfig(type, getInputActiveModelId(type));
-}
-
-function getInputModelName(id) {
-  return (MODELS_DATA.find(m => m.id === id) || { name: MODELS_MAP[id] || id }).name;
-}
-
-function inputOptionIconHtml(kind, type = curType) {
-  const icon = kind === 'model'
-    ? (TYPE_ICONS[type] || TYPE_ICONS.image)
-    : (OPTION_ICONS[kind] || TYPE_ICONS.image);
-  return '<span class="type-opt-icon" aria-hidden="true">' + icon + '</span>';
-}
-
-function ratioPillIconHtml(width, height) {
-  return `<span class="pill-ratio-box" style="width:${width}px;height:${height}px;"></span>`;
-}
-
-function getRatioIconSize(ratio) {
-  let rw = 14, rh = 14;
-  if (RATIO_SIZES[ratio]) {
-    [rw, rh] = RATIO_SIZES[ratio];
-  } else {
-    const nums = String(ratio || '').split(':').map(Number);
-    if (nums.length === 2 && nums[0] && nums[1]) {
-      const mx = 16;
-      if (nums[0] >= nums[1]) { rw = mx; rh = Math.round(mx * nums[1] / nums[0]); }
-      else { rh = mx; rw = Math.round(mx * nums[0] / nums[1]); }
-    }
-  }
-  const sc = 11 / Math.max(rw, rh);
-  return [Math.max(2, Math.round(rw * sc)), Math.max(2, Math.round(rh * sc))];
-}
-
-function getResolutionLabel(res) {
-  return res === '4K' ? '超清 4K' : res === '3K' ? '高清 3K' : res === '1K' ? '1K' : '高清 2K';
-}
-
-function renderGenerateButtonLabel() {
-  const btn = document.getElementById('inputGenBtn');
-  if (!btn) return;
-  const label = curType === 'chat' ? '发送' : '生成';
-  btn.innerHTML = '<span class="gen-btn-icon" aria-hidden="true">' + GENERATE_ICON + '</span><span>' + label + '</span>';
 }
 
 function getTaskModelConfig(task, modelId) {
@@ -3669,35 +3311,21 @@ function getTaskDisplayMeta(task, modelId, resultTypeOverride) {
           </div>
           <textarea class="input-textarea" id="inputPrompt" rows="3"
             placeholder="描述您想要生成的内容..."
-            oninput="onInputChange();autoGrowTextarea(this,80,5)"></textarea>
+            oninput="onInputChange()"></textarea>
         </div>
         <div class="input-ref-strip" id="inputRefStrip"></div>
         <div class="input-toolbar" id="inputToolbar">
           <div id="inputOptArea" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;"></div>
           <div class="input-toolbar-spacer"></div>
           <button class="gen-btn" id="inputGenBtn" onclick="doGenerate()">
-            <span class="gen-btn-icon" aria-hidden="true">${GENERATE_ICON}</span><span>生成</span>
+            <span>生成</span>
           </button>
         </div>
       </div>
     </div>
   </div>`;
-  setTimeout(function(){
-    renderGenerateButtonLabel();
-    if (typeof renderInputOpts === 'function') renderInputOpts();
-    autoGrowTextarea(document.getElementById('inputPrompt'), 80, 5);
-  }, 0);
+  setTimeout(function(){ if (typeof renderInputOpts === 'function') renderInputOpts(); }, 0);
 })();
-
-function autoGrowTextarea(textarea, defaultH, extraRows) {
-  if (!textarea) return;
-  const lineHeight = parseFloat(getComputedStyle(textarea).lineHeight) || 21;
-  const maxH = defaultH + lineHeight * extraRows;
-  textarea.style.height = defaultH + 'px';
-  const nextH = Math.min(textarea.scrollHeight, maxH);
-  textarea.style.height = Math.max(defaultH, nextH) + 'px';
-  textarea.style.overflowY = textarea.scrollHeight > maxH ? 'auto' : 'hidden';
-}
 
 function expandInputBox() {
   document.getElementById('inputBox').classList.add('expanded');
@@ -3738,21 +3366,21 @@ window.addEventListener('contentTabChanged', function(e) {
     if (placeholder) placeholder.textContent = '输入文本内容...';
     if (uploadBlock) uploadBlock.style.display = 'none';
     if (optArea) optArea.style.display = '';
-    renderGenerateButtonLabel();
+    genBtn.innerHTML = '<span>发送</span>';
     renderInputOpts();
   } else if (tab === 'video') {
     prompt.placeholder = '描述您想要生成的视频...';
     if (placeholder) placeholder.textContent = '描述您想要生成的视频...';
     if (uploadBlock) uploadBlock.style.display = '';
     if (optArea) optArea.style.display = '';
-    renderGenerateButtonLabel();
+    genBtn.innerHTML = '<span>生成</span>';
     renderInputOpts();
   } else {
     prompt.placeholder = '描述您想要生成的图像...';
     if (placeholder) placeholder.textContent = '描述您想要生成的图像...';
     if (uploadBlock) uploadBlock.style.display = '';
     if (optArea) optArea.style.display = '';
-    renderGenerateButtonLabel();
+    genBtn.innerHTML = '<span>生成</span>';
     renderInputOpts();
   }
 });
@@ -3919,51 +3547,26 @@ document.addEventListener('click', function(e) {
 // ══════════════════════════════════════
 // Option Pills + 生成 + Asset Modal
 // ══════════════════════════════════════
-function inputPillHtml(key, valueHtml, ddInner) {
-  const ddHtml = ddInner ? `<div class="opt-dd" id="dd-${key}">${ddInner}</div>` : '';
-  const clickAttr = ddInner ? ` onclick="togglePill(event,'${key}')"` : '';
-  return `<div class="opt-pill" id="pill-${key}"${clickAttr}><span class="opt-pill-val">${valueHtml}</span>${ddHtml}</div>`;
-}
-
-function renderInputModelDropdown(activeId, type) {
-  const list = MODELS_DATA.filter(m => Array.isArray(m.types) ? m.types.includes(type) : (type === 'video' ? (m.durations && m.durations.length) : (m.qualities && m.qualities.length)));
-  return `<div class="dd-section">
-    <div class="dd-section-title">模型</div>
-    <div class="model-list">
-      ${list.map(mx => `<div class="model-opt-row" data-desc="${mx.desc || ''}" onclick="pickModel(event,'${mx.id}')">
-        <div class="model-radio${mx.id===activeId?' active':''}"></div>
-        <span class="model-opt-name">${mx.name}</span>
-      </div>`).join('')}
-    </div>
-  </div>`;
-}
-
-function renderInputCountDropdown(active, values, picker) {
-  return `<div class="dd-section">
-    <div class="dd-section-title">生成数量</div>
-    <div class="dd-chips">
-      ${values.map(v => `<span class="dd-chip${v===active?' active':''}" onclick="${picker}(event,'${v}')">${v}</span>`).join('')}
-    </div>
-  </div>`;
-}
-
-function renderInputRatioChips(values, active) {
-  return `<div class="ratio-row">
-    ${values.map(v => {
-      const [w, h] = RATIO_SIZES[v] || [14, 14];
-      return `<div class="ratio-chip${v===active?' active':''}" onclick="pickRatio(event,'${v}')">
-        <div class="ratio-box" style="width:${w}px;height:${h}px;"></div>
-        <span class="ratio-lbl">${v}</span>
-      </div>`;
-    }).join('')}
-  </div>`;
-}
-
 function renderInputOpts() {
   const area = document.getElementById('inputOptArea');
   if (!area) return;
-  renderGenerateButtonLabel();
   area.innerHTML = '';
+
+  if (curType !== 'chat') {
+    const models = sel[curType].models || [];
+    const activeId = getInputActiveModelId();
+    const activeCfg = getInputActiveConfig();
+    const modelNames = models.map(id => (MODELS_DATA.find(m=>m.id===id)||{name:id}).name).join('、');
+    area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>${models.length > 1 ? `${models.length} 个模型` : modelNames}</span></div>`;
+    if (models.length > 1) {
+      area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>当前：${(MODELS_DATA.find(m=>m.id===activeId)||{name:activeId}).name}</span></div>`;
+    }
+    if (curType === 'video') {
+      area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>${activeCfg.ratio || '16:9'} · ${activeCfg.dur || '5秒'} · ${activeCfg.count || '1'} 个</span></div>`;
+    } else {
+      area.innerHTML += `<div class="opt-pill" style="cursor:default;"><span>${activeCfg.ratio || '1:1'} · ${activeCfg.res || '2K'} · ${activeCfg.count || '1'} 张</span></div>`;
+    }
+  }
 
   if (curType === 'chat') {
     // ── 对话模型选择 ──
@@ -3977,7 +3580,7 @@ function renderInputOpts() {
       </div>`
     ).join('');
     area.innerHTML += `<div class="opt-pill" id="pill-chat-model" onclick="togglePill(event,'chat-model')">
-      <span class="opt-pill-val">${inputOptionIconHtml('model','chat')}${cm.name}</span>
+      <span>${cm.name}</span><span class="arr">▼</span>
       <div class="opt-dd" id="dd-chat-model" style="min-width:220px">
         <div class="cm-tier-label">快速</div>
         <div class="model-list">${renderTier(CHAT_MODELS.fast)}</div>
@@ -3985,13 +3588,6 @@ function renderInputOpts() {
         <div class="model-list">${renderTier(CHAT_MODELS.smart)}</div>
       </div>
     </div>`;
-
-    const chatCount = sel.chat.count || '1';
-    area.innerHTML += inputPillHtml(
-      'chat-count',
-      inputOptionIconHtml('count') + `${chatCount} 条`,
-      renderInputCountDropdown(chatCount, INPUT_OPTS.chat.countValues, 'pickChatCount')
-    );
 
     // ── 思考模式 ──
     const thinkOn = sel.chat.think;
@@ -4009,80 +3605,9 @@ function renderInputOpts() {
     area.innerHTML += `<div class="opt-pill toggle-pill" onclick="void(0)">
       <span class="opt-pill-val"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> 上传文件</span>
     </div>`;
-    return;
-  }
 
-  const models = sel[curType].models || [];
-  const activeId = getInputActiveModelId();
-  const activeCfg = getInputActiveConfig();
-  const activeModel = MODELS_DATA.find(m => m.id === activeId) || {};
-  const modelLabel = models.length > 1
-    ? `${getInputModelName(models[0])} 等 ${models.length} 个模型`
-    : getInputModelName(activeId);
-  area.innerHTML += inputPillHtml(
-    'input-model',
-    inputOptionIconHtml('model', curType) + modelLabel,
-    renderInputModelDropdown(activeId, curType)
-  );
-
-  const countUnit = curType === 'video' ? '个' : '张';
-  const countVal = activeCfg.count || '1';
-  area.innerHTML += inputPillHtml(
-    'input-count',
-    inputOptionIconHtml('count') + `${countVal} ${countUnit}`,
-    renderInputCountDropdown(countVal, INPUT_OPTS[curType].countValues, 'pickCount')
-  );
-
-  if (curType === 'video') {
-    const modeVal = activeCfg.mode || '智能参考';
-    area.innerHTML += inputPillHtml(
-      'input-mode',
-      inputOptionIconHtml('mode') + modeVal,
-      `<div class="dd-section">
-        <div class="dd-section-title">生成模式</div>
-        <div class="dd-chips">
-          ${INPUT_OPTS.video.modeValues.map(v => `<span class="dd-chip${v===modeVal?' active':''}" onclick="pickMode(event,'${v}')">${v}</span>`).join('')}
-        </div>
-      </div>`
-    );
-
-    const ratio = activeCfg.ratio || '16:9';
-    const dur = activeCfg.dur || '5秒';
-    const [iw, ih] = getRatioIconSize(ratio);
-    const durations = activeModel.durations && activeModel.durations.includes(dur) ? activeModel.durations : [dur].concat(activeModel.durations || []);
-    area.innerHTML += inputPillHtml(
-      'input-ratio-dur',
-      ratioPillIconHtml(iw, ih) + `${ratio} · ${dur}`,
-      `<div class="dd-section">
-        <div class="dd-section-title">比例</div>
-        ${renderInputRatioChips(INPUT_OPTS.video.ratioValues, ratio)}
-      </div>
-      <div class="dd-section">
-        <div class="dd-section-title">时长</div>
-        <div class="dd-chips">
-          ${durations.map(v => `<span class="dd-chip${v===dur?' active':''}" onclick="pickDur(event,'${v}')">${v}</span>`).join('')}
-        </div>
-      </div>`
-    );
   } else {
-    const ratio = activeCfg.ratio || '1:1';
-    const res = activeCfg.res || '2K';
-    const [iw, ih] = getRatioIconSize(ratio);
-    const qualities = activeModel.qualities && activeModel.qualities.includes(res) ? activeModel.qualities : [res].concat(activeModel.qualities || []);
-    area.innerHTML += inputPillHtml(
-      'input-ratio-res',
-      ratioPillIconHtml(iw, ih) + `${ratio} · ${getResolutionLabel(res)}`,
-      `<div class="dd-section">
-        <div class="dd-section-title">比例</div>
-        ${renderInputRatioChips(INPUT_OPTS.image.ratioValues, ratio)}
-      </div>
-      <div class="dd-section">
-        <div class="dd-section-title">质量</div>
-        <div class="dd-chips">
-          ${qualities.map(v => `<span class="dd-chip${v===res?' active':''}" onclick="pickRes(event,'${v}')">${getResolutionLabel(v)}</span>`).join('')}
-        </div>
-      </div>`
-    );
+    // 我的任务页底部输入区先展示摘要，不再提供逐模型编辑，避免误改丢配置
   }
 }
 
@@ -4102,18 +3627,11 @@ document.addEventListener('click', function(e) {
   }
 });
 
-function pickModel(e,id){
-  e.stopPropagation();
-  sel[curType].models = [id];
-  sel[curType].activeModel = id;
-  ensureInputModelConfig(curType, id);
-  renderInputOpts();
-}
+function pickModel(e,id){ e.stopPropagation(); sel[curType].activeModel=id; ensureInputModelConfig(curType, id); renderInputOpts(); }
 function pickRatio(e,r){ e.stopPropagation(); getInputActiveConfig().ratio=r; renderInputOpts(); }
 function pickRes(e,r){ e.stopPropagation(); getInputActiveConfig().res=r; renderInputOpts(); }
 function pickCount(e,n){ e.stopPropagation(); getInputActiveConfig().count=n; renderInputOpts(); }
 function pickChatModel(e,id){ e.stopPropagation(); sel.chat.model=id; renderInputOpts(); }
-function pickChatCount(e,n){ e.stopPropagation(); sel.chat.count=n; renderInputOpts(); }
 function toggleChatOpt(key){ sel.chat[key]=!sel.chat[key]; renderInputOpts(); }
 function pickMode(e,v){ e.stopPropagation(); getInputActiveConfig().mode=v; renderInputOpts(); }
 function pickDur(e,v){ e.stopPropagation(); getInputActiveConfig().dur=v; renderInputOpts(); }
@@ -4123,40 +3641,13 @@ function doGenerate() {
   if (!txt) { document.getElementById('inputPrompt').focus(); return; }
   const refImgs = [];
   document.querySelectorAll('#inputRefStrip .input-ref-item img').forEach(img => refImgs.push({ thumb: img.src, url: img.src }));
-  if (curType === 'chat') {
-    const modelId = sel.chat.model || CHAT_MODELS.fast[0].id;
-    const count = parseInt(sel.chat.count || '1', 10) || 1;
-    const newTask = {
-      id: String(Date.now()), name: txt.length>30?txt.substring(0,30)+'...':txt,
-      type:'chat', taskType:'direct_generate', resultType:'text', status:'generating',
-      createdTime: new Date().toISOString().replace('T',' ').substring(0,16),
-      creator:'我', source:'universal',
-      input: { prompt:txt, refImages:[], inputType:'text', models:[modelId], count:count, think:sel.chat.think, search:sel.chat.search },
-      output: { byModel: { [modelId]: { total:0, items:[] } } }
-    };
-    window.dispatchEvent(new CustomEvent('taskCreated', { detail: newTask }));
-    collapseInputBox();
-    document.getElementById('inputPrompt').value = '';
-    onInputChange();
-    showToast('任务已提交');
-    setTimeout(() => {
-      window.dispatchEvent(new CustomEvent('taskUpdated', {
-        detail: {
-          id: newTask.id,
-          status:'completed',
-          output: { byModel: { [modelId]: { total:count, items:Array.from({length:count}, (_,i) => ({ type:'text', content:`${txt} · 候选文案 ${i + 1}` })) } } }
-        }
-      }));
-    }, 3000);
-    return;
-  }
   const models = (sel[curType].models && sel[curType].models.length) ? sel[curType].models.slice() : [getInputActiveModelId()];
   const modelConfigs = {};
   models.forEach(function(id){ modelConfigs[id] = Object.assign({}, ensureInputModelConfig(curType, id)); });
   const firstCfg = modelConfigs[models[0]] || {};
   const newTask = {
     id: String(Date.now()), name: txt.length>30?txt.substring(0,30)+'...':txt,
-    type: curType==='video'?'video':'image', taskType:'direct_generate', resultType:curType==='video'?'video':'image', status:'generating',
+    type: curType==='video'?'video':'image', status:'generating',
     createdTime: new Date().toISOString().replace('T',' ').substring(0,16),
     creator:'我', source:'universal',
     input: { prompt:txt, refImages:refImgs, inputType:refImgs.length>1?'multi_image':refImgs.length===1?'image':'text', models:models, modelConfigs:modelConfigs, ratio:firstCfg.ratio, res:firstCfg.res, dur:firstCfg.dur, count:parseInt(firstCfg.count)||1, mode:firstCfg.mode },

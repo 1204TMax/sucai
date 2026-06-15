@@ -3,348 +3,1229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原料库 - 生产线溯源管理</title>
+    <title>原料库 - 量化投放系统</title>
     <style>
-        /* ── 基础与重置 ── */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         :root {
-            --primary: #1677ff;
-            --bg-page: #f5f7fa;
-            --bg-card: #ffffff;
-            --border: #e8e8e8;
-            --text-main: #333;
-            --text-sec: #666;
-            --text-muted: #999;
+            --ant-primary-1: #E6F4FF;
+            --ant-primary-2: #BAE0FF;
+            --ant-primary-5: #4096FF;
+            --ant-primary-6: #1677FF;
+            --ant-primary-7: #0958D9;
+            --ant-success-1: #F6FFED;
+            --ant-success-2: #D9F7BE;
+            --ant-success-6: #52C41A;
+            --ant-warning-1: #FFFBE6;
+            --ant-warning-2: #FFF1B8;
+            --ant-warning-6: #FAAD14;
+            --ant-error-1: #FFF1F0;
+            --ant-error-2: #FFCCC7;
+            --ant-error-6: #F5222D;
+            --ant-text-color: #262626;
+            --ant-text-color-secondary: #595959;
+            --ant-text-color-tertiary: #8C8C8C;
+            --ant-text-color-inverse: #FFFFFF;
+            --ant-bg-base: #F5F5F5;
+            --ant-bg-container: #FFFFFF;
+            --ant-bg-secondary: rgba(0,0,0,0.02);
+            --ant-bg-tertiary: rgba(0,0,0,0.04);
+            --ant-border-color: #D9D9D9;
+            --ant-border-color-secondary: #F0F0F0;
+            --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --ant-font-size-h4: 20px;
+            --ant-font-size-h5: 16px;
+            --ant-font-size: 14px;
+            --ant-font-size-sm: 12px;
+            --ant-size-xxs: 4px;
+            --ant-size-xs: 8px;
+            --ant-size-sm: 12px;
+            --ant-size: 16px;
+            --ant-size-md: 20px;
+            --ant-size-lg: 24px;
+            --ant-border-radius-sm: 4px;
+            --ant-border-radius: 6px;
+            --ant-border-radius-lg: 8px;
+            --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
         }
 
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            background: var(--bg-page); 
-            color: var(--text-main); 
-            padding: 8px; /* 遵循 README.md 规范 */
-            /* 修正：不再使用 height: 100vh，改用 calc 适配 iframe 环境，防止双滚动条 */
-            height: calc(100vh - 4px); 
-            overflow: hidden; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            height: calc(100vh - 4px);
+            overflow: hidden;
+            padding: var(--ant-size-xs);
+            background: var(--ant-bg-base);
+            color: var(--ant-text-color);
+            font-family: var(--ant-font-family);
+            font-size: var(--ant-font-size);
+        }
+
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        button {
+            border: none;
+        }
+
+        svg {
+            width: 1em;
+            height: 1em;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .page {
+            height: 100%;
             display: flex;
             flex-direction: column;
+            gap: var(--ant-size-xs);
+            min-height: 0;
         }
 
-        /* ── 通用按钮 ── */
-        .btn { padding: 6px 16px; border-radius: 6px; font-size: 14px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-        .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
-        .btn-primary:hover { background: #4096ff; border-color: #4096ff; }
-        .btn-default { background: #fff; border: 1px solid #d9d9d9; color: var(--text-main); }
-        .btn-default:hover { border-color: var(--primary); color: var(--primary); }
-        .btn-sm { padding: 4px 10px; font-size: 13px; border-radius: 4px; }
-        .text-danger { color: #ff4d4f; }
-        
-        svg { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .surface {
+            background: var(--ant-bg-container);
+            border: 1px solid var(--ant-border-color-secondary);
+            border-radius: var(--ant-border-radius-lg);
+            box-shadow: var(--ant-box-shadow);
+        }
 
-        /* ── 页面头部 ── */
         .page-header {
-            background: #fff;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-            margin-bottom: 8px;
-            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: var(--ant-size);
+            padding: var(--ant-size) var(--ant-size-lg);
+            flex-shrink: 0;
         }
-        
-        .header-left { display: flex; align-items: center; gap: 24px; }
-        .tabs { display: flex; gap: 24px; }
-        .tab {
-            font-size: 15px;
-            cursor: pointer;
-            padding: 4px 0;
-            color: #555;
-            font-weight: 500;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-        .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* ── 组合筛选栏 (1:1 复刻原型图) ── */
-        .filter-bar {
-            display: flex; gap: 16px; margin-bottom: 8px; flex-shrink: 0;
-            background: #fff; padding: 12px 20px; border-radius: 8px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        .title-wrap {
+            min-width: 0;
+        }
+
+        .page-title {
+            font-size: var(--ant-font-size-h4);
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .page-desc {
+            margin-top: var(--ant-size-xxs);
+            color: var(--ant-text-color-secondary);
+            font-size: var(--ant-font-size-sm);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn {
+            height: 32px;
+            padding: 0 var(--ant-size);
+            border-radius: var(--ant-border-radius);
+            border: 1px solid var(--ant-border-color);
+            background: var(--ant-bg-container);
+            color: var(--ant-text-color);
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
+            gap: var(--ant-size-xs);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+        }
+
+        .btn:hover {
+            border-color: var(--ant-primary-5);
+            color: var(--ant-primary-6);
+        }
+
+        .btn-primary {
+            background: var(--ant-primary-6);
+            border-color: var(--ant-primary-6);
+            color: var(--ant-text-color-inverse);
+        }
+
+        .btn-primary:hover {
+            background: var(--ant-primary-5);
+            border-color: var(--ant-primary-5);
+            color: var(--ant-text-color-inverse);
+        }
+
+        .btn-small {
+            height: 28px;
+            padding: 0 var(--ant-size-sm);
+            font-size: var(--ant-font-size-sm);
+        }
+
+        .layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 252px minmax(0, 1fr);
+            gap: var(--ant-size-xs);
+            min-height: 0;
+        }
+
+        .folder-panel,
+        .main-panel {
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .folder-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            padding: var(--ant-size-sm) var(--ant-size);
+            border-bottom: 1px solid var(--ant-border-color-secondary);
+            font-size: var(--ant-font-size-h5);
+            font-weight: 600;
+        }
+
+        .folder-search,
+        .toolbar {
+            padding: var(--ant-size-sm) var(--ant-size);
+            border-bottom: 1px solid var(--ant-border-color-secondary);
+        }
+
+        .input,
+        .select {
+            height: 32px;
+            border: 1px solid var(--ant-border-color);
+            border-radius: var(--ant-border-radius);
+            background: var(--ant-bg-container);
+            color: var(--ant-text-color);
+            outline: none;
+        }
+
+        .input {
+            width: 100%;
+            padding: 0 var(--ant-size-sm);
+        }
+
+        .select {
+            min-width: 120px;
+            padding: 0 var(--ant-size-sm);
+        }
+
+        .input:focus,
+        .select:focus {
+            border-color: var(--ant-primary-6);
+            box-shadow: var(--ant-box-shadow-focus);
+        }
+
+        .tree {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            padding: var(--ant-size-xs);
+        }
+
+        .tree-label {
+            padding: var(--ant-size-xs) var(--ant-size-xs) var(--ant-size-xxs);
+            color: var(--ant-text-color-tertiary);
+            font-size: var(--ant-font-size-sm);
+        }
+
+        .tree-node {
+            display: grid;
+            grid-template-columns: 18px minmax(0, 1fr) auto;
+            gap: var(--ant-size-xs);
+            align-items: center;
+            min-height: 34px;
+            padding: var(--ant-size-xs) var(--ant-size-sm);
+            border-radius: var(--ant-border-radius);
+            color: var(--ant-text-color-secondary);
+            cursor: pointer;
+            transition: background 120ms ease, color 120ms ease;
+        }
+
+        .tree-node:hover {
+            background: var(--ant-bg-secondary);
+            color: var(--ant-primary-6);
+        }
+
+        .tree-node.active {
+            background: var(--ant-primary-1);
+            color: var(--ant-primary-7);
+            font-weight: 600;
+        }
+
+        .tree-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tree-count {
+            color: var(--ant-text-color-tertiary);
+            font-size: var(--ant-font-size-sm);
+            font-weight: 400;
+        }
+
+        .tree-children {
+            margin-left: var(--ant-size-md);
+            padding-left: var(--ant-size-xs);
+            border-left: 1px solid var(--ant-border-color-secondary);
+        }
+
+        .main-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stage-tabs {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: var(--ant-size-xs);
+            padding: var(--ant-size);
+            border-bottom: 1px solid var(--ant-border-color-secondary);
+            flex-shrink: 0;
+        }
+
+        .stage-tab {
+            min-height: 64px;
+            padding: var(--ant-size-sm);
+            border-radius: var(--ant-border-radius-lg);
+            border: 1px solid var(--ant-border-color-secondary);
+            background: var(--ant-bg-container);
+            color: var(--ant-text-color-secondary);
+            text-align: left;
+            cursor: pointer;
+            transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+        }
+
+        .stage-tab:hover {
+            border-color: var(--ant-primary-2);
+            color: var(--ant-primary-6);
+        }
+
+        .stage-tab.active {
+            background: var(--ant-primary-1);
+            border-color: var(--ant-primary-2);
+            color: var(--ant-primary-7);
+        }
+
+        .stage-name {
+            display: flex;
+            align-items: center;
+            gap: var(--ant-size-xs);
+            font-weight: 600;
+            color: var(--ant-text-color);
+        }
+
+        .stage-tab.active .stage-name {
+            color: var(--ant-primary-7);
+        }
+
+        .stage-desc {
+            margin-top: var(--ant-size-xxs);
+            font-size: var(--ant-font-size-sm);
+            color: var(--ant-text-color-tertiary);
+            line-height: 1.45;
+        }
+
+        .context-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--ant-size);
+            padding: var(--ant-size-sm) var(--ant-size);
+            border-bottom: 1px solid var(--ant-border-color-secondary);
+            background: var(--ant-bg-secondary);
+            flex-shrink: 0;
+        }
+
+        .context-title {
+            font-weight: 600;
+        }
+
+        .context-meta {
+            margin-left: var(--ant-size-xs);
+            color: var(--ant-text-color-tertiary);
+            font-size: var(--ant-font-size-sm);
+        }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--ant-size-sm);
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+
+        .toolbar-left,
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: var(--ant-size-xs);
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .type-tabs {
+            display: none;
+            align-items: center;
+            gap: var(--ant-size-xxs);
             flex-wrap: wrap;
         }
-        .filter-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sec); }
-        .filter-input {
-            padding: 6px 10px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; outline: none; transition: 0.2s; width: 120px;
-        }
-        .filter-input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(22,119,255,0.1); }
-        .filter-select { padding: 5px 10px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; background: #fff; outline: none; }
 
-        /* ── 主体布局 ── */
-        .main-layout {
-            flex: 1;
+        .type-tabs.show {
             display: flex;
-            gap: 8px;
-            overflow: hidden;
         }
 
-        /* ── 左侧：资产管理文件夹树 (完全复刻原型) ── */
-        .sidebar {
-            width: 240px;
-            background: #fff;
-            border-radius: 8px;
+        .type-tab {
+            height: 28px;
+            padding: 0 var(--ant-size-sm);
+            border-radius: var(--ant-border-radius);
+            background: transparent;
+            color: var(--ant-text-color-secondary);
+            cursor: pointer;
+        }
+
+        .type-tab.active {
+            background: var(--ant-primary-1);
+            color: var(--ant-primary-7);
+            font-weight: 600;
+        }
+
+        .content {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            padding: var(--ant-size);
+        }
+
+        .stage-note {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--ant-size-xs);
+            padding: var(--ant-size-sm) var(--ant-size);
+            margin-bottom: var(--ant-size);
+            border: 1px solid var(--ant-primary-2);
+            border-radius: var(--ant-border-radius-lg);
+            background: var(--ant-primary-1);
+            color: var(--ant-text-color-secondary);
+            line-height: 1.7;
+        }
+
+        .stage-note strong {
+            color: var(--ant-primary-7);
+        }
+
+        .list {
             display: flex;
             flex-direction: column;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            gap: var(--ant-size-sm);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: var(--ant-size);
+            align-items: center;
+            padding: var(--ant-size);
+            border: 1px solid var(--ant-border-color-secondary);
+            border-radius: var(--ant-border-radius-lg);
+            background: var(--ant-bg-container);
+        }
+
+        .row-main {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            gap: var(--ant-size-sm);
+            min-width: 0;
+        }
+
+        .thumb,
+        .icon-thumb {
+            width: 76px;
+            height: 76px;
+            border-radius: var(--ant-border-radius);
+            background: var(--ant-bg-tertiary);
             overflow: hidden;
             flex-shrink: 0;
         }
-        .sidebar-header { padding: 12px; border-bottom: 1px solid #f0f0f0; }
-        .search-box { position: relative; width: 100%; }
-        .search-box input {
-            width: 100%; padding: 6px 12px 6px 30px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 13px; outline: none;
-        }
-        .search-box svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
 
-        .tree-container { flex: 1; overflow-y: auto; padding: 8px; }
-        .tree-node {
-            display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; cursor: pointer;
-            font-size: 14px; color: #555; transition: 0.2s;
-        }
-        .tree-node:hover { background: #f5f5f5; color: var(--primary); }
-        .tree-node.active { background: #e6f4ff; color: var(--primary); font-weight: 500; }
-        .tree-node svg { font-size: 16px; flex-shrink: 0; }
-        .indent { margin-left: 20px; border-left: 1px solid #f0f0f0; }
-
-        /* ── 右侧：内容容器 ── */
-        .content-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            overflow: hidden;
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
 
-        /* 批量操作栏 */
-        .batch-bar {
-            background: #fff;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .icon-thumb {
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
-            flex-shrink: 0;
+            justify-content: center;
+            color: var(--ant-primary-7);
+            background: var(--ant-primary-1);
+            font-size: 28px;
         }
-        .batch-bar label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
-        .selection-info { font-size: 13px; color: var(--primary); margin-left: auto; font-weight: 500; }
 
-        /* 滚动内容区 */
-        .content-area { flex: 1; overflow-y: auto; padding: 4px; }
-
-        /* ── 核心组件：溯源徽章 (Traceability Badge) ── */
-        .trace-tag {
-            display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
-            border-radius: 4px; font-size: 11px; font-weight: 600;
+        .role-views {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--ant-size-xxs);
+            width: 126px;
+            height: 76px;
         }
-        .trace-wf { background: #e6f7ff; color: var(--primary); border: 1px solid #91caff; cursor: pointer; }
-        .trace-manual { background: #f6ffed; color: #389e0d; border: 1px solid #b7eb8f; }
 
-        /* ── 图像/视频网格 (Grid View) ── */
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-        
-        .card {
-            background: #fff; border: 1px solid #e8e8e8; border-radius: 8px; overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
-            display: flex; flex-direction: column;
+        .role-view {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--ant-border-radius-sm);
+            background: var(--ant-bg-tertiary);
         }
-        .card:hover { border-color: var(--primary); box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-4px); }
-        
-        .card-cover { width: 100%; aspect-ratio: 1/1; background: #fafafa; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .card-cover img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .card-cover .trace-tag { position: absolute; top: 8px; left: 8px; z-index: 10; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-family: monospace; }
-        
-        .card-info { padding: 12px; }
-        .card-title { font-size: 13px; font-weight: 500; color: #333; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-sec); margin-bottom: 10px; }
-        
-        .card-actions { display: flex; align-items: center; gap: 14px; padding-top: 10px; border-top: 1px solid #f0f0f0; color: #666; }
-        .card-actions svg { cursor: pointer; transition: 0.2s; }
-        .card-actions svg:hover { color: var(--primary); }
 
-        .card-checkbox { position: absolute; top: 8px; right: 8px; z-index: 15; width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary); }
-
-        /* ── 文案列表 (List View - 垂直列表) ── */
-        .list-layout { display: flex; flex-direction: column; gap: 12px; }
-        .list-item {
-            background: #fff; border: 1px solid #e8e8e8; border-radius: 10px; padding: 16px;
-            transition: all 0.2s; display: flex; flex-direction: column; gap: 12px;
+        .role-view img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
-        .list-item:hover { border-color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
-        
-        .list-item-top { display: flex; align-items: center; gap: 12px; }
-        .list-item-title { font-size: 14px; font-weight: 600; color: #333; flex: 1; }
-        
-        .list-item-body { font-size: 13px; color: #444; line-height: 1.6; background: #fafafa; padding: 12px; border-radius: 8px; border: 1px solid #f0f0f0; white-space: pre-wrap; }
-        
-        .list-item-footer { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--text-muted); }
+
+        .view-label {
+            position: absolute;
+            left: 2px;
+            bottom: 2px;
+            padding: 1px 4px;
+            border-radius: var(--ant-border-radius-sm);
+            background: rgba(0,0,0,0.62);
+            color: var(--ant-text-color-inverse);
+            font-size: 10px;
+        }
+
+        .row-title {
+            display: flex;
+            align-items: center;
+            gap: var(--ant-size-xs);
+            min-width: 0;
+            font-weight: 600;
+            color: var(--ant-text-color);
+        }
+
+        .row-title-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .row-desc {
+            margin-top: var(--ant-size-xs);
+            color: var(--ant-text-color-secondary);
+            line-height: 1.65;
+        }
+
+        .row-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--ant-size-xs);
+            flex-wrap: wrap;
+            margin-top: var(--ant-size-xs);
+            color: var(--ant-text-color-tertiary);
+            font-size: var(--ant-font-size-sm);
+        }
+
+        .row-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--ant-size-xs);
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            height: 24px;
+            padding: 0 var(--ant-size-xs);
+            border-radius: var(--ant-border-radius-sm);
+            border: 1px solid var(--ant-border-color-secondary);
+            background: var(--ant-bg-secondary);
+            color: var(--ant-text-color-secondary);
+            font-size: var(--ant-font-size-sm);
+            white-space: nowrap;
+        }
+
+        .tag-primary {
+            background: var(--ant-primary-1);
+            border-color: var(--ant-primary-2);
+            color: var(--ant-primary-7);
+        }
+
+        .tag-success {
+            background: var(--ant-success-1);
+            border-color: var(--ant-success-2);
+            color: var(--ant-success-6);
+        }
+
+        .tag-warning {
+            background: var(--ant-warning-1);
+            border-color: var(--ant-warning-2);
+            color: var(--ant-warning-6);
+        }
+
+        .tag-error {
+            background: var(--ant-error-1);
+            border-color: var(--ant-error-2);
+            color: var(--ant-error-6);
+        }
+
+        .copy-preview {
+            padding: var(--ant-size-sm);
+            border-radius: var(--ant-border-radius);
+            background: var(--ant-bg-secondary);
+            color: var(--ant-text-color-secondary);
+            line-height: 1.7;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(96px, 1fr));
+            gap: var(--ant-size-xs);
+            margin-top: var(--ant-size-xs);
+        }
+
+        .metric {
+            padding: var(--ant-size-xs);
+            border-radius: var(--ant-border-radius);
+            background: var(--ant-bg-secondary);
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--ant-text-color);
+        }
+
+        .metric-label {
+            margin-top: 2px;
+            color: var(--ant-text-color-tertiary);
+            font-size: var(--ant-font-size-sm);
+        }
+
+        .empty {
+            display: none;
+            min-height: 260px;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed var(--ant-border-color);
+            border-radius: var(--ant-border-radius-lg);
+            color: var(--ant-text-color-tertiary);
+            background: var(--ant-bg-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            right: var(--ant-size-lg);
+            bottom: var(--ant-size-lg);
+            z-index: 20;
+            display: none;
+            padding: var(--ant-size-sm) var(--ant-size);
+            border-radius: var(--ant-border-radius-lg);
+            background: var(--ant-text-color);
+            color: var(--ant-text-color-inverse);
+            box-shadow: var(--ant-box-shadow);
+            font-size: var(--ant-font-size-sm);
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        @media (max-width: 1020px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                overflow: auto;
+            }
+
+            .page {
+                height: auto;
+            }
+
+            .layout,
+            .stage-tabs {
+                grid-template-columns: 1fr;
+            }
+
+            .folder-panel,
+            .main-panel {
+                min-height: 360px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .row-actions {
+                justify-content: flex-start;
+            }
+
+            .metric-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
     </style>
 </head>
 <body>
-
-    <!-- 顶部导航 -->
-    <div class="page-header">
-        <div class="header-left">
-            <div class="tabs" id="typeTabs">
-                <div class="tab" onclick="switchTab('copy')">文案</div>
-                <div class="tab active" onclick="switchTab('image')">图像</div>
-                <div class="tab" onclick="switchTab('video')">视频</div>
+    <div class="page">
+        <header class="page-header surface">
+            <div class="title-wrap">
+                <h1 class="page-title">原料库</h1>
+                <p class="page-desc">按生产、存储、使用、数据反馈四个场景管理工作流可复用原料。</p>
             </div>
-        </div>
-        <button class="btn btn-primary">
-            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            上传原料
-        </button>
-    </div>
-
-    <!-- 检索维度 -->
-    <div class="filter-bar">
-        <div class="filter-item"><label>名字</label><input type="text" class="filter-input" placeholder="输入名称..."></div>
-        <div class="filter-item"><label>ID</label><input type="text" class="filter-input" placeholder="输入ID..."></div>
-        <div class="filter-item"><label>产品</label><input type="text" class="filter-input" placeholder="所属产品..."></div>
-        <div class="filter-item"><label>入库时间</label><input type="date" class="filter-input"></div>
-        <div class="filter-item">
-            <label>来源</label>
-            <select class="filter-select">
-                <option value="all">全部来源</option>
-                <option value="workflow">工作流产出</option>
-                <option value="manual">外部导入</option>
-            </select>
-        </div>
-        <div class="filter-item"><label>标签</label><input type="text" class="filter-input" placeholder="选择标签..."></div>
-    </div>
-
-    <!-- 主体布局 -->
-    <div class="main-layout">
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="search-box">
-                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" placeholder="搜索文件夹" id="folderSearch">
-                </div>
+            <div class="row-actions">
+                <button class="btn" data-action="新建文件夹">
+                    <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+                    新建文件夹
+                </button>
+                <button class="btn btn-primary" data-action="导入原料">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5-5 5 5"></path><path d="M12 5v12"></path></svg>
+                    导入原料
+                </button>
             </div>
-            <div class="tree-container" id="folderTree">
-                <div class="tree-node"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg> 置顶</div>
-                <div class="tree-node"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg> 收藏</div>
-                <div class="indent">
-                    <div class="tree-node"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 默认收藏夹</div>
+        </header>
+
+        <main class="layout">
+            <aside class="folder-panel surface">
+                <div class="panel-title">业务文件夹</div>
+                <div class="folder-search">
+                    <input id="folderSearch" class="input" type="search" placeholder="搜索文件夹">
                 </div>
-                <div class="tree-node active"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg> 全部</div>
-                <div class="indent">
-                    <div class="tree-node"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 文件夹A</div>
-                    <div class="indent">
-                        <div class="tree-node"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 文件夹A1</div>
-                        <div class="tree-node"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 文件夹A2</div>
+                <div class="tree" id="folderTree">
+                    <div class="tree-label">系统视图</div>
+                    <div class="tree-node active" data-name="全部原料" data-meta="全部业务文件夹 · 全部原料" data-folder="全部">
+                        <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M3 12h18"></path><path d="M3 18h18"></path></svg>
+                        <span class="tree-name">全部原料</span>
+                        <span class="tree-count">1286</span>
                     </div>
-                    <div class="tree-node"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg> 文件夹B</div>
-                </div>
-            </div>
-        </div>
+                    <div class="tree-node" data-name="待入库" data-meta="生产后待确认入库的脚本和演员" data-folder="待入库">
+                        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                        <span class="tree-name">待入库</span>
+                        <span class="tree-count">31</span>
+                    </div>
+                    <div class="tree-node" data-name="最近使用" data-meta="最近 7 天被下载或工作流引用" data-folder="最近使用">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                        <span class="tree-name">最近使用</span>
+                        <span class="tree-count">76</span>
+                    </div>
+                    <div class="tree-node" data-name="未归类" data-meta="尚未放入业务文件夹的原料" data-folder="未归类">
+                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5-5 5 5"></path><path d="M12 5v12"></path></svg>
+                        <span class="tree-name">未归类</span>
+                        <span class="tree-count">18</span>
+                    </div>
 
-        <div class="content-container">
-            <div class="batch-bar">
-                <label><input type="checkbox" id="selectAll"> 全选</label>
-                <button class="btn btn-default btn-sm">批量下载</button>
-                <button class="btn btn-default btn-sm">移动至</button>
-                <button class="btn btn-default btn-sm text-danger">批量删除</button>
-                <span class="selection-info">已选择 0 项</span>
-            </div>
-            <div class="content-area" id="mainContent"></div>
-        </div>
+                    <div class="tree-label">业务分类</div>
+                    <div class="tree-node" data-name="IAA" data-meta="广告变现业务 · 用户创建的一级文件夹" data-folder="IAA">
+                        <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        <span class="tree-name">IAA</span>
+                        <span class="tree-count">618</span>
+                    </div>
+                    <div class="tree-children">
+                        <div class="tree-node" data-name="IAA / 步数赚金币" data-meta="步数、打卡、金币激励类脚本和演员" data-folder="IAA / 步数赚金币">
+                            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M7 14l4-4 4 3 5-7"></path></svg>
+                            <span class="tree-name">步数赚金币</span>
+                            <span class="tree-count">164</span>
+                        </div>
+                        <div class="tree-node" data-name="IAA / 清理加速" data-meta="清理、加速、省电、安全工具类原料" data-folder="IAA / 清理加速">
+                            <svg viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="M5 7h14"></path><path d="M7 12h10"></path><path d="M9 17h6"></path></svg>
+                            <span class="tree-name">清理加速</span>
+                            <span class="tree-count">132</span>
+                        </div>
+                        <div class="tree-node" data-name="IAA / 网赚工具" data-meta="网赚、任务、提现相关原料" data-folder="IAA / 网赚工具">
+                            <svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            <span class="tree-name">网赚工具</span>
+                            <span class="tree-count">98</span>
+                        </div>
+                    </div>
+                    <div class="tree-node" data-name="IAP" data-meta="内购变现业务 · 用户创建的一级文件夹" data-folder="IAP">
+                        <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                        <span class="tree-name">IAP</span>
+                        <span class="tree-count">384</span>
+                    </div>
+                    <div class="tree-children">
+                        <div class="tree-node" data-name="IAP / 小游戏" data-meta="小游戏试玩、关卡、内购转化脚本和演员" data-folder="IAP / 小游戏">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2"></rect><path d="M8 12v3"></path><path d="M6.5 13.5h3"></path><path d="M15 13h.01"></path><path d="M18 13h.01"></path></svg>
+                            <span class="tree-name">小游戏</span>
+                            <span class="tree-count">146</span>
+                        </div>
+                        <div class="tree-node" data-name="IAP / 订阅工具" data-meta="订阅、试用、会员权益相关原料" data-folder="IAP / 订阅工具">
+                            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                            <span class="tree-name">订阅工具</span>
+                            <span class="tree-count">82</span>
+                        </div>
+                    </div>
+
+                    <div class="tree-label">项目文件夹</div>
+                    <div class="tree-node" data-name="短剧" data-meta="短剧情节、口播、人物关系相关原料" data-folder="短剧">
+                        <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>
+                        <span class="tree-name">短剧</span>
+                        <span class="tree-count">206</span>
+                    </div>
+                    <div class="tree-node" data-name="美妆" data-meta="美妆种草、测评、短视频口播原料" data-folder="美妆">
+                        <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.2L18.5 21 12 16.8 5.5 21l2-7.8L2 9h7l3-7z"></path></svg>
+                        <span class="tree-name">美妆</span>
+                        <span class="tree-count">128</span>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="main-panel surface">
+                <div class="stage-tabs" id="stageTabs">
+                    <button class="stage-tab active" data-stage="production">
+                        <div class="stage-name">
+                            <svg viewBox="0 0 24 24"><path d="M3 12h5l2 7 4-14 2 7h5"></path></svg>
+                            生产
+                        </div>
+                        <div class="stage-desc">工作流产物进入原料库前的确认、补齐和入库。</div>
+                    </button>
+                    <button class="stage-tab" data-stage="storage">
+                        <div class="stage-name">
+                            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+                            存储
+                        </div>
+                        <div class="stage-desc">按业务文件夹管理脚本、演员和二期原料。</div>
+                    </button>
+                    <button class="stage-tab" data-stage="usage">
+                        <div class="stage-name">
+                            <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"></path></svg>
+                            使用
+                        </div>
+                        <div class="stage-desc">选择脚本或演员，作为通用生成和工作流输入。</div>
+                    </button>
+                    <button class="stage-tab" data-stage="feedback">
+                        <div class="stage-name">
+                            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M7 14l4-4 4 3 5-7"></path></svg>
+                            数据反馈
+                        </div>
+                        <div class="stage-desc">把投放表现、引用次数和问题反馈回原料。</div>
+                    </button>
+                </div>
+
+                <div class="context-bar">
+                    <div>
+                        <span class="context-title" id="folderName">全部原料</span>
+                        <span class="context-meta" id="folderMeta">全部项目 · 全部类型</span>
+                    </div>
+                    <button class="btn btn-small" data-action="查看文件夹规则">文件夹规则</button>
+                </div>
+
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <input class="input" id="keyword" type="search" placeholder="搜索脚本、演员、标签、来源">
+                        <select class="select" id="statusFilter">
+                            <option value="全部">全部状态</option>
+                            <option value="可用">可用</option>
+                            <option value="待处理">待处理</option>
+                            <option value="需复核">需复核</option>
+                        </select>
+                    </div>
+                    <div class="toolbar-right">
+                        <div class="type-tabs" id="typeTabs">
+                            <button class="type-tab active" data-type="全部">全部</button>
+                            <button class="type-tab" data-type="脚本">脚本</button>
+                            <button class="type-tab" data-type="演员">演员</button>
+                            <button class="type-tab" data-type="二期原料">二期原料</button>
+                        </div>
+                        <button class="btn btn-small" id="resetBtn">重置</button>
+                    </div>
+                </div>
+
+                <div class="content">
+                    <div id="stageBody"></div>
+                    <div class="empty" id="emptyState">没有匹配的原料。</div>
+                </div>
+            </section>
+        </main>
     </div>
+
+    <div class="toast" id="toast"></div>
 
     <script>
-        const SVGS = {
-            download: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>',
-            edit: '<svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>',
-            star: '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
-            trash: '<svg class="text-danger" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>',
-            wf: '<svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>',
-            manual: '<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>'
+        const iconMap = {
+            copy: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M16 13H8"></path></svg>',
+            role: '<svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>',
+            cloth: '<svg viewBox="0 0 24 24"><path d="M16 3l4 2-2 5-2-1v12H8V9l-2 1-2-5 4-2a4 4 0 0 0 8 0z"></path></svg>',
+            voice: '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>',
+            scene: '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>',
+            pack: '<svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 9.2-8 10-4.5-.8-8-5-8-10V6l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg>'
         };
 
-        const mockData = {
-            image: [
-                { id: '101', title: '主图-春季新款-背景衍生.png', url: 'https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=400', source: 'workflow', wfId: 'WF-772', taskId: 'TSK-991', date: '2026-04-27' },
-                { id: '102', title: '外部导入底图-01.jpg', url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400', source: 'manual', date: '2026-04-27' }
+        const rows = {
+            production: [
+                {
+                    type: '演员',
+                    title: '阿澈｜步数 App 男性教练',
+                    desc: '由爆款视频逆向工作流生成，正面 / 侧面 / 背面三视图已齐，等待业务确认后进入 IAA 文件夹。',
+                    status: '待处理',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['来源：WF-827', '目标文件夹：IAA / 步数赚金币', '待处理：确认入库'],
+                    action: '确认入库',
+                    views: [
+                        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?auto=format&fit=crop&w=220&q=80'
+                    ]
+                },
+                {
+                    type: '脚本',
+                    title: '步数打卡激励脚本组',
+                    desc: '逆向脚本裂变生成 10 条候选，用户选中的 3 条直接进入脚本库，不需要重复上传。',
+                    status: '待处理',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['来源：COPY-16', '选中：3 / 10', '目标文件夹：IAA / 步数赚金币'],
+                    action: '选择入库',
+                    copy: '今天多走 1000 步，金币就多一点。把每天通勤路上的步数变成小奖励。'
+                },
+                {
+                    type: '二期原料',
+                    title: '温柔女声 A03',
+                    desc: '音色、BGM、音效后续可进入原料库，但第一版先作为二期能力占位。',
+                    status: '需复核',
+                    folder: '美妆',
+                    meta: ['来源：MiniMax 预设', '样音：12 秒', '依赖：音色/画布使用能力'],
+                    action: '复核授权'
+                }
             ],
-            video: [
-                { id: '201', title: '裂变产出-高光特写.mp4', duration: '00:15', source: 'workflow', wfId: 'WF-881', bg: '#1a1a1a', date: '2026-04-27' }
+            storage: [
+                {
+                    type: '演员',
+                    title: '林夏｜美妆测评虚拟人',
+                    desc: '演员作为独立原料管理，包含三视图、默认音色和基础标签；不再单独拆服装库。',
+                    status: '可用',
+                    folder: '美妆',
+                    recent: true,
+                    meta: ['文件夹：美妆', '三视图 3/3', '默认音色：温柔女声 A03'],
+                    action: '编辑',
+                    views: [
+                        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=220&q=80'
+                    ]
+                },
+                {
+                    type: '演员',
+                    title: '阿澈｜步数 App 男性教练',
+                    desc: '跑量素材沉淀出的演员，可在 IAA 脚本裂变时直接调用。',
+                    status: '可用',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['文件夹：IAA / 步数赚金币', '性别：男', '职业：健身教练'],
+                    action: '编辑',
+                    views: [
+                        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?auto=format&fit=crop&w=220&q=80'
+                    ]
+                },
+                {
+                    type: '脚本',
+                    title: '步数打卡激励脚本组',
+                    desc: '脚本按业务文件夹归档，可作为提示词种子或口播脚本继续裂变。',
+                    status: '可用',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['文件夹：IAA / 步数赚金币', '产品系列：网赚', '引用：33 次'],
+                    action: '编辑',
+                    copy: '今天多走 1000 步，金币就多一点。把每天通勤路上的步数变成小奖励。'
+                },
+                {
+                    type: '脚本',
+                    title: '敏感肌通勤妆前乳卖点组',
+                    desc: '脚本保留来源、标签、适用平台和数据反馈，放在用户创建的美妆文件夹下。',
+                    status: '可用',
+                    folder: '美妆',
+                    meta: ['文件夹：美妆', '小红书', '口播可用'],
+                    action: '编辑',
+                    copy: '熬夜后的脸色真的很难骗过镜头。这版主打「提亮 + 修护」双收益。'
+                },
+                {
+                    type: '脚本',
+                    title: '小游戏闯关付费点脚本',
+                    desc: 'IAP 小游戏下的付费转化脚本，适合关卡失败、限时礼包、复活权益等场景。',
+                    status: '可用',
+                    folder: 'IAP / 小游戏',
+                    meta: ['文件夹：IAP / 小游戏', '产品系列：小游戏', '引用：18 次'],
+                    action: '编辑',
+                    copy: '只差一步通关，现在复活可以直接拿到双倍奖励。'
+                },
+                {
+                    type: '二期原料',
+                    title: '爆款 BGM / 花字贴纸 / 背景',
+                    desc: '这些原料需要画布、发布或过程编辑能力承接，第一版只保留二期占位。',
+                    status: '需复核',
+                    folder: '未归类',
+                    meta: ['文件夹：未归类', '依赖：画布 / 重点字 / BGM 外部服务'],
+                    action: '查看依赖'
+                }
             ],
-            copy: [
-                { id: '301', title: '痛点文案-衍生版', content: '还在为换季不知道穿什么发愁吗？\n这款绝美小开衫一套搞定！', source: 'workflow', wfId: 'WF-550', date: '2026-04-27' }
+            usage: [
+                {
+                    type: '演员',
+                    title: '阿澈｜步数 App 男性教练',
+                    desc: '在 IAA 工作流里直接调用演员，作为爆款视频二创的人物输入。',
+                    status: '可用',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['文件夹：IAA / 步数赚金币', '下载：21 次', '默认音色：清爽男声'],
+                    action: '下载演员',
+                    views: [
+                        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=220&q=80',
+                        'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?auto=format&fit=crop&w=220&q=80'
+                    ]
+                },
+                {
+                    type: '脚本',
+                    title: '步数打卡激励脚本组',
+                    desc: '选择脚本后可作为逆向脚本裂变种子，也可下载到外部画布继续生产。',
+                    status: '可用',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['文件夹：IAA / 步数赚金币', '调用：33 次', '可裂变'],
+                    action: '作为脚本种子',
+                    copy: '今天多走 1000 步，金币就多一点。把每天通勤路上的步数变成小奖励。'
+                },
+                {
+                    type: '脚本',
+                    title: '敏感肌通勤妆前乳卖点组',
+                    desc: '作为提示词种子或口播脚本使用，进入工作流后可继续裂变。',
+                    status: '可用',
+                    folder: '美妆',
+                    meta: ['文件夹：美妆', '调用：18 次', '可裂变'],
+                    action: '作为脚本种子',
+                    copy: '把通勤、空调房、午后补妆这些真实场景串起来，适合 15 秒口播。'
+                }
+            ],
+            feedback: [
+                {
+                    type: '演员',
+                    title: '阿澈｜步数 App 男性教练',
+                    desc: 'IAA 步数业务里表现稳定，可继续作为默认演员；精准归因依赖后续内部画布。',
+                    status: '可用',
+                    folder: 'IAA / 步数赚金币',
+                    recent: true,
+                    meta: ['文件夹：IAA / 步数赚金币', '反馈动作：继续复用'],
+                    action: '查看关联任务',
+                    metrics: [['下载', '21 次'], ['调用', '14 次'], ['通过率', '96%'], ['ROI', '1.34']]
+                },
+                {
+                    type: '脚本',
+                    title: '步数打卡激励脚本组',
+                    desc: '点击表现高，但落地页转化偏低，需要回写“强引导但弱转化”。',
+                    status: '需复核',
+                    folder: 'IAA / 步数赚金币',
+                    meta: ['文件夹：IAA / 步数赚金币', '反馈动作：回写标签 / 重新裂变'],
+                    action: '回写标签',
+                    metrics: [['调用', '33 次'], ['CTR', '+18%'], ['CVR', '-6%'], ['建议', '重写']]
+                },
+                {
+                    type: '演员',
+                    title: '林夏｜美妆测评虚拟人',
+                    desc: '美妆业务素材通过率稳定，建议继续沉淀同类演员。',
+                    status: '待处理',
+                    folder: '美妆',
+                    meta: ['文件夹：美妆', '反馈动作：补充同类演员'],
+                    action: '生成同类演员',
+                    metrics: [['下载', '16 次'], ['通过率', '94%'], ['拒审', '1 次'], ['建议', '扩充']]
+                }
             ]
         };
 
-        function switchTab(type) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            render(type);
+        const stageNotes = {
+            production: '<strong>生产场景：</strong>工作流或人工任务产出脚本和演员后，按左侧业务文件夹确认入库。',
+            storage: '<strong>存储场景：</strong>左侧是 IAA、IAP 这类人为创建的业务文件夹；右侧再用脚本、演员等类型筛选。',
+            usage: '<strong>使用场景：</strong>从业务文件夹里选择脚本或演员，下载或作为工作流输入；外部画布使用先记录下载/调用。',
+            feedback: '<strong>数据反馈场景：</strong>投放和审核数据回流到脚本、演员；外部使用的精准归因依赖后续内部画布。'
+        };
+
+        let currentStage = 'production';
+        let currentType = '全部';
+        let currentFolder = '全部';
+
+        function escapeHtml(text) {
+            return String(text || '').replace(/[&<>"']/g, function(match) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[match];
+            });
         }
 
-        function render(type) {
-            const container = document.getElementById('mainContent');
-            if (type === 'copy') {
-                let html = '<div class="list-layout">';
-                mockData.copy.forEach(item => {
-                    html += `<div class="list-item">
-                        <div class="list-item-top">
-                            <input type="checkbox" class="card-checkbox" style="position:static">
-                            <div class="list-item-title">${item.title}</div>
-                            <div class="trace-tag trace-wf">${SVGS.wf} 产物溯源: ${item.wfId}</div>
-                            <button class="btn btn-default btn-sm">复制</button>
-                        </div>
-                        <div class="list-item-body">${item.content}</div>
-                        <div class="list-item-footer"><span>入库时间：${item.date}</span></div>
-                    </div>`;
-                });
-                container.innerHTML = html + '</div>';
-            } else {
-                let html = '<div class="grid-layout">';
-                mockData[type].forEach(item => {
-                    html += `<div class="card">
-                        <input type="checkbox" class="card-checkbox">
-                        <div class="card-cover" style="${item.bg ? 'background:'+item.bg : ''}">
-                            <div class="trace-tag ${item.source==='workflow'?'trace-wf':'trace-manual'}">${item.source==='workflow'?SVGS.wf+' 溯源: '+item.wfId:SVGS.manual+' 外部导入'}</div>
-                            ${item.url ? `<img src="${item.url}">` : `<svg viewBox="0 0 24 24" style="width:48px;color:#ddd"><polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon></svg>`}
-                            ${item.duration ? `<div class="duration">${item.duration}</div>` : ''}
-                        </div>
-                        <div class="card-info">
-                            <div class="card-title">${item.title}</div>
-                            <div class="card-meta"><span>${item.date}</span><span>ID: ${item.id}</span></div>
-                            <div class="card-actions">${SVGS.download}${SVGS.edit}${SVGS.star}${SVGS.trash}</div>
-                        </div>
-                    </div>`;
-                });
-                container.innerHTML = html + '</div>';
+        function statusTag(status) {
+            if (status === '可用') return '<span class="tag tag-success">可用</span>';
+            if (status === '需复核') return '<span class="tag tag-warning">需复核</span>';
+            return '<span class="tag tag-primary">待处理</span>';
+        }
+
+        function renderThumb(row) {
+            if (row.views) {
+                const labels = ['正面', '侧面', '背面'];
+                return '<div class="role-views">' + row.views.map(function(src, index) {
+                    return '<div class="role-view"><img src="' + src + '" alt="' + escapeHtml(row.title + labels[index]) + '"><span class="view-label">' + labels[index] + '</span></div>';
+                }).join('') + '</div>';
             }
+            if (row.image) {
+                return '<div class="thumb"><img src="' + row.image + '" alt="' + escapeHtml(row.title) + '"></div>';
+            }
+            return '<div class="icon-thumb">' + (row.type === '脚本' ? iconMap.copy : row.type === '演员' ? iconMap.role : iconMap.voice) + '</div>';
         }
 
-        // 初始化
-        render('image');
+        function renderMetrics(row) {
+            if (!row.metrics) return '';
+            return '<div class="metric-grid">' + row.metrics.map(function(item) {
+                return '<div class="metric"><div class="metric-value">' + escapeHtml(item[1]) + '</div><div class="metric-label">' + escapeHtml(item[0]) + '</div></div>';
+            }).join('') + '</div>';
+        }
 
-        // 文件夹搜索逻辑
-        document.getElementById('folderSearch').addEventListener('input', function(e) {
-            const val = e.target.value.toLowerCase();
-            document.querySelectorAll('#folderTree .tree-node').forEach(node => {
-                const text = node.textContent.toLowerCase();
-                node.style.display = text.includes(val) ? 'flex' : 'none';
+        function renderRow(row) {
+            const copy = row.copy ? '<div class="copy-preview">' + escapeHtml(row.copy) + '</div>' : '';
+            const meta = row.meta.map(function(item) {
+                return '<span>' + escapeHtml(item) + '</span>';
+            }).join('<span>·</span>');
+
+            return '<article class="row">'
+                + '<div class="row-main">'
+                    + renderThumb(row)
+                    + '<div>'
+                        + '<div class="row-title"><span class="row-title-text">' + escapeHtml(row.title) + '</span>' + statusTag(row.status) + '<span class="tag tag-primary">' + escapeHtml(row.type) + '</span></div>'
+                        + '<div class="row-desc">' + escapeHtml(row.desc) + '</div>'
+                        + copy
+                        + '<div class="row-meta">' + meta + '</div>'
+                        + renderMetrics(row)
+                    + '</div>'
+                + '</div>'
+                + '<div class="row-actions">'
+                    + '<button class="btn btn-small" data-action="' + escapeHtml(row.action) + '">' + escapeHtml(row.action) + '</button>'
+                    + '<button class="btn btn-small" data-action="查看详情">详情</button>'
+                + '</div>'
+            + '</article>';
+        }
+
+        function getFilteredRows() {
+            const keyword = document.getElementById('keyword').value.trim().toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+            return rows[currentStage].filter(function(row) {
+                const text = [row.type, row.title, row.desc, row.status, row.folder || '', row.meta.join(' '), row.copy || ''].join(' ').toLowerCase();
+                const folder = row.folder || '未归类';
+                const folderMatched = currentFolder === '全部'
+                    || (currentFolder === '待入库' && row.status === '待处理')
+                    || (currentFolder === '最近使用' && row.recent)
+                    || (currentFolder === '未归类' && folder === '未归类')
+                    || folder === currentFolder
+                    || folder.indexOf(currentFolder + ' /') === 0;
+                return (currentStage !== 'storage' || currentType === '全部' || row.type === currentType)
+                    && folderMatched
+                    && (status === '全部' || row.status === status)
+                    && (!keyword || text.includes(keyword));
+            });
+        }
+
+        function render() {
+            const body = document.getElementById('stageBody');
+            const empty = document.getElementById('emptyState');
+            const typeTabs = document.getElementById('typeTabs');
+            typeTabs.classList.toggle('show', currentStage === 'storage');
+            const list = getFilteredRows();
+            if (!list.length) {
+                body.innerHTML = '';
+                empty.style.display = 'flex';
+                return;
+            }
+            empty.style.display = 'none';
+            body.innerHTML = '<div class="stage-note">' + stageNotes[currentStage] + '</div><div class="list">' + list.map(renderRow).join('') + '</div>';
+            body.querySelectorAll('[data-action]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    showToast(btn.dataset.action);
+                });
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            clearTimeout(showToast.timer);
+            showToast.timer = setTimeout(function() {
+                toast.classList.remove('show');
+            }, 1400);
+        }
+
+        document.querySelectorAll('[data-action]').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                showToast(btn.dataset.action);
             });
         });
+
+        document.querySelectorAll('.stage-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.stage-tab').forEach(function(item) {
+                    item.classList.remove('active');
+                });
+                tab.classList.add('active');
+                currentStage = tab.dataset.stage;
+                render();
+            });
+        });
+
+        document.querySelectorAll('.type-tab').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.type-tab').forEach(function(item) {
+                    item.classList.remove('active');
+                });
+                tab.classList.add('active');
+                currentType = tab.dataset.type;
+                render();
+            });
+        });
+
+        document.querySelectorAll('#keyword, #statusFilter').forEach(function(control) {
+            control.addEventListener('input', render);
+            control.addEventListener('change', render);
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            document.getElementById('keyword').value = '';
+            document.getElementById('statusFilter').value = '全部';
+            currentType = '全部';
+            document.querySelectorAll('.type-tab').forEach(function(item) {
+                item.classList.toggle('active', item.dataset.type === '全部');
+            });
+            render();
+        });
+
+        document.querySelectorAll('.tree-node').forEach(function(node) {
+            node.addEventListener('click', function() {
+                document.querySelectorAll('.tree-node').forEach(function(item) {
+                    item.classList.remove('active');
+                });
+                node.classList.add('active');
+                currentFolder = node.dataset.folder || '全部';
+                document.getElementById('folderName').textContent = node.dataset.name;
+                document.getElementById('folderMeta').textContent = node.dataset.meta;
+                render();
+            });
+        });
+
+        document.getElementById('folderSearch').addEventListener('input', function(event) {
+            const value = event.target.value.trim().toLowerCase();
+            document.querySelectorAll('#folderTree .tree-node').forEach(function(node) {
+                node.style.display = node.textContent.toLowerCase().includes(value) ? 'grid' : 'none';
+            });
+        });
+
+        render();
     </script>
 </body>
 </html>

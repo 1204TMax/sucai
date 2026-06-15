@@ -282,9 +282,9 @@
                 type: 'text',
                 control: 'select',
                 options: [
-                    { name: '写实风格', desc: '生成照片级别的真实质感' },
-                    { name: '二次元', desc: '日系动漫插画风格' },
-                    { name: '3D 渲染', desc: '立体细腻的 3D 模型效果' }
+                    { name: '写实风格', value: '写实风格', desc: '生成照片级别的真实质感' },
+                    { name: '二次元', value: '二次元', desc: '日系动漫插画风格' },
+                    { name: '3D 渲染', value: '3D 渲染', desc: '立体细腻的 3D 模型效果' }
                 ]
             }
         ];
@@ -714,7 +714,7 @@
                                                 optionLabelProp="label"
                                             >
                                                 {fieldMeta.videoStyle.options.map(opt => (
-                                                    <Select.Option key={opt.name} value={opt.name} label={opt.name}>
+                                                    <Select.Option key={opt.value} value={opt.value} label={opt.name}>
                                                         <Tooltip title={opt.desc} placement="right" mouseEnterDelay={0.3}>
                                                             <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', padding: '4px 0' }}>
                                                                 <span style={{ fontSize: '14px', color: 'var(--text-hi)', lineHeight: '1.2' }}>{opt.name}</span>

@@ -358,6 +358,41 @@
         .start-control-switch.select .start-control-select-label {
             color: var(--accent-text);
         }
+        .start-control-radio-group {
+            display: inline-flex;
+            align-items: center;
+            font-size: 12px;
+            line-height: 28px;
+        }
+        .start-control-radio-button {
+            position: relative;
+            height: 28px;
+            padding: 0 16px;
+            border: 1px solid var(--border-2);
+            background: #fff;
+            color: var(--text-hi);
+            cursor: pointer;
+            transition: color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+            user-select: none;
+        }
+        .start-control-radio-button + .start-control-radio-button {
+            margin-left: -1px;
+        }
+        .start-control-radio-button:first-child {
+            border-radius: 6px 0 0 6px;
+        }
+        .start-control-radio-button:last-child {
+            border-radius: 0 6px 6px 0;
+        }
+        .start-control-radio-button:hover,
+        .start-control-radio-button.active {
+            z-index: 1;
+            color: var(--accent-solid);
+            border-color: var(--accent-solid);
+        }
+        .start-control-radio-button.active {
+            box-shadow: 0 0 0 2px var(--accent-bg);
+        }
         
         .var-tag { 
             display: inline-block; margin: 4px 4px 0 0; background: var(--accent-bg); 
@@ -425,6 +460,7 @@
         .start-options-summary-action:hover {
             border-color: var(--accent-solid);
             background: var(--accent-bg);
+            color: var(--accent-solid);
         }
         .start-options-empty {
             padding: 16px;
@@ -1170,7 +1206,15 @@ function normalizeStartInputConfig(input) {
         input.control = 'input';
     }
     if (input.control === 'select' && (!input.options || input.options.length === 0)) {
-        input.options = [{ name: '', desc: '' }];
+        input.options = [{ name: '', value: '', desc: '' }];
+    }
+    if (input.control === 'select') {
+        input.options = (input.options || []).map(option => {
+            if (!Object.prototype.hasOwnProperty.call(option, 'value')) {
+                return { ...option, value: option.name || '' };
+            }
+            return option;
+        });
     }
     return input;
 }
@@ -2278,7 +2322,7 @@ function renderRunInput(input) {
     normalizeStartInputConfig(input);
     const maxUploadCount = normalizeMaxUploadCount(input.maxUploadCount);
     if (input.control === 'select' && isSelectControlConfigurableInput(input.type)) {
-        const options = (input.options || []).filter(opt => String(opt.name || '').trim());
+        const options = (input.options || []).filter(opt => String(opt.name || '').trim() && String(opt.value || '').trim());
         if (!options.length) {
             return `<select disabled style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit; background:#fff; color:var(--text-muted);">
                 <option>请先设置选项</option>
@@ -2286,12 +2330,13 @@ function renderRunInput(input) {
         }
         const optionsHtml = options.map(opt => {
             const name = String(opt.name || '').trim();
+            const value = String(opt.value || '').trim();
             const displayLabel = opt.desc ? `${escapeAttr(name)}（${escapeAttr(opt.desc)}）` : escapeAttr(name);
-            const isSelected = runState.values[input.key] === name;
-            return `<option value="${escapeAttr(name)}" ${isSelected ? 'selected' : ''}>${displayLabel}</option>`;
+            const isSelected = runState.values[input.key] === value;
+            return `<option value="${escapeAttr(value)}" ${isSelected ? 'selected' : ''}>${displayLabel}</option>`;
         }).join('');
         if (!runState.values[input.key] && options.length > 0) {
-            runState.values[input.key] = String(options[0].name || '').trim();
+            runState.values[input.key] = String(options[0].value || '').trim();
         }
         return `<select onchange="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit; background:#fff;">
             ${optionsHtml}
@@ -2907,11 +2952,11 @@ function renderStartInputsEditor(node) {
 function renderStartInputControlSwitch(input, inputIdx) {
     const mode = input.control === 'select' ? 'select' : 'input';
     return `
-        <div class="start-control-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-2);">
+        <div class="start-control-row" style="padding-bottom: 12px; border-bottom: 1px dashed var(--border-2);">
             <span class="start-control-label">填写方式</span>
-            <div style="display: inline-flex; font-size: 12px; line-height: 26px;">
-                <div style="padding: 0 16px; cursor: pointer; border: 1px solid ${mode !== 'select' ? '#1677ff' : '#d9d9d9'}; background: #fff; color: ${mode !== 'select' ? '#1677ff' : 'var(--text-hi)'}; z-index: ${mode !== 'select' ? 1 : 0}; transition: all 0.2s; border-radius: 6px 0 0 6px; position: relative;" onclick="updateStartInput(${inputIdx}, 'control', 'input')">输入框</div>
-                <div style="padding: 0 16px; cursor: pointer; border: 1px solid ${mode === 'select' ? '#1677ff' : '#d9d9d9'}; margin-left: -1px; background: #fff; color: ${mode === 'select' ? '#1677ff' : 'var(--text-hi)'}; z-index: ${mode === 'select' ? 1 : 0}; transition: all 0.2s; border-radius: 0 6px 6px 0; position: relative;" onclick="updateStartInput(${inputIdx}, 'control', 'select')">下拉菜单</div>
+            <div class="start-control-radio-group" role="radiogroup" aria-label="填写方式">
+                <div class="start-control-radio-button ${mode !== 'select' ? 'active' : ''}" role="radio" aria-checked="${mode !== 'select' ? 'true' : 'false'}" onclick="updateStartInput(${inputIdx}, 'control', 'input')">输入框</div>
+                <div class="start-control-radio-button ${mode === 'select' ? 'active' : ''}" role="radio" aria-checked="${mode === 'select' ? 'true' : 'false'}" onclick="updateStartInput(${inputIdx}, 'control', 'select')">下拉菜单</div>
             </div>
         </div>
     `;
@@ -2919,9 +2964,9 @@ function renderStartInputControlSwitch(input, inputIdx) {
 
 function renderStartInputSelectOptionsSummary(input, inputIdx) {
     return `
-        <div class="start-options-summary-row" style="display: flex; align-items: center; justify-content: space-between; margin-top: 12px;">
-            <span class="start-options-summary-count" style="color: var(--text-lo); font-size: 12px;">已设置${getConfiguredOptionCount(input)}个选项</span>
-            <button type="button" style="height: 28px; padding: 0 12px; font-size: 12px; border-radius: 6px; border: 1px solid var(--border-2); background: #fff; color: var(--text-hi); cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='var(--primary-color, #1677ff)'; this.style.borderColor='var(--primary-color, #1677ff)';" onmouseout="this.style.color='var(--text-hi)'; this.style.borderColor='var(--border-2)';" onclick="openStartInputOptionsModal(${inputIdx})">设置选项</button>
+        <div class="start-options-summary-row">
+            <span class="start-options-summary-count">已设置${getConfiguredOptionCount(input)}个选项</span>
+            <button class="start-options-summary-action" type="button" onclick="openStartInputOptionsModal(${inputIdx})">设置选项</button>
         </div>
     `;
 }
@@ -3116,7 +3161,7 @@ function updateStartInput(index, key, value) {
         if (isSelectControlConfigurableInput(input.type)) {
             input.control = value === 'select' ? 'select' : 'input';
             if (input.control === 'select' && (!input.options || input.options.length === 0)) {
-                input.options = [{ name: '', desc: '' }];
+                input.options = [{ name: '', value: '', desc: '' }];
             }
         }
     } else if (key === 'type') {

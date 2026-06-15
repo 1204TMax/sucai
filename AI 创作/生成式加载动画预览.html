@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生成式加载动画预览</title>
+    <style>
+        :root {
+            /* 主色 */
+            --ant-primary-1: #E6F4FF;
+            --ant-primary-2: #BAE0FF;
+            --ant-primary-3: #91CAFF;
+            --ant-primary-4: #69B1FF;
+            --ant-primary-5: #4096FF;
+            --ant-primary-6: #1677FF;
+            --ant-primary-7: #0958D9;
+
+            /* 状态色 */
+            --ant-success-1: #F6FFED;
+            --ant-success-2: #D9F7BE;
+            --ant-success-6: #52C41A;
+            --ant-warning-1: #FFFBE6;
+            --ant-warning-2: #FFF1B8;
+            --ant-warning-6: #FAAD14;
+            --ant-error-1: #FFF1F0;
+            --ant-error-2: #FFCCC7;
+            --ant-error-6: #F5222D;
+
+            /* 文字颜色 */
+            --ant-text-color: #262626;
+            --ant-text-color-secondary: #595959;
+            --ant-text-color-tertiary: #8C8C8C;
+            --ant-text-color-quaternary: #BFBFBF;
+            --ant-text-color-inverse: #FFFFFF;
+
+            /* 背景与边框 */
+            --ant-bg-base: #F5F5F5;
+            --ant-bg-container: #FFFFFF;
+            --ant-bg-secondary: rgba(0,0,0,0.02);
+            --ant-bg-tertiary: rgba(0,0,0,0.04);
+            --ant-border-color: #D9D9D9;
+            --ant-border-color-secondary: #F0F0F0;
+
+            /* 字体 */
+            --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+            --ant-font-size-h1: 38px;
+            --ant-font-size-h2: 30px;
+            --ant-font-size-h3: 24px;
+            --ant-font-size-h4: 20px;
+            --ant-font-size-h5: 16px;
+            --ant-font-size-lg: 16px;
+            --ant-font-size: 14px;
+            --ant-font-size-sm: 12px;
+
+            /* 间距 */
+            --ant-size-xxs: 4px;
+            --ant-size-xs: 8px;
+            --ant-size-sm: 12px;
+            --ant-size: 16px;
+            --ant-size-md: 20px;
+            --ant-size-lg: 24px;
+            --ant-size-xl: 32px;
+            --ant-size-xxl: 48px;
+
+            /* 圆角 */
+            --ant-border-radius-xs: 2px;
+            --ant-border-radius-sm: 4px;
+            --ant-border-radius: 6px;
+            --ant-border-radius-lg: 8px;
+            --ant-border-radius-xl: 16px;
+
+            /* 阴影 */
+            --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            --ant-box-shadow-secondary: 0 4px 16px rgba(0,0,0,0.12);
+            --ant-box-shadow-popup: 0 8px 24px rgba(0,0,0,0.15);
+            --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
+
+            --page-padding: clamp(24px, 6vw, 72px);
+            --card-size: min(72vmin, 720px);
+            --card-radius: 28px;
+            --card-border: rgba(116, 139, 172, 0.14);
+            --card-shadow: 0 24px 80px rgba(72, 90, 130, 0.14);
+            --card-shadow-soft: 0 8px 28px rgba(72, 90, 130, 0.08);
+
+            --mist-blue: rgba(145, 192, 255, 0.74);
+            --mist-blue-soft: rgba(188, 218, 255, 0.7);
+            --mist-cyan: rgba(146, 225, 232, 0.66);
+            --mist-lavender: rgba(187, 174, 255, 0.7);
+            --mist-lavender-soft: rgba(218, 208, 255, 0.64);
+            --mist-pink: rgba(255, 184, 222, 0.66);
+            --mist-pink-soft: rgba(255, 216, 237, 0.72);
+            --mist-white: rgba(255, 255, 255, 0.74);
+            --mist-clear: rgba(255, 255, 255, 0);
+            --mist-base: rgb(239, 246, 255);
+            --mist-veil: rgba(255, 255, 255, 0.28);
+            --mist-veil-strong: rgba(255, 255, 255, 0.42);
+            --blur-soft: 26px;
+            --blur-deep: 36px;
+            --motion-slow: 6s;
+            --motion-slower: 8s;
+            --motion-deep: 10s;
+            --motion-ease: cubic-bezier(0.45, 0, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--ant-font-family);
+            background:
+                radial-gradient(circle at 50% 28%, var(--ant-bg-container), var(--ant-bg-base) 58%),
+                var(--ant-bg-base);
+        }
+
+        .preview-shell {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: var(--page-padding);
+        }
+
+        .loading-card {
+            width: min(var(--card-size), calc(100vw - var(--page-padding) - var(--page-padding)));
+            max-width: 100%;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            border-radius: var(--card-radius);
+            background: var(--mist-base);
+            box-shadow: var(--card-shadow), var(--card-shadow-soft);
+        }
+
+        .generative-loading {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            isolation: isolate;
+            border-radius: inherit;
+            background-color: var(--mist-base);
+            background-image:
+                radial-gradient(circle at 18% 18%, var(--mist-cyan) 0%, var(--mist-clear) 34%),
+                radial-gradient(circle at 82% 16%, var(--mist-pink-soft) 0%, var(--mist-clear) 38%),
+                radial-gradient(circle at 78% 82%, var(--mist-blue) 0%, var(--mist-clear) 42%),
+                radial-gradient(circle at 22% 84%, var(--mist-lavender-soft) 0%, var(--mist-clear) 40%),
+                linear-gradient(132deg, var(--mist-blue-soft) 0%, var(--mist-lavender) 42%, var(--mist-pink) 72%, var(--mist-cyan) 100%);
+            background-position:
+                10% 8%,
+                92% 10%,
+                80% 90%,
+                12% 86%,
+                50% 50%;
+            background-size:
+                150% 150%,
+                156% 156%,
+                164% 164%,
+                152% 152%,
+                220% 220%;
+            animation: gradient-drift var(--motion-slow) var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading::before,
+        .generative-loading::after {
+            content: "";
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            will-change: transform, opacity;
+        }
+
+        .generative-loading::before {
+            inset: -38%;
+            opacity: 0.74;
+            filter: blur(var(--blur-deep));
+            background:
+                radial-gradient(ellipse at 16% 42%, var(--mist-cyan) 0%, var(--mist-clear) 42%),
+                radial-gradient(ellipse at 78% 28%, var(--mist-pink) 0%, var(--mist-clear) 48%),
+                radial-gradient(ellipse at 50% 84%, var(--mist-blue-soft) 0%, var(--mist-clear) 50%);
+            transform: translate3d(-14%, 7%, 0) rotate(-10deg) scale(1.18);
+            animation: vapor-orbit var(--motion-slower) var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading::after {
+            inset: -26%;
+            opacity: 0.64;
+            filter: blur(var(--blur-soft));
+            background:
+                radial-gradient(ellipse at 42% 46%, var(--mist-veil-strong) 0%, var(--mist-clear) 34%),
+                radial-gradient(ellipse at 66% 58%, var(--mist-lavender) 0%, var(--mist-clear) 44%),
+                radial-gradient(ellipse at 28% 68%, var(--mist-cyan) 0%, var(--mist-clear) 40%);
+            transform: translate3d(10%, -6%, 0) rotate(6deg) scale(1.14);
+            animation: soft-return var(--motion-deep) var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading__field {
+            position: absolute;
+            inset: -48%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.86;
+            filter: blur(22px) saturate(1.06);
+            background:
+                radial-gradient(ellipse at 16% 30%, var(--mist-cyan) 0%, var(--mist-clear) 34%),
+                radial-gradient(ellipse at 82% 22%, var(--mist-pink) 0%, var(--mist-clear) 34%),
+                radial-gradient(ellipse at 74% 82%, var(--mist-blue) 0%, var(--mist-clear) 38%),
+                radial-gradient(ellipse at 28% 76%, var(--mist-lavender) 0%, var(--mist-clear) 36%),
+                radial-gradient(ellipse at 52% 50%, var(--mist-white) 0%, var(--mist-clear) 32%);
+            transform: translate3d(-14%, -8%, 0) rotate(-18deg) scale(1.04);
+            animation: field-sweep 8s var(--motion-ease) infinite alternate;
+            will-change: transform, opacity;
+        }
+
+        .generative-loading__flow {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 48% 52% 44% 56% / 58% 44% 56% 42%;
+            filter: blur(24px) saturate(1.08);
+            will-change: transform, opacity;
+        }
+
+        .generative-loading__flow--blue {
+            z-index: 1;
+            width: 72%;
+            height: 56%;
+            left: -48%;
+            top: 10%;
+            opacity: 0.78;
+            background:
+                radial-gradient(ellipse at 48% 48%, var(--mist-cyan) 0%, var(--mist-blue-soft) 48%, var(--mist-clear) 78%);
+            transform: translate3d(0, 0, 0) rotate(-10deg) scale(1.04);
+            animation: flow-blue 6.5s var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading__flow--pink {
+            z-index: 2;
+            width: 74%;
+            height: 58%;
+            right: -46%;
+            top: -6%;
+            opacity: 0.74;
+            background:
+                radial-gradient(ellipse at 48% 46%, var(--mist-pink-soft) 0%, var(--mist-lavender-soft) 48%, var(--mist-clear) 78%);
+            transform: translate3d(0, 0, 0) rotate(12deg) scale(1.02);
+            animation: flow-pink 7s var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading__flow--violet {
+            z-index: 1;
+            width: 86%;
+            height: 54%;
+            left: 6%;
+            bottom: -42%;
+            opacity: 0.7;
+            background:
+                radial-gradient(ellipse at 52% 52%, var(--mist-lavender) 0%, var(--mist-blue) 50%, var(--mist-clear) 80%);
+            transform: translate3d(0, 0, 0) rotate(3deg) scale(1.08);
+            animation: flow-violet 8s var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading__flow--cyan {
+            z-index: 2;
+            width: 62%;
+            height: 48%;
+            left: 18%;
+            top: -36%;
+            opacity: 0.56;
+            background:
+                radial-gradient(ellipse at 52% 50%, var(--mist-white) 0%, var(--mist-cyan) 42%, var(--mist-clear) 78%);
+            transform: translate3d(0, 0, 0) rotate(-4deg) scale(1.02);
+            animation: flow-cyan 7.5s var(--motion-ease) infinite alternate;
+        }
+
+        .generative-loading__wash {
+            position: absolute;
+            inset: -10%;
+            z-index: 3;
+            pointer-events: none;
+            opacity: 0.28;
+            background:
+                radial-gradient(ellipse at 52% 52%, var(--mist-veil) 0%, var(--mist-clear) 42%),
+                linear-gradient(118deg, var(--mist-clear) 16%, var(--mist-white) 48%, var(--mist-clear) 76%);
+            filter: blur(36px);
+            transform: translate3d(-2%, 1%, 0) scale(1.04);
+            animation: quiet-breathe var(--motion-slower) var(--motion-ease) infinite alternate;
+        }
+
+        @keyframes gradient-drift {
+            0% {
+                background-position:
+                    10% 8%,
+                    92% 10%,
+                    80% 90%,
+                    12% 86%,
+                    50% 50%;
+                transform: scale(1);
+            }
+            48% {
+                background-position:
+                    52% 18%,
+                    48% 32%,
+                    42% 58%,
+                    58% 62%,
+                    76% 32%;
+                transform: scale(1.045) rotate(0.8deg);
+            }
+            100% {
+                background-position:
+                    28% 46%,
+                    78% 44%,
+                    34% 88%,
+                    70% 78%,
+                    24% 70%;
+                transform: scale(1.07) rotate(-0.6deg);
+            }
+        }
+
+        @keyframes vapor-orbit {
+            0% {
+                opacity: 0.62;
+                transform: translate3d(-14%, 7%, 0) rotate(-10deg) scale(1.18);
+            }
+            44% {
+                opacity: 0.82;
+                transform: translate3d(14%, -10%, 0) rotate(7deg) scale(1.24);
+            }
+            100% {
+                opacity: 0.68;
+                transform: translate3d(20%, 8%, 0) rotate(-6deg) scale(1.2);
+            }
+        }
+
+        @keyframes soft-return {
+            0% {
+                opacity: 0.62;
+                transform: translate3d(10%, -6%, 0) rotate(6deg) scale(1.14);
+            }
+            50% {
+                opacity: 0.78;
+                transform: translate3d(-14%, 11%, 0) rotate(-8deg) scale(1.24);
+            }
+            100% {
+                opacity: 0.66;
+                transform: translate3d(-20%, -4%, 0) rotate(3deg) scale(1.16);
+            }
+        }
+
+        @keyframes flow-blue {
+            0% {
+                opacity: 0.42;
+                border-radius: 48% 52% 44% 56% / 58% 44% 56% 42%;
+                transform: translate3d(-24%, 2%, 0) rotate(-16deg) scale(0.96);
+            }
+            45% {
+                opacity: 0.82;
+                border-radius: 58% 42% 54% 46% / 44% 58% 42% 56%;
+                transform: translate3d(96%, 28%, 0) rotate(10deg) scale(1.28);
+            }
+            100% {
+                opacity: 0.48;
+                border-radius: 42% 58% 48% 52% / 56% 42% 58% 44%;
+                transform: translate3d(168%, -8%, 0) rotate(22deg) scale(1.04);
+            }
+        }
+
+        @keyframes field-sweep {
+            0% {
+                opacity: 0.76;
+                transform: translate3d(-16%, -10%, 0) rotate(-18deg) scale(1.02);
+            }
+            42% {
+                opacity: 0.9;
+                transform: translate3d(14%, 10%, 0) rotate(10deg) scale(1.12);
+            }
+            100% {
+                opacity: 0.8;
+                transform: translate3d(-4%, 18%, 0) rotate(32deg) scale(1.06);
+            }
+        }
+
+        @keyframes flow-pink {
+            0% {
+                opacity: 0.46;
+                border-radius: 54% 46% 58% 42% / 48% 56% 44% 52%;
+                transform: translate3d(24%, -12%, 0) rotate(16deg) scale(0.98);
+            }
+            52% {
+                opacity: 0.8;
+                border-radius: 42% 58% 46% 54% / 58% 44% 56% 42%;
+                transform: translate3d(-106%, 30%, 0) rotate(-12deg) scale(1.26);
+            }
+            100% {
+                opacity: 0.5;
+                border-radius: 60% 40% 52% 48% / 42% 58% 46% 54%;
+                transform: translate3d(-164%, 68%, 0) rotate(-24deg) scale(1.04);
+            }
+        }
+
+        @keyframes flow-violet {
+            0% {
+                opacity: 0.44;
+                border-radius: 50% 50% 44% 56% / 46% 58% 42% 54%;
+                transform: translate3d(-8%, 28%, 0) rotate(4deg) scale(0.98);
+            }
+            50% {
+                opacity: 0.78;
+                border-radius: 58% 42% 56% 44% / 56% 42% 58% 44%;
+                transform: translate3d(-28%, -86%, 0) rotate(-12deg) scale(1.28);
+            }
+            100% {
+                opacity: 0.48;
+                border-radius: 44% 56% 52% 48% / 42% 56% 44% 58%;
+                transform: translate3d(26%, -158%, 0) rotate(12deg) scale(1.06);
+            }
+        }
+
+        @keyframes flow-cyan {
+            0% {
+                opacity: 0.34;
+                border-radius: 48% 52% 58% 42% / 46% 58% 42% 54%;
+                transform: translate3d(-22%, -18%, 0) rotate(-8deg) scale(0.96);
+            }
+            50% {
+                opacity: 0.62;
+                border-radius: 58% 42% 46% 54% / 56% 44% 58% 42%;
+                transform: translate3d(18%, 118%, 0) rotate(9deg) scale(1.24);
+            }
+            100% {
+                opacity: 0.38;
+                border-radius: 42% 58% 52% 48% / 44% 56% 46% 54%;
+                transform: translate3d(44%, 196%, 0) rotate(18deg) scale(1.02);
+            }
+        }
+
+        @keyframes quiet-breathe {
+            0% {
+                opacity: 0.46;
+                transform: translate3d(-2%, 1%, 0) scale(1.04);
+            }
+            50% {
+                opacity: 0.68;
+                transform: translate3d(2%, -1%, 0) scale(1.1);
+            }
+            100% {
+                opacity: 0.52;
+                transform: translate3d(1%, 3%, 0) scale(1.06);
+            }
+        }
+
+        @media (max-width: 720px) {
+            :root {
+                --page-padding: var(--ant-size-lg);
+                --card-size: min(72vmin, 560px);
+                --card-radius: 22px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            :root {
+                --motion-slow: 18s;
+                --motion-slower: 24s;
+                --motion-deep: 30s;
+            }
+
+            .generative-loading__flow {
+                opacity: 0.42;
+            }
+
+            .generative-loading__field {
+                opacity: 0.58;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="preview-shell">
+        <section class="loading-card" aria-label="生成式图像和视频加载动画预览">
+            <div class="generative-loading" aria-hidden="true">
+                <span class="generative-loading__field"></span>
+                <span class="generative-loading__flow generative-loading__flow--blue"></span>
+                <span class="generative-loading__flow generative-loading__flow--pink"></span>
+                <span class="generative-loading__flow generative-loading__flow--violet"></span>
+                <span class="generative-loading__flow generative-loading__flow--cyan"></span>
+                <span class="generative-loading__wash"></span>
+            </div>
+        </section>
+    </main>
+</body>
+</html>
