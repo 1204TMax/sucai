@@ -476,6 +476,19 @@
         .cover-preview { width: 110px; height: 150px; border-radius: 12px; background: linear-gradient(180deg, #3aa0ff 0%, #1677ff 100%); color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; line-height: 1.4; }
         .radio-row { display: flex; flex-wrap: wrap; gap: 16px; }
         .radio-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-lo); }
+        .visibility-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+        .visibility-option {
+            display: flex; align-items: flex-start; gap: 10px;
+            padding: 12px; border: 1px solid var(--border-1);
+            border-radius: var(--r-lg); background: var(--bg-surface);
+            cursor: pointer; transition: border-color 0.16s, background 0.16s, box-shadow 0.16s;
+        }
+        .visibility-option:hover { border-color: var(--accent-border); background: #fff; }
+        .visibility-option:has(input:checked) { border-color: var(--accent-solid); background: var(--accent-bg); box-shadow: 0 0 0 1px var(--accent-border); }
+        .visibility-option input { width: auto; height: auto; margin-top: 2px; accent-color: var(--accent-solid); flex-shrink: 0; }
+        .visibility-option-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .visibility-option-title { font-size: 13px; color: var(--text-hi); font-weight: 600; line-height: 1.3; }
+        .visibility-option-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; font-weight: 400; }
         .modal-footer { padding: 16px 20px 20px; border-top: 1px solid var(--border-1); display: flex; justify-content: flex-end; gap: 8px; }
         @keyframes runPulse { 0%, 100% { opacity: 0.35; transform: scale(0.9); } 50% { opacity: 1; transform: scale(1); } }
     
@@ -1697,6 +1710,21 @@ const nodesLayer = document.getElementById('nodes-layer');
 const svgLayer = document.getElementById('svg-layer');
 const tempEdgeEl = document.getElementById('temp-edge');
 
+function normalizeWorkflowVisibility(value) {
+    return value === 'public' || value === 'team' || value === 'plaza' ? 'public' : 'private';
+}
+
+function applyInitialWorkflowMeta() {
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get('name');
+    const visibility = params.get('visibility');
+    if (name) workflowMeta.name = name;
+    workflowMeta.visibility = normalizeWorkflowVisibility(visibility || workflowMeta.visibility);
+}
+
+applyInitialWorkflowMeta();
+updateWorkflowTitle();
+
 canvasEl.addEventListener('mousedown', (e) => {
     if (e.target === canvasEl || e.target === svgLayer || e.target === canvasContent) {
         isPanning = true;
@@ -2194,6 +2222,7 @@ function getWorkflowCoverText(name) {
 
 function renderWorkflowMetaForm() {
     const draft = workflowMetaDraft || workflowMeta;
+    const visibility = normalizeWorkflowVisibility(draft.visibility);
     return `
         <div class="form-item">
             <label>名称</label>
@@ -2218,11 +2247,22 @@ function renderWorkflowMetaForm() {
             </div>
         </div>
         <div class="form-item">
-            <label>可见性权限</label>
-            <div class="radio-row">
-                <label class="radio-item"><input type="radio" name="workflow-visibility" value="private" ${draft.visibility === 'private' ? 'checked' : ''} onchange="updateWorkflowMetaDraft('visibility', this.value)">仅自己可见</label>
-                <label class="radio-item"><input type="radio" name="workflow-visibility" value="team" ${draft.visibility === 'team' ? 'checked' : ''} onchange="updateWorkflowMetaDraft('visibility', this.value)">团队公开</label>
-                <label class="radio-item"><input type="radio" name="workflow-visibility" value="plaza" ${draft.visibility === 'plaza' ? 'checked' : ''} onchange="updateWorkflowMetaDraft('visibility', this.value)">广场公开</label>
+            <label>可见范围</label>
+            <div class="visibility-options">
+                <label class="visibility-option">
+                    <input type="radio" name="workflow-visibility" value="private" ${visibility === 'private' ? 'checked' : ''} onchange="updateWorkflowMetaDraft('visibility', this.value)">
+                    <span class="visibility-option-main">
+                        <span class="visibility-option-title">仅自己可见</span>
+                        <span class="visibility-option-desc">仅本人可查看、编辑、运行</span>
+                    </span>
+                </label>
+                <label class="visibility-option">
+                    <input type="radio" name="workflow-visibility" value="public" ${visibility === 'public' ? 'checked' : ''} onchange="updateWorkflowMetaDraft('visibility', this.value)">
+                    <span class="visibility-option-main">
+                        <span class="visibility-option-title">全部可见</span>
+                        <span class="visibility-option-desc">成员可查看、复制、使用</span>
+                    </span>
+                </label>
             </div>
         </div>
     `;
@@ -2264,7 +2304,10 @@ function onWorkflowMetaMaskClick(event) {
 }
 
 function saveWorkflowMeta() {
-    workflowMeta = { ...workflowMetaDraft };
+    workflowMeta = {
+        ...workflowMetaDraft,
+        visibility: normalizeWorkflowVisibility(workflowMetaDraft?.visibility)
+    };
     updateWorkflowTitle();
     touchAutoSave();
     closeWorkflowMetaModal();
@@ -2499,6 +2542,10 @@ function renderRunResult() {
 function publishWorkflow() {
     // 简单的 Toast 提示
     const toast = document.createElement('div');
+    const visibility = normalizeWorkflowVisibility(workflowMeta.visibility);
+    const message = visibility === 'public'
+        ? '发布成功！该工作流已设为「全部可见」，其他成员可在「工作流广场」和「通用生成」中查看、复制和使用。'
+        : '发布成功！该工作流保持「仅自己可见」，仅创建者可查看、编辑和运行。';
     toast.style.position = 'fixed';
     toast.style.top = '24px';
     toast.style.left = '50%';
@@ -2519,7 +2566,7 @@ function publishWorkflow() {
     
     toast.innerHTML = `
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52c41a" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-        <span>发布成功！该工作流已发布至「工作流广场」和「通用生成」页面。</span>
+        <span>${message}</span>
     `;
     
     document.body.appendChild(toast);

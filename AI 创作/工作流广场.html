@@ -704,6 +704,10 @@
       return item.source === 'mine' || item.creator === '我';
     }
 
+    function getWorkflowVisibilityLabel(item) {
+      return item && (item.visibility === 'private' || isMineWorkflow(item)) ? '仅自己可见' : '全部可见';
+    }
+
     function saveFavorites() {
       localStorage.setItem('workflow_favorites', JSON.stringify(Array.from(state.favorites)));
       localStorage.setItem('workflow_favorite_items', JSON.stringify(
@@ -746,7 +750,7 @@
           </div>
           <div class="wf-desc-text">${esc(item.desc)}</div>
           <div class="wf-card-footer">
-            <span class="wf-meta">${esc(item.creator)} · ${esc(item.createdAt)}</span>
+            <span class="wf-meta">${esc(item.creator)} · ${esc(item.createdAt)} · ${getWorkflowVisibilityLabel(item)}</span>
           </div>
           <div class="wf-menu">${getMenuHtml(item)}</div>
         </div>

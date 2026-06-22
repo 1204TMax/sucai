@@ -27,6 +27,40 @@ var CC_PREVIEW_ICONS = {
   editLg: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
 };
 
+function ccPreviewAttr(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+  });
+}
+
+function ccPreviewInferType(url) {
+  return /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(String(url || '')) ? 'video' : 'image';
+}
+
+function ccPreviewOpenArchive(items) {
+  if (typeof window.openAssetArchiveModal === 'function') {
+    window.openAssetArchiveModal({ items: items || [] });
+    return;
+  }
+  if (typeof showToast === 'function') showToast('已入库');
+}
+
+function openPreviewArchiveFromThumb(btn, url) {
+  var host = btn && btn.closest ? btn.closest('[data-preview-url], .o-thumb, .cc-thumb-host, .detail-thumb-wrap') : null;
+  var resolvedUrl = (btn && btn.getAttribute ? btn.getAttribute('data-archive-url') : '') || url || '';
+  var type = '';
+  if (host) {
+    resolvedUrl = resolvedUrl || host.getAttribute('data-preview-url') || '';
+    type = host.getAttribute('data-preview-type') || '';
+    if (!resolvedUrl) {
+      var mediaNode = host.querySelector('video,img');
+      if (mediaNode) resolvedUrl = mediaNode.currentSrc || mediaNode.src || '';
+    }
+  }
+  type = type || ccPreviewInferType(resolvedUrl);
+  ccPreviewOpenArchive([{ type:type, url:resolvedUrl, thumb:resolvedUrl, name:type === 'video' ? '视频素材' : '图片素材' }]);
+}
+
 function thumbOverlayHtml(url, downloadAction) {
   if (arguments.length === 1) {
     downloadAction = url;
@@ -34,9 +68,16 @@ function thumbOverlayHtml(url, downloadAction) {
   }
   if (!downloadAction) downloadAction = "event.stopPropagation();showToast('已下载')";
 
-  var storeDD = CC_PREVIEW_STORAGE_TARGETS.map(function(t) {
-    return '<div class="storage-dd-item" onclick="event.stopPropagation();showToast(\'已入库到' + t + '\');this.closest(\'.storage-dropdown\').style.display=\'none\'">' + t + '</div>';
-  }).join('');
+  var storeControl = '';
+  if (typeof window.openAssetArchiveModal === 'function') {
+    storeControl = '<button class="thumb-act" title="入库" data-archive-url="' + ccPreviewAttr(url) + '" onclick="event.stopPropagation();openPreviewArchiveFromThumb(this)">' + CC_PREVIEW_ICONS.store + '</button>';
+  } else {
+    var storeDD = CC_PREVIEW_STORAGE_TARGETS.map(function(t) {
+      return '<div class="storage-dd-item" onclick="event.stopPropagation();showToast(\'已入库到' + t + '\');this.closest(\'.storage-dropdown\').style.display=\'none\'">' + t + '</div>';
+    }).join('');
+    storeControl = '<button class="thumb-act" title="入库" onclick="event.stopPropagation();toggleThumbDD(this,\'store\')">' + CC_PREVIEW_ICONS.store
+      + '<div class="storage-dropdown" onclick="event.stopPropagation()">' + storeDD + '</div></button>';
+  }
 
   var editDD = CC_PREVIEW_EDIT_OPTIONS.map(function(opt) {
     if (opt.children) {
@@ -51,8 +92,7 @@ function thumbOverlayHtml(url, downloadAction) {
 
   return '<div class="thumb-overlay">'
     + '<button class="thumb-act" title="下载" onclick="' + downloadAction + '">' + CC_PREVIEW_ICONS.download + '</button>'
-    + '<button class="thumb-act" title="入库" onclick="event.stopPropagation();toggleThumbDD(this,\'store\')">' + CC_PREVIEW_ICONS.store
-    + '<div class="storage-dropdown" onclick="event.stopPropagation()">' + storeDD + '</div></button>'
+    + storeControl
     + '<button class="thumb-act" title="编辑" onclick="event.stopPropagation();toggleThumbDD(this,\'edit\')">' + CC_PREVIEW_ICONS.edit
     + '<div class="edit-menu" onclick="event.stopPropagation()">' + editDD + '</div></button>'
     + '</div>';
@@ -84,9 +124,18 @@ var _ccPvType = 'image';
 function initImagePreview() {
   if (document.getElementById('imgPreviewMask')) return;
 
-  var storeItems = CC_PREVIEW_STORAGE_TARGETS.map(function(t) {
-    return '<div class="pv-dd-item" onclick="showToast(\'已入库到' + t + '\');this.closest(\'.img-preview-store-dd\').classList.remove(\'show\')">' + t + '</div>';
-  }).join('');
+  var storeControl = '';
+  if (typeof window.openAssetArchiveModal === 'function') {
+    storeControl = '<button title="入库" onclick="pvOpenArchive()">' + CC_PREVIEW_ICONS.storeLg + '</button>';
+  } else {
+    var storeItems = CC_PREVIEW_STORAGE_TARGETS.map(function(t) {
+      return '<div class="pv-dd-item" onclick="showToast(\'已入库到' + t + '\');this.closest(\'.img-preview-store-dd\').classList.remove(\'show\')">' + t + '</div>';
+    }).join('');
+    storeControl = '<div class="img-preview-store-wrap">'
+      + '<button title="入库" onclick="pvToggleDD(this)">' + CC_PREVIEW_ICONS.storeLg + '</button>'
+      + '<div class="img-preview-store-dd" onclick="event.stopPropagation()">' + storeItems + '</div>'
+      + '</div>';
+  }
 
   var editItems = CC_PREVIEW_EDIT_OPTIONS.map(function(opt) {
     if (opt.children) {
@@ -104,10 +153,7 @@ function initImagePreview() {
     + '<div class="img-preview-bar" onclick="event.stopPropagation()">'
     +   '<button title="关闭" onclick="closeImagePreview()">' + CC_PREVIEW_ICONS.close + '</button>'
     +   '<button title="下载" onclick="pvDownload()">' + CC_PREVIEW_ICONS.downloadLg + '</button>'
-    +   '<div class="img-preview-store-wrap">'
-    +     '<button title="入库" onclick="pvToggleDD(this)">' + CC_PREVIEW_ICONS.storeLg + '</button>'
-    +     '<div class="img-preview-store-dd" onclick="event.stopPropagation()">' + storeItems + '</div>'
-    +   '</div>'
+    +   storeControl
     +   '<div class="img-preview-store-wrap">'
     +     '<button title="编辑" onclick="pvToggleDD(this)">' + CC_PREVIEW_ICONS.editLg + '</button>'
     +     '<div class="img-preview-store-dd" onclick="event.stopPropagation()">' + editItems + '</div>'
@@ -201,6 +247,19 @@ function pvDownload() {
   a.href = node.src;
   a.download = _ccPvType === 'video' ? 'download.mp4' : 'download.png';
   a.click();
+}
+
+function pvOpenArchive() {
+  var media = _ccPvList[_ccPvIdx];
+  if (typeof media === 'string') media = { type:_ccPvType || ccPreviewInferType(media), url:media, thumb:media };
+  media = media || {};
+  var url = media.url || '';
+  ccPreviewOpenArchive([{
+    type: media.type || _ccPvType || ccPreviewInferType(url),
+    url: url,
+    thumb: media.thumb || url,
+    name: media.name || ((media.type || _ccPvType) === 'video' ? '视频素材' : '图片素材')
+  }]);
 }
 
 function pvToggleDD(btn) {

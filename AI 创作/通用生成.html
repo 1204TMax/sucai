@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>通用生成 - 量化投放系统</title>
+    <link rel="stylesheet" href="../共享样式/components.css">
     <link rel="stylesheet" href="../共享样式/project-picker.css">
     <link rel="stylesheet" href="../共享样式/confirm-modal.css">
     <style>
@@ -65,6 +66,11 @@
             width: 100%; max-width: 960px; background: #fff;
             border-radius: 16px; border: 1px solid rgba(0,0,0,0.08);
             box-shadow: 0 4px 24px rgba(0,0,0,0.07); position: relative;
+            --cc-prompt-min-height: 108px;
+            --cc-prompt-max-height: 228px;
+            --cc-prompt-font-size: 15px;
+            --cc-prompt-line-height: 1.65;
+            --cc-prompt-placeholder: #c0c0c0;
         }
 
         .input-top {
@@ -89,6 +95,9 @@
             background: transparent; resize: none; line-height: 1.65;
         }
         textarea.prompt::placeholder { color: #c0c0c0; }
+        .cc-prompt-editor.prompt {
+            padding: 0;
+        }
 
         /* ── 参考图缩略图条 ── */
         .ref-strip {
@@ -114,7 +123,13 @@
             border-radius: 8px; overflow: hidden; flex-shrink: 0;
             border: 1px solid rgba(0,0,0,0.08); background: #f0f0f0;
         }
-        .ref-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ref-item img, .ref-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .ref-video-mark {
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            width: 22px; height: 22px; border-radius: 50%; background: rgba(0,0,0,0.48);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 10px; pointer-events: none;
+        }
         .ref-del {
             position: absolute; top: 3px; right: 3px;
             width: 18px; height: 18px;
@@ -494,8 +509,24 @@
         .count-confirm-btn:hover { background: #333; }
 
         /* ── 生成按钮（文字版）── */
+        .prompt-action-group {
+            margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
+            flex-shrink: 0;
+        }
+        .prompt-clear-btn {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.12); background: #fff;
+            color: #9a9a9a; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center;
+            transition: border-color 0.16s, color 0.16s, background 0.16s, transform 0.1s;
+        }
+        .prompt-clear-btn svg { width: 16px; height: 16px; display: block; }
+        .prompt-clear-btn.has-text { color: #555; border-color: rgba(0,0,0,0.18); }
+        .prompt-clear-btn.has-text:hover { color: #1a1a1a; border-color: rgba(0,0,0,0.3); background: rgba(0,0,0,0.04); }
+        .prompt-clear-btn.has-text:active { transform: scale(0.96); }
+        .prompt-clear-btn:disabled { cursor: not-allowed; opacity: 0.5; }
         .gen-btn {
-            margin-left: auto; height: 34px; padding: 0 22px;
+            margin-left: 0; height: 34px; padding: 0 22px;
             border-radius: 20px; border: none;
             font-size: 14px; font-weight: 500; font-family: inherit;
             cursor: pointer; background: #d8d8d8; color: rgba(255,255,255,0.75);
@@ -1310,6 +1341,19 @@
         .radio-group { display: flex; gap: var(--space-4); flex-wrap: wrap; }
         .radio-label { display: flex; align-items: center; gap: var(--space-2); cursor: pointer; font-size: var(--text-base); color: var(--text-lo); }
         .radio-label input { accent-color: var(--accent-solid); }
+        .visibility-radio-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+        .visibility-radio-label {
+            align-items: flex-start; gap: var(--space-2);
+            padding: var(--space-3); border: 1px solid var(--border);
+            border-radius: var(--r-lg); background: var(--bg-surface);
+            transition: border-color 0.16s, background 0.16s, box-shadow 0.16s;
+        }
+        .visibility-radio-label:hover { border-color: var(--accent-border); background: #fff; }
+        .visibility-radio-label:has(input:checked) { border-color: var(--accent-solid); background: var(--accent-bg); box-shadow: 0 0 0 1px var(--accent-border); }
+        .visibility-radio-label input { margin-top: 2px; flex-shrink: 0; }
+        .visibility-radio-main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .visibility-radio-title { color: var(--text-hi); font-weight: 600; line-height: 1.35; }
+        .visibility-radio-desc { color: var(--text-muted); font-size: var(--text-sm); line-height: 1.5; font-weight: 400; }
         .modal-footer {
             padding: var(--space-3) var(--space-4); border-top: 1px solid var(--border-1);
             display: flex; justify-content: flex-end; gap: var(--space-2);
@@ -1358,7 +1402,7 @@
     </div>
 
     <div class="input-box" id="inputBox">
-        <input type="file" id="uploadInput" accept="image/*" multiple onchange="onUpload(event)">
+        <input type="file" id="uploadInput" accept="image/*,video/*" multiple onchange="onUpload(event)">
         <input type="file" id="uploadFirst" accept="image/*" onchange="onUploadFrame(event,'frameFirst')">
         <input type="file" id="uploadLast"  accept="image/*" onchange="onUploadFrame(event,'frameLast')">
         <input type="file" id="chatMediaInput" accept="image/*,video/*" multiple onchange="onChatMedia(event)">
@@ -1391,9 +1435,9 @@
                     <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
                 </svg>
             </div>
-            <textarea class="prompt" id="prompt" rows="3"
-                placeholder="尝试描述您想要创建的图像"
-                oninput="onInput();autoGrowTextarea(this,108,5)"></textarea>
+            <textarea class="prompt cc-prompt-source" id="prompt" rows="3"
+                placeholder="尝试描述您想要创建的图像"></textarea>
+            <div class="prompt cc-prompt-editor" id="promptEditor" data-placeholder="尝试描述您想要创建的图像" aria-label="提示词输入框"></div>
         </div>
 
         <!-- 参考图缩略图 -->
@@ -1421,10 +1465,18 @@
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
                 </button>
             </div>
-            <button class="gen-btn" id="genBtn" onclick="doGenerate()">
-                <span id="genText"><span class="gen-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg></span><span>生成</span></span>
-                <div class="spin" id="genSpin"></div>
-            </button>
+            <div class="prompt-action-group">
+                <button class="prompt-clear-btn" id="promptClearBtn" type="button" title="清空提示词" aria-label="清空提示词" onclick="clearPrompt()" disabled>
+                    <svg t="1782095109764" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5136" aria-hidden="true">
+                        <path d="M405.312 736a32 32 0 0 1-32-32V448a32 32 0 0 1 64 0v256a32 32 0 0 1-32 32zM650.688 448a32 32 0 0 0-64 0v256a32 32 0 1 0 64 0V448z" fill="#333333" p-id="5137"></path>
+                        <path d="M514.816 53.312h-2.752c-21.504 0-39.808 0-55.04 1.408a116.672 116.672 0 0 0-45.568 12.352c-5.76 3.008-11.2 6.528-16.32 10.496a116.608 116.608 0 0 0-30.144 36.352c-7.552 13.248-15.168 29.888-24.128 49.536l-17.856 39.232H128a32 32 0 0 0 0 64h32V832A160 160 0 0 0 320 992h384a160 160 0 0 0 160-160V266.688h32a32 32 0 0 0 0-64h-190.912l-20.992-43.264c-9.152-18.944-16.896-35.008-24.576-47.744a116.608 116.608 0 0 0-30.208-35.072 117.376 117.376 0 0 0-16.064-10.112 116.608 116.608 0 0 0-44.736-11.84c-14.784-1.28-32.64-1.28-53.696-1.28zM800 266.688V832a96 96 0 0 1-96 96H320A96 96 0 0 1 224 832V266.688h576z m-166.016-64h-240.64l5.184-11.456c9.664-21.184 16.064-35.2 22.016-45.568a54.144 54.144 0 0 1 13.568-17.28 53.312 53.312 0 0 1 7.424-4.8 54.144 54.144 0 0 1 21.312-5.12c11.968-1.088 27.328-1.152 50.624-1.152 22.72 0 37.76 0 49.344 1.088 11.072 0.96 16.704 2.752 20.928 4.928 2.56 1.28 4.992 2.88 7.36 4.608 3.776 2.816 7.808 7.168 13.504 16.64 6.016 10.048 12.608 23.488 22.528 43.968l6.848 14.08z" fill="#333333" p-id="5138"></path>
+                    </svg>
+                </button>
+                <button class="gen-btn" id="genBtn" onclick="doGenerate()">
+                    <span id="genText"><span class="gen-btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15z"/></svg></span><span>生成</span></span>
+                    <div class="spin" id="genSpin"></div>
+                </button>
+            </div>
         </div>
     </div>
 
@@ -1608,10 +1660,20 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label required">可见性权限</label>
-                    <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="wfVisibility" value="private" checked> 仅自己可见</label>
-                        <label class="radio-label"><input type="radio" name="wfVisibility" value="team"> 团队公开</label>
+                    <label class="form-label required">可见范围</label>
+                    <div class="radio-group visibility-radio-group">
+                        <label class="radio-label visibility-radio-label"><input type="radio" name="wfVisibility" value="private" checked>
+                            <span class="visibility-radio-main">
+                                <span class="visibility-radio-title">仅自己可见</span>
+                                <span class="visibility-radio-desc">仅本人可查看、编辑、运行</span>
+                            </span>
+                        </label>
+                        <label class="radio-label visibility-radio-label"><input type="radio" name="wfVisibility" value="public">
+                            <span class="visibility-radio-main">
+                                <span class="visibility-radio-title">全部可见</span>
+                                <span class="visibility-radio-desc">成员可查看、复制、使用</span>
+                            </span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -1623,6 +1685,7 @@
         </div>
     </div>
 
+<script src="../共享样式/components.js"></script>
 <script>
 const createWfModal = document.getElementById('createWfModal');
 
@@ -1744,15 +1807,20 @@ function deleteUploadedCover() {
 
 function submitCreate() {
     const name = document.getElementById('wfName').value;
+    const visibility = document.querySelector('input[name="wfVisibility"]:checked')?.value || 'private';
     if (!name.trim()) {
         showToast('请输入工作流名称', 'error');
         return;
     }
+    const params = new URLSearchParams({
+        name: name.trim(),
+        visibility
+    });
     closeCreateModal();
     parent.postMessage({ 
         action: 'openTab', 
         title: name, 
-        url: 'AI 创作/工作流编辑器.html?name=' + encodeURIComponent(name) 
+        url: 'AI 创作/工作流编辑器.html?' + params.toString()
     }, '*');
 }
 
@@ -1938,6 +2006,50 @@ const OPTION_ICONS = {
     project: '<svg class="lucide lucide-folder" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" /></svg>'
 };
 const GENERATE_ICON = '<svg class="lucide lucide-send-horizontal" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.714 3.048a.498.498 0 0 0-.683.627l2.843 7.627a2 2 0 0 1 0 1.396l-2.842 7.627a.498.498 0 0 0 .682.627l18-8.5a.5.5 0 0 0 0-.904z" /><path d="M6 12h16" /></svg>';
+let promptInputApi = null;
+
+function initPromptMediaInput() {
+    if (promptInputApi || !window.CCPromptMediaInput) return promptInputApi;
+    promptInputApi = CCPromptMediaInput.init({
+        source: 'prompt',
+        editor: 'promptEditor',
+        getReferences: function() {
+            return CCPromptMediaInput.collectReferences(document.getElementById('refStrip'), '.ref-item');
+        },
+        onAddReference: function() {
+            const input = document.getElementById('uploadInput');
+            if (input) input.click();
+        },
+        onChange: function() { onInput(); }
+    });
+    return promptInputApi;
+}
+
+function getPromptText() {
+    return promptInputApi ? promptInputApi.getText() : (document.getElementById('prompt')?.value || '').trim();
+}
+
+function setPromptText(value) {
+    if (promptInputApi) promptInputApi.setText(value || '');
+    else {
+        const prompt = document.getElementById('prompt');
+        if (prompt) prompt.value = value || '';
+    }
+    onInput();
+}
+
+function focusPromptInput() {
+    if (promptInputApi) promptInputApi.focus();
+    else document.getElementById('prompt')?.focus();
+}
+
+function setPromptPlaceholder(value) {
+    if (promptInputApi) promptInputApi.setPlaceholder(value || '');
+    else {
+        const prompt = document.getElementById('prompt');
+        if (prompt) prompt.placeholder = value || '';
+    }
+}
 
 function getOptionIconKey(opt) {
     if (opt.type === 'ratio-res' || opt.type === 'ratio-dur' || opt.type === 'ratio') return 'ratio';
@@ -1977,9 +2089,23 @@ function renderTypeIcons() {
 }
 
 function onInput() {
-    const has = document.getElementById('prompt').value.trim().length > 0;
+    const has = getPromptText().length > 0;
     document.getElementById('genBtn').className = 'gen-btn' + (has ? ' has-text' : '');
+    const clearBtn = document.getElementById('promptClearBtn');
+    if (clearBtn) {
+        clearBtn.disabled = !has;
+        clearBtn.classList.toggle('has-text', has);
+    }
     syncToolboxFormatState();
+}
+
+function clearPrompt() {
+    if (!getPromptText()) {
+        focusPromptInput();
+        return;
+    }
+    setPromptText('');
+    focusPromptInput();
 }
 
 // ── 上传来源菜单 ──
@@ -2060,8 +2186,11 @@ function renderChatAttachStrip() {
     strip.style.display = 'flex';
     strip.innerHTML = chatAttachments.map(a => {
         if (a.type === 'media') {
+            const mediaHtml = a.isVideo
+                ? `<video src="${a.url}" muted playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;display:block"></video><div class="ref-video-mark">▶</div>`
+                : `<img src="${a.url}" style="width:100%;height:100%;object-fit:cover;display:block">`;
             return `<div class="ref-item" style="position:relative;width:60px;height:60px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid rgba(0,0,0,0.08);background:#f0f0f0">
-                <img src="${a.url}" style="width:100%;height:100%;object-fit:cover;display:block">
+                ${mediaHtml}
                 <div class="ref-del" style="display:none" onclick="removeChatAttach('${a.id}')">✕</div>
             </div>`;
         } else {
@@ -2074,74 +2203,105 @@ function renderChatAttachStrip() {
     }).join('');
 }
 
+let _promptRefId = 0;
+
+function refAttr(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+    });
+}
+
+function inferReferenceType(name, url, fallback) {
+    const text = [fallback || '', name || '', url || ''].join(' ');
+    return /video|\.((mp4)|(mov)|(webm)|(m4v))(\?|#|$|\s)/i.test(text) ? 'video' : 'image';
+}
+
+function normalizeReference(input) {
+    input = input || {};
+    const url = input.url || input.thumb || '';
+    const type = inferReferenceType(input.name, url, input.type || input.assetType);
+    return {
+        id: input.id || ('prompt-ref-' + (++_promptRefId)),
+        type,
+        url,
+        thumb: input.thumb || url,
+        name: input.name || input.fileName || input.filename || (type === 'video' ? '参考视频' : '参考图片')
+    };
+}
+
+function ensureRefAddButton() {
+    const strip = document.getElementById('refStrip');
+    if (document.getElementById('refAddBtn')) return;
+    document.getElementById('uploadBlock').style.display = 'none';
+    const addBtn = document.createElement('div');
+    addBtn.className = 'ref-add';
+    addBtn.id = 'refAddBtn';
+    addBtn.onclick = function(ev) { showUploadMenu(ev, this); };
+    addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>`;
+    strip.insertBefore(addBtn, strip.firstChild);
+    syncToolboxParseState();
+}
+
+function referenceMediaHtml(ref) {
+    const src = refAttr(ref.thumb || ref.url);
+    if (ref.type === 'video') {
+        return `<video src="${src}" muted playsinline preload="metadata"></video><div class="ref-video-mark">▶</div>`;
+    }
+    return `<img src="${src}" alt="${refAttr(ref.name)}" style="cursor:pointer" onclick="previewImage('${refAttr(ref.url)}')">`;
+}
+
+function appendReferenceItem(ref) {
+    ref = normalizeReference(ref);
+    if (curType === 'chat') {
+        const id = 'ca' + (++_chatAttachId);
+        chatAttachments.push({ id, type: 'media', url: ref.url, name: ref.name, isVideo: ref.type === 'video' });
+        renderChatAttachStrip();
+        return;
+    }
+    ensureRefAddButton();
+    const strip = document.getElementById('refStrip');
+    const item = document.createElement('div');
+    item.className = 'ref-item';
+    item.setAttribute('data-ref-id', ref.id);
+    item.setAttribute('data-ref-type', ref.type);
+    item.setAttribute('data-ref-url', ref.url);
+    item.setAttribute('data-ref-thumb', ref.thumb || ref.url);
+    item.setAttribute('data-ref-name', ref.name);
+    item.innerHTML = referenceMediaHtml(ref) + '<div class="ref-del" onclick="removeRef(this)">✕</div>';
+    strip.appendChild(item);
+    syncToolboxParseState();
+}
+
 function onUpload(e) {
     if (curType === 'chat') {
         Array.from(e.target.files).forEach(f => {
             const url = URL.createObjectURL(f);
             const id = 'ca' + (++_chatAttachId);
-            chatAttachments.push({ id, type: 'media', url, name: f.name, isVideo: false });
+            chatAttachments.push({ id, type: 'media', url, name: f.name, isVideo: f.type.startsWith('video/') });
         });
         e.target.value = '';
         renderChatAttachStrip();
         return;
     }
-
-    const strip = document.getElementById('refStrip');
-
-    // 第一次上传：隐藏左侧大按钮，在缩略图条最左侧插入小添加按钮
-    if (!document.getElementById('refAddBtn')) {
-        document.getElementById('uploadBlock').style.display = 'none';
-        const addBtn = document.createElement('div');
-        addBtn.className = 'ref-add';
-        addBtn.id = 'refAddBtn';
-        addBtn.onclick = function(ev) { showUploadMenu(ev, this); };
-        addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>`;
-        strip.insertBefore(addBtn, strip.firstChild);
-        syncToolboxParseState();
-    }
-
     Array.from(e.target.files).forEach(f => {
         const url = URL.createObjectURL(f);
-        const item = document.createElement('div');
-        item.className = 'ref-item';
-        item.innerHTML = `<img src="${url}" alt="" style="cursor:pointer" onclick="previewImage('${url}')"><div class="ref-del" onclick="removeRef(this)">✕</div>`;
-        strip.appendChild(item);
+        appendReferenceItem({ url, thumb: url, name: f.name, type: f.type.startsWith('video/') ? 'video' : 'image' });
     });
     e.target.value = '';
     syncToolboxParseState();
 }
 
-// 从素材库弹窗添加图片到参考图
-function addRefFromUrl(url) {
-    if (curType === 'chat') {
-        const id = 'ca' + (++_chatAttachId);
-        chatAttachments.push({ id, type: 'media', url, name: url.split('/').pop(), isVideo: false });
-        renderChatAttachStrip();
-        return;
-    }
+// 从素材库弹窗添加参考图片/视频
+function addRefFromUrl(url, name, type, thumb) {
+    appendReferenceItem({ url, thumb: thumb || url, name: name || String(url || '').split('/').pop(), type });
+}
 
-    const strip = document.getElementById('refStrip');
-    if (!document.getElementById('refAddBtn')) {
-        document.getElementById('uploadBlock').style.display = 'none';
-        const addBtn = document.createElement('div');
-        addBtn.className = 'ref-add';
-        addBtn.id = 'refAddBtn';
-        addBtn.onclick = function(ev) { showUploadMenu(ev, this); };
-        addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>`;
-        strip.insertBefore(addBtn, strip.firstChild);
-        syncToolboxParseState();
-    }
-    const item = document.createElement('div');
-    item.className = 'ref-item';
-    item.innerHTML = `<img src="${url}" alt="" style="cursor:pointer" onclick="previewImage('${url}')"><div class="ref-del" onclick="removeRef(this)">✕</div>`;
-    strip.appendChild(item);
-    syncToolboxParseState();
+function addRefFromAsset(asset) {
+    asset = asset || {};
+    addRefFromUrl(asset.url || asset.thumb, asset.name, asset.type || asset.assetType, asset.thumb || asset.url);
 }
 
 function removeRef(btn) {
@@ -2556,9 +2716,9 @@ function clearAllSelected() {
 
 function confirmAssetSelect() {
     const items = MOCK_ASSETS[assetCurrentCat] || [];
-    items.forEach(a => { if (assetSelected.has(a.id)) addRefFromUrl(a.thumb); });
-    MOCK_TASKS.forEach(t => t.thumbs.forEach(a => { if (assetSelected.has(a.id)) addRefFromUrl(a.thumb); }));
-    MOCK_PRODUCTS.forEach(p => p.materials.forEach(a => { if (assetSelected.has(a.id)) addRefFromUrl(a.thumb); }));
+    items.forEach(a => { if (assetSelected.has(a.id)) addRefFromAsset(a); });
+    MOCK_TASKS.forEach(t => t.thumbs.forEach(a => { if (assetSelected.has(a.id)) addRefFromAsset(a); }));
+    MOCK_PRODUCTS.forEach(p => p.materials.forEach(a => { if (assetSelected.has(a.id)) addRefFromAsset(a); }));
     closeAssetModal();
 }
 
@@ -2643,7 +2803,6 @@ let _toolboxBusy = false;
 
 function doParseWithLoading() {
     const item = document.getElementById('toolboxParseItem');
-    const ta = document.getElementById('prompt');
     if (!item) return;
     if (_toolboxBusy) { showToast('请等待生成完成后尝试', 'ghost'); return; }
 
@@ -2660,7 +2819,7 @@ function doParseWithLoading() {
         }, 3000);
     };
 
-    if (ta && ta.value.trim()) {
+    if (getPromptText()) {
         openConfirmModal({
             title: '提示',
             description: '解析后将替换已输入的提示词，请确认。',
@@ -2711,9 +2870,8 @@ function syncToolboxParseState() {
 
 function syncToolboxFormatState() {
     const item = document.getElementById('toolboxFormatItem');
-    const ta = document.getElementById('prompt');
-    if (!item || !ta) return;
-    const hasText = ta.value.trim().length > 0;
+    if (!item) return;
+    const hasText = getPromptText().length > 0;
     if (hasText) item.classList.remove('disabled');
     else item.classList.add('disabled');
 }
@@ -2721,10 +2879,9 @@ function syncToolboxFormatState() {
 function onToolboxFormat() {
     pinToolboxPanel();
     const item = document.getElementById('toolboxFormatItem');
-    const ta = document.getElementById('prompt');
-    if (!item || !ta || item.classList.contains('disabled') || item.dataset.loading === '1') return;
+    if (!item || item.classList.contains('disabled') || item.dataset.loading === '1') return;
     if (_toolboxBusy) { showToast('请等待生成完成后尝试', 'ghost'); return; }
-    const value = ta.value.trim();
+    const value = getPromptText();
     if (!value) return;
 
     const origHTML = item.innerHTML;
@@ -2734,7 +2891,7 @@ function onToolboxFormat() {
     item.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:rot 0.6s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> 提示词格式化';
 
     setTimeout(function() {
-        ta.value = [
+        setPromptText([
             '主体：' + value,
             '场景：补充明确的环境与空间信息',
             '构图：补充景别、视角与主体位置',
@@ -2742,12 +2899,11 @@ function onToolboxFormat() {
             '光线：补充光源方向、明暗关系与氛围',
             '细节：补充材质、动作、表情与重点元素',
             '输出要求：高清、主体清晰、细节丰富'
-        ].join('\n');
+        ].join('\n'));
         _toolboxBusy = false;
         item.dataset.loading = '0';
         item.style.pointerEvents = '';
         item.innerHTML = origHTML;
-        onInput();
     }, 3000);
 }
 
@@ -3544,6 +3700,7 @@ const HIDDEN_SQUARE_FAVORITES = new Set();
             author: '张三',
             date: '2025-02-12',
             type: WF_LABELS[type],
+            visibility: i > 5 && i <= 20 ? 'private' : 'public',
             isPinned: i <= 5,
             isMine: i > 5 && i <= 20
         });
@@ -3556,6 +3713,10 @@ function getWorkflowById(id) {
         if (found) return found;
     }
     return null;
+}
+
+function getWorkflowVisibilityLabel(w) {
+    return w && (w.visibility === 'private' || w.isMine) ? '仅自己可见' : '全部可见';
 }
 
 function renderWorkflows() {
@@ -3602,7 +3763,7 @@ function renderWorkflows() {
                 </div>
                 <div class="wf-desc-text">${w.desc}</div>
                 <div class="wf-card-footer">
-                    <span class="wf-meta">${w.date || '刚刚'}</span>
+                    <span class="wf-meta">${w.date || '刚刚'} · ${getWorkflowVisibilityLabel(w)}</span>
                 </div>
                 <div class="wf-menu">${menuHtml}</div>
             </div>
@@ -3684,6 +3845,7 @@ function getSquareFavoriteWorkflows(type) {
                 sourceName: item.sourceName || '工作流广场',
                 uses: item.uses || 0,
                 favorites: item.favorites || 0,
+                visibility: item.visibility || 'public',
                 isSquareFavorite: true,
                 isPinned: true,
                 isMine: false
@@ -3788,7 +3950,7 @@ function switchType(btn) {
 
     // placeholder
     const ph = { chat: '尝试描述你想要的文案内容，或上传图片让 AI 识图写文', image: '尝试描述您想要创建的图像', video: '尝试描述您想要创建的视频' };
-    document.getElementById('prompt').placeholder = ph[curType] || '';
+    setPromptPlaceholder(ph[curType] || '');
 
     // dynamic workflow title
     const wfTitles = { chat: '文案工作流', image: '图像工作流', video: '视频工作流' };
@@ -3807,12 +3969,12 @@ function useWorkflow(type) {
     }
     const btn = document.querySelector(`.type-btn[data-type="${type}"]`);
     if (btn) switchType(btn);
-    document.getElementById('prompt').focus();
+    focusPromptInput();
 }
 
 function doGenerate() {
-    const txt = document.getElementById('prompt').value.trim();
-    if (!txt) { document.getElementById('prompt').focus(); return; }
+    const txt = getPromptText();
+    if (!txt) { focusPromptInput(); return; }
     if (document.getElementById('genBtn').classList.contains('loading')) return;
     localStorage.setItem('pendingGen', JSON.stringify({
         type: curType,
@@ -3860,10 +4022,12 @@ function hideNotif() {
 document.addEventListener('click', closeAll);
 
 updateSize(sel.image.ratio, sel.image.res);
+initPromptMediaInput();
 renderTypeIcons();
 renderOpts();
 setGenerateButtonLabel();
 renderWorkflows();
+onInput();
 syncToolboxParseState();
 syncToolboxFormatState();
 </script>

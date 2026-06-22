@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="../共享样式/components.css">
   <link rel="stylesheet" href="../共享样式/project-picker.css">
   <link rel="stylesheet" href="../共享样式/image-preview.css">
+  <link rel="stylesheet" href="../共享样式/asset-intake-modal.css">
   <link rel="stylesheet" href="../共享样式/confirm-modal.css">
   <style>
     :root {
@@ -255,7 +256,8 @@
     /* 卡片参考图 */
     .card-ref-thumbs { display: flex; gap: var(--space-1); flex-shrink: 0; margin-right: var(--space-1); }
     .card-ref-thumb { width: 28px; height: 28px; border-radius: var(--r-sm); overflow: hidden; cursor: pointer; border: 1px solid var(--border-1); flex-shrink: 0; }
-    .card-ref-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-ref-thumb img, .card-ref-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-ref-thumb { position: relative; }
 
     /* 自定义 Tag */
     .c-tag { display: inline-flex; align-items: center; padding: 2px var(--space-2); border-radius: var(--r-sm); font-size: var(--text-xs); font-weight: 500; line-height: 18px; white-space: nowrap; }
@@ -285,6 +287,14 @@
     .output-row.collapsed .o-thumb { flex: 0 0 52px; width: 52px; height: 52px; }
     .o-thumb { border-radius: var(--r-md); overflow: hidden; position: relative; cursor: pointer; background: var(--bg-subtle); }
     .o-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .o-thumb > .thumb-overlay { z-index: 5; align-items: center; justify-content: flex-end; }
+    .media-info-layer { position: absolute; left: 0; right: 0; z-index: 3; pointer-events: none; display: flex; min-width: 0; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.45); font: 600 var(--text-xs)/1.2 var(--font); }
+    .media-info-attr { top: 0; padding: 6px 7px 16px; background: linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0)); }
+    .media-info-file { bottom: 0; padding: 16px 7px 6px; background: linear-gradient(0deg, rgba(0,0,0,0.64), rgba(0,0,0,0)); }
+    .media-info-text { min-width: 0; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .output-row.collapsed .media-info-layer { font-size: 9px; line-height: 1.1; font-weight: 600; }
+    .output-row.collapsed .media-info-attr { padding: 4px 4px 12px; }
+    .output-row.collapsed .media-info-file { padding: 12px 4px 4px; }
 
     /* 文案任务输出 */
     .copy-output-list { flex-direction: column; align-items: stretch; gap: var(--space-2); padding: var(--space-2); background: var(--bg-subtle); border: 1px solid var(--border-1); border-radius: var(--r-lg); }
@@ -353,6 +363,8 @@
     .card-bottom-count { color: var(--text-lo); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
     .card-act-btn { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); position: relative; }
     .card-act-btn:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
+    .card-act-btn.card-act-error { border-color: rgba(229,72,77,0.24); background: rgba(229,72,77,0.04); color: var(--error); }
+    .card-act-btn.card-act-error:hover { border-color: rgba(229,72,77,0.56); background: rgba(229,72,77,0.08); color: var(--error); }
     .card-act-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
     .card-act-more { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); }
     .card-act-more:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
@@ -404,7 +416,7 @@
 
     /* ═══ 底部输入框 ═══ */
     .input-box-wrapper { z-index: 100; padding: var(--space-3) var(--space-5) var(--space-4); background: linear-gradient(to top, var(--bg-page) 60%, transparent); }
-    .input-box { background: var(--bg-surface); border-radius: 14px; border: 1px solid var(--border-1); box-shadow: 0 -2px 12px rgba(0,0,0,0.03); transition: all .3s ease; max-width: 900px; margin: 0 auto; }
+    .input-box { background: var(--bg-surface); border-radius: 14px; border: 1px solid var(--border-1); box-shadow: 0 -2px 12px rgba(0,0,0,0.03); transition: all .3s ease; max-width: 900px; margin: 0 auto; --cc-prompt-min-height: 80px; --cc-prompt-max-height: 190px; }
     .input-collapsed { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); cursor: pointer; min-height: 44px; }
     .input-plus-icon { width: 28px; height: 28px; border-radius: var(--r-lg); border: 1.5px dashed var(--border-2); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg); color: var(--text-muted); flex-shrink: 0; }
     .input-placeholder { flex: 1; color: var(--text-ghost); font-size: var(--text-base); }
@@ -418,9 +430,11 @@
     .upload-block:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
     .input-textarea { flex: 1; border: none; outline: none; resize: none; font-size: var(--text-base); line-height: 1.6; color: var(--text-hi); font-family: inherit; min-height: 80px; }
     .input-textarea::placeholder { color: var(--text-ghost); }
+    .cc-prompt-editor.input-textarea { padding: 0; }
     .input-ref-strip { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-2); }
     .input-ref-item { width: 60px; height: 60px; border-radius: var(--r-md); overflow: hidden; position: relative; border: 1px solid var(--border-1); }
-    .input-ref-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .input-ref-item img, .input-ref-item video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .input-ref-video-mark { position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%, -50%); border-radius: var(--r-full); background: rgba(0,0,0,0.48); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 10px; pointer-events: none; }
     .input-ref-del { position: absolute; top: 2px; right: 2px; width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,0.5); color: #fff; font-size: 10px; display: none; align-items: center; justify-content: center; cursor: pointer; line-height: 1; }
     .input-ref-item:hover .input-ref-del { display: flex; }
     .input-ref-add { width: 60px; height: 60px; border-radius: var(--r-md); border: 1.5px dashed var(--border-2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-muted); }
@@ -711,6 +725,10 @@
     .review-grid-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,0.10); border-color: var(--primary-4); }
     .review-grid-card.selected { border-color: var(--primary-6); box-shadow: 0 0 0 3px rgba(74,158,255,0.12), 0 8px 20px rgba(15,23,42,0.10); }
     .review-grid-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .review-media-frame { width: 100%; height: 100%; position: relative; overflow: hidden; background: var(--bg-subtle); }
+    .review-media-frame img, .review-media-frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .review-video-play { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; transform: translate(-50%, -50%); border-radius: var(--r-full); background: rgba(255,255,255,0.88); color: var(--text-hi); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.18); pointer-events: none; z-index: 2; }
+    .review-video-play svg { margin-left: 2px; }
     .review-card-check { position: absolute; top: 8px; left: 8px; width: 22px; height: 22px; border-radius: 50%; background: rgba(255,255,255,0.96); border: 1px solid var(--border-2); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); opacity: 0; transition: all var(--ease); }
     .review-grid-card.is-selectable:hover .review-card-check, .review-grid-card.selected .review-card-check { opacity: 1; }
     .review-grid-card.selected .review-card-check { background: var(--primary-6); border-color: var(--primary-6); }
@@ -845,6 +863,7 @@
 
 <script src="../共享样式/components.js"></script>
 <script src="../共享样式/image-preview.js"></script>
+<script src="../共享样式/asset-intake-modal.js"></script>
 <script src="../共享样式/confirm-modal.js"></script>
 
 <div class="toast" id="toast">
@@ -975,14 +994,14 @@
     <div class="detail-modal-body" id="detailModalBody"></div>
     <div class="detail-modal-footer">
       <button onclick="showToast('已全部下载')">全部下载</button>
-      <button onclick="showToast('已批量入库')">批量入库</button>
+      <button onclick="archiveCurrentDetailItems()">批量入库</button>
       <button onclick="showToast('再生成功能开发中')">再次生成</button>
       <button class="dm-primary" onclick="closeDetailModal()">关闭</button>
     </div>
   </div>
 </div>
 
-<input type="file" id="uploadFileInput" accept="image/*" multiple onchange="onFileUpload(event)">
+<input type="file" id="uploadFileInput" accept="image/*,video/*" multiple onchange="onFileUpload(event)">
 
 <script>
 // ═══ 常量 ═══
@@ -1442,8 +1461,109 @@ function getTaskCardViewModel(task, modelId) {
 // ═══ 辅助函数 ═══
 function getTaskById(id) { return state.tasks.find(t => t.id === id); }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escJs(s) { return String(s == null ? '' : s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\n/g,'\\n').replace(/\r/g,''); }
 function icon(path, size) { size = size||14; return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+path+'</svg>'; }
 function imageIcon(src, size, alt) { size = size||14; return '<img src="'+src+'" alt="'+(alt||'')+'" width="'+size+'" height="'+size+'">'; }
+
+function compactMediaValue(value) {
+  if (!value) return '';
+  if (Array.isArray(value)) return value.filter(Boolean).join(' · ');
+  if (typeof value === 'object') {
+    return Object.keys(value).map(function(key) { return value[key]; }).filter(Boolean).join(' · ');
+  }
+  return String(value);
+}
+
+function mediaKind(item, fallback) {
+  item = item || {};
+  var type = item.type || item.assetType || fallback || '';
+  var url = item.url || item.thumb || '';
+  if (type === 'video' || /\.(mp4|mov|webm)(\?|$)/i.test(url)) return 'video';
+  return 'image';
+}
+
+function renderReferenceThumb(ref, className, inlineStyle) {
+  ref = ref || {};
+  var type = mediaKind(ref, 'image');
+  var url = ref.url || ref.thumb || '';
+  var thumb = ref.thumb || url;
+  var safeUrl = escHtml(url);
+  var safeThumb = escHtml(thumb);
+  var style = inlineStyle ? ' style="' + escHtml(inlineStyle) + '"' : '';
+  var previewAction = type === 'video'
+    ? "window.__previewMedia ? window.__previewMedia({type:'video',url:'" + escJs(url) + "'}) : window.__previewImage('" + escJs(thumb) + "')"
+    : "window.__previewImage('" + escJs(url) + "')";
+  var media = type === 'video'
+    ? '<video src="' + safeThumb + '" muted playsinline preload="metadata"></video><div class="input-ref-video-mark">▶</div>'
+    : '<img src="' + safeThumb + '" alt="">';
+  return '<div class="' + (className || 'card-ref-thumb') + '" data-preview-url="' + safeUrl + '" data-preview-type="' + type + '" onclick="' + previewAction + '"' + style + '>' + media + '</div>';
+}
+
+function getMediaUrlSizeText(item) {
+  var url = item && (item.url || item.thumb) ? String(item.url || item.thumb) : '';
+  if (!url) return '';
+  try {
+    var parsed = new URL(url, window.location.href);
+    var w = parsed.searchParams.get('w');
+    var h = parsed.searchParams.get('h');
+    if (w && h) return w + '×' + h;
+  } catch (e) {}
+  var pathMatch = url.match(/\/(\d{2,5})\/(\d{2,5})(?:[/?#]|$)/);
+  return pathMatch ? (pathMatch[1] + '×' + pathMatch[2]) : '';
+}
+
+function uniqueMediaParts(parts) {
+  var seen = {};
+  return parts.map(function(part) { return compactMediaValue(part).trim(); })
+    .filter(function(part) {
+      if (!part || seen[part]) return false;
+      seen[part] = true;
+      return true;
+    });
+}
+
+function getMediaAttributeText(item, task, displayMeta, type) {
+  item = item || {};
+  type = mediaKind(item, type);
+  var parts = [];
+  parts.push(item.attributes || item.attrs || item.attribute || item.metaLabel || item.metaText || item.spec);
+  if (item.width && item.height) parts.push(item.width + '×' + item.height);
+  parts.push(getMediaUrlSizeText(item));
+  parts.push(item.ratio || item.aspectRatio);
+  if (type === 'video') parts.push(item.duration || item.dur);
+  else parts.push(item.res || item.resolution || item.quality);
+  if (displayMeta && displayMeta.metaItems) parts = parts.concat(displayMeta.metaItems);
+  parts = uniqueMediaParts(parts);
+  if (!parts.length && task && task.input) {
+    parts = uniqueMediaParts([task.input.ratio, type === 'video' ? task.input.dur : task.input.res]);
+  }
+  if (!parts.length) parts.push(type === 'video' ? '视频' : '图片');
+  return parts.join(' · ');
+}
+
+function ensureMediaFileExt(name, type) {
+  name = String(name || '').trim();
+  if (!name) return '';
+  if (/\.[a-z0-9]{2,5}$/i.test(name)) return name;
+  return name + (type === 'video' ? '.mp4' : '.png');
+}
+
+function getMediaFileName(item, index, type, task) {
+  item = item || {};
+  type = mediaKind(item, type);
+  var raw = item.fileName || item.filename || item.originalName || item.name || item.title || item.itemId || item.id;
+  if (!raw && task && task.name) raw = task.name + '_' + String((index || 0) + 1).padStart(2, '0');
+  if (!raw) raw = (type === 'video' ? '视频' : '图片') + '_' + String((index || 0) + 1).padStart(2, '0');
+  return ensureMediaFileExt(raw, type);
+}
+
+function mediaInfoOverlayHtml(item, index, type, task, displayMeta) {
+  var mediaType = mediaKind(item, type);
+  var attrText = getMediaAttributeText(item, task, displayMeta, mediaType);
+  var fileName = getMediaFileName(item, index, mediaType, task);
+  return '<div class="media-info-layer media-info-attr"><span class="media-info-text">' + escHtml(attrText) + '</span></div>'
+    + '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + escHtml(fileName) + '">' + escHtml(fileName) + '</span></div>';
+}
 
 const SVG = {
   eye:      '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
@@ -2107,9 +2227,7 @@ function renderTaskCard(task) {
   if (task.input.refImages && task.input.refImages.length > 0) {
     refThumbs = '<div class="card-ref-thumbs">'
       + task.input.refImages.slice(0,3).map(function(ref){
-          var url = escHtml(ref.url||ref.thumb);
-          return '<div class="card-ref-thumb" data-preview-url="'+url+'" style="cursor:pointer" onclick="window.__previewImage(\''+url+'\')">'
-            +'<img src="'+escHtml(ref.thumb||ref.url)+'" alt=""></div>';
+          return renderReferenceThumb(ref, 'card-ref-thumb');
         }).join('')
       +'</div>';
   }
@@ -2512,6 +2630,18 @@ function focusPendingReview() {
   }, 50);
 }
 
+function renderReviewGridMedia(item, index, task) {
+  var type = mediaKind(item, 'image');
+  var previewUrl = escHtml(item.thumb || item.url || '');
+  var mediaUrl = escHtml(item.url || item.thumb || '');
+  var activeModel = task && task.input && task.input.models ? task.input.models[0] : '';
+  var displayMeta = task && task.input ? getTaskDisplayMeta(task, activeModel, type) : null;
+  var mediaHtml = type === 'video'
+    ? '<video src="' + mediaUrl + '" poster="' + previewUrl + '" muted playsinline preload="metadata"></video><div class="review-video-play"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21"/></svg></div>'
+    : '<img src="' + mediaUrl + '" alt="" loading="lazy">';
+  return '<div class="review-media-frame">' + mediaHtml + mediaInfoOverlayHtml(item, index, type, task, displayMeta) + '</div>';
+}
+
 
 
 
@@ -2738,14 +2868,14 @@ function renderReviewPage() {
       let actionOverlay = '';
       {
         let opacityState = (it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1';
-        actionOverlay = '<div class="action-overlay-hover" style="position:absolute; bottom: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; opacity:' + opacityState + '; transition: opacity 0.2s ease;">'
+        actionOverlay = '<div class="action-overlay-hover" style="position:absolute; bottom: 42px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; opacity:' + opacityState + '; transition: opacity 0.2s ease; z-index: 6;">'
           + (it.reviewStatus !== 'approved' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--primary-6); border: 1px solid var(--primary-6); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'approved\')">通过</button>' : '')
           + (it.reviewStatus !== 'rejected' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--error); border: 1px solid var(--error); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(229,72,77,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'rejected\')">拒绝</button>' : '')
           + '</div>';
       }
 
       return '<div class="review-grid-card' + (isSelected ? ' selected' : '') + '" data-item-id="' + escHtml(it.itemId) + '" onmouseover="var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'1\';" onmouseout="var overlay=this.querySelector(\'.action-overlay-hover\');if(overlay)overlay.style.opacity=\'' + ((it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1') + '\';" onclick="openReviewPreview(\'' + task.id + '\', \'' + it.itemId + '\')">'
-        + '<div style="width:100%;padding-bottom:100%;position:relative;"><img src="' + escHtml(it.url) + '" alt="" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover; border-radius: var(--r-xl);">' + actionOverlay + '</div>'
+        + '<div style="width:100%;height:100%;position:relative;">' + renderReviewGridMedia(it, idx, task) + actionOverlay + '</div>'
         + statusBadge
         + '</div>';
     }).join('') + '</div>';
@@ -3017,7 +3147,7 @@ function renderOutputRow(task, output, collapsed, vm) {
   var totalForViewAll = Math.max(vm && vm.producedCount ? vm.producedCount : 0, output.total || 0, output.items.length);
   var remaining = Math.max(totalForViewAll - showItems.length, 0);
   var thumbs = showItems.map(function(item, i){
-    return resultType === 'video' || item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
+    return resultType === 'video' || item.type === 'video' ? renderVideoThumb(item, collapsed, task, i, vm && vm.displayMeta) : renderImageThumb(item, i, task, vm && vm.displayMeta);
   }).join('');
   var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
   return '<div class="output-row '+(collapsed?'collapsed':'expanded')+'">'+thumbs+viewAll+'</div>';
@@ -3128,7 +3258,7 @@ function renderGeneratingOutputRow(task, output, collapsed, vm) {
   var showLimit = Math.max(baseSlots - 1, 0);
   var showItems = output.items.slice(0, showLimit);
   var thumbs = showItems.map(function(item, i){
-    return item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
+    return item.type === 'video' ? renderVideoThumb(item, collapsed, task, i, vm && vm.displayMeta) : renderImageThumb(item, i, task, vm && vm.displayMeta);
   }).join('');
   var loadingCount = Math.max(baseSlots - showItems.length, 1);
   var loadingHtml = '';
@@ -3145,7 +3275,7 @@ function renderPartialFailedOutputRow(task, output, collapsed, vm) {
   var baseSlots = Math.max(MAX - 1, 0);
   var showItems = output.items.slice(0, baseSlots);
   var thumbs = showItems.map(function(item, i){
-    return item.type === 'video' ? renderVideoThumb(item, collapsed) : renderImageThumb(item, i);
+    return item.type === 'video' ? renderVideoThumb(item, collapsed, task, i, vm && vm.displayMeta) : renderImageThumb(item, i, task, vm && vm.displayMeta);
   }).join('');
   var remaining = Math.max((task.failedCount || 0), 0);
   var viewAll = remaining > 0 ? renderViewAllCard(task, remaining, vm) : '';
@@ -3226,28 +3356,61 @@ function renderViewAllCard(task, remaining, vm) {
 }
 
 
-function renderVideoThumb(item, collapsed) {
+function renderVideoThumb(item, collapsed, task, index, displayMeta) {
   var g = VIDEO_GRADIENTS[(item.gradientIdx||0) % 5];
   var dur = item.duration || '5s';
   var ps = collapsed ? 10 : 14;
-  var url = escHtml(item.thumb||item.url);
-  return '<div class="o-thumb" data-preview-url="'+url+'" data-preview-type="video" data-preview-duration="'+escHtml(dur)+'" style="cursor:pointer" onclick="event.stopPropagation();window.__previewMedia({type:\'video\',url:\''+url+'\',duration:\''+escHtml(dur)+'\'})">'
+  var fullUrl = escHtml(item.url||item.thumb);
+  return '<div class="o-thumb" data-preview-url="'+fullUrl+'" data-preview-type="video" data-preview-duration="'+escHtml(dur)+'" style="cursor:pointer" onclick="event.stopPropagation();window.__previewMedia({type:\'video\',url:\''+fullUrl+'\',duration:\''+escHtml(dur)+'\'})">'
     +'<div class="vid-thumb-inner" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'
     +'<div class="vid-play"><svg width="'+ps+'" height="'+ps+'" viewBox="0 0 24 24" fill="#333"><polygon points="6 3 20 12 6 21"/></svg></div>'
-    +'<span class="vid-dur">'+dur+'</span></div>'
-    +thumbOverlayHtml(url)
+    +'</div>'
+    +mediaInfoOverlayHtml(item, index || 0, 'video', task, displayMeta)
+    +thumbOverlayHtml(fullUrl)
     +'</div>';
 }
 
-function renderImageThumb(item, index) {
+function renderImageThumb(item, index, task, displayMeta) {
   var thumbUrl = escHtml(item.thumb||item.url);
   var fullUrl = escHtml(item.url||item.thumb);
   var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
   var dlFn = 'event.stopPropagation();(function(u,i){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(i+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+fullUrl+'\','+index+')';
   return '<div class="o-thumb" data-preview-url="'+fullUrl+'" style="cursor:pointer">'
     +'<img src="'+thumbUrl+'" alt="" loading="lazy">'
+    +mediaInfoOverlayHtml(item, index, 'image', task, displayMeta)
     +thumbOverlayHtml(fullUrl, dlFn)
     +'</div>';
+}
+
+function buildArchiveItem(item, index, fallbackType) {
+  if (!item) return null;
+  var type = item.type || item.assetType || fallbackType || inferResultTypeFromItem(item) || 'image';
+  if (type === 'text') return null;
+  var url = item.url || item.thumb || '';
+  var name = item.name || item.fileName || item.filename || item.itemId || ((type === 'video' ? '视频素材-' : '图片素材-') + (index + 1));
+  return {
+    id: item.itemId || item.id || ('task-asset-' + index),
+    type: type,
+    url: url,
+    thumb: item.thumb || url,
+    name: name,
+    meta: item.duration || ''
+  };
+}
+
+function openArchiveForTaskItems(items, fallbackType) {
+  var archiveItems = (items || []).map(function(item, index) {
+    return buildArchiveItem(item, index, fallbackType);
+  }).filter(Boolean);
+  if (!archiveItems.length) {
+    showToast('暂无可入库素材');
+    return;
+  }
+  if (typeof openAssetArchiveModal === 'function') {
+    openAssetArchiveModal({ items: archiveItems });
+  } else {
+    showToast('入库功能加载中');
+  }
 }
 
 function renderCardActions(task, vm) {
@@ -3277,7 +3440,7 @@ function renderCardActions(task, vm) {
     }
     if (s === 'completed') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
+        +'<button class="card-act-btn card-act-error" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 错误详情</button>'
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
@@ -3285,7 +3448,7 @@ function renderCardActions(task, vm) {
     }
     if (s === 'failed' || task.status === 'failed') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 查看详情</button>'
+        +'<button class="card-act-btn card-act-error" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 错误详情</button>'
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'</div>';
@@ -3339,7 +3502,7 @@ function switchCardModel(taskId, modelId) {
 
 function handleReEditById(id) { var t=getTaskById(id); if(t) window.__handleReEdit(t); }
 function handleRetryById(id) { var t=getTaskById(id); if(t) window.__handleRetry(t); }
-function usePrompt(id) { var t=getTaskById(id); if(!t) return; var el=document.getElementById('inputPrompt'); if(el){ el.value=t.input.prompt; el.focus(); } }
+function usePrompt(id) { var t=getTaskById(id); if(!t) return; setInputPromptText(t.input.prompt || ''); focusInputPrompt(); }
 function handleStopById(id) { var t=getTaskById(id); if(t) window.__handleStop(t); }
 function toggleNoticeCard(kind) {
   state.noticeExpanded[kind] = !state.noticeExpanded[kind];
@@ -3385,6 +3548,25 @@ function closeDetailModal() {
 function switchDetailModel(modelId) { state.detailActiveModel = modelId; state.detailPage = 1; renderDetailModalBody(); }
 function setDetailPage(page) { state.detailPage = page; renderDetailModalBody(); }
 
+function getCurrentDetailOutputItems() {
+  var task = state.detailTask;
+  if (!task) return { items: [], resultType: 'image' };
+  var activeModel = state.detailActiveModel || (task.input && task.input.models && task.input.models[0]);
+  var vm = getTaskCardViewModel(task, activeModel);
+  return { items: (vm.output && vm.output.items) || [], resultType: vm.resultType || 'image' };
+}
+
+function archiveCurrentDetailItems() {
+  var detail = getCurrentDetailOutputItems();
+  openArchiveForTaskItems(detail.items, detail.resultType);
+}
+
+function archiveCurrentDetailItem(index) {
+  var detail = getCurrentDetailOutputItems();
+  var item = detail.items[index];
+  openArchiveForTaskItems(item ? [item] : [], detail.resultType);
+}
+
 function renderDetailModalBody() {
   var task = state.detailTask; if (!task) return;
   var page = state.detailPage, activeModel = state.detailActiveModel;
@@ -3403,7 +3585,7 @@ function renderDetailModalBody() {
     }).join('')+'</div>' : '';
 
   var refImgsHtml = (task.input.refImages && task.input.refImages.length > 0)
-    ? '<div style="display:flex;gap:6px;margin-top:8px">'+task.input.refImages.map(function(r){ return '<img src="'+escHtml(r.thumb)+'" style="width:60px;height:60px;border-radius:6px;object-fit:cover;border:1px solid #e8e8e8" alt="">'; }).join('')+'</div>' : '';
+    ? '<div style="display:flex;gap:6px;margin-top:8px">'+task.input.refImages.map(function(r){ return renderReferenceThumb(r, 'input-ref-item', 'width:60px;height:60px;border-radius:6px;object-fit:cover;border:1px solid #e8e8e8'); }).join('')+'</div>' : '';
 
   var thumbGridHtml = pageItems.map(function(item, i) {
     if (item.type === 'video') {
@@ -3412,7 +3594,7 @@ function renderDetailModalBody() {
     var url = escHtml(item.url||item.thumb);
     var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
     var dlFn = 'event.stopPropagation();(function(u,n){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(n+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+url+'\','+i+')';
-    return '<div class="detail-thumb-wrap" onclick="window.__previewImage(\''+url+'\')"><img src="'+url+'" alt="" loading="lazy"><div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:4px"><button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button><button class="thumb-act" title="入库" onclick="event.stopPropagation();showToast(\'已入库\')">'+icon(SVG.store)+'</button></div></div>';
+    return '<div class="detail-thumb-wrap" onclick="window.__previewImage(\''+url+'\')"><img src="'+url+'" alt="" loading="lazy"><div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:4px"><button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button><button class="thumb-act" title="入库" onclick="event.stopPropagation();archiveCurrentDetailItem('+(((page-1)*DM_PAGE_SIZE)+i)+')">'+icon(SVG.store)+'</button></div></div>';
   }).join('');
 
   var paginationHtml = '';
@@ -3642,6 +3824,51 @@ function getTaskDisplayMeta(task, modelId, resultTypeOverride) {
   };
 }
 
+let inputPromptApi = null;
+
+function initInputPromptMediaInput() {
+  if (inputPromptApi || !window.CCPromptMediaInput) return inputPromptApi;
+  inputPromptApi = CCPromptMediaInput.init({
+    source: 'inputPrompt',
+    editor: 'inputPromptEditor',
+    getReferences: function() {
+      return CCPromptMediaInput.collectReferences(document.getElementById('inputRefStrip'), '.input-ref-item');
+    },
+    onAddReference: function() {
+      const input = document.getElementById('uploadFileInput');
+      if (input) input.click();
+    },
+    onChange: function() { onInputChange(); }
+  });
+  return inputPromptApi;
+}
+
+function getInputPromptText() {
+  return inputPromptApi ? inputPromptApi.getText() : (document.getElementById('inputPrompt')?.value || '').trim();
+}
+
+function setInputPromptText(value) {
+  if (inputPromptApi) inputPromptApi.setText(value || '');
+  else {
+    const prompt = document.getElementById('inputPrompt');
+    if (prompt) prompt.value = value || '';
+  }
+  onInputChange();
+}
+
+function focusInputPrompt() {
+  if (inputPromptApi) inputPromptApi.focus();
+  else document.getElementById('inputPrompt')?.focus();
+}
+
+function setInputPromptPlaceholder(value) {
+  if (inputPromptApi) inputPromptApi.setPlaceholder(value || '');
+  else {
+    const prompt = document.getElementById('inputPrompt');
+    if (prompt) prompt.placeholder = value || '';
+  }
+}
+
 (function initInputBox() {
   const root = document.getElementById('input-box-root');
   if (state.pageMode === 'review') {
@@ -3667,9 +3894,9 @@ function getTaskDisplayMeta(task, modelId, resultTypeOverride) {
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
           </div>
-          <textarea class="input-textarea" id="inputPrompt" rows="3"
-            placeholder="描述您想要生成的内容..."
-            oninput="onInputChange();autoGrowTextarea(this,80,5)"></textarea>
+          <textarea class="input-textarea cc-prompt-source" id="inputPrompt" rows="3"
+            placeholder="描述您想要生成的内容..."></textarea>
+          <div class="input-textarea cc-prompt-editor" id="inputPromptEditor" data-placeholder="描述您想要生成的内容..." aria-label="提示词输入框"></div>
         </div>
         <div class="input-ref-strip" id="inputRefStrip"></div>
         <div class="input-toolbar" id="inputToolbar">
@@ -3683,9 +3910,10 @@ function getTaskDisplayMeta(task, modelId, resultTypeOverride) {
     </div>
   </div>`;
   setTimeout(function(){
+    initInputPromptMediaInput();
     renderGenerateButtonLabel();
     if (typeof renderInputOpts === 'function') renderInputOpts();
-    autoGrowTextarea(document.getElementById('inputPrompt'), 80, 5);
+    onInputChange();
   }, 0);
 })();
 
@@ -3701,7 +3929,7 @@ function autoGrowTextarea(textarea, defaultH, extraRows) {
 
 function expandInputBox() {
   document.getElementById('inputBox').classList.add('expanded');
-  setTimeout(()=>document.getElementById('inputPrompt').focus(), 100);
+  setTimeout(()=>focusInputPrompt(), 100);
 }
 function collapseInputBox() {
   document.getElementById('inputBox').classList.remove('expanded');
@@ -3720,7 +3948,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 function onInputChange() {
-  const has = document.getElementById('inputPrompt').value.trim().length > 0;
+  const has = getInputPromptText().length > 0;
   document.getElementById('inputGenBtn').className = 'gen-btn' + (has ? ' has-text' : '');
 }
 
@@ -3734,21 +3962,21 @@ window.addEventListener('contentTabChanged', function(e) {
   var placeholder = document.querySelector('.input-placeholder');
   curType = tab === 'video' ? 'video' : tab === 'chat' ? 'chat' : 'image';
   if (tab === 'chat') {
-    prompt.placeholder = '输入文本内容...';
+    setInputPromptPlaceholder('输入文本内容...');
     if (placeholder) placeholder.textContent = '输入文本内容...';
     if (uploadBlock) uploadBlock.style.display = 'none';
     if (optArea) optArea.style.display = '';
     renderGenerateButtonLabel();
     renderInputOpts();
   } else if (tab === 'video') {
-    prompt.placeholder = '描述您想要生成的视频...';
+    setInputPromptPlaceholder('描述您想要生成的视频...');
     if (placeholder) placeholder.textContent = '描述您想要生成的视频...';
     if (uploadBlock) uploadBlock.style.display = '';
     if (optArea) optArea.style.display = '';
     renderGenerateButtonLabel();
     renderInputOpts();
   } else {
-    prompt.placeholder = '描述您想要生成的图像...';
+    setInputPromptPlaceholder('描述您想要生成的图像...');
     if (placeholder) placeholder.textContent = '描述您想要生成的图像...';
     if (uploadBlock) uploadBlock.style.display = '';
     if (optArea) optArea.style.display = '';
@@ -3777,10 +4005,49 @@ function triggerUpload() {
   document.getElementById('uploadFileInput').click();
 }
 function onFileUpload(e) {
-  Array.from(e.target.files).forEach(f => addRefFromUrl(URL.createObjectURL(f)));
+  Array.from(e.target.files).forEach(f => {
+    const url = URL.createObjectURL(f);
+    addRefFromUrl(url, f.name, f.type.startsWith('video/') ? 'video' : 'image', url);
+  });
   e.target.value = '';
 }
-function addRefFromUrl(url) {
+
+let _inputRefId = 0;
+
+function inputRefAttr(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+  });
+}
+
+function inferInputRefType(name, url, fallback) {
+  const text = [fallback || '', name || '', url || ''].join(' ');
+  return /video|\.((mp4)|(mov)|(webm)|(m4v))(\?|#|$|\s)/i.test(text) ? 'video' : 'image';
+}
+
+function normalizeInputRef(ref) {
+  ref = ref || {};
+  const url = ref.url || ref.thumb || '';
+  const type = inferInputRefType(ref.name, url, ref.type || ref.assetType);
+  return {
+    id: ref.id || ('input-ref-' + (++_inputRefId)),
+    type,
+    url,
+    thumb: ref.thumb || url,
+    name: ref.name || ref.fileName || ref.filename || (type === 'video' ? '参考视频' : '参考图片')
+  };
+}
+
+function inputRefMediaHtml(ref) {
+  const src = inputRefAttr(ref.thumb || ref.url);
+  if (ref.type === 'video') {
+    return `<video src="${src}" muted playsinline preload="metadata"></video><div class="input-ref-video-mark">▶</div>`;
+  }
+  return `<img src="${src}" alt="${inputRefAttr(ref.name)}">`;
+}
+
+function addRefFromUrl(url, name, type, thumb) {
+  const ref = normalizeInputRef({ url, thumb: thumb || url, name, type });
   const strip = document.getElementById('inputRefStrip');
   if (!document.getElementById('inputRefAdd')) {
     document.getElementById('inputUploadBlock').style.display = 'none';
@@ -3792,7 +4059,14 @@ function addRefFromUrl(url) {
   }
   const item = document.createElement('div');
   item.className = 'input-ref-item';
-  item.innerHTML = `<img src="${url}" alt=""><div class="input-ref-del" onclick="removeInputRef(this)">✕</div>`;
+  item.setAttribute('data-ref-id', ref.id);
+  item.setAttribute('data-ref-type', ref.type);
+  item.setAttribute('data-ref-url', ref.url);
+  item.setAttribute('data-ref-thumb', ref.thumb || ref.url);
+  item.setAttribute('data-ref-name', ref.name);
+  item.setAttribute('data-preview-url', ref.url);
+  item.setAttribute('data-preview-type', ref.type);
+  item.innerHTML = inputRefMediaHtml(ref) + '<div class="input-ref-del" onclick="removeInputRef(this)">✕</div>';
   strip.appendChild(item);
 }
 function removeInputRef(btn) {
@@ -3828,11 +4102,10 @@ function restoreTaskToInput(task) {
       : { count:String(cfg.count || 1), ratio:cfg.ratio || '1:1', res:cfg.res || '2K', platformSize: cfg.platformSize || null };
   });
   expandInputBox();
-  document.getElementById('inputPrompt').value = task.input.prompt || '';
-  onInputChange();
+  setInputPromptText(task.input.prompt || '');
   clearRefImages();
   if (task.input.refImages && task.input.refImages.length) {
-    task.input.refImages.forEach(function(ref) { addRefFromUrl(ref.thumb || ref.url); });
+    task.input.refImages.forEach(function(ref) { addRefFromUrl(ref.url || ref.thumb, ref.name, ref.type, ref.thumb || ref.url); });
   }
   if (typeof renderInputOpts === 'function') renderInputOpts();
 }
@@ -4119,10 +4392,17 @@ function pickMode(e,v){ e.stopPropagation(); getInputActiveConfig().mode=v; rend
 function pickDur(e,v){ e.stopPropagation(); getInputActiveConfig().dur=v; renderInputOpts(); }
 
 function doGenerate() {
-  const txt = document.getElementById('inputPrompt').value.trim();
-  if (!txt) { document.getElementById('inputPrompt').focus(); return; }
+  const txt = getInputPromptText();
+  if (!txt) { focusInputPrompt(); return; }
   const refImgs = [];
-  document.querySelectorAll('#inputRefStrip .input-ref-item img').forEach(img => refImgs.push({ thumb: img.src, url: img.src }));
+  document.querySelectorAll('#inputRefStrip .input-ref-item').forEach(item => {
+    refImgs.push({
+      type: item.getAttribute('data-ref-type') || 'image',
+      thumb: item.getAttribute('data-ref-thumb') || item.getAttribute('data-ref-url'),
+      url: item.getAttribute('data-ref-url') || item.getAttribute('data-ref-thumb'),
+      name: item.getAttribute('data-ref-name') || ''
+    });
+  });
   if (curType === 'chat') {
     const modelId = sel.chat.model || CHAT_MODELS.fast[0].id;
     const count = parseInt(sel.chat.count || '1', 10) || 1;
@@ -4136,8 +4416,7 @@ function doGenerate() {
     };
     window.dispatchEvent(new CustomEvent('taskCreated', { detail: newTask }));
     collapseInputBox();
-    document.getElementById('inputPrompt').value = '';
-    onInputChange();
+    setInputPromptText('');
     showToast('任务已提交');
     setTimeout(() => {
       window.dispatchEvent(new CustomEvent('taskUpdated', {
@@ -4159,13 +4438,12 @@ function doGenerate() {
     type: curType==='video'?'video':'image', taskType:'direct_generate', resultType:curType==='video'?'video':'image', status:'generating',
     createdTime: new Date().toISOString().replace('T',' ').substring(0,16),
     creator:'我', source:'universal',
-    input: { prompt:txt, refImages:refImgs, inputType:refImgs.length>1?'multi_image':refImgs.length===1?'image':'text', models:models, modelConfigs:modelConfigs, ratio:firstCfg.ratio, res:firstCfg.res, dur:firstCfg.dur, count:parseInt(firstCfg.count)||1, mode:firstCfg.mode },
+    input: { prompt:txt, refImages:refImgs, inputType:refImgs.length>1?'multi_media':refImgs.length===1?(refImgs[0].type === 'video' ? 'video' : 'image'):'text', models:models, modelConfigs:modelConfigs, ratio:firstCfg.ratio, res:firstCfg.res, dur:firstCfg.dur, count:parseInt(firstCfg.count)||1, mode:firstCfg.mode },
     output: { byModel: Object.fromEntries(models.map(function(id){ return [id, { total:0, items:[] }]; })) }
   };
   window.dispatchEvent(new CustomEvent('taskCreated', { detail: newTask }));
   collapseInputBox();
-  document.getElementById('inputPrompt').value = '';
-  onInputChange();
+  setInputPromptText('');
   showToast('任务已提交');
   setTimeout(() => {
     const byModel = {};
@@ -4288,7 +4566,7 @@ function updateAssetFooter() {
 }
 function confirmAssetSelect() {
   const allItems = [...Object.values(MOCK_ASSETS).flat(), ...MOCK_PRODUCTS_ASSET.flatMap(p=>p.materials), ...MOCK_TASKS_ASSET.flatMap(t=>t.thumbs)];
-  allItems.forEach(a=>{ if(assetSelected.has(a.id)) addRefFromUrl(a.thumb); });
+  allItems.forEach(a=>{ if(assetSelected.has(a.id)) addRefFromUrl(a.url || a.thumb, a.name, a.type || a.assetType, a.thumb || a.url); });
   closeAssetModal();
 }
 function showAssetPreview(src) { document.getElementById('assetPreviewImg').src=src; document.getElementById('assetPreviewMask').classList.add('show'); }
@@ -4306,8 +4584,8 @@ function closeAssetPreview() { document.getElementById('assetPreviewMask').class
     if (data.prompt) {
       setTimeout(()=>{
         expandInputBox();
-        document.getElementById('inputPrompt').value = data.prompt;
-        onInputChange(); renderInputOpts();
+        setInputPromptText(data.prompt);
+        renderInputOpts();
         setTimeout(()=>doGenerate(), 500);
       }, 300);
     }
