@@ -79,6 +79,7 @@ function openConfirmModal(options) {
   var originalText = opts.confirmText || '确认';
   okBtn.textContent = originalText;
   okBtn.disabled = false;
+  okBtn.classList.toggle('cc-confirm-btn-danger', opts.variant === 'danger');
 
   if (_ccConfirmState.timer) {
     clearInterval(_ccConfirmState.timer);

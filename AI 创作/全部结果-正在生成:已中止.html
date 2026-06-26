@@ -1056,10 +1056,8 @@ function mediaResultFileName(item) {
 }
 
 function mediaInfoOverlayHtml(item) {
-    const attrText = mediaResultAttributeText(item);
     const fileName = mediaResultFileName(item);
-    return '<div class="media-info-layer media-info-attr"><span class="media-info-text">' + resultHtmlEscape(attrText) + '</span></div>'
-        + '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + resultHtmlEscape(fileName) + '">' + resultHtmlEscape(fileName) + '</span></div>';
+    return '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + resultHtmlEscape(fileName) + '">' + resultHtmlEscape(fileName) + '</span></div>';
 }
 
 if (typeof thumbOverlayHtml !== 'function') {

@@ -12,7 +12,7 @@
 .cc-confirm-mask {
   position: fixed;
   inset: 0;
-  z-index: 3000;
+  z-index: 4600;
   background: var(--overlay, rgba(0,0,0,0.45));
   display: none;
   align-items: center;
@@ -76,6 +76,13 @@
 .cc-confirm-btn-primary:hover {
   background: var(--accent-solid-h, #4096ff);
   border-color: var(--accent-solid-h, #4096ff);
+  color: var(--white, #fff);
+}
+
+.cc-confirm-btn-danger,
+.cc-confirm-btn-danger:hover {
+  background: var(--error, #ff4d4f);
+  border-color: var(--error, #ff4d4f);
   color: var(--white, #fff);
 }
 

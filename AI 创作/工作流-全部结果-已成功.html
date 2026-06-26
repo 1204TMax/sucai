@@ -870,19 +870,19 @@ const COLORS = [
 ];
 
 let images = [
-    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001', model:'Seedream 5.0' },
+    { id:1,  ratio:'9:16',  ar:9/16,  color:COLORS[0],  name:'竖屏-001', model:'Seedream 5.0', archived:true },
     { id:2,  ratio:'9:16',  ar:9/16,  color:COLORS[1],  name:'竖屏-002', model:'Seedream 5.0' },
     { id:3,  ratio:'9:16',  ar:9/16,  color:COLORS[2],  name:'竖屏-003', model:'Banana 2' },
     { id:4,  ratio:'9:16',  ar:9/16,  color:COLORS[3],  name:'竖屏-004', model:'Banana 2' },
     { id:5,  ratio:'9:16',  ar:9/16,  color:COLORS[4],  name:'竖屏-005', model:'Seedream 5.0' },
     { id:6,  ratio:'9:16',  ar:9/16,  color:COLORS[5],  name:'竖屏-006', model:'Banana 2' },
     { id:7,  ratio:'16:9',  ar:16/9,  color:COLORS[6],  name:'横屏-001', model:'Seedream 5.0' },
-    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002', model:'Seedream 5.0' },
+    { id:8,  ratio:'16:9',  ar:16/9,  color:COLORS[7],  name:'横屏-002', model:'Seedream 5.0', archived:true },
     { id:9,  ratio:'16:9',  ar:16/9,  color:COLORS[8],  name:'横屏-003', model:'Banana 2' },
     { id:10, ratio:'16:9',  ar:16/9,  color:COLORS[9],  name:'横屏-004', model:'Banana 2' },
     { id:11, ratio:'16:9',  ar:16/9,  color:COLORS[10], name:'横屏-005', model:'Seedream 5.0' },
     { id:12, ratio:'16:9',  ar:16/9,  color:COLORS[11], name:'横屏-006', model:'Banana 2' },
-    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001', model:'Seedream 5.0' },
+    { id:13, ratio:'1:1',   ar:1,     color:COLORS[12], name:'方图-001', model:'Seedream 5.0', archived:true },
     { id:14, ratio:'1:1',   ar:1,     color:COLORS[13], name:'方图-002', model:'Banana 2' },
     { id:15, ratio:'1:1',   ar:1,     color:COLORS[14], name:'方图-003', model:'Seedream 5.0' },
     { id:16, ratio:'1:1',   ar:1,     color:COLORS[15], name:'方图-004', model:'Banana 2' },
@@ -945,10 +945,16 @@ function mediaResultFileName(item) {
 }
 
 function mediaInfoOverlayHtml(item) {
-    const attrText = mediaResultAttributeText(item);
     const fileName = mediaResultFileName(item);
-    return '<div class="media-info-layer media-info-attr"><span class="media-info-text">' + resultHtmlEscape(attrText) + '</span></div>'
-        + '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + resultHtmlEscape(fileName) + '">' + resultHtmlEscape(fileName) + '</span></div>';
+    return '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + resultHtmlEscape(fileName) + '">' + resultHtmlEscape(fileName) + '</span></div>';
+}
+
+function isArchivedMedia(item) {
+    return !!(item && (item.archived || item.isArchived || item.inLibrary || item.hasArchived || item.storageStatus === 'archived'));
+}
+
+function archiveStatusBadgeHtml(item) {
+    return isArchivedMedia(item) ? '<span class="media-archive-badge">已入库</span>' : '';
 }
 
 if (typeof thumbOverlayHtml !== 'function') {
@@ -1065,9 +1071,10 @@ function mkCard(item) {
     el.dataset.id = item.id;
 
     const mediaInfoHtml = mediaInfoOverlayHtml(item);
+    const archiveBadgeHtml = !isLoading ? archiveStatusBadgeHtml(item) : '';
     const contentHtml = isLoading
         ? `<div class="img-block"><div class="cc-img-loading-thumb" style="width:100%;height:100%;"><div class="cc-img-loading-spinner"></div></div>${mediaInfoHtml}</div>`
-        : `<div class="img-block" style="background:linear-gradient(135deg,${item.color}dd,${item.color})">${mediaInfoHtml}</div>`;
+        : `<div class="img-block" style="background:linear-gradient(135deg,${item.color}dd,${item.color})">${archiveBadgeHtml}${mediaInfoHtml}</div>`;
 
     const batchPreviewBtn = !isLoading
         ? `<button class="batch-preview-btn" title="预览" onclick="event.stopPropagation();openPreview(find(${item.id}))">${ico.eye}</button>`
@@ -1171,7 +1178,8 @@ function archiveMediaItem(item) {
         url: archiveMediaUrlFor(item),
         thumb: previewUrlFor(item),
         name: mediaResultFileName(item),
-        meta: mediaResultAttributeText(item)
+        meta: mediaResultAttributeText(item),
+        archived: isArchivedMedia(item)
     };
 }
 

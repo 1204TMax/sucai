@@ -33,6 +33,34 @@
 .o-thumb:hover .thumb-overlay,
 .cc-thumb-host:hover .thumb-overlay { opacity: 1; }
 
+.media-archive-badge {
+  position: absolute;
+  top: var(--space-2, 8px);
+  left: var(--space-2, 8px);
+  z-index: 6;
+  height: 22px;
+  padding: 0 var(--space-2, 8px);
+  border: 1px solid var(--success-border, #b7eb8f);
+  border-radius: var(--r-md, 6px);
+  background: var(--success-bg, #f6ffed);
+  color: var(--success, #389e0d);
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xs, 12px);
+  font-weight: 600;
+  line-height: 1;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.output-row.collapsed .media-archive-badge {
+  top: var(--space-1, 4px);
+  left: var(--space-1, 4px);
+  height: 18px;
+  padding: 0 5px;
+  font-size: 10px;
+}
+
 .thumb-act {
   width: var(--h-sm);
   height: var(--h-sm);

@@ -2,8 +2,10 @@
   if (window.__ccAssetIntakeModalLoaded) return;
   window.__ccAssetIntakeModalLoaded = true;
 
-  var DEFAULT_VISIBLE_COUNT = 4;
+  var DEFAULT_VISIBLE_COUNT = 3;
   var TRASH_ICON = '<svg class="lucide lucide-trash-2" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 11v6" /><path d="M14 11v6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>';
+  var PLUS_ICON = '<svg class="lucide lucide-plus" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14" /><path d="M12 5v14" /></svg>';
+  var EDIT_ICON = '<svg class="lucide lucide-pencil" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" /></svg>';
   var DESIGNERS = ['大山', '周玥', '张宁', '李想', '陈晨', '王敏'];
   var PLATFORMS = ['头条', '快手', '广点通', 'OPPO', 'VIVO', '华为 Ads', '百度'];
   var SEARCH_ALIASES = {
@@ -33,21 +35,21 @@
     '王敏':['wangmin', 'wm']
   };
   var FOLDERS = [
-    { id:'f001', name:'IAA / 步数赚金币 / 信息流图片', product:'步数赚金币', series:'IAA' },
+    { id:'f001', name:'IAA / 步数赚金币 / 信息流图片', product:'步数赚金币', series:'IAA', pinned:true },
     { id:'f002', name:'IAA / 步数赚金币 / 视频片段', product:'步数赚金币', series:'IAA' },
     { id:'f003', name:'IAA / 走路赚金币 / 封面素材', product:'走路赚金币', series:'IAA' },
     { id:'f004', name:'IAA / 走路赚金币 / 激励视频', product:'走路赚金币', series:'IAA' },
-    { id:'f005', name:'IAA / 成语赚钱 / 成品图', product:'成语赚钱', series:'IAA' },
+    { id:'f005', name:'IAA / 成语赚钱 / 成品图', product:'成语赚钱', series:'IAA', favorite:true },
     { id:'f006', name:'IAA / 成语赚钱 / 竖版视频', product:'成语赚钱', series:'IAA' },
     { id:'f007', name:'网赚 / 欢乐消消 / 入口图', product:'欢乐消消', series:'网赚' },
     { id:'f008', name:'网赚 / 欢乐消消 / 原生视频', product:'欢乐消消', series:'网赚' },
     { id:'f009', name:'网赚 / 红包短剧 / 剧情切片', product:'红包短剧', series:'网赚' },
     { id:'f010', name:'网赚 / 红包短剧 / 落地页配图', product:'红包短剧', series:'网赚' },
-    { id:'f011', name:'工具 / 清理大师 / 功能演示', product:'清理大师', series:'工具' },
+    { id:'f011', name:'工具 / 清理大师 / 功能演示', product:'清理大师', series:'工具', pinned:true },
     { id:'f012', name:'工具 / 清理大师 / 图标素材', product:'清理大师', series:'工具' },
     { id:'f013', name:'工具 / 电池管家 / 对比图', product:'电池管家', series:'工具' },
     { id:'f014', name:'工具 / 电池管家 / 视频素材', product:'电池管家', series:'工具' },
-    { id:'f015', name:'社交 / 心动聊天 / 角色图', product:'心动聊天', series:'社交' },
+    { id:'f015', name:'社交 / 心动聊天 / 角色图', product:'心动聊天', series:'社交', favorite:true },
     { id:'f016', name:'社交 / 心动聊天 / 开场视频', product:'心动聊天', series:'社交' },
     { id:'f017', name:'社交 / 星语陪伴 / 场景图', product:'星语陪伴', series:'社交' },
     { id:'f018', name:'社交 / 星语陪伴 / 口播视频', product:'星语陪伴', series:'社交' },
@@ -69,6 +71,8 @@
       target: '素材库',
       selectedFolders: new Set(),
       filterMode: 'product',
+      nameSearchMode: 'folder',
+      nameQuery: '',
       productQuery: '',
       seriesQuery: '',
       filterSearchQuery: '',
@@ -82,6 +86,12 @@
       renameVisible: false,
       archiveName: '',
       draftArchiveName: '',
+      folderEditorVisible: false,
+      folderEditorMode: 'create',
+      folderEditorTargetId: '',
+      folderEditorTreeNodeId: '',
+      folderEditorName: '',
+      folderEditorError: '',
       subMode: '',
       previewIndex: -1
     };
@@ -101,7 +111,8 @@
         url: url,
         thumb: item.thumb || item.poster || item.url || '',
         name: name,
-        meta: item.meta || ''
+        meta: item.meta || '',
+        archived: isArchivedItem(item)
       };
     });
   }
@@ -118,10 +129,15 @@
         url: source.url,
         thumb: source.thumb || source.url,
         name: (type === 'video' ? '视频素材-' : '图片素材-') + String(i + 1).padStart(3, '0'),
-        meta: source.meta || ''
+        meta: source.meta || '',
+        archived: isArchivedItem(source) || i % 9 === 0
       });
     }
     return result;
+  }
+
+  function isArchivedItem(item) {
+    return !!(item && (item.archived || item.isArchived || item.inLibrary || item.hasArchived || item.storageStatus === 'archived'));
   }
 
   function inferType(url) {
@@ -134,10 +150,13 @@
   }
 
   function defaultExpandedTree() {
-    var expanded = new Set(['root']);
+    var expanded = new Set(['root', 'section:pinned', 'section:favorite', 'section:all']);
+    var sections = ['pinned', 'favorite', 'all'];
     FOLDERS.forEach(function(folder) {
-      if (folder.series) expanded.add('series:' + folder.series);
-      if (folder.series && folder.product) expanded.add('product:' + folder.series + ':' + folder.product);
+      sections.forEach(function(sectionId) {
+        if ((sectionId === 'pinned' && !folder.pinned) || (sectionId === 'favorite' && !folder.favorite)) return;
+        expanded.add('tree:' + sectionId + ':album:' + getFolderAlbum(folder));
+      });
     });
     return expanded;
   }
@@ -167,20 +186,23 @@
       + '    <div class="ai-intake-body">'
       + '      <div class="ai-intake-main">'
       + '        <section class="ai-intake-section ai-intake-folder-section">'
-      + '          <div class="ai-intake-section-head">'
-      + '            <div class="ai-intake-section-title">入库位置 <span class="ai-intake-required">*</span></div>'
+      + '          <div class="ai-intake-section-head ai-intake-folder-head">'
+      + '            <div class="ai-intake-folder-title-row">'
+      + '              <div class="ai-intake-section-title">入库位置 <span class="ai-intake-required">*</span></div>'
+      + '              <div class="ai-intake-targets" id="aiIntakeTargets"></div>'
+      + '            </div>'
       + '            <div class="ai-intake-section-actions">'
       + '              <button class="ai-intake-btn ai-intake-btn-link" type="button" onclick="ccAssetIntakeClearFolders()">清空</button>'
       + '              <button class="ai-intake-btn ai-intake-btn-link" type="button" onclick="ccAssetIntakeOpenSub(\'folders\')">展开全部</button>'
       + '            </div>'
       + '          </div>'
       + '          <div class="ai-intake-section-body">'
-      + '            <div class="ai-intake-target-row">'
-      + '              <div class="ai-intake-targets" id="aiIntakeTargets"></div>'
-      + '              <div class="ai-intake-selected-folders" id="aiIntakeSelectedFolders"></div>'
-      + '            </div>'
       + '            <div class="ai-intake-hint" id="aiIntakeTargetHint"></div>'
-      + '            <div class="ai-intake-filter-control">'
+      + '            <div class="ai-intake-name-search-control">'
+      + '              <div class="ai-intake-name-search-tabs" id="aiIntakeNameSearchTabs"></div>'
+      + '              <input class="ai-intake-input ai-intake-name-search-input" id="aiIntakeNameSearchInput" autocomplete="off" placeholder="搜索文件夹名称" oninput="ccAssetIntakeSetNameSearch(this.value)">'
+      + '            </div>'
+      + '            <div class="ai-intake-filter-control" id="aiIntakeFilterControl">'
       + '              <span class="ai-intake-filter-label">筛选</span>'
       + '              <div class="ai-intake-filter-tabs" id="aiIntakeFilterTabs"></div>'
       + '              <div class="ai-intake-combobox" id="aiIntakeFilterSelect">'
@@ -254,7 +276,13 @@
       + '      </div>'
       + '    </div>'
       + '    <div class="ai-intake-footer">'
-      + '      <div class="ai-intake-hint" id="aiIntakeFooterHint"></div>'
+      + '      <div class="ai-intake-footer-left">'
+      + '        <div class="ai-intake-hint" id="aiIntakeFooterHint"></div>'
+      + '        <div class="ai-intake-selected-summary">'
+      + '          <span class="ai-intake-selected-summary-label">已选文件夹</span>'
+      + '          <div class="ai-intake-selected-folders" id="aiIntakeSelectedFolders"></div>'
+      + '        </div>'
+      + '      </div>'
       + '      <div class="ai-intake-footer-actions">'
       + '        <button class="ai-intake-btn" type="button" onclick="ccAssetIntakeReset()">重置</button>'
       + '        <button class="ai-intake-btn ai-intake-btn-primary" type="button" onclick="ccAssetIntakeSubmit()">确认</button>'
@@ -276,6 +304,28 @@
       + '        <div class="ai-intake-name-footer">'
       + '          <button class="ai-intake-btn" type="button" onclick="ccAssetIntakeCloseRename()">取消</button>'
       + '          <button class="ai-intake-btn ai-intake-btn-primary" type="button" onclick="ccAssetIntakeConfirmRename()">确认</button>'
+      + '        </div>'
+      + '      </div>'
+      + '    </div>'
+      + '    <div class="ai-intake-folder-edit-mask" id="aiIntakeFolderEditMask" onclick="if(event.target===this)ccAssetIntakeCloseFolderEditor()">'
+      + '      <div class="ai-intake-folder-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="aiIntakeFolderEditTitle">'
+      + '        <div class="ai-intake-name-head">'
+      + '          <div class="ai-intake-subtitle-main" id="aiIntakeFolderEditTitle"></div>'
+      + '          <button class="ai-intake-close" type="button" onclick="ccAssetIntakeCloseFolderEditor()" aria-label="关闭">×</button>'
+      + '        </div>'
+      + '        <div class="ai-intake-name-body">'
+      + '          <label class="ai-intake-name-field">'
+      + '            <span class="ai-intake-label">文件夹名字</span>'
+      + '            <input class="ai-intake-input" id="aiIntakeFolderNameInput" placeholder="输入文件夹名字" oninput="ccAssetIntakeSetFolderName(this.value)" onkeydown="if(event.key===\'Enter\')ccAssetIntakeConfirmFolderEditor()">'
+      + '          </label>'
+      + '          <div class="ai-intake-folder-default" id="aiIntakeFolderDefault">'
+      + '            <span>素材归属</span><strong>通用</strong><em>每次新增默认回填</em>'
+      + '          </div>'
+      + '          <div class="ai-intake-error" id="aiIntakeFolderNameError"></div>'
+      + '        </div>'
+      + '        <div class="ai-intake-name-footer">'
+      + '          <button class="ai-intake-btn" type="button" onclick="ccAssetIntakeCloseFolderEditor()">取消</button>'
+      + '          <button class="ai-intake-btn ai-intake-btn-primary" type="button" onclick="ccAssetIntakeConfirmFolderEditor()">确认</button>'
       + '        </div>'
       + '      </div>'
       + '    </div>'
@@ -324,16 +374,19 @@
     closeFilterDropdown();
     closeDesignerDropdown();
     closeRenameEditor();
+    closeFolderEditor();
   }
 
   function renderAll() {
     renderSummary();
     renderTargets();
+    renderNameSearchControls();
     renderFilterControls();
     renderInputs();
     renderDesignerOptions();
     renderFolders();
     renderNameEditor();
+    renderFolderEditor();
     renderAssets();
     renderPlatforms();
     renderAiSwitch();
@@ -367,6 +420,8 @@
   }
 
   function renderFilterControls() {
+    var filterControl = document.getElementById('aiIntakeFilterControl');
+    if (filterControl) filterControl.style.display = state.nameSearchMode === 'album' ? 'none' : '';
     var tabs = document.getElementById('aiIntakeFilterTabs');
     if (tabs) {
       tabs.innerHTML = ['product', 'series'].map(function(mode) {
@@ -385,6 +440,22 @@
       if (search.value !== state.filterSearchQuery) search.value = state.filterSearchQuery;
     }
     renderFilterOptions();
+  }
+
+  function renderNameSearchControls(scope) {
+    var prefix = scope === 'sub' ? 'aiIntakeSub' : 'aiIntake';
+    var tabs = document.getElementById(prefix + 'NameSearchTabs');
+    var input = document.getElementById(prefix + 'NameSearchInput');
+    if (tabs) {
+      tabs.innerHTML = ['folder', 'album'].map(function(mode) {
+        var label = mode === 'folder' ? '搜文件夹' : '搜专辑';
+        return '<button class="ai-intake-name-search-tab' + (state.nameSearchMode === mode ? ' on' : '') + '" type="button" onclick="ccAssetIntakeSetNameSearchMode(\'' + mode + '\')">' + label + '</button>';
+      }).join('');
+    }
+    if (input) {
+      input.placeholder = state.nameSearchMode === 'folder' ? '搜索文件夹名称' : '搜索专辑名称';
+      if (input.value !== state.nameQuery) input.value = state.nameQuery;
+    }
   }
 
   function getActiveFilterOptions() {
@@ -484,6 +555,13 @@
     return FOLDERS.find(function(folder) { return folder.id === id; }) || null;
   }
 
+  function getFolderAlbum(folder) {
+    if (!folder) return '';
+    if (folder.album) return folder.album;
+    if (folder.series) return folder.series + ' 专辑';
+    return '未分组专辑';
+  }
+
   function getFolderLeafName(folder) {
     if (!folder) return '';
     return folder.name.split(' / ').pop();
@@ -491,9 +569,7 @@
 
   function getFolderDisplayName(folder) {
     if (!folder) return '';
-    var leaf = getFolderLeafName(folder);
-    var prefix = [folder.series, folder.product].filter(Boolean).join(' / ');
-    return prefix ? prefix + ' / ' + leaf : leaf;
+    return [getFolderAlbum(folder)].concat(getFolderPathParts(folder)).filter(Boolean).join(' / ');
   }
 
   function renderSelectedFolders() {
@@ -506,7 +582,7 @@
     }
     container.innerHTML = ids.map(function(id) {
       var folder = getFolderById(id);
-      var label = folder ? getFolderLeafName(folder) : id;
+      var label = folder ? getFolderDisplayName(folder) : id;
       var title = folder ? getFolderDisplayName(folder) : id;
       return '<span class="ai-intake-selected-folder" title="' + escHtml(title) + '">'
         + '<span>' + escHtml(label) + '</span>'
@@ -517,11 +593,15 @@
 
   function renderInputs() {
     var filterSearch = document.getElementById('aiIntakeFilterSearch');
+    var nameSearch = document.getElementById('aiIntakeNameSearchInput');
+    var subNameSearch = document.getElementById('aiIntakeSubNameSearchInput');
     var designerSearch = document.getElementById('aiIntakeDesignerSearch');
     var designerText = document.getElementById('aiIntakeDesignerText');
     var designerTrigger = document.getElementById('aiIntakeDesignerTrigger');
     var remark = document.getElementById('aiIntakeRemark');
     if (filterSearch && filterSearch.value !== state.filterSearchQuery) filterSearch.value = state.filterSearchQuery;
+    if (nameSearch && nameSearch.value !== state.nameQuery) nameSearch.value = state.nameQuery;
+    if (subNameSearch && subNameSearch.value !== state.nameQuery) subNameSearch.value = state.nameQuery;
     if (designerSearch && designerSearch.value !== state.designerSearchQuery) designerSearch.value = state.designerSearchQuery;
     if (designerText) designerText.textContent = state.designer || '请选择设计师';
     if (designerTrigger) designerTrigger.classList.toggle('placeholder', !state.designer);
@@ -529,13 +609,29 @@
   }
 
   function filteredFolders() {
+    var nameQuery = state.nameQuery.trim();
     var productQuery = state.productQuery.trim();
     var seriesQuery = state.seriesQuery.trim();
     return FOLDERS.filter(function(folder) {
-      if (productQuery && !fuzzyMatches(folder.product, productQuery)) return false;
-      if (seriesQuery && !fuzzyMatches(folder.series, seriesQuery)) return false;
+      if (nameQuery) {
+        if (state.nameSearchMode === 'album') {
+          if (!fuzzyMatches(getFolderAlbum(folder), nameQuery)) return false;
+        } else if (!folderNameMatches(folder, nameQuery)) {
+          return false;
+        }
+      }
+      if (state.nameSearchMode !== 'album') {
+        if (productQuery && !fuzzyMatches(folder.product, productQuery)) return false;
+        if (seriesQuery && !fuzzyMatches(folder.series, seriesQuery)) return false;
+      }
       return true;
     });
+  }
+
+  function folderNameMatches(folder, query) {
+    var parts = getFolderPathParts(folder);
+    var names = parts.concat([parts.join(' / '), getFolderLeafName(folder)]);
+    return names.some(function(name) { return fuzzyMatches(name, query); });
   }
 
   function renderFolders(targetId) {
@@ -551,32 +647,74 @@
     renderSummary();
   }
 
+  function ensureTreeChild(parent, id, type, label) {
+    if (!parent.childMap) parent.childMap = {};
+    if (!parent.childMap[id]) {
+      parent.childMap[id] = { id:id, type:type, label:label, children:[] };
+      parent.children.push(parent.childMap[id]);
+    }
+    return parent.childMap[id];
+  }
+
+  function ensureScopedTreeChild(parent, sectionId, rawId, type, label) {
+    var child = ensureTreeChild(parent, 'tree:' + sectionId + ':' + rawId, type, label);
+    child.contextId = rawId;
+    return child;
+  }
+
+  function getFolderPathParts(folder) {
+    var parts = folder.name.split(' / ').filter(Boolean);
+    if (parts[0] === getFolderAlbum(folder)) parts.shift();
+    if (folder.series && parts[0] === folder.series) parts.shift();
+    return parts.length ? parts : [folder.name];
+  }
+
+  function buildFolderPathIndex(folders) {
+    var index = {};
+    folders.forEach(function(folder) {
+      index[getFolderAlbum(folder) + ' / ' + getFolderPathParts(folder).join(' / ')] = folder.id;
+    });
+    return index;
+  }
+
+  function cleanupFolderTree(node) {
+    delete node.childMap;
+    node.children.forEach(cleanupFolderTree);
+    return node;
+  }
+
+  function buildTreeSection(sectionId, label, folders) {
+    var root = { id:'section:' + sectionId, label:label, type:'section', count:folders.length, children:[] };
+    var albumMap = {};
+    var folderPathIndex = buildFolderPathIndex(folders);
+    folders.forEach(function(folder) {
+      var albumName = getFolderAlbum(folder);
+      if (!albumMap[albumName]) {
+        albumMap[albumName] = { id:'tree:' + sectionId + ':album:' + albumName, contextId:'album:' + albumName, type:'album', label:albumName, children:[] };
+        root.children.push(albumMap[albumName]);
+      }
+      var folderParent = albumMap[albumName];
+      var folderParts = getFolderPathParts(folder);
+      folderParts.forEach(function(part, index) {
+        var fullPath = albumName + ' / ' + folderParts.slice(0, index + 1).join(' / ');
+        var mappedFolderId = folderPathIndex[fullPath];
+        var nodeId = mappedFolderId ? 'folder:' + mappedFolderId : 'folderPath:' + albumName + ':' + folderParts.slice(0, index + 1).join(' / ');
+        var child = ensureScopedTreeChild(folderParent, sectionId, nodeId, 'folder', part);
+        if (index === folderParts.length - 1) child.folder = folder;
+        folderParent = child;
+      });
+    });
+    return cleanupFolderTree(root);
+  }
+
   function buildFolderTree(folders) {
     var root = { id:'root', label:'全部', type:'root', children:[] };
-    var seriesMap = {};
-    folders.forEach(function(folder) {
-      if (!folder.series && !folder.product) {
-        root.children.push({ id:'folder:' + folder.id, type:'folder', folder:folder, label:folder.name, children:[] });
-        return;
-      }
-      var seriesKey = folder.series || '未分组';
-      if (!seriesMap[seriesKey]) {
-        seriesMap[seriesKey] = { id:'series:' + seriesKey, type:'series', label:seriesKey, children:[], productMap:{} };
-        root.children.push(seriesMap[seriesKey]);
-      }
-      var seriesNode = seriesMap[seriesKey];
-      var productKey = folder.product || '未分组';
-      if (!seriesNode.productMap[productKey]) {
-        seriesNode.productMap[productKey] = { id:'product:' + seriesKey + ':' + productKey, type:'product', label:productKey, children:[] };
-        seriesNode.children.push(seriesNode.productMap[productKey]);
-      }
-      var leafName = folder.name.split(' / ').pop();
-      seriesNode.productMap[productKey].children.push({ id:'folder:' + folder.id, type:'folder', folder:folder, label:leafName, children:[] });
-    });
-    root.children.forEach(function(seriesNode) {
-      delete seriesNode.productMap;
-    });
-    return root;
+    var pinnedFolders = folders.filter(function(folder) { return folder.pinned; });
+    var favoriteFolders = folders.filter(function(folder) { return folder.favorite; });
+    root.children.push(buildTreeSection('pinned', '置顶', pinnedFolders));
+    root.children.push(buildTreeSection('favorite', '收藏', favoriteFolders));
+    root.children.push(buildTreeSection('all', '全部文件夹', folders));
+    return cleanupFolderTree(root);
   }
 
   function renderFolderTree(node, depth) {
@@ -584,21 +722,34 @@
     var isFolder = node.type === 'folder';
     var hasChildren = node.children && node.children.length;
     var expanded = state.expandedTree.has(node.id);
-    var html = '<div class="ai-intake-tree-row depth-' + depth + (isFolder ? ' is-leaf' : ' is-branch') + '">';
+    var html = '<div class="ai-intake-tree-row depth-' + depth + (isFolder ? ' is-leaf' : ' is-branch') + ' type-' + escHtml(node.type || '') + '">';
     if (hasChildren) {
       html += '<button class="ai-intake-tree-toggle' + (expanded ? ' open' : '') + '" type="button" onclick="ccAssetIntakeToggleTreeNode(\'' + escJsString(node.id) + '\')">›</button>';
     } else {
       html += '<span class="ai-intake-tree-spacer"></span>';
     }
     html += '<span class="ai-intake-folder-icon"></span>';
-    if (isFolder) {
+    if (isFolder && node.folder) {
       var checked = state.selectedFolders.has(node.folder.id);
       html += '<label class="ai-intake-tree-label">'
         + '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="ccAssetIntakeToggleFolder(\'' + escJsString(node.folder.id) + '\', this.checked)">'
         + '<span>' + escHtml(node.label) + '</span>'
         + '</label>';
     } else {
-      html += '<button class="ai-intake-tree-branch-label" type="button" onclick="ccAssetIntakeToggleTreeNode(\'' + escJsString(node.id) + '\')">' + escHtml(node.label) + '</button>';
+      html += '<button class="ai-intake-tree-branch-label" type="button" onclick="ccAssetIntakeToggleTreeNode(\'' + escJsString(node.id) + '\')">'
+        + '<span>' + escHtml(node.label) + '</span>'
+        + (node.type === 'section' ? '<span class="ai-intake-tree-count">' + (node.count || 0) + '</span>' : '')
+        + '</button>';
+    }
+    if (node.id !== 'root' && node.type !== 'section') {
+      var actionNodeId = node.contextId || node.id;
+      html += '<span class="ai-intake-tree-actions">';
+      html += '<button class="ai-intake-tree-action" type="button" title="新增子文件夹" aria-label="新增子文件夹" onclick="event.stopPropagation();ccAssetIntakeOpenCreateFolder(\'' + escJsString(actionNodeId) + '\', \'' + escJsString(node.id) + '\')">' + PLUS_ICON + '</button>';
+      if (node.folder) {
+        html += '<button class="ai-intake-tree-action" type="button" title="编辑文件夹名字" aria-label="编辑文件夹名字" onclick="event.stopPropagation();ccAssetIntakeOpenEditFolder(\'' + escJsString(node.folder.id) + '\')">' + EDIT_ICON + '</button>';
+        html += '<button class="ai-intake-tree-action danger" type="button" title="删除文件夹" aria-label="删除文件夹" onclick="event.stopPropagation();ccAssetIntakeConfirmDeleteFolder(\'' + escJsString(node.folder.id) + '\')">' + TRASH_ICON + '</button>';
+      }
+      html += '</span>';
     }
     html += '</div>';
     if (hasChildren && expanded) {
@@ -669,6 +820,200 @@
     preview.textContent = getArchiveNamePreview(state.draftArchiveName);
   }
 
+  function renderFolderEditor() {
+    var mask = document.getElementById('aiIntakeFolderEditMask');
+    var title = document.getElementById('aiIntakeFolderEditTitle');
+    var input = document.getElementById('aiIntakeFolderNameInput');
+    var error = document.getElementById('aiIntakeFolderNameError');
+    var defaultValue = document.getElementById('aiIntakeFolderDefault');
+    if (!mask || !input) return;
+    mask.classList.toggle('show', state.folderEditorVisible);
+    if (title) title.textContent = state.folderEditorMode === 'edit' ? '编辑文件夹名字' : '新增子文件夹';
+    if (input.value !== state.folderEditorName) input.value = state.folderEditorName;
+    if (error) error.textContent = state.folderEditorError;
+    if (defaultValue) defaultValue.style.display = state.folderEditorMode === 'create' ? 'flex' : 'none';
+  }
+
+  function getFolderEditorParentContext(nodeId) {
+    if (nodeId === 'root') return { album:'未分组专辑', series:'', product:'', namePrefix:'' };
+    if (nodeId.indexOf('album:') === 0) {
+      return { album:nodeId.slice('album:'.length), series:'', product:'', namePrefix:'' };
+    }
+    if (nodeId.indexOf('series:') === 0) {
+      var series = nodeId.slice('series:'.length);
+      return { album:series + ' 专辑', series:series, product:'', namePrefix:'' };
+    }
+    if (nodeId.indexOf('product:') === 0) {
+      var productParts = nodeId.slice('product:'.length).split(':');
+      return { album:(productParts[0] || '未分组') + ' 专辑', series:productParts[0] || '', product:productParts[1] || '', namePrefix:productParts[1] || '' };
+    }
+    if (nodeId.indexOf('folder:') === 0) {
+      var folder = getFolderById(nodeId.slice('folder:'.length));
+      return folder ? { album:getFolderAlbum(folder), series:folder.series, product:folder.product, namePrefix:folder.name } : null;
+    }
+    if (nodeId.indexOf('folderPath:') === 0) {
+      var pathParts = nodeId.slice('folderPath:'.length).split(':');
+      var album = pathParts[0] || '未分组专辑';
+      var folderPath = pathParts.slice(1).join(':');
+      return { album:album, series:'', product:'', namePrefix:folderPath };
+    }
+    return null;
+  }
+
+  function getNewFolderId() {
+    return 'f' + Date.now().toString(36) + Math.random().toString(16).slice(2, 6);
+  }
+
+  function refreshFolderViews() {
+    renderNameSearchControls();
+    renderFilterControls();
+    renderFolders();
+    if (state.subMode === 'folders') renderSub();
+  }
+
+  function openCreateFolder(nodeId, treeNodeId) {
+    state.folderEditorVisible = true;
+    state.folderEditorMode = 'create';
+    state.folderEditorTargetId = nodeId;
+    state.folderEditorTreeNodeId = treeNodeId || nodeId;
+    state.folderEditorName = '';
+    state.folderEditorError = '';
+    renderFolderEditor();
+    setTimeout(function() {
+      var input = document.getElementById('aiIntakeFolderNameInput');
+      if (input) input.focus();
+    }, 0);
+  }
+
+  function openEditFolder(folderId) {
+    var folder = getFolderById(folderId);
+    if (!folder) return;
+    state.folderEditorVisible = true;
+    state.folderEditorMode = 'edit';
+    state.folderEditorTargetId = folderId;
+    state.folderEditorTreeNodeId = '';
+    state.folderEditorName = getFolderLeafName(folder);
+    state.folderEditorError = '';
+    renderFolderEditor();
+    setTimeout(function() {
+      var input = document.getElementById('aiIntakeFolderNameInput');
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+  }
+
+  function setFolderName(value) {
+    state.folderEditorName = value;
+    state.folderEditorError = '';
+    var error = document.getElementById('aiIntakeFolderNameError');
+    if (error) error.textContent = '';
+  }
+
+  function closeFolderEditor() {
+    state.folderEditorVisible = false;
+    state.folderEditorTargetId = '';
+    state.folderEditorTreeNodeId = '';
+    state.folderEditorName = '';
+    state.folderEditorError = '';
+    renderFolderEditor();
+  }
+
+  function createChildFolder(name) {
+    var parent = getFolderEditorParentContext(state.folderEditorTargetId);
+    if (!parent) return false;
+    var cleanName = name.trim();
+    var fullName = parent.namePrefix ? parent.namePrefix + ' / ' + cleanName : cleanName;
+    var newFolder = { id:getNewFolderId(), album:parent.album || '未分组专辑', name:fullName, product:parent.product || '', series:parent.series || '', materialScope:'通用' };
+    FOLDERS.push(newFolder);
+    if (state.folderEditorTreeNodeId) state.expandedTree.add(state.folderEditorTreeNodeId);
+    state.selectedFolders.add(newFolder.id);
+    return true;
+  }
+
+  function deleteFolder(folderId) {
+    var folder = getFolderById(folderId);
+    if (!folder) return false;
+    var prefix = folder.name + ' / ';
+    var album = getFolderAlbum(folder);
+    var removeIds = new Set();
+    for (var i = FOLDERS.length - 1; i >= 0; i--) {
+      if (getFolderAlbum(FOLDERS[i]) === album && (FOLDERS[i].id === folderId || FOLDERS[i].name.indexOf(prefix) === 0)) {
+        removeIds.add(FOLDERS[i].id);
+        FOLDERS.splice(i, 1);
+      }
+    }
+    removeIds.forEach(function(id) {
+      state.selectedFolders.delete(id);
+      state.expandedTree.delete('folder:' + id);
+    });
+    return true;
+  }
+
+  function confirmDeleteFolder(folderId) {
+    var folder = getFolderById(folderId);
+    if (!folder) return;
+    var leafName = getFolderLeafName(folder);
+    var runDelete = function() {
+      if (!deleteFolder(folderId)) return;
+      refreshFolderViews();
+      showArchiveToast('删除成功');
+    };
+    if (typeof window.openConfirmModal === 'function') {
+      window.openConfirmModal({
+        title:'删除文件夹',
+        description:'确认删除「' + leafName + '」及其下级内容？此操作不可恢复。',
+        cancelText:'取消',
+        confirmText:'确定',
+        variant:'danger',
+        maskClosable:false,
+        onConfirm:runDelete
+      });
+      return;
+    }
+    if (window.confirm('确认删除「' + leafName + '」及其下级内容？此操作不可恢复。')) runDelete();
+  }
+
+  function renameFolder(folderId, name) {
+    var folder = getFolderById(folderId);
+    if (!folder) return false;
+    var cleanName = name.trim();
+    var oldName = folder.name;
+    var album = getFolderAlbum(folder);
+    var parts = oldName.split(' / ');
+    parts[parts.length - 1] = cleanName;
+    var newName = parts.join(' / ');
+    FOLDERS.forEach(function(item) {
+      if (getFolderAlbum(item) !== album) return;
+      if (item.id === folderId) {
+        item.name = newName;
+        return;
+      }
+      if (item.name.indexOf(oldName + ' / ') === 0) {
+        item.name = newName + item.name.slice(oldName.length);
+      }
+    });
+    return true;
+  }
+
+  function confirmFolderEditor() {
+    var name = state.folderEditorName.trim();
+    if (!name) {
+      state.folderEditorError = '请输入文件夹名字';
+      renderFolderEditor();
+      return;
+    }
+    var isEdit = state.folderEditorMode === 'edit';
+    var ok = isEdit
+      ? renameFolder(state.folderEditorTargetId, name)
+      : createChildFolder(name);
+    if (!ok) return;
+    closeFolderEditor();
+    refreshFolderViews();
+    showArchiveToast(isEdit ? '文件夹名字已更新' : '已新增子文件夹');
+  }
+
   function renderAssetItem(item, index) {
     var mediaHtml = '';
     if (item.type === 'video') {
@@ -682,6 +1027,7 @@
     }
     return '<div class="ai-intake-asset" role="button" tabindex="0" onclick="ccAssetIntakePreview(' + index + ')" onkeydown="ccAssetIntakeAssetKey(event, ' + index + ')">'
       + '<button class="ai-intake-asset-delete" type="button" title="删除" aria-label="删除文件" onclick="ccAssetIntakeDeleteAsset(event, ' + index + ')">' + TRASH_ICON + '</button>'
+      + (item.archived ? '<span class="ai-intake-asset-status">已入库</span>' : '')
       + '<span class="ai-intake-asset-media">' + mediaHtml + '</span>'
       + '<span class="ai-intake-asset-info">'
       + '  <span class="ai-intake-asset-name" title="' + escHtml(item.name) + '">' + escHtml(item.name) + '</span>'
@@ -730,6 +1076,21 @@
 
   function clearFolders() {
     state.selectedFolders.clear();
+    renderFolders();
+    if (state.subMode === 'folders') renderSub();
+  }
+
+  function setNameSearchMode(mode) {
+    state.nameSearchMode = mode === 'album' ? 'album' : 'folder';
+    renderNameSearchControls();
+    renderFilterControls();
+    renderFolders();
+    if (state.subMode === 'folders') renderSub();
+  }
+
+  function setNameSearch(value) {
+    state.nameQuery = value;
+    renderNameSearchControls();
     renderFolders();
     if (state.subMode === 'folders') renderSub();
   }
@@ -941,7 +1302,12 @@
     if (!title || !body) return;
     if (state.subMode === 'folders') {
       title.textContent = '全部入库位置';
-      body.innerHTML = '<div class="ai-intake-folder-list" id="aiIntakeAllFolderList"></div>';
+      body.innerHTML = '<div class="ai-intake-name-search-control ai-intake-name-search-control-sub">'
+        + '<div class="ai-intake-name-search-tabs" id="aiIntakeSubNameSearchTabs"></div>'
+        + '<input class="ai-intake-input ai-intake-name-search-input" id="aiIntakeSubNameSearchInput" autocomplete="off" placeholder="搜索文件夹名称" oninput="ccAssetIntakeSetNameSearch(this.value)">'
+        + '</div>'
+        + '<div class="ai-intake-folder-list" id="aiIntakeAllFolderList"></div>';
+      renderNameSearchControls('sub');
       renderFolders('aiIntakeAllFolderList');
       return;
     }
@@ -1040,6 +1406,7 @@
     var preview = document.getElementById('aiIntakePreviewMask');
     var sub = document.getElementById('aiIntakeSubMask');
     var main = document.getElementById('aiIntakeMask');
+    if (state.folderEditorVisible) return closeFolderEditor();
     if (state.renameVisible) return closeRenameEditor();
     if (preview && preview.classList.contains('show')) return closePreview();
     if (sub && sub.classList.contains('show')) return closeSub();
@@ -1051,6 +1418,8 @@
   window.ccAssetIntakeClose = closeModal;
   window.ccAssetIntakeSetTarget = setTarget;
   window.ccAssetIntakeClearFolders = clearFolders;
+  window.ccAssetIntakeSetNameSearchMode = setNameSearchMode;
+  window.ccAssetIntakeSetNameSearch = setNameSearch;
   window.ccAssetIntakeSetFilterMode = setFilterMode;
   window.ccAssetIntakeSetFilterSearch = setFilterSearch;
   window.ccAssetIntakeSetFilter = setFilterSearch;
@@ -1059,6 +1428,12 @@
   window.ccAssetIntakeToggleTreeNode = toggleTreeNode;
   window.ccAssetIntakeToggleFolder = toggleFolder;
   window.ccAssetIntakeRemoveSelectedFolder = removeSelectedFolder;
+  window.ccAssetIntakeOpenCreateFolder = openCreateFolder;
+  window.ccAssetIntakeOpenEditFolder = openEditFolder;
+  window.ccAssetIntakeConfirmDeleteFolder = confirmDeleteFolder;
+  window.ccAssetIntakeSetFolderName = setFolderName;
+  window.ccAssetIntakeCloseFolderEditor = closeFolderEditor;
+  window.ccAssetIntakeConfirmFolderEditor = confirmFolderEditor;
   window.ccAssetIntakeSetDesignerSearch = setDesignerSearch;
   window.ccAssetIntakeSetDesigner = setDesignerSearch;
   window.ccAssetIntakeOpenDesignerDropdown = openDesignerDropdown;

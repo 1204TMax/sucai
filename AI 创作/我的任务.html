@@ -287,7 +287,7 @@
     .output-row.collapsed .o-thumb { flex: 0 0 52px; width: 52px; height: 52px; }
     .o-thumb { border-radius: var(--r-md); overflow: hidden; position: relative; cursor: pointer; background: var(--bg-subtle); }
     .o-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .o-thumb > .thumb-overlay { z-index: 5; align-items: center; justify-content: flex-end; }
+    .o-thumb > .thumb-overlay { z-index: 5; align-items: flex-end; justify-content: flex-end; }
     .media-info-layer { position: absolute; left: 0; right: 0; z-index: 3; pointer-events: none; display: flex; min-width: 0; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.45); font: 600 var(--text-xs)/1.2 var(--font); }
     .media-info-attr { top: 0; padding: 6px 7px 16px; background: linear-gradient(180deg, rgba(0,0,0,0.58), rgba(0,0,0,0)); }
     .media-info-file { bottom: 0; padding: 16px 7px 6px; background: linear-gradient(0deg, rgba(0,0,0,0.64), rgba(0,0,0,0)); }
@@ -1011,9 +1011,9 @@ const GEN_SOURCES = { universal:'通用生成', poster:'大字报衍生', workfl
 const STORAGE_TARGETS = ['素材库','物料库','原料库'];
 const RECENT_WORKFLOWS = ['大字报裂变工作流','产品展示工作流','品牌形象工作流'];
 const DM_PAGE_SIZE = 24;
-const img = s => ({ type:'image', thumb:`https://picsum.photos/seed/${s}/200/200`, url:`https://picsum.photos/seed/${s}/800/800` });
+const img = (s, archived) => ({ type:'image', thumb:`https://picsum.photos/seed/${s}/200/200`, url:`https://picsum.photos/seed/${s}/800/800`, archived: !!archived });
 const DEMO_VIDEO_URL = '../icon/步数1-1.mp4';
-const vid = (s,i,d) => ({ type:'video', thumb:`https://picsum.photos/seed/${s}/800/800`, url:DEMO_VIDEO_URL, gradientIdx:i||0, duration:d||'5s' });
+const vid = (s,i,d,archived) => ({ type:'video', thumb:`https://picsum.photos/seed/${s}/800/800`, url:DEMO_VIDEO_URL, gradientIdx:i||0, duration:d||'5s', archived: !!archived });
 
 // 兼容兜底：共享预览脚本偶发未成功挂载时，避免主任务流直接渲染中断。
 if (typeof thumbOverlayHtml !== 'function') {
@@ -1119,7 +1119,7 @@ const INITIAL_TASKS = [
       items: [
         { itemId:'wf-item-1', type:'image', assetType:'image', thumb:'https://picsum.photos/seed/wf1/200/200', url:'https://picsum.photos/seed/wf1/800/800', sourceNodeId:'image-1', reviewTaskId:'rv-1', reviewStatus:'pending', createdTime:'2026-04-20 14:05' },
         { itemId:'wf-item-2', type:'image', assetType:'image', thumb:'https://picsum.photos/seed/wf2/200/200', url:'https://picsum.photos/seed/wf2/800/800', sourceNodeId:'image-1', reviewTaskId:'rv-1', reviewStatus:'pending', createdTime:'2026-04-20 14:06' },
-        { itemId:'wf-item-3', type:'image', assetType:'image', thumb:'https://picsum.photos/seed/wf3/200/200', url:'https://picsum.photos/seed/wf3/800/800', sourceNodeId:'image-1', reviewTaskId:'rv-1', reviewStatus:'approved', createdTime:'2026-04-20 14:07' },
+        { itemId:'wf-item-3', type:'image', assetType:'image', thumb:'https://picsum.photos/seed/wf3/200/200', url:'https://picsum.photos/seed/wf3/800/800', sourceNodeId:'image-1', reviewTaskId:'rv-1', reviewStatus:'approved', createdTime:'2026-04-20 14:07', archived:true },
         { itemId:'wf-item-4', type:'image', assetType:'image', thumb:'https://picsum.photos/seed/wf4/200/200', url:'https://picsum.photos/seed/wf4/800/800', sourceNodeId:'image-1', reviewTaskId:'rv-1', reviewStatus:'approved', createdTime:'2026-04-20 14:08' },
         { itemId:'wf-item-5', type:'image', assetType:'image', thumb:'https://picsum.photos/seed/wf5/200/200', url:'https://picsum.photos/seed/wf5/800/800', sourceNodeId:'image-1', reviewTaskId:'rv-1', reviewStatus:'approved', createdTime:'2026-04-20 14:09' }
       ]
@@ -1247,11 +1247,11 @@ const INITIAL_TASKS = [
   { id:'2', name:'品牌形象图多模型对比', type:'image', taskType:'direct_generate', resultType:'image', status:'completed', createdTime:'2026-04-02 13:10', creator:'我',
     source:'universal',
     input:{ prompt:'大字报风格品牌代言人主图，革命海报构图，浓郁红黄配色，粗体宋体标题"品质之选 引领潮流"，人物半身像居中，背景放射线光晕，时尚杂志封面质感', refImages:[{url:'https://picsum.photos/seed/ref1/200/200',thumb:'https://picsum.photos/seed/ref1/200/200'}], inputType:'image', models:['seedream5','banana2'], ratio:'3:4', res:'2K', count:4 },
-    output:{ byModel:{ seedream5:{ total:4, items:[img('m1a'),img('m1b'),img('m1c'),img('m1d')] }, banana2:{ total:4, items:[img('m2a'),img('m2b'),img('m2c'),img('m2d')] }}}},
+    output:{ byModel:{ seedream5:{ total:4, items:[img('m1a', true),img('m1b'),img('m1c'),img('m1d')] }, banana2:{ total:4, items:[img('m2a'),img('m2b'),img('m2c', true),img('m2d')] }}}},
   { id:'3', name:'产品短视频素材', type:'video', taskType:'direct_generate', resultType:'video', status:'completed', createdTime:'2026-04-02 11:45', creator:'我',
     source:'universal',
     input:{ prompt:'护肤品产品展示动画，旋转展示，光影效果', refImages:[], inputType:'text', models:['minimax1'], ratio:'16:9', dur:'5秒', count:4 },
-    output:{ byModel:{ minimax1:{ total:4, items:[vid('v1',0,'5s'),vid('v2',1,'5s'),vid('v3',2,'5s'),vid('v4',3,'5s')] }}}},
+    output:{ byModel:{ minimax1:{ total:4, items:[vid('v1',0,'5s', true),vid('v2',1,'5s'),vid('v3',2,'5s'),vid('v4',3,'5s')] }}}},
   { id:'4', name:'直播间背景视频', type:'video', taskType:'direct_generate', resultType:'video', status:'generating', createdTime:'2026-04-02 15:20', creator:'我',
     source:'universal',
     input:{ prompt:'直播间科技感背景循环动画，蓝紫色调', refImages:[{url:'https://picsum.photos/seed/ref2/200/200',thumb:'https://picsum.photos/seed/ref2/200/200'}], inputType:'image', models:['minimax1'], ratio:'16:9', dur:'10秒', count:3 },
@@ -1259,7 +1259,7 @@ const INITIAL_TASKS = [
   { id:'5', name:'社媒投放图批量裂变', type:'image', taskType:'direct_generate', resultType:'image', status:'completed', createdTime:'2026-04-01 16:30', creator:'张三',
     source:'poster', project:'走路赚金币',
     input:{ prompt:'大字报风格社交媒体投放素材，多尺寸适配，主色调正红配金黄，标题"爆款新品 全网最低价"，口号横幅、五角星装饰、产品图居中，品牌色系统一', refImages:[{url:'https://picsum.photos/seed/ref3/200/200',thumb:'https://picsum.photos/seed/ref3/200/200'},{url:'https://picsum.photos/seed/ref4/200/200',thumb:'https://picsum.photos/seed/ref4/200/200'}], inputType:'multi_image', models:['seedream5'], ratio:'1:1', res:'2K', count:20 },
-    output:{ byModel:{ seedream5:{ total:20, items:Array.from({length:20},(_,i)=>img('b5_'+i)) }}}},
+    output:{ byModel:{ seedream5:{ total:20, items:Array.from({length:20},(_,i)=>img('b5_'+i, i % 7 === 0)) }}}},
   { id:'6', name:'首尾帧产品转场视频', type:'video', taskType:'direct_generate', resultType:'video', status:'completed', createdTime:'2026-04-01 14:00', creator:'我',
     source:'workflow',
     input:{ prompt:'产品A到产品B的平滑转场', refImages:[{url:'https://picsum.photos/seed/kf1/200/200',thumb:'https://picsum.photos/seed/kf1/200/200'},{url:'https://picsum.photos/seed/kf2/200/200',thumb:'https://picsum.photos/seed/kf2/200/200'}], inputType:'keyframe', models:['minimax1'], ratio:'16:9', dur:'5秒', count:2 },
@@ -1559,10 +1559,16 @@ function getMediaFileName(item, index, type, task) {
 
 function mediaInfoOverlayHtml(item, index, type, task, displayMeta) {
   var mediaType = mediaKind(item, type);
-  var attrText = getMediaAttributeText(item, task, displayMeta, mediaType);
   var fileName = getMediaFileName(item, index, mediaType, task);
-  return '<div class="media-info-layer media-info-attr"><span class="media-info-text">' + escHtml(attrText) + '</span></div>'
-    + '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + escHtml(fileName) + '">' + escHtml(fileName) + '</span></div>';
+  return '<div class="media-info-layer media-info-file"><span class="media-info-text" title="' + escHtml(fileName) + '">' + escHtml(fileName) + '</span></div>';
+}
+
+function isArchivedMedia(item) {
+  return !!(item && (item.archived || item.isArchived || item.inLibrary || item.hasArchived || item.storageStatus === 'archived'));
+}
+
+function archiveStatusBadgeHtml(item) {
+  return isArchivedMedia(item) ? '<span class="media-archive-badge">已入库</span>' : '';
 }
 
 const SVG = {
@@ -3365,6 +3371,7 @@ function renderVideoThumb(item, collapsed, task, index, displayMeta) {
     +'<div class="vid-thumb-inner" style="background:linear-gradient(135deg,'+g[0]+','+g[1]+')">'
     +'<div class="vid-play"><svg width="'+ps+'" height="'+ps+'" viewBox="0 0 24 24" fill="#333"><polygon points="6 3 20 12 6 21"/></svg></div>'
     +'</div>'
+    +archiveStatusBadgeHtml(item)
     +mediaInfoOverlayHtml(item, index || 0, 'video', task, displayMeta)
     +thumbOverlayHtml(fullUrl)
     +'</div>';
@@ -3377,6 +3384,7 @@ function renderImageThumb(item, index, task, displayMeta) {
   var dlFn = 'event.stopPropagation();(function(u,i){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(i+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+fullUrl+'\','+index+')';
   return '<div class="o-thumb" data-preview-url="'+fullUrl+'" style="cursor:pointer">'
     +'<img src="'+thumbUrl+'" alt="" loading="lazy">'
+    +archiveStatusBadgeHtml(item)
     +mediaInfoOverlayHtml(item, index, 'image', task, displayMeta)
     +thumbOverlayHtml(fullUrl, dlFn)
     +'</div>';
@@ -3394,7 +3402,8 @@ function buildArchiveItem(item, index, fallbackType) {
     url: url,
     thumb: item.thumb || url,
     name: name,
-    meta: item.duration || ''
+    meta: item.duration || '',
+    archived: isArchivedMedia(item)
   };
 }
 
@@ -3594,7 +3603,7 @@ function renderDetailModalBody() {
     var url = escHtml(item.url||item.thumb);
     var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
     var dlFn = 'event.stopPropagation();(function(u,n){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(n+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+url+'\','+i+')';
-    return '<div class="detail-thumb-wrap" onclick="window.__previewImage(\''+url+'\')"><img src="'+url+'" alt="" loading="lazy"><div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:4px"><button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button><button class="thumb-act" title="入库" onclick="event.stopPropagation();archiveCurrentDetailItem('+(((page-1)*DM_PAGE_SIZE)+i)+')">'+icon(SVG.store)+'</button></div></div>';
+    return '<div class="detail-thumb-wrap" onclick="window.__previewImage(\''+url+'\')"><img src="'+url+'" alt="" loading="lazy">'+archiveStatusBadgeHtml(item)+'<div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:4px"><button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button><button class="thumb-act" title="入库" onclick="event.stopPropagation();archiveCurrentDetailItem('+(((page-1)*DM_PAGE_SIZE)+i)+')">'+icon(SVG.store)+'</button></div></div>';
   }).join('');
 
   var paginationHtml = '';
@@ -3609,8 +3618,6 @@ function renderDetailModalBody() {
     +'<div class="detail-input-section"><div class="detail-label">输入信息</div><div class="detail-prompt">'+escHtml(task.input.prompt)+'</div>'
     +'<div class="detail-params">'
     +task.input.models.map(function(m){ return '<span class="detail-param">模型: <strong>'+escHtml(MODELS_MAP[m]||m)+'</strong></span>'; }).join('')
-    +(displayMeta.ratioText?'<span class="detail-param">比例: <strong>'+escHtml(displayMeta.ratioText)+'</strong></span>':'')
-    +(vm.resultType==='image' && displayMeta.extra?'<span class="detail-param">分辨率: <strong>'+escHtml(displayMeta.extra)+'</strong></span>':'')
     +(vm.resultType==='video' && displayMeta.extra?'<span class="detail-param">时长: <strong>'+escHtml(displayMeta.extra)+'</strong></span>':'')
     +'<span class="detail-param">数量: <strong>'+vm.producedCount+'/'+vm.expectedCount+'</strong></span></div>'
     +refImgsHtml+'</div>'
