@@ -77,6 +77,11 @@ const MENU_CONFIG = [
         name: '节点类型管理',
         page: 'AI 创作/节点类型管理.html',
         icon: '<circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h2a3 3 0 0 1 3 3v6"></path><path d="M6 9v2a3 3 0 0 0 3 3h1"></path>'
+      },
+      {
+        name: '成本管理',
+        page: 'AI 创作/成本管理.html',
+        icon: '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>'
       }
     ]
   },

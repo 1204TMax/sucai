@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成本管理 - 量化投放系统</title>
+  <style>
+    :root {
+      --ant-primary-1: #E6F4FF;
+      --ant-primary-2: #BAE0FF;
+      --ant-primary-3: #91CAFF;
+      --ant-primary-4: #69B1FF;
+      --ant-primary-5: #4096FF;
+      --ant-primary-6: #1677FF;
+      --ant-primary-7: #0958D9;
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+      --ant-bg-base: #F5F7FA;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h5: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+      --ant-box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      --cost-table-stripe: #FAFAFA;
+      --cost-blue-soft: #F0F5FF;
+      --cost-blue-border: #ADC6FF;
+      --cost-green-soft: #E6FFFB;
+      --cost-green-border: #87E8DE;
+      --cost-orange-soft: #FFF7E6;
+      --cost-orange-border: #FFD591;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow: hidden;
+      padding: var(--ant-size-xs);
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-family: var(--ant-font-family);
+      font-size: var(--ant-font-size);
+      line-height: 1.5715;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      border: none;
+    }
+
+    .cost-page {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      min-height: calc(100vh - var(--ant-size));
+    }
+
+    .cost-toolbar,
+    .org-panel,
+    .report-panel {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius);
+      box-shadow: var(--ant-box-shadow);
+    }
+
+    .cost-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: var(--ant-size);
+      min-height: 64px;
+      padding: var(--ant-size-sm) var(--ant-size);
+      flex-shrink: 0;
+    }
+
+    .toolbar-left,
+    .date-trigger,
+    .filter-row,
+    .segmented,
+    .search-wrap,
+    .report-title,
+    .report-tags,
+    .table-user,
+    .tree-row,
+    .metric-grid,
+    .metric-tile {
+      display: flex;
+      align-items: center;
+    }
+
+    .toolbar-left {
+      gap: var(--ant-size-sm);
+      min-width: 0;
+    }
+
+    .toolbar-label {
+      color: var(--ant-text-color);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .date-wrap {
+      position: relative;
+    }
+
+    .date-trigger {
+      height: 32px;
+      gap: var(--ant-size-xs);
+      min-width: 238px;
+      padding: 0 var(--ant-size-sm);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color-secondary);
+      cursor: pointer;
+      justify-content: space-between;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .date-trigger:hover,
+    .date-trigger.open {
+      border-color: var(--ant-primary-5);
+      box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+
+    .date-trigger svg,
+    .search-wrap svg,
+    .tree-caret,
+    .reset-btn svg {
+      flex-shrink: 0;
+    }
+
+    .date-value {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .date-name {
+      color: var(--ant-text-color);
+      font-weight: 500;
+    }
+
+    .date-range {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .date-menu {
+      position: absolute;
+      top: calc(100% + var(--ant-size-xxs));
+      left: 0;
+      z-index: 20;
+      display: none;
+      width: 184px;
+      padding: var(--ant-size-xxs);
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    }
+
+    .date-menu.show {
+      display: block;
+    }
+
+    .date-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 32px;
+      padding: 0 var(--ant-size-sm);
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-text-color-secondary);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .date-option:hover {
+      background: var(--ant-bg-tertiary);
+      color: var(--ant-text-color);
+    }
+
+    .date-option.active {
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+      font-weight: 600;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 188px minmax(0, 1fr);
+      gap: var(--ant-size-xs);
+      flex: 1;
+      min-height: 0;
+    }
+
+    .org-panel {
+      min-height: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .org-title {
+      flex-shrink: 0;
+      padding: var(--ant-size-sm) var(--ant-size-sm) var(--ant-size-xs);
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 600;
+    }
+
+    .org-tree {
+      overflow: auto;
+      padding: 0 var(--ant-size-xxs) var(--ant-size-xs);
+    }
+
+    .tree-row {
+      gap: var(--ant-size-xxs);
+      width: 100%;
+      height: 28px;
+      padding: 0 var(--ant-size-xs);
+      border-radius: var(--ant-border-radius-sm);
+      color: var(--ant-text-color-secondary);
+      cursor: pointer;
+      user-select: none;
+      transition: background 120ms ease, color 120ms ease;
+    }
+
+    .tree-row:hover {
+      background: var(--ant-bg-tertiary);
+      color: var(--ant-text-color);
+    }
+
+    .tree-row.active {
+      background: var(--cost-blue-soft);
+      color: var(--ant-primary-6);
+      font-weight: 600;
+    }
+
+    .tree-caret {
+      width: 14px;
+      height: 14px;
+      color: var(--ant-text-color-quaternary);
+      transition: transform 120ms ease;
+    }
+
+    .tree-row.expanded .tree-caret {
+      transform: rotate(90deg);
+    }
+
+    .tree-caret.placeholder {
+      opacity: 0;
+    }
+
+    .tree-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .tree-children {
+      display: none;
+    }
+
+    .tree-children.show {
+      display: block;
+    }
+
+    .report-panel {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .report-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      min-height: 42px;
+      padding: 0 var(--ant-size);
+      border-bottom: 1px solid var(--cost-blue-border);
+      flex-shrink: 0;
+    }
+
+    .report-title {
+      gap: var(--ant-size-sm);
+      min-width: 0;
+    }
+
+    .report-title strong {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .report-tags {
+      gap: var(--ant-size-xs);
+      min-width: 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 var(--ant-size-xs);
+      border: 1px solid transparent;
+      border-radius: var(--ant-border-radius-sm);
+      color: var(--ant-text-color-tertiary);
+      background: var(--ant-bg-tertiary);
+      font-size: var(--ant-font-size-sm);
+      white-space: nowrap;
+    }
+
+    .tag.primary {
+      color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+      border-color: var(--ant-primary-2);
+    }
+
+    .report-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-sm);
+      padding: var(--ant-size);
+      flex: 1;
+      min-height: 0;
+    }
+
+    .filter-row {
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .segmented {
+      height: 32px;
+      border: 1px solid var(--ant-primary-4);
+      border-radius: var(--ant-border-radius);
+      overflow: hidden;
+      background: var(--ant-bg-container);
+      flex-shrink: 0;
+    }
+
+    .segment-btn {
+      height: 30px;
+      padding: 0 var(--ant-size);
+      background: var(--ant-bg-container);
+      color: var(--ant-primary-6);
+      border-right: 1px solid var(--ant-primary-4);
+      cursor: pointer;
+      font-size: var(--ant-font-size-sm);
+      font-weight: 600;
+      transition: background 120ms ease, color 120ms ease;
+      white-space: nowrap;
+    }
+
+    .segment-btn:last-child {
+      border-right: none;
+    }
+
+    .segment-btn.active {
+      background: var(--ant-primary-5);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 320px;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: var(--ant-size-sm);
+      color: var(--ant-text-color-quaternary);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 32px;
+      padding: 0 var(--ant-size-sm) 0 var(--ant-size-xl);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color);
+      outline: none;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--ant-primary-6);
+      box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+
+    .search-input::placeholder {
+      color: var(--ant-text-color-quaternary);
+    }
+
+    .reset-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xxs);
+      height: 32px;
+      padding: 0 var(--ant-size-sm);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color 120ms ease, color 120ms ease;
+    }
+
+    .reset-btn:hover {
+      border-color: var(--ant-primary-5);
+      color: var(--ant-primary-6);
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(148px, 1fr));
+      gap: var(--ant-size-xs);
+      flex-shrink: 0;
+    }
+
+    .metric-tile {
+      min-height: 70px;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--ant-size-xxs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+    }
+
+    .metric-tile.highlight {
+      background: var(--cost-blue-soft);
+      border-color: var(--cost-blue-border);
+    }
+
+    .metric-value {
+      color: var(--ant-text-color);
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.2;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metric-tile.highlight .metric-value {
+      color: var(--ant-primary-5);
+    }
+
+    .metric-label {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .table-wrap {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      border-top: 1px solid var(--ant-border-color-secondary);
+    }
+
+    table {
+      width: 100%;
+      min-width: 920px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    thead th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      height: 42px;
+      padding: 0 var(--ant-size-sm);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 700;
+      text-align: right;
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      height: 47px;
+      padding: 0 var(--ant-size-sm);
+      color: var(--ant-text-color-secondary);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      text-align: right;
+      font-size: var(--ant-font-size-sm);
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: var(--cost-table-stripe);
+    }
+
+    tbody tr:hover td {
+      background: var(--ant-primary-1);
+    }
+
+    th.rank-col,
+    td.rank-col {
+      width: 58px;
+      text-align: center;
+      color: var(--ant-text-color-tertiary);
+    }
+
+    th.name-col,
+    td.name-col {
+      width: 240px;
+      text-align: left;
+    }
+
+    .table-user {
+      min-width: 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xxs);
+    }
+
+    .table-user-name {
+      max-width: 100%;
+      overflow: hidden;
+      color: var(--ant-text-color-secondary);
+      font-weight: 700;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .table-user-sub {
+      max-width: 100%;
+      overflow: hidden;
+      color: var(--ant-text-color-tertiary);
+      font-size: 11px;
+      font-weight: 500;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .money {
+      color: var(--ant-primary-5);
+      font-weight: 800;
+    }
+
+    .empty-row td {
+      height: 160px;
+      color: var(--ant-text-color-tertiary);
+      text-align: center;
+      font-weight: 500;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        overflow: auto;
+      }
+
+      .cost-page {
+        min-height: auto;
+      }
+
+      .cost-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .org-panel {
+        max-height: 240px;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(148px, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .date-trigger,
+      .search-wrap {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+      }
+
+      .filter-row,
+      .toolbar-left {
+        width: 100%;
+      }
+
+      .segmented {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .segment-btn {
+        flex: 1;
+        padding: 0 var(--ant-size-xs);
+      }
+
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cost-page">
+    <header class="cost-toolbar">
+      <div class="toolbar-left">
+        <span class="toolbar-label">费用时间</span>
+        <div class="date-wrap">
+          <button class="date-trigger" id="dateTrigger" type="button" onclick="toggleDateMenu(event)">
+            <span class="date-value">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span class="date-name" id="dateName">本周</span>
+              <span class="date-range" id="dateRangeText">2026-06-29 ~ 2026-07-05</span>
+            </span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+          <div class="date-menu" id="dateMenu"></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-grid">
+      <aside class="org-panel" aria-label="组织架构树">
+        <div class="org-title">部门筛选</div>
+        <div class="org-tree" id="orgTree"></div>
+      </aside>
+
+      <section class="report-panel">
+        <div class="report-header">
+          <div class="report-title">
+            <strong>费用汇总统计</strong>
+            <div class="report-tags">
+              <span class="tag" id="headerDateTag">本周</span>
+              <span class="tag primary" id="headerOrgTag">发行平台</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="report-body">
+          <div class="filter-row">
+            <div class="segmented" role="tablist" aria-label="统计维度">
+              <button class="segment-btn active" type="button" data-mode="user" onclick="setMode('user')">按用户统计</button>
+              <button class="segment-btn" type="button" data-mode="supplier" onclick="setMode('supplier')">按供应商统计</button>
+              <button class="segment-btn" type="button" data-mode="model" onclick="setMode('model')">按模型统计</button>
+            </div>
+            <div class="search-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input class="search-input" id="searchInput" type="search" placeholder="按用户名搜索" oninput="setSearch(this.value)">
+            </div>
+            <button class="reset-btn" type="button" onclick="resetFilters()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+              重置
+            </button>
+          </div>
+
+          <div class="metric-grid">
+            <div class="metric-tile">
+              <div class="metric-value" id="metricUsers">0</div>
+              <div class="metric-label">用户数</div>
+            </div>
+            <div class="metric-tile">
+              <div class="metric-value" id="metricImages">0</div>
+              <div class="metric-label">总生成图片数</div>
+            </div>
+            <div class="metric-tile">
+              <div class="metric-value" id="metricVideos">0</div>
+              <div class="metric-label">总生成视频数</div>
+            </div>
+            <div class="metric-tile highlight">
+              <div class="metric-value" id="metricCost">¥0.0000</div>
+              <div class="metric-label">总费用</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="rank-col">排名</th>
+                  <th class="name-col" id="nameColumnTitle">用户名</th>
+                  <th>文本 token 数</th>
+                  <th>图片生成数</th>
+                  <th>视频生成数</th>
+                  <th>查询期总费用</th>
+                  <th>日均费用</th>
+                </tr>
+              </thead>
+              <tbody id="costTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const orgTree = [
+      {
+        name: '发行平台',
+        type: 'department',
+        children: [
+          {
+            name: '市场中心',
+            type: 'department',
+            children: [
+              { name: '孙爱华', type: 'person' },
+              {
+                name: '繁花市场部',
+                type: 'department',
+                children: [
+                  { name: '罗剑妙', type: 'person' },
+                  { name: '吴波', type: 'person' },
+                  { name: '陶琼', type: 'person' },
+                  { name: '郭俏颜', type: 'person' },
+                  { name: '马静', type: 'person' },
+                  { name: '陈雪莹', type: 'person' },
+                  { name: '蒋展豪', type: 'person' },
+                  { name: '陈丽诗', type: 'person' },
+                  { name: '江志华', type: 'person' }
+                ]
+              },
+              {
+                name: '喜量市场部',
+                type: 'department',
+                children: [
+                  { name: '黄海玲', type: 'person' },
+                  { name: '王文杰', type: 'person' },
+                  { name: '曹译方', type: 'person' },
+                  { name: '胡俊诣', type: 'person' },
+                  { name: '张素厘', type: 'person' },
+                  { name: '李思思', type: 'person' },
+                  { name: '孙梦婷', type: 'person' },
+                  { name: '胡慧玲', type: 'person' }
+                ]
+              },
+              {
+                name: '公共素材组-素材组',
+                type: 'department',
+                children: [
+                  { name: '曾诗瑶', type: 'person' },
+                  { name: '余君玲', type: 'person' }
+                ]
+              },
+              { name: '公共素材组-摄制组', type: 'department' },
+              {
+                name: '海外组',
+                type: 'department',
+                children: [
+                  { name: '刘军', type: 'person' },
+                  { name: '彭丽', type: 'person' },
+                  { name: '左江林', type: 'person' },
+                  { name: '苏明玉', type: 'person' },
+                  { name: '李川', type: 'person' },
+                  { name: '庞美芸', type: 'person' },
+                  { name: '曲晶', type: 'person' },
+                  { name: '李健', type: 'person' },
+                  { name: '吴明洲', type: 'person' },
+                  { name: '曹昊楠', type: 'person' },
+                  { name: '梁皓强', type: 'person' },
+                  { name: '谭倩雯', type: 'person' }
+                ]
+              },
+              {
+                name: '海外二组',
+                type: 'department',
+                children: [
+                  { name: '张瑾', type: 'person' },
+                  { name: '唐宝怡', type: 'person' },
+                  { name: '罗珮瑜', type: 'person' },
+                  { name: '傅昱', type: 'person' },
+                  { name: '李昭禾', type: 'person' }
+                ]
+              },
+              {
+                name: '橘米市场部',
+                type: 'department',
+                children: [
+                  { name: '彭晓佳', type: 'person' },
+                  { name: '陈瑶', type: 'person' },
+                  { name: '谢秀鹏', type: 'person' },
+                  { name: '钟欣蓉', type: 'person' },
+                  { name: '曾妍', type: 'person' },
+                  { name: '欧炳林', type: 'person' },
+                  { name: '庄姚丽', type: 'person' },
+                  { name: '余兆康', type: 'person' },
+                  { name: '杨茜', type: 'person' },
+                  { name: '余琦琪', type: 'person' }
+                ]
+              },
+              {
+                name: '追光市场部',
+                type: 'department',
+                children: [
+                  { name: '林雨涵', type: 'person' },
+                  { name: '朱烨怡', type: 'person' },
+                  { name: '刘展通', type: 'person' },
+                  { name: '陈燕纯', type: 'person' },
+                  { name: '何泳欣', type: 'person' },
+                  { name: '唐建滨', type: 'person' },
+                  { name: '欧甜甜', type: 'person' },
+                  { name: '何俊恒', type: 'person' },
+                  { name: '卢善辉', type: 'person' },
+                  { name: '梁晓潼', type: 'person' },
+                  { name: '杨俊艺', type: 'person' }
+                ]
+              },
+              { name: '渠道管理部', type: 'department' },
+              { name: '爆量市场部', type: 'department' },
+              { name: '厂商组', type: 'department' }
+            ]
+          },
+          {
+            name: 'AI增长研究中心',
+            type: 'department',
+            children: [
+              {
+                name: 'AI素材组',
+                type: 'department',
+                children: [
+                  { name: '杜晶', type: 'person' },
+                  { name: '胡慧', type: 'person' },
+                  { name: '王燕', type: 'person' },
+                  { name: '周梓炀', type: 'person' },
+                  { name: '胡伟鑫', type: 'person' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    const userRows = buildUserRowsFromOrgTree(orgTree);
+
+    const supplierRows = [
+      { name: '火山引擎', sub: '市场中心主力供应商', path: ['发行平台', '市场中心'], tokens: 24894600, images: 913, videos: 31, cost: 181.4286 },
+      { name: 'Kie.ai', sub: '海外组 / 海外二组', path: ['发行平台', '市场中心', '海外组'], tokens: 15338340, images: 587, videos: 18, cost: 92.3417 },
+      { name: 'Google', sub: 'AI素材组视频模型', path: ['发行平台', 'AI增长研究中心', 'AI素材组'], tokens: 13640280, images: 392, videos: 15, cost: 71.2054 },
+      { name: 'OpenAI', sub: '公共素材组-素材组', path: ['发行平台', '市场中心', '公共素材组-素材组'], tokens: 6821870, images: 211, videos: 0, cost: 22.1182 }
+    ];
+
+    const modelRows = [
+      { name: 'doubao-seedream-3.0', sub: '市场中心图片生成', path: ['发行平台', '市场中心'], tokens: 12650320, images: 812, videos: 0, cost: 88.6372 },
+      { name: 'seedance-1.0-pro', sub: '市场中心视频生成', path: ['发行平台', '市场中心'], tokens: 8418090, images: 0, videos: 44, cost: 118.9043 },
+      { name: 'gemini-3.1-pro-preview', sub: 'AI素材组文本理解', path: ['发行平台', 'AI增长研究中心', 'AI素材组'], tokens: 9832784, images: 0, videos: 0, cost: 34.8921 },
+      { name: 'gpt-image-1', sub: '公共素材组-素材组', path: ['发行平台', '市场中心', '公共素材组-素材组'], tokens: 4126450, images: 366, videos: 0, cost: 46.0128 },
+      { name: 'veo-3-fast', sub: 'AI素材组视频生成', path: ['发行平台', 'AI增长研究中心', 'AI素材组'], tokens: 1350860, images: 0, videos: 11, cost: 79.5216 }
+    ];
+
+    const datePresets = [
+      { key: 'today', label: '今天' },
+      { key: 'yesterday', label: '昨天' },
+      { key: 'week', label: '本周' },
+      { key: 'lastWeek', label: '上周' },
+      { key: 'month', label: '本月' },
+      { key: 'lastMonth', label: '上月' },
+      { key: 'halfYear', label: '半年' },
+      { key: 'year', label: '今年' }
+    ];
+
+    const state = {
+      mode: 'user',
+      dateKey: 'week',
+      selectedOrg: '发行平台',
+      search: '',
+      expanded: {
+        '发行平台': true,
+        '市场中心': true,
+        'AI增长研究中心': true,
+        'AI素材组': true
+      }
+    };
+
+    const modeMeta = {
+      user: { nameTitle: '用户名', searchPlaceholder: '按用户名搜索', rows: userRows },
+      supplier: { nameTitle: '供应商', searchPlaceholder: '按供应商搜索', rows: supplierRows },
+      model: { nameTitle: '模型名称', searchPlaceholder: '按模型搜索', rows: modelRows }
+    };
+
+    function buildUserRowsFromOrgTree(nodes) {
+      const leaderNames = ['孙爱华', '罗剑妙', '黄海玲', '曾诗瑶', '刘军', '张瑾', '彭晓佳', '林雨涵', '杜晶'];
+      const people = [];
+
+      function walk(node, path) {
+        const nextPath = path.concat(node.name);
+        if (node.type === 'person') {
+          people.push({ name: node.name, path: nextPath });
+          return;
+        }
+        (node.children || []).forEach(function (child) {
+          walk(child, nextPath);
+        });
+      }
+
+      nodes.forEach(function (node) {
+        walk(node, []);
+      });
+
+      return people.map(function (person, index) {
+        const isLeader = leaderNames.indexOf(person.name) !== -1;
+        const isMaterial = person.path.indexOf('AI素材组') !== -1 || person.path.indexOf('公共素材组-素材组') !== -1;
+        const isOverseas = person.path.indexOf('海外组') !== -1 || person.path.indexOf('海外二组') !== -1;
+        const multiplier = (isLeader ? 1.42 : 1) + (isMaterial ? 0.22 : 0) + (isOverseas ? 0.12 : 0);
+        const tokens = Math.round((780000 + (index + 1) * 214000 + (index % 7) * 183456) * multiplier);
+        const images = Math.round((46 + ((index * 17) % 164) + (isMaterial ? 86 : 0)) * (isLeader ? 1.16 : 1));
+        const videos = Math.round(((index * 5 + (isOverseas ? 6 : 2)) % 19) * (isLeader ? 1.18 : 1));
+        const cost = Number((tokens / 1000000 * 0.36 + images * 0.043 + videos * 1.28 + (isLeader ? 4.6 : 1.8)).toFixed(4));
+        return {
+          name: person.name,
+          sub: person.path.slice(1, -1).join(' / '),
+          path: person.path,
+          tokens: tokens,
+          images: images,
+          videos: videos,
+          cost: cost
+        };
+      });
+    }
+
+    function pad(value) {
+      return String(value).padStart(2, '0');
+    }
+
+    function formatDate(date) {
+      return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate());
+    }
+
+    function cloneDate(date) {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    function addDays(date, days) {
+      const next = cloneDate(date);
+      next.setDate(next.getDate() + days);
+      return next;
+    }
+
+    function startOfWeek(date) {
+      const day = date.getDay() || 7;
+      return addDays(date, 1 - day);
+    }
+
+    function endOfMonth(date) {
+      return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    }
+
+    function getDateSpan(key) {
+      const today = cloneDate(new Date());
+      if (key === 'today') return { start: today, end: today, days: 1 };
+      if (key === 'yesterday') {
+        const yesterday = addDays(today, -1);
+        return { start: yesterday, end: yesterday, days: 1 };
+      }
+      if (key === 'lastWeek') {
+        const start = addDays(startOfWeek(today), -7);
+        return { start, end: addDays(start, 6), days: 7 };
+      }
+      if (key === 'month') {
+        const start = new Date(today.getFullYear(), today.getMonth(), 1);
+        return { start, end: endOfMonth(today), days: endOfMonth(today).getDate() };
+      }
+      if (key === 'lastMonth') {
+        const anchor = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        return { start: anchor, end: endOfMonth(anchor), days: endOfMonth(anchor).getDate() };
+      }
+      if (key === 'halfYear') {
+        return { start: addDays(today, -182), end: today, days: 183 };
+      }
+      if (key === 'year') {
+        const start = new Date(today.getFullYear(), 0, 1);
+        const diff = Math.round((today - start) / 86400000) + 1;
+        return { start, end: today, days: diff };
+      }
+      const start = startOfWeek(today);
+      return { start, end: addDays(start, 6), days: 7 };
+    }
+
+    function formatNumber(value) {
+      return Math.round(value).toLocaleString('en-US');
+    }
+
+    function formatMoney(value) {
+      return '¥' + value.toFixed(4);
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, function (char) {
+        return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char];
+      });
+    }
+
+    function renderDateMenu() {
+      const menu = document.getElementById('dateMenu');
+      menu.innerHTML = datePresets.map(function (preset) {
+        const active = preset.key === state.dateKey ? ' active' : '';
+        return '<button class="date-option' + active + '" type="button" onclick="setDateKey(\'' + preset.key + '\')">'
+          + '<span>' + preset.label + '</span>'
+          + (active ? '<span>✓</span>' : '')
+          + '</button>';
+      }).join('');
+    }
+
+    function renderOrgTree() {
+      const root = document.getElementById('orgTree');
+      root.innerHTML = orgTree.map(function (node) {
+        return renderOrgNode(node, 0);
+      }).join('');
+    }
+
+    function renderOrgNode(node, depth) {
+      const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+      const expanded = !!state.expanded[node.name];
+      const active = state.selectedOrg === node.name;
+      const padding = 8 + depth * 16;
+      const caret = hasChildren
+        ? '<svg class="tree-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>'
+        : '<span class="tree-caret placeholder"></span>';
+      const children = hasChildren
+        ? '<div class="tree-children' + (expanded ? ' show' : '') + '">' + node.children.map(function (child) { return renderOrgNode(child, depth + 1); }).join('') + '</div>'
+        : '';
+      return '<div class="tree-node">'
+        + '<div class="tree-row' + (active ? ' active' : '') + (expanded ? ' expanded' : '') + '" style="padding-left:' + padding + 'px" onclick="selectOrg(\'' + escapeHtml(node.name) + '\')">'
+        + caret
+        + '<span class="tree-name" title="' + escapeHtml(node.name) + '">' + escapeHtml(node.name) + '</span>'
+        + '</div>'
+        + children
+        + '</div>';
+    }
+
+    function getRowsForMode() {
+      return modeMeta[state.mode].rows;
+    }
+
+    function matchesOrg(row) {
+      return row.path.indexOf(state.selectedOrg) !== -1;
+    }
+
+    function getFilteredRows() {
+      const keyword = state.search.trim().toLowerCase();
+      return getRowsForMode()
+        .filter(matchesOrg)
+        .filter(function (row) {
+          if (!keyword) return true;
+          return (row.name + ' ' + row.sub).toLowerCase().indexOf(keyword) !== -1;
+        })
+        .sort(function (a, b) {
+          return b.cost - a.cost;
+        });
+    }
+
+    function renderMetrics(rows) {
+      const totals = rows.reduce(function (acc, row) {
+        acc.tokens += row.tokens;
+        acc.images += row.images;
+        acc.videos += row.videos;
+        acc.cost += row.cost;
+        return acc;
+      }, { tokens: 0, images: 0, videos: 0, cost: 0 });
+
+      document.getElementById('metricUsers').textContent = formatNumber(rows.length);
+      document.getElementById('metricImages').textContent = formatNumber(totals.images);
+      document.getElementById('metricVideos').textContent = formatNumber(totals.videos);
+      document.getElementById('metricCost').textContent = formatMoney(totals.cost);
+    }
+
+    function renderTable(rows) {
+      const body = document.getElementById('costTableBody');
+      const span = getDateSpan(state.dateKey);
+      if (!rows.length) {
+        body.innerHTML = '<tr class="empty-row"><td colspan="7">暂无符合筛选条件的成本数据</td></tr>';
+        return;
+      }
+
+      body.innerHTML = rows.map(function (row, index) {
+        const averageCost = row.cost / span.days;
+        return '<tr>'
+          + '<td class="rank-col">' + (index + 1) + '</td>'
+          + '<td class="name-col"><div class="table-user">'
+          + '<span class="table-user-name" title="' + escapeHtml(row.name) + '">' + escapeHtml(row.name) + '</span>'
+          + '<span class="table-user-sub" title="' + escapeHtml(row.sub) + '">' + escapeHtml(row.sub) + '</span>'
+          + '</div></td>'
+          + '<td>' + formatNumber(row.tokens) + '</td>'
+          + '<td>' + formatNumber(row.images) + '</td>'
+          + '<td>' + formatNumber(row.videos) + '</td>'
+          + '<td class="money">' + formatMoney(row.cost) + '</td>'
+          + '<td class="money">' + formatMoney(averageCost) + '</td>'
+          + '</tr>';
+      }).join('');
+    }
+
+    function renderHeader() {
+      const span = getDateSpan(state.dateKey);
+      const preset = datePresets.find(function (item) { return item.key === state.dateKey; });
+      const rangeText = formatDate(span.start) + ' ~ ' + formatDate(span.end);
+      document.getElementById('dateName').textContent = preset.label;
+      document.getElementById('dateRangeText').textContent = rangeText;
+      document.getElementById('headerDateTag').textContent = preset.label + '  ' + rangeText;
+      document.getElementById('headerOrgTag').textContent = state.selectedOrg;
+      document.getElementById('nameColumnTitle').textContent = modeMeta[state.mode].nameTitle;
+      document.getElementById('searchInput').placeholder = modeMeta[state.mode].searchPlaceholder;
+    }
+
+    function renderMode() {
+      document.querySelectorAll('.segment-btn').forEach(function (button) {
+        button.classList.toggle('active', button.dataset.mode === state.mode);
+      });
+    }
+
+    function render() {
+      renderHeader();
+      renderDateMenu();
+      renderOrgTree();
+      renderMode();
+      const rows = getFilteredRows();
+      renderMetrics(rows);
+      renderTable(rows);
+    }
+
+    function setMode(mode) {
+      state.mode = mode;
+      state.search = '';
+      document.getElementById('searchInput').value = '';
+      render();
+    }
+
+    function setSearch(value) {
+      state.search = value;
+      render();
+    }
+
+    function selectOrg(name) {
+      const node = findOrgNode(orgTree, name);
+      state.selectedOrg = name;
+      if (node && node.children && node.children.length) {
+        state.expanded[name] = !state.expanded[name];
+      }
+      render();
+    }
+
+    function findOrgNode(nodes, name) {
+      for (const node of nodes) {
+        if (node.name === name) return node;
+        if (node.children) {
+          const found = findOrgNode(node.children, name);
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
+    function toggleDateMenu(event) {
+      event.stopPropagation();
+      document.getElementById('dateMenu').classList.toggle('show');
+      document.getElementById('dateTrigger').classList.toggle('open');
+    }
+
+    function closeDateMenu() {
+      document.getElementById('dateMenu').classList.remove('show');
+      document.getElementById('dateTrigger').classList.remove('open');
+    }
+
+    function setDateKey(key) {
+      state.dateKey = key;
+      closeDateMenu();
+      render();
+    }
+
+    function resetFilters() {
+      state.mode = 'user';
+      state.dateKey = 'week';
+      state.selectedOrg = '发行平台';
+      state.search = '';
+      state.expanded['发行平台'] = true;
+      document.getElementById('searchInput').value = '';
+      closeDateMenu();
+      render();
+    }
+
+    document.addEventListener('click', closeDateMenu);
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') closeDateMenu();
+    });
+
+    render();
+  </script>
+</body>
+</html>
