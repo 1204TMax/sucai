@@ -1083,7 +1083,10 @@
     }
 
     function renderOrgNode(node, depth) {
-      const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+      const visibleChildren = (node.children || []).filter(function (child) {
+        return child.type !== 'person';
+      });
+      const hasChildren = visibleChildren.length > 0;
       const expanded = !!state.expanded[node.name];
       const active = state.selectedOrg === node.name;
       const padding = 8 + depth * 16;
@@ -1091,7 +1094,7 @@
         ? '<svg class="tree-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>'
         : '<span class="tree-caret placeholder"></span>';
       const children = hasChildren
-        ? '<div class="tree-children' + (expanded ? ' show' : '') + '">' + node.children.map(function (child) { return renderOrgNode(child, depth + 1); }).join('') + '</div>'
+        ? '<div class="tree-children' + (expanded ? ' show' : '') + '">' + visibleChildren.map(function (child) { return renderOrgNode(child, depth + 1); }).join('') + '</div>'
         : '';
       return '<div class="tree-node">'
         + '<div class="tree-row' + (active ? ' active' : '') + (expanded ? ' expanded' : '') + '" style="padding-left:' + padding + 'px" onclick="selectOrg(\'' + escapeHtml(node.name) + '\')">'
