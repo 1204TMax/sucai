@@ -364,6 +364,14 @@
     .card-act-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
     .card-act-more { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); }
     .card-act-more:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
+    .card-more-wrap { position: relative; display: inline-flex; align-items: center; }
+    .card-more-trigger { width: 24px; height: 24px; border: 1px solid transparent; border-radius: var(--r-full); background: transparent; color: var(--text-muted); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: background var(--ease), border-color var(--ease), color var(--ease); }
+    .card-more-trigger:hover, .card-more-wrap.open .card-more-trigger { background: var(--bg-subtle); border-color: var(--border-1); color: var(--text-hi); }
+    .card-more-trigger svg { width: 14px; height: 14px; }
+    .card-more-menu { position: absolute; right: 0; bottom: calc(100% + 6px); min-width: 132px; padding: 4px; border: 1px solid var(--border-1); border-radius: var(--r-md); background: var(--bg-surface); box-shadow: 0 8px 24px rgba(15,23,42,0.12); z-index: 40; display: none; }
+    .card-more-wrap.open .card-more-menu { display: block; }
+    .card-more-menu button { width: 100%; height: 32px; padding: 0 10px; border: 0; border-radius: var(--r-sm); background: transparent; color: var(--text-lo); font: 500 var(--text-sm)/1 var(--font); text-align: left; cursor: pointer; white-space: nowrap; }
+    .card-more-menu button:hover { background: var(--bg-subtle); color: var(--accent-solid); }
     .card-act-stop { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid #fecaca; background: var(--bg-surface); font-size: var(--text-base); color: var(--error); cursor: pointer; transition: all var(--ease); }
     .card-act-stop:hover { border-color: var(--error); background: #fef2f2; }
     .card-act-stop svg, .card-act-stop img { width: 14px; height: 14px; flex-shrink: 0; }
@@ -807,6 +815,72 @@
       margin-left: 1px;
     }
     .pill.on .pill-n { background: var(--bg-hover); color: var(--text-lo); }
+    .review-transfer-flow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); padding: var(--space-3) 0 var(--space-2); }
+    .review-node-track, .review-source-stage { display: grid; align-items: center; justify-content: center; column-gap: var(--space-3); }
+    .review-node-link { width: 42px; height: 1px; border-top: 1px solid var(--border-2); }
+    .review-source-stack { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); }
+    .review-flow-node { min-width: 176px; padding: var(--space-3) var(--space-4); border-radius: var(--r-lg); border: 1px solid var(--border-1); background: var(--bg-surface); display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .review-flow-node.is-source { cursor: pointer; transition: border-color var(--ease), box-shadow var(--ease), background var(--ease); }
+    .review-flow-node.is-source:hover { border-color: var(--accent-border); box-shadow: 0 4px 12px rgba(74,158,255,0.12); background: var(--accent-bg); }
+    .review-flow-node.is-review { min-width: 148px; }
+    .review-flow-node.is-review.is-current { border-color: var(--accent-border); background: var(--accent-bg); box-shadow: 0 0 0 3px rgba(74,158,255,0.10); }
+    .review-flow-node.is-review[disabled] { cursor: not-allowed; opacity: 0.72; }
+    .review-flow-kicker { font-size: var(--text-xs); color: var(--text-muted); }
+    .review-flow-title { font: 600 var(--text-md)/1 var(--font); color: var(--text-hi); }
+    .review-flow-node.is-review .review-flow-title { color: var(--primary-7); }
+    .review-flow-status { height: 22px; padding: 0 var(--space-2); border-radius: var(--r-full); display: inline-flex; align-items: center; font: 500 var(--text-xs)/1 var(--font); white-space: nowrap; background: var(--bg-subtle); color: var(--text-lo); border: 1px solid var(--border-1); }
+    .review-flow-status.done { color: var(--success); background: rgba(52,199,89,0.10); border-color: rgba(52,199,89,0.22); }
+    .review-flow-status.active { color: var(--primary-6); background: var(--accent-bg); border-color: var(--accent-border); }
+    .review-source-arrow { position: relative; width: 34px; height: 52px; overflow: hidden; }
+    .review-source-line { position: absolute; left: 50%; top: 10px; bottom: 0; width: 2px; transform: translateX(-50%); background-image: repeating-linear-gradient(0deg, var(--accent-solid) 0 8px, transparent 8px 14px); background-size: 2px 28px; opacity: 0.72; animation: reviewDashFlowUp 1.1s linear infinite; }
+    .review-source-arrow::after { content: ''; position: absolute; left: 50%; bottom: 0; width: 10px; height: 40px; transform: translateX(-50%); background: linear-gradient(0deg, transparent, rgba(74,158,255,0.26), transparent); animation: reviewPulseFlowUp 1.7s ease-in-out infinite; }
+    .review-source-head { position: absolute; left: 50%; top: 2px; width: 10px; height: 10px; border-top: 2px solid var(--accent-solid); border-left: 2px solid var(--accent-solid); transform: translateX(-50%) rotate(45deg); }
+    @keyframes reviewDashFlowUp { to { background-position: 0 -28px; } }
+    @keyframes reviewPulseFlowUp { 0% { transform: translate(-50%, 48px); opacity: 0; } 35% { opacity: 1; } 100% { transform: translate(-50%, -48px); opacity: 0; } }
+    .review-content-title-card { width: 100%; box-sizing: border-box; border: 1px solid var(--border-1); background: var(--bg-surface); border-radius: var(--r-lg); padding: var(--space-3) var(--space-4); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); cursor: pointer; text-align: left; transition: border-color var(--ease), box-shadow var(--ease), background var(--ease); }
+    .review-content-title-card:hover { border-color: var(--accent-border); background: var(--accent-bg); box-shadow: 0 4px 12px rgba(74,158,255,0.10); }
+    .review-content-title-main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+    .review-content-kicker { font-size: var(--text-xs); color: var(--text-muted); }
+    .review-content-title { font: 600 var(--text-md)/1.2 var(--font); color: var(--text-hi); }
+    .review-content-subtitle { font-size: var(--text-xs); color: var(--text-muted); }
+    .review-content-open { color: var(--accent-solid); font-size: var(--text-sm); flex: 0 0 auto; }
+    .review-action-toolbar { display: flex; justify-content: space-between; align-items: center; }
+    .review-status-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .review-bulk-actions { display: flex; gap: 12px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+    .readonly-node-summary { margin-bottom: var(--space-5); padding: var(--space-4); border: 1px solid var(--border-1); border-radius: var(--r-lg); background: var(--bg-subtle); display: flex; flex-direction: column; gap: var(--space-2); }
+    .readonly-node-summary-title { font-size: var(--text-md); font-weight: 600; color: var(--text-hi); }
+    .readonly-node-summary-desc { font-size: var(--text-base); color: var(--text-lo); line-height: 1.6; }
+    .readonly-input-list { display: flex; flex-direction: column; gap: var(--space-4); }
+    .readonly-input-item { border: 1px solid var(--border-1); border-radius: var(--r-lg); background: var(--bg-surface); padding: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+    .readonly-input-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+    .readonly-input-label { font-size: var(--text-sm); font-weight: 600; color: var(--text-hi); }
+    .readonly-input-type { height: 22px; padding: 0 var(--space-2); border-radius: var(--r-full); background: var(--bg-subtle); color: var(--text-muted); font-size: var(--text-xs); display: inline-flex; align-items: center; }
+    .readonly-input-desc { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.5; }
+    .readonly-input-value { min-height: 36px; padding: var(--space-2) var(--space-3); border: 1px solid var(--border-1); border-radius: var(--r-md); background: var(--bg-subtle); color: var(--text-hi); font-size: var(--text-base); line-height: 1.6; white-space: pre-wrap; }
+    .readonly-media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: var(--space-3); }
+    .readonly-media-card { border: 1px solid var(--border-1); border-radius: var(--r-lg); background: var(--bg-subtle); overflow: hidden; cursor: pointer; display: flex; flex-direction: column; transition: border-color var(--ease), box-shadow var(--ease), transform var(--ease); }
+    .readonly-media-card:hover { border-color: var(--accent-border); box-shadow: 0 6px 14px rgba(15,23,42,0.10); transform: translateY(-1px); }
+    .readonly-media-thumb { position: relative; aspect-ratio: 1; background: var(--bg-hover); overflow: hidden; }
+    .readonly-media-thumb img, .readonly-media-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .readonly-media-play { position: absolute; left: 50%; top: 50%; width: 34px; height: 34px; transform: translate(-50%, -50%); border-radius: var(--r-full); background: rgba(255,255,255,0.88); color: var(--text-hi); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.18); }
+    .readonly-media-meta { padding: var(--space-2); display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+    .readonly-media-name { font-size: var(--text-xs); color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .readonly-media-kind { font-size: var(--text-xs); color: var(--text-muted); }
+    @media (max-width: 760px) {
+      .review-transfer-flow { align-items: stretch; gap: var(--space-3); }
+      .review-node-track { display: flex !important; flex-direction: column; gap: var(--space-2); }
+      .review-source-stage { display: flex !important; justify-content: center; }
+      .review-node-link { width: 1px; height: 18px; border-top: none; border-left: 1px solid var(--border-2); }
+      .review-source-stack { width: 100%; }
+      .review-flow-node { width: 100%; min-width: 0; }
+      .review-source-arrow { height: 44px; }
+      .review-action-toolbar { flex-direction: column; align-items: flex-start !important; gap: var(--space-3); padding: 16px !important; }
+      .review-status-pills, .review-bulk-actions { width: 100%; }
+      .review-bulk-actions { justify-content: flex-start; gap: var(--space-2); }
+      .review-bulk-actions button { flex: 1 1 96px; min-width: 0; }
+      .review-content-title-card { align-items: flex-start; }
+      .review-content-open { padding-top: 2px; }
+    }
   </style>
 </head>
 <body>
@@ -963,6 +1037,55 @@ const DM_PAGE_SIZE = 24;
 const img = s => ({ type:'image', thumb:`https://picsum.photos/seed/${s}/200/200`, url:`https://picsum.photos/seed/${s}/800/800` });
 const DEMO_VIDEO_URL = '../icon/步数1-1.mp4';
 const vid = (s,i,d) => ({ type:'video', thumb:`https://picsum.photos/seed/${s}/800/800`, url:DEMO_VIDEO_URL, gradientIdx:i||0, duration:d||'5s' });
+const REVIEW_CONTENT_NODE_INPUTS = {
+  node1: {
+    id: 'node1',
+    label: '内容节点1',
+    title: '内容节点1',
+    role: '上游内容节点',
+    statusText: '已完成',
+    statusKind: 'done',
+    summary: '该节点已完成图片裂变输入采集，并把生成结果传输到审核点B等待人工审核。',
+    inputs: [
+      { label: '任务名称', type: 'text', value: '爆款图片裂变20260444' },
+      { label: '生成提示词', type: 'textarea', desc: '工作流表单填写页提交的原始文案。', value: '围绕新品精华液生成电商投放图，画面需要突出产品质感、补水修护卖点和适合信息流点击的视觉中心。' },
+      { label: '参考商品图', type: 'image_array', desc: '支持点击预览。', value: [
+        { name: 'product-front.png', thumb: 'https://picsum.photos/seed/review-product-front/320/320', url: 'https://picsum.photos/seed/review-product-front/960/960' },
+        { name: 'product-texture.png', thumb: 'https://picsum.photos/seed/review-product-texture/320/320', url: 'https://picsum.photos/seed/review-product-texture/960/960' },
+        { name: 'brand-color-board.png', thumb: 'https://picsum.photos/seed/review-brand-board/320/320', url: 'https://picsum.photos/seed/review-brand-board/960/960' }
+      ] },
+      { label: '参考视频', type: 'video_array', desc: '用于约束镜头节奏和产品出现方式。', value: [
+        { name: '产品上手参考.mp4', thumb: 'https://picsum.photos/seed/review-video-cover/640/360', url: DEMO_VIDEO_URL, duration: '5秒' }
+      ] },
+      { label: '投放平台', type: 'select', value: '小红书 / 信息流' },
+      { label: '生成数量', type: 'number', value: '6' },
+      { label: '画面规格', type: 'resolution', value: '500×500' },
+      { label: '品牌限制', type: 'textarea', value: '不要出现医疗功效承诺；不要出现竞品品牌；标题必须保留补水、修护、透亮三个关键词。' }
+    ]
+  },
+  node2: {
+    id: 'node2',
+    label: '内容节点2',
+    title: '内容节点2',
+    role: '上游内容节点',
+    statusText: '待审核',
+    statusKind: 'pending',
+    summary: '该节点产出文案候选，当前可在审核区按条通过或拒绝。',
+    inputs: [
+      { label: '文案主题', type: 'textarea', value: '围绕通勤、熬夜、午后暗沉三个真实场景生成小红书种草文案。' },
+      { label: '语气要求', type: 'select', value: '朋友分享 / 克制可信' },
+      { label: '参考素材', type: 'image_array', value: [
+        { name: '场景参考-通勤.png', thumb: 'https://picsum.photos/seed/review-copy-commute/320/320', url: 'https://picsum.photos/seed/review-copy-commute/960/960' },
+        { name: '场景参考-午后.png', thumb: 'https://picsum.photos/seed/review-copy-afternoon/320/320', url: 'https://picsum.photos/seed/review-copy-afternoon/960/960' }
+      ] },
+      { label: '输出条数', type: 'number', value: '5' },
+      { label: '禁用词', type: 'file_array', value: [
+        { name: 'brand-forbidden-words.xlsx', value: '已上传' },
+        { name: '合规表达说明.pdf', value: '已上传' }
+      ] }
+    ]
+  }
+};
 
 // 兼容兜底：共享预览脚本偶发未成功挂载时，避免主任务流直接渲染中断。
 if (typeof thumbOverlayHtml !== 'function') {
@@ -1388,6 +1511,191 @@ function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 function icon(path, size) { size = size||14; return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">'+path+'</svg>'; }
 function imageIcon(src, size, alt) { size = size||14; return '<img src="'+src+'" alt="'+(alt||'')+'" width="'+size+'" height="'+size+'">'; }
 
+function getReviewContentNodeList(ids) {
+  var all = Object.keys(REVIEW_CONTENT_NODE_INPUTS).map(function(key) { return REVIEW_CONTENT_NODE_INPUTS[key]; });
+  if (!ids || !ids.length) return all;
+  return ids.map(function(id) { return REVIEW_CONTENT_NODE_INPUTS[id]; }).filter(Boolean);
+}
+
+function getReviewContentNodeMeta(nodeId) {
+  return REVIEW_CONTENT_NODE_INPUTS[nodeId] || REVIEW_CONTENT_NODE_INPUTS.node1;
+}
+
+function reviewStatusClass(statusKind) {
+  if (statusKind === 'done' || statusKind === 'completed') return 'done';
+  if (statusKind === 'active' || statusKind === 'reviewing' || statusKind === 'pending_review') return 'active';
+  return '';
+}
+
+function getReviewFlowGridTemplate(reviewNodes) {
+  var count = Math.max((reviewNodes || []).length, 1);
+  var cols = [];
+  for (var i = 0; i < count; i++) {
+    if (i > 0) cols.push('42px');
+    cols.push('minmax(148px, 176px)');
+  }
+  return cols.join(' ');
+}
+
+function renderReviewTransferFlow(contentNode, reviewNodes, activeReviewNode) {
+  contentNode = contentNode || getReviewContentNodeMeta('node1');
+  if (!Array.isArray(reviewNodes)) reviewNodes = reviewNodes ? [reviewNodes] : [];
+  if (!reviewNodes.length) reviewNodes = [activeReviewNode || { id: 'review', title: '审核点', statusText: '审核中', statusKind: 'active' }];
+  activeReviewNode = activeReviewNode || reviewNodes[0];
+
+  var activeIndex = reviewNodes.findIndex(function(node) { return node.id === activeReviewNode.id; });
+  if (activeIndex < 0) activeIndex = 0;
+  var gridTemplate = getReviewFlowGridTemplate(reviewNodes);
+  var activeCol = activeIndex * 2 + 1;
+
+  var reviewNodesHtml = reviewNodes.map(function(node, idx) {
+    var col = idx * 2 + 1;
+    var isCurrent = idx === activeIndex;
+    var encodedReviewNodeId = encodeURIComponent(node.id || '');
+    var reviewClickAttr = node.clickable === false
+      ? ' disabled'
+      : ' onclick="state.reviewContext.reviewTaskId=decodeURIComponent(\'' + encodedReviewNodeId + '\'); state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"';
+    var linkHtml = idx === 0 ? '' : '<span class="review-node-link" style="grid-column:' + (col - 1) + '; grid-row:1;" aria-hidden="true"></span>';
+    return linkHtml
+      + '<button type="button" class="review-flow-node is-review' + (isCurrent ? ' is-current' : '') + '" style="grid-column:' + col + '; grid-row:1;"' + reviewClickAttr + (isCurrent ? ' aria-current="step"' : '') + '>'
+        + '<span class="review-flow-kicker">' + (isCurrent ? '当前审核点' : '审核点') + '</span>'
+        + '<span class="review-flow-title">' + escHtml(node.title || '审核点') + '</span>'
+        + '<span class="review-flow-status ' + reviewStatusClass(node.statusKind) + '">' + escHtml(node.statusText || '待处理') + '</span>'
+      + '</button>';
+  }).join('');
+
+  return ''
+    + '<div class="review-transfer-flow" aria-label="审核点关系和内容传输关系">'
+      + '<div class="review-node-track" style="grid-template-columns:' + gridTemplate + ';">' + reviewNodesHtml + '</div>'
+      + '<div class="review-source-stage" style="grid-template-columns:' + gridTemplate + ';">'
+        + '<div class="review-source-stack" style="grid-column:' + activeCol + ';">'
+          + '<div class="review-source-arrow" aria-label="内容节点传输到当前审核点"><span class="review-source-head"></span><span class="review-source-line"></span></div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';
+}
+
+function renderReviewContentTitleCard(contentNode) {
+  contentNode = contentNode || getReviewContentNodeMeta('node1');
+  var encodedNodeId = encodeURIComponent(contentNode.id || 'node1');
+  return ''
+    + '<button type="button" class="review-content-title-card" onclick="openContentNodeInputModal(decodeURIComponent(\'' + encodedNodeId + '\'))">'
+      + '<div class="review-content-title-main">'
+        + '<span class="review-content-kicker">当前内容节点</span>'
+        + '<span class="review-content-title">' + escHtml(contentNode.title || contentNode.label) + '</span>'
+        + '<span class="review-content-subtitle">' + escHtml(contentNode.summary || '点击查看该节点输入内容') + '</span>'
+      + '</div>'
+      + '<span class="review-content-open">查看输入</span>'
+    + '</button>';
+}
+
+function getReadonlyInputTypeLabel(type) {
+  return {
+    text: '文本',
+    textarea: '长文本',
+    number: '数字',
+    count: '数量',
+    select: '选项',
+    resolution: '规格',
+    image: '图片',
+    image_array: '图片组',
+    video: '视频',
+    video_array: '视频组',
+    file: '文件',
+    file_array: '文件组'
+  }[type] || '内容';
+}
+
+function normalizeReadonlyMediaItems(value) {
+  if (!value) return [];
+  return Array.isArray(value) ? value : [value];
+}
+
+function previewReadonlyNodeMedia(url, type, duration) {
+  if (!url) return;
+  if (type === 'video') {
+    window.__previewMedia({ type: 'video', url: url, duration: duration || '' });
+    return;
+  }
+  window.__previewImage(url);
+}
+
+function renderReadonlyMediaValue(input) {
+  var mediaType = input.type && input.type.indexOf('video') > -1 ? 'video' : 'image';
+  var items = normalizeReadonlyMediaItems(input.value);
+  if (!items.length) return '<div class="readonly-input-value">未上传</div>';
+  return '<div class="readonly-media-grid">' + items.map(function(item, idx) {
+    var url = item.url || item.thumb || '';
+    var thumb = item.thumb || item.url || '';
+    var name = item.name || ((mediaType === 'video' ? '视频' : '图片') + (idx + 1));
+    var duration = item.duration || '';
+    var encodedUrl = encodeURIComponent(url);
+    var encodedType = encodeURIComponent(mediaType);
+    var encodedDuration = encodeURIComponent(duration);
+    var visual = mediaType === 'video'
+      ? '<img src="' + escHtml(thumb) + '" alt="" loading="lazy"><span class="readonly-media-play">' + icon(SVG.play, 14) + '</span>'
+      : '<img src="' + escHtml(thumb) + '" alt="" loading="lazy">';
+    return '<button type="button" class="readonly-media-card" onclick="previewReadonlyNodeMedia(decodeURIComponent(\'' + encodedUrl + '\'), decodeURIComponent(\'' + encodedType + '\'), decodeURIComponent(\'' + encodedDuration + '\'))">'
+      + '<span class="readonly-media-thumb">' + visual + '</span>'
+      + '<span class="readonly-media-meta"><span class="readonly-media-name" title="' + escHtml(name) + '">' + escHtml(name) + '</span><span class="readonly-media-kind">' + getReadonlyInputTypeLabel(input.type) + (duration ? ' · ' + escHtml(duration) : '') + '</span></span>'
+    + '</button>';
+  }).join('') + '</div>';
+}
+
+function renderReadonlyFileValue(input) {
+  var files = normalizeReadonlyMediaItems(input.value);
+  if (!files.length) return '<div class="readonly-input-value">未上传</div>';
+  return '<div class="readonly-input-value">' + files.map(function(file) {
+    return escHtml(file.name || file.value || '文件');
+  }).join('\n') + '</div>';
+}
+
+function renderReadonlyInputItem(input) {
+  var type = input.type || 'text';
+  var valueHtml = '';
+  if (type.indexOf('image') > -1 || type.indexOf('video') > -1) valueHtml = renderReadonlyMediaValue(input);
+  else if (type.indexOf('file') > -1) valueHtml = renderReadonlyFileValue(input);
+  else valueHtml = '<div class="readonly-input-value">' + escHtml(input.value || '-') + '</div>';
+  return '<div class="readonly-input-item">'
+    + '<div class="readonly-input-head"><span class="readonly-input-label">' + escHtml(input.label || '输入项') + '</span><span class="readonly-input-type">' + getReadonlyInputTypeLabel(type) + '</span></div>'
+    + (input.desc ? '<div class="readonly-input-desc">' + escHtml(input.desc) + '</div>' : '')
+    + valueHtml
+  + '</div>';
+}
+
+function renderReadonlyContentNodeInputs(node) {
+  node = node || getReviewContentNodeMeta('node1');
+  return '<div class="readonly-node-summary">'
+      + '<div class="readonly-node-summary-title">' + escHtml(node.title || node.label) + '输入内容</div>'
+      + '<div class="readonly-node-summary-desc">' + escHtml(node.summary || '以下内容来自工作流表单填写页，仅供审核时查看。') + '</div>'
+    + '</div>'
+    + '<div class="readonly-input-list">' + (node.inputs || []).map(renderReadonlyInputItem).join('') + '</div>';
+}
+
+function restoreDetailModalFooter() {
+  var footer = document.querySelector('#detailModalMask .detail-modal-footer');
+  if (!footer) return;
+  var archiveAction = typeof archiveCurrentDetailItems === 'function' ? 'archiveCurrentDetailItems()' : "showToast('已批量入库')";
+  footer.innerHTML = '<button onclick="showToast(\'已全部下载\')">全部下载</button>'
+    + '<button onclick="' + archiveAction + '">批量入库</button>'
+    + '<button onclick="showToast(\'再生成功能开发中\')">再次生成</button>'
+    + '<button class="dm-primary" onclick="closeDetailModal()">关闭</button>';
+}
+
+function setReadonlyDetailModalFooter() {
+  var footer = document.querySelector('#detailModalMask .detail-modal-footer');
+  if (footer) footer.innerHTML = '<button class="dm-primary" onclick="closeDetailModal()">关闭</button>';
+}
+
+function openContentNodeInputModal(nodeId) {
+  var node = getReviewContentNodeMeta(nodeId);
+  state.detailTask = null;
+  document.getElementById('detailModalTitle').textContent = (node.title || node.label) + '输入内容';
+  document.getElementById('detailModalBody').innerHTML = renderReadonlyContentNodeInputs(node);
+  setReadonlyDetailModalFooter();
+  document.getElementById('detailModalMask').classList.add('show');
+}
+
 function compactMediaValue(value) {
   if (!value) return '';
   if (Array.isArray(value)) return value.filter(Boolean).join(' · ');
@@ -1486,6 +1794,7 @@ const SVG = {
   play:     '<polygon points="6 3 20 12 6 21"/>',
   txt:      '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/>',
   chevDown: '<polyline points="6 9 12 15 18 9"/>',
+  moreVertical: '<circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>',
 };
 
 const PROJECT_TREE = [
@@ -1508,8 +1817,9 @@ const state = {
   viewMode: 'expanded',
   pageMode: 'review',
   reviewContext: { taskId: routeParams.get('taskId') || 'wf-1', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
-  reviewFilter: 'pending',
-  reviewContentNode: 'node2',
+  reviewFilter: routeParams.get('reviewFilter') || 'pending',
+  reviewContentNode: routeParams.get('contentNode') || 'node2',
+  reviewReadOnly: routeParams.get('reviewMode') === 'history' || routeParams.get('readonly') === '1',
   reviewBatchMode: false,
   reviewSelected: new Set(),
   filters: { status:'', search:'', project:'', dateRange:'', dateStart:'', dateEnd:'', model:'' },
@@ -2008,7 +2318,7 @@ function renderTaskCard(task) {
     +'</div>'
     +modelTabsHtml
     +'<div class="card-output">'+renderOutputArea(task, currentOutput, collapsed, vm)+'</div>'
-    +'<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+statusLabel+pulseDot+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span></div></div>'
+    +'<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+statusLabel+pulseDot+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span>'+renderCardMoreMenu(task)+'</div></div>'
     +'</div>';
 }
 
@@ -2110,15 +2420,117 @@ function renderWorkflowReviewCard(task, vm) {
     + '<div class="card-output workflow-review-output">'
       + '<div class="wf-abs-flow">'+nodesHtml+'</div>'
     + '</div>'
-    + '<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+escHtml(statusLabel)+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span></div></div>'
+    + '<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+escHtml(statusLabel)+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span>'+renderCardMoreMenu(task)+'</div></div>'
   + '</div>';
+}
+
+function getReviewPageUrlPrefix() {
+  var pathname = window.location.pathname || '';
+  try { pathname = decodeURIComponent(pathname); } catch (e) {}
+  return pathname.indexOf('我的任务.html') >= 0 && state.pageMode !== 'review'
+    ? 'AI 创作/人工审核页.html'
+    : 'AI 创作/我的任务.html?view=review';
+}
+
+function buildReviewPageUrl(taskId, reviewTaskId, options) {
+  var params = new URLSearchParams();
+  options = options || {};
+  params.set('taskId', taskId || '');
+  params.set('reviewTaskId', reviewTaskId || '');
+  if (options.history) {
+    params.set('reviewMode', 'history');
+    params.set('reviewFilter', 'approved');
+    params.set('contentNode', 'node1');
+  }
+  var prefix = getReviewPageUrlPrefix();
+  return prefix + (prefix.indexOf('?') >= 0 ? '&' : '?') + params.toString();
+}
+
+function getWorkflowHistoryReviewTaskId(task) {
+  var queue = getWorkflowReviewQueue(task);
+  if (queue && queue.reviewTaskId) return queue.reviewTaskId;
+  var nodes = getWorkflowReviewNodes(task);
+  var doneNode = nodes.find(function(node) { return node.status === 'completed' || node.status === 'reviewing' || node.status === 'pending_review'; });
+  return doneNode && doneNode.reviewTaskId ? doneNode.reviewTaskId : '';
+}
+
+function renderCardMoreMenu(task) {
+  if (!task || task.type !== 'workflow') return '';
+  var taskId = escHtml(task.id || '');
+  return '<span class="card-more-wrap" data-task-id="' + taskId + '">'
+    + '<button class="card-more-trigger" title="更多" aria-label="更多" onclick="toggleCardMoreMenu(event,\'' + taskId + '\')">' + icon(SVG.moreVertical, 14) + '</button>'
+    + '<span class="card-more-menu">'
+      + '<button onclick="event.stopPropagation();openReviewHistory(\'' + taskId + '\')">查看审核历史</button>'
+      + '<button onclick="event.stopPropagation();downloadAllTaskOutputs(\'' + taskId + '\')">下载全部</button>'
+    + '</span>'
+  + '</span>';
+}
+
+function closeCardMoreMenus(exceptTaskId) {
+  document.querySelectorAll('.card-more-wrap.open').forEach(function(el) {
+    if (!exceptTaskId || el.getAttribute('data-task-id') !== exceptTaskId) el.classList.remove('open');
+  });
+}
+
+function toggleCardMoreMenu(event, taskId) {
+  event.stopPropagation();
+  var wrap = event.currentTarget && event.currentTarget.closest('.card-more-wrap');
+  if (!wrap) return;
+  var willOpen = !wrap.classList.contains('open');
+  closeCardMoreMenus(taskId);
+  wrap.classList.toggle('open', willOpen);
+}
+
+function openReviewHistory(taskId) {
+  var task = getTaskById(taskId);
+  if (!task) return;
+  parent.postMessage({
+    action: 'openTab',
+    title: '人工审核页',
+    url: buildReviewPageUrl(taskId, getWorkflowHistoryReviewTaskId(task), { history: true })
+  }, '*');
+  closeCardMoreMenus();
+}
+
+function getTaskAllOutputItems(task) {
+  var items = [];
+  if (!task || !task.output) return items;
+  if (Array.isArray(task.output.items)) items = items.concat(task.output.items);
+  if (task.output.byModel) {
+    Object.keys(task.output.byModel).forEach(function(modelId) {
+      var output = task.output.byModel[modelId];
+      if (output && Array.isArray(output.items)) items = items.concat(output.items);
+    });
+  }
+  return items;
+}
+
+function downloadAllTaskOutputs(taskId) {
+  var task = getTaskById(taskId);
+  var items = getTaskAllOutputItems(task).filter(function(item) { return item && (item.url || item.thumb); });
+  if (!items.length) {
+    showToast('暂无可下载内容');
+    closeCardMoreMenus();
+    return;
+  }
+  items.forEach(function(item, index) {
+    setTimeout(function() {
+      var url = item.url || item.thumb;
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = getMediaFileName(item, index, mediaKind(item, 'image'), task);
+      a.click();
+    }, index * 80);
+  });
+  showToast('已开始下载全部');
+  closeCardMoreMenus();
 }
 
 function openReviewPage(taskId, reviewTaskId) {
   parent.postMessage({
     action: 'openTab',
     title: '人工审核页',
-    url: 'AI 创作/我的任务.html?view=review&taskId=' + encodeURIComponent(taskId) + '&reviewTaskId=' + encodeURIComponent(reviewTaskId)
+    url: buildReviewPageUrl(taskId, reviewTaskId)
   }, '*');
 }
 
@@ -2298,12 +2710,14 @@ function clearReviewSelection() {
 }
 
 function toggleReviewBatch() {
+  if (state.reviewReadOnly) return;
   state.reviewBatchMode = !state.reviewBatchMode;
   clearReviewSelection();
   renderReviewPage();
 }
 
 function toggleReviewSelect(itemId) {
+  if (state.reviewReadOnly) return;
   if (state.reviewSelected.has(itemId)) state.reviewSelected.delete(itemId);
   else state.reviewSelected.add(itemId);
   renderReviewBottomBar();
@@ -2312,6 +2726,7 @@ function toggleReviewSelect(itemId) {
 }
 
 function selectAllVisibleReviewItems() {
+  if (state.reviewReadOnly) return;
   const visible = getReviewVisibleItems().filter(function(it) {
     return it.reviewStatus === 'pending' || !it.reviewStatus;
   });
@@ -2325,6 +2740,7 @@ function selectAllVisibleReviewItems() {
 }
 
 function applyBatchReviewAction(action, force) {
+  if (state.reviewReadOnly) return;
   const ids = Array.from(state.reviewSelected);
   if (!ids.length) return;
   if (!force && action === 'rejected') {
@@ -2409,8 +2825,12 @@ function renderReviewPage() {
     renderReviewBottomBar();
     return;
   }
+  const isReviewReadOnly = !!state.reviewReadOnly;
+  if (isReviewReadOnly && (state.reviewFilter === 'pending' || state.reviewFilter === 'all')) {
+    state.reviewFilter = 'approved';
+  }
 
-  // 1. 顶部审核点
+  // 1. 顶部审核脉络
   const hardcodedNodes = [
     { id: 'nodeB', title: '审核点B', statusText: '审核中', statusKind: 'active', clickable: true }
   ];
@@ -2418,44 +2838,22 @@ function renderReviewPage() {
     state.reviewContext.reviewTaskId = 'nodeB';
   }
   const reviewTaskId = state.reviewContext.reviewTaskId;
-
-  const contentNodeTabs = [
-    { id: 'node1', label: '内容节点1', check: true }
-  ];
-
-  const isSingleNodeAndSource = hardcodedNodes.length === 1 && contentNodeTabs.length === 1;
-
-  let nodesHtml = '';
-  if (!isSingleNodeAndSource) {
-    nodesHtml = '<div style="display:flex; align-items:center; justify-content:center; width:100%; padding: 10px 0 8px;">' + hardcodedNodes.map(function(node, i) {
-      const isCurrent = node.id === reviewTaskId;
-      const clickAttr = node.clickable ? ('onclick="state.reviewContext.reviewTaskId=\'' + node.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"') : '';
-      const statusStyle = node.statusKind === 'done'
-        ? 'background:rgba(52,199,89,0.1);color:var(--success);border:1px solid rgba(52,199,89,0.22);'
-        : (node.statusKind === 'active'
-          ? 'background:var(--accent-bg);color:var(--primary-6);border:1px solid var(--accent-border);'
-          : 'background:var(--bg-subtle);color:var(--text-muted);border:1px solid var(--border-1);');
-      const disabledStyle = !node.clickable ? 'cursor:not-allowed; opacity:0.58;' : 'cursor:pointer;';
-
-      let tab = '<div ' + clickAttr + ' style="' + disabledStyle + ' display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding: 9px 14px; border-radius: 10px; border: 1px solid ' + (isCurrent ? 'var(--primary-6)' : 'var(--border-1)') + '; background: ' + (isCurrent ? 'var(--accent-bg)' : 'var(--bg-surface)') + '; box-shadow: ' + (isCurrent ? '0 0 0 3px rgba(74,158,255,0.12)' : 'none') + '; transition: all var(--ease); min-width: 132px;">'
-        + '<span style="font: 600 13px/1 var(--font); color: ' + (isCurrent ? 'var(--primary-7)' : 'var(--text-hi)') + ';">' + escHtml(node.title) + '</span>'
-        + '<span style="height:20px;padding:0 7px;border-radius:999px;display:inline-flex;align-items:center;font:500 11px/1 var(--font);white-space:nowrap;' + statusStyle + '">' + escHtml(node.statusText) + '</span>'
-        + '</div>';
-
-      if (i < hardcodedNodes.length - 1) {
-        tab += '<div style="width: 44px; height: 1px; background: var(--border-2); margin: 0 10px;"></div>';
-      }
-      return tab;
-    }).join('') + '</div>';
+  const activeReviewNode = hardcodedNodes.find(function(node) { return node.id === reviewTaskId; }) || hardcodedNodes[0];
+  const contentNodeTabs = getReviewContentNodeList(['node1']);
+  if (!contentNodeTabs.some(function(tab) { return tab.id === state.reviewContentNode; })) {
+    state.reviewContentNode = contentNodeTabs[0].id;
   }
+  const activeContentNode = getReviewContentNodeMeta(state.reviewContentNode);
+  const isSingleNodeAndSource = hardcodedNodes.length === 1 && contentNodeTabs.length === 1;
+  const nodesHtml = renderReviewTransferFlow(activeContentNode, hardcodedNodes, activeReviewNode);
 
   // 2. 内容节点维度 Tab
   let contentNodeHtml = '';
   if (!isSingleNodeAndSource) {
     const contentNodeTabsHtml = contentNodeTabs.map(function(tab) {
       const isActive = state.reviewContentNode === tab.id;
-      const statusText = tab.check ? '已完成' : '待审核';
-      const statusStyle = tab.check ? 'color:var(--success);' : 'color:var(--text-muted);';
+      const statusText = tab.statusText || '已完成';
+      const statusStyle = tab.statusKind === 'done' ? 'color:var(--success);' : 'color:var(--text-muted);';
       return '<button class="pill ' + (isActive ? 'on' : '') + '" style="height: 46px; font-size: 13px; padding: 0 18px; border-radius: 10px; border:' + (isActive ? '1px solid var(--primary-6)' : '1px solid transparent') + '; box-shadow:' + (isActive ? '0 0 0 3px rgba(74,158,255,0.10)' : 'none') + '; flex-direction:column; gap:4px; align-items:center; justify-content:center;" onclick="state.reviewContentNode=\'' + tab.id + '\'; state.reviewFocusIndex=0; state.reviewBatchMode=false; clearReviewSelection(); renderReviewPage();"><span>' + tab.label + '</span><span style="font:500 11px/1 var(--font);' + statusStyle + '">' + statusText + '</span></button>';
     }).join('');
     contentNodeHtml = '<div style="display: flex; justify-content: center; margin-bottom: 8px;"><div class="pills" style="padding: 3px; border-radius: 12px;">' + contentNodeTabsHtml + '</div></div>';
@@ -2505,7 +2903,7 @@ function renderReviewPage() {
   }
 
   let displayItems = allItems;
-  if(state.reviewFilter === 'all') state.reviewFilter = 'pending';
+  if(state.reviewFilter === 'all') state.reviewFilter = isReviewReadOnly ? 'approved' : 'pending';
 
   if (state.reviewFilter !== 'all') {
     if (state.reviewFilter === 'pending') displayItems = allItems.filter(function(it) { return it.reviewStatus === 'pending' || !it.reviewStatus; });
@@ -2534,13 +2932,16 @@ function renderReviewPage() {
   const pillsHtml = '<div class="pills">' + filterPillsHtml + '</div>';
 
   window.updateMockText = function(idx, e) {
+    if (state.reviewReadOnly) return;
     window.__mockTexts[idx] = e.target.value;
   };
   window.setMockTextStatus = function(idx, status) {
+    if (state.reviewReadOnly) return;
     window.__mockTextStatus[idx] = status;
     renderReviewPage();
   };
   window.setMockImageStatus = function(id, status) {
+    if (state.reviewReadOnly) return;
     window.__mockImgStatus[id] = status;
     renderReviewPage();
   };
@@ -2552,6 +2953,7 @@ function renderReviewPage() {
     return lines * lineHeight + paddingY;
   }
   window.mockApproveAll = function(count) {
+    if (state.reviewReadOnly) return;
     openConfirmModal({
       title: '全部通过',
       description: '确定将当前节点的 ' + count + ' 项待审内容全部通过吗？',
@@ -2568,6 +2970,7 @@ function renderReviewPage() {
     });
   };
   window.mockRejectAll = function(count) {
+    if (state.reviewReadOnly) return;
     openConfirmModal({
       title: '全部拒绝',
       description: '确定将当前节点的 ' + count + ' 项待审内容全部拒绝吗？此操作不可撤销。',
@@ -2587,6 +2990,7 @@ function renderReviewPage() {
   window.__mockNodeSubmitted = window.__mockNodeSubmitted || {};
   const isSubmitted = window.__mockNodeSubmitted[state.reviewContentNode];
   window.mockSubmitNode = function() {
+    if (state.reviewReadOnly) return;
     window.__mockNodeSubmitted[state.reviewContentNode] = true;
     renderReviewPage();
   };
@@ -2606,7 +3010,7 @@ function renderReviewPage() {
       }
 
       let actionBtns = '';
-      if (!isSubmitted) {
+      if (!isSubmitted && !isReviewReadOnly) {
         actionBtns = '<div style="display:flex; gap: 8px; flex-shrink: 0; flex-wrap:wrap;">';
         if (it.reviewStatus !== 'approved') {
           actionBtns += '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--primary-6); background: #fff; color: var(--primary-6); cursor: pointer; transition: all var(--ease); display: flex; align-items: center; gap: 4px;" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="setMockTextStatus(' + idx + ', \'approved\')">通过</button>';
@@ -2623,7 +3027,7 @@ function renderReviewPage() {
           + statusBadge
         + '</div>'
         + '<div style="display:flex; align-items: flex-start; flex:1; min-width:0;">'
-          + '<textarea ' + (isSubmitted ? 'disabled ' : '') + 'style="flex:1; height:' + getCopyReviewBoxHeight(it.content) + 'px; max-height:128px; overflow-y:auto; border:0; border-radius:8px; resize:none; font: 400 14px/1.65 var(--font); color:var(--text-hi); outline:none; background:var(--bg-subtle); padding:10px 12px; margin:0; box-shadow:none;" rows="1" onfocus="this.style.background=\'var(--bg-surface)\';this.style.boxShadow=\'0 0 0 2px rgba(74,158,255,0.12)\';" onblur="this.style.background=\'var(--bg-subtle)\';this.style.boxShadow=\'none\';" oninput="updateMockText(' + idx + ', event)">' + escHtml(it.content) + '</textarea>'
+          + '<textarea ' + (isSubmitted ? 'disabled ' : '') + (isReviewReadOnly ? 'readonly ' : '') + 'style="flex:1; height:' + getCopyReviewBoxHeight(it.content) + 'px; max-height:128px; overflow-y:auto; border:0; border-radius:8px; resize:none; font: 400 14px/1.65 var(--font); color:var(--text-hi); outline:none; background:var(--bg-subtle); padding:10px 12px; margin:0; box-shadow:none;" rows="1"' + (isReviewReadOnly ? '' : ' onfocus="this.style.background=\'var(--bg-surface)\';this.style.boxShadow=\'0 0 0 2px rgba(74,158,255,0.12)\';" onblur="this.style.background=\'var(--bg-subtle)\';this.style.boxShadow=\'none\';" oninput="updateMockText(' + idx + ', event)"') + '>' + escHtml(it.content) + '</textarea>'
         + '</div>'
         + '</div>';
     }).join('') + '</div>';
@@ -2645,7 +3049,7 @@ function renderReviewPage() {
       }
 
       let actionOverlay = '';
-      if (!isSubmitted) {
+      if (!isSubmitted && !isReviewReadOnly) {
         let opacityState = (it.reviewStatus === 'approved' || it.reviewStatus === 'rejected') ? '0' : '1';
         actionOverlay = '<div class="action-overlay-hover" style="position:absolute; bottom: 42px; left: 0; width: 100%; display: flex; justify-content: center; gap: 8px; opacity: ' + opacityState + '; transition: opacity 0.2s ease; z-index: 6;">'
           + (it.reviewStatus !== 'approved' ? '<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: #fff; color: var(--primary-6); border: 1px solid var(--primary-6); cursor: pointer; display: flex; align-items: center; justify-content: center; font: 600 12px/1 var(--font); box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all var(--ease);" onmouseover="this.style.background=\'rgba(74,158,255,0.08)\';" onmouseout="this.style.background=\'#fff\';" onclick="event.stopPropagation(); setMockImageStatus(\'' + it.itemId + '\', \'approved\')">通过</button>' : '')
@@ -2660,15 +3064,7 @@ function renderReviewPage() {
     }).join('') + '</div>';
   }
 
-  let singleNodeTagHtml = '';
-  if (isSingleNodeAndSource) {
-    const node = hardcodedNodes[0];
-    const sourceNode = contentNodeTabs[0];
-    singleNodeTagHtml = '<div style="display: inline-flex; align-items: center; gap: 8px; margin-left: 12px;">'
-      + '<span style="font-size: 12px; font-weight: normal; background: #e6f4ff; color: #1677ff; border: 1px solid #91caff; padding: 2px 8px; border-radius: 4px;">' + escHtml(node.title) + '</span>'
-      + '<span style="font-size: 12px; color: var(--text-muted);">来源节点：' + escHtml(sourceNode.label) + '</span>'
-      + '</div>';
-  }
+  const contentTitleHtml = renderReviewContentTitleCard(activeContentNode);
 
   root.innerHTML = '<div class="review-page" id="reviewPageContainer" style="background: var(--bg-page); padding: 24px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box; align-items: center; overflow-y: auto; font-family: var(--font);">'
     + '<div style="width: 100%; display: flex; flex-direction: column; gap: 16px;">'
@@ -2677,26 +3073,23 @@ function renderReviewPage() {
           + '<div style="display: flex; align-items: flex-start; gap: 12px;">'
             + '<div style="width: 4px; height: 16px; background: var(--primary-6); border-radius: 2px; margin-top: 2px;"></div>'
             + '<div style="display:flex; flex-direction:column; gap:6px;">'
-              + '<div style="font: 600 16px/1 var(--font); color: var(--text-hi); display: flex; align-items: center;">工作流名称爆款图片裂变' + singleNodeTagHtml + '</div>'
+              + '<div style="font: 600 16px/1 var(--font); color: var(--text-hi); display: flex; align-items: center;">工作流名称爆款图片裂变</div>'
               + '<div style="font: 400 13px/1 var(--font); color: var(--text-muted);">任务名称爆款图片裂变20260444</div>'
             + '</div>'
           + '</div>'
           + '<button style="height: 32px; padding: 0 16px; font-size: 13px; border-radius: 6px; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); cursor: pointer; transition: all var(--ease); display: flex; align-items: center; gap: 6px;" onmouseover="this.style.borderColor=\'var(--primary-6)\';this.style.color=\'var(--primary-6)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.color=\'var(--text-lo)\'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>导出内容</button>'
         + '</div>'
-        + (isSingleNodeAndSource ? '' : (
-          '<div style="height: 1px; background: var(--border-1); margin: 4px 0;"></div>'
-          + '<div style="padding: 4px 0;">'
-            + nodesHtml.replace(/var\(--bg-surface\)/g, '#fff').replace(/border: 1px solid transparent/g, 'border: 1px solid var(--border-1)')
-          + '</div>'
-          + '<div style="display: flex; justify-content: center; margin-top: 8px;">'
-            + contentNodeHtml
-          + '</div>'
-        ))
+        + '<div style="height: 1px; background: var(--border-1); margin: 4px 0;"></div>'
+        + '<div style="padding: 4px 0;">' + nodesHtml + '</div>'
+        + (contentNodeHtml ? '<div style="display: flex; justify-content: center; margin-top: 8px;">' + contentNodeHtml + '</div>' : '')
       + '</div>'
       + '<div style="background:var(--bg-surface); border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid var(--border-1); padding-bottom: 24px; display: flex; flex-direction: column;">'
-        + '<div style="display:flex; justify-content:space-between; align-items:center; padding: 16px 24px; border-bottom: 1px solid var(--border-1);">'
-          + '<div style="display:flex; gap: 8px;">' + pillsHtml.replace(/border-radius: var\(--r-full\)/g, 'border-radius: 16px;') + '</div>'
-          + '<div style="display:flex; gap: 12px; align-items: center;">'
+        + '<div style="padding: 16px 24px 0;">' + contentTitleHtml + '</div>'
+        + '<div class="review-action-toolbar" style="display:flex; justify-content:space-between; align-items:center; padding: 16px 24px; border-bottom: 1px solid var(--border-1);">'
+          + '<div class="review-status-pills" style="display:flex; gap: 8px;">' + pillsHtml.replace(/border-radius: var\(--r-full\)/g, 'border-radius: 16px;') + '</div>'
+          + (isReviewReadOnly
+            ? '<div class="review-bulk-actions" style="display:flex; gap: 12px; align-items:center;"><span style="height: 30px; display:inline-flex; align-items:center; padding:0 12px; border-radius: 16px; border:1px solid var(--border-2); background:var(--bg-subtle); color:var(--text-muted); font:500 12px/1 var(--font);">只读查看</span></div>'
+            : '<div class="review-bulk-actions" style="display:flex; gap: 12px; align-items: center;">'
             + '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); opacity:' + (pendingCount && !isSubmitted ? '1' : '0.5') + '; cursor:' + (pendingCount && !isSubmitted ? 'pointer' : 'not-allowed') + '; transition: all var(--ease);" ' + (pendingCount && !isSubmitted ? 'onmouseover="this.style.borderColor=\'var(--success)\';this.style.color=\'var(--success)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.color=\'var(--text-lo)\'"' : '') + ' onclick="mockApproveAll(' + pendingCount + ')">全部通过</button>'
             + '<button style="height: 32px; padding: 0 16px; font-weight: 500; font-size: 13px; border-radius: 16px; border: 1px solid var(--border-2); background: #fff; color: var(--text-lo); opacity:' + (pendingCount && !isSubmitted ? '1' : '0.5') + '; cursor:' + (pendingCount && !isSubmitted ? 'pointer' : 'not-allowed') + '; transition: all var(--ease);" ' + (pendingCount && !isSubmitted ? 'onmouseover="this.style.borderColor=\'var(--error)\';this.style.color=\'var(--error)\'" onmouseout="this.style.borderColor=\'var(--border-2)\';this.style.color=\'var(--text-lo)\'"' : '') + ' onclick="mockRejectAll(' + pendingCount + ')">全部拒绝</button>'
             + (isSubmitted
@@ -2707,6 +3100,7 @@ function renderReviewPage() {
                 )
             )
           + '</div>'
+          )
         + '</div>'
         + (displayItems.length === 0
             ? '<div style="padding: 80px; text-align:center; color:var(--text-ghost); font: 400 14px/1 var(--font);">暂无数据</div>'
@@ -2777,11 +3171,13 @@ function renderReviewPreviewContent() {
   const controlsContainer = document.getElementById('reviewPreviewControls');
   if (!controlsContainer) return;
   let controlsHtml = '';
-  if (item.reviewStatus !== 'approved') {
-    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:var(--primary-6);color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="approveFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>通过</button>';
-  }
-  if (item.reviewStatus !== 'rejected') {
-    controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#ef4444;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="rejectFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>拒绝</button>';
+  if (!state.reviewReadOnly) {
+    if (item.reviewStatus !== 'approved') {
+      controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:var(--primary-6);color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="approveFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>通过</button>';
+    }
+    if (item.reviewStatus !== 'rejected') {
+      controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#ef4444;color:#fff;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="rejectFromPreview(\'' + item.itemId + '\')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>拒绝</button>';
+    }
   }
   controlsHtml += '<button style="height:40px;padding:0 24px;border-radius:20px;border:none;background:#fff;color:#333;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;" onclick="downloadFromPreview(\'' + escHtml(item.url) + '\')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>下载</button>';
   controlsContainer.innerHTML = controlsHtml;
@@ -2796,6 +3192,7 @@ function rejectFromPreview(itemId) {
 }
 
 function applyPreviewReviewStatus(itemId, status) {
+  if (state.reviewReadOnly) return;
   const currentIndex = __reviewPreviewData.currentIndex;
   const currentItem = __reviewPreviewData.items[currentIndex];
   const currentStatus = currentItem && currentItem.itemId === itemId ? currentItem.reviewStatus : '';
@@ -3163,6 +3560,9 @@ document.addEventListener('click', function(e) {
   if (!e.target.closest('.card-act-btn')) {
     document.querySelectorAll('.card-actions .storage-dropdown').forEach(function(el){ el.style.display='none'; });
   }
+  if (!e.target.closest('.card-more-wrap')) {
+    closeCardMoreMenus();
+  }
 });
 
 function switchCardModel(taskId, modelId) {
@@ -3201,6 +3601,7 @@ function focusTaskCard(id, kind) {
 // ═══ DetailModal ═══
 function openDetailModal(taskId) {
   var task = getTaskById(taskId); if (!task) return;
+  restoreDetailModalFooter();
   state.detailTask = task; state.detailPage = 1; state.detailActiveModel = task.input.models[0];
   document.getElementById('detailModalTitle').textContent = task.name;
   renderDetailModalBody();
@@ -3210,6 +3611,7 @@ function openDetailModal(taskId) {
 function closeDetailModal() {
   state.detailTask = null;
   document.getElementById('detailModalMask').classList.remove('show');
+  restoreDetailModalFooter();
 }
 
 function switchDetailModel(modelId) { state.detailActiveModel = modelId; state.detailPage = 1; renderDetailModalBody(); }
