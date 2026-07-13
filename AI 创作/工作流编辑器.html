@@ -116,15 +116,15 @@
         
         /* Minimalist Node Design Updates */
         .node {
-            position: absolute; width: 236px; background: #fff; border-radius: 12px;
+            position: absolute; width: 260px; background: #fff; border-radius: 12px;
             border: 1px solid var(--border-1); box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06); 
             pointer-events: auto; transition: 0.2s; 
         }
         .node.active { border-color: var(--accent-solid); box-shadow: 0 8px 32px rgba(22, 119, 255, 0.12); z-index: 10; }
         
         .node-header {
-            padding: 12px; font-size: 14px; font-weight: 600;
-            display: flex; align-items: center; gap: 10px;
+            padding: 14px; font-size: 14px; font-weight: 600;
+            display: flex; align-items: center; gap: 12px;
             background: #fff; border-radius: 12px 12px 0 0; cursor: move;
             border-bottom: none;
         }
@@ -133,44 +133,24 @@
             display: flex; align-items: center; justify-content: center;
             color: #fff; flex-shrink: 0;
         }
-        .node-title-wrapper { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .node-title-wrapper { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
         .node-name { color: var(--text-hi); font-size: 15px; font-weight: 600; line-height: 1.2; }
         .node-status {
             display: inline-flex; align-items: center; width: fit-content;
-            height: 20px; padding: 0 8px; border-radius: 999px;
+            height: 22px; padding: 0 8px; border-radius: 999px;
             font-size: 11px; font-weight: 600; line-height: 1;
             border: 1px solid var(--border-1);
         }
         .node-status.pending { background: #fffbe6; border-color: #ffe58f; color: #ad6800; }
         .node-status.ready { background: #f6ffed; border-color: #b7eb8f; color: #237804; }
-        .node-status.manual { background: #fff7e6; border-color: #ffd591; color: #ad4e00; }
-        .node-status.hybrid { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
-        .node-mode-badge {
-            display: inline-flex;
-            align-items: center;
-            width: fit-content;
-            height: 18px;
-            padding: 0 7px;
-            border-radius: 999px;
-            font-size: 11px;
-            font-weight: 600;
-            border: 1px solid var(--border-1);
-            background: var(--bg-subtle);
-            color: var(--text-muted);
-        }
-        .node-mode-badge.auto { background: #f6ffed; border-color: #b7eb8f; color: #237804; }
-        .node-mode-badge.manual { background: #fff7e6; border-color: #ffd591; color: #ad4e00; }
-        .node-mode-badge.hybrid { background: #e6f4ff; border-color: #91caff; color: #0958d9; }
         
         .node-body { 
-            padding: 0 14px 14px; font-size: 13px; color: var(--text-lo);
+            padding: 0 16px 16px; font-size: 13px; color: var(--text-lo);
             min-height: 20px; line-height: 1.5;
             border-top: none;
         }
-        .summary-line { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
-        .summary-line strong { color: var(--text-hi); font-weight: 600; }
         /* Add a light divider line above body if body has content */
-        .node-body:not(:empty) { padding-top: 10px; border-top: 1px solid #f1f5f9; margin: 0 14px 12px; padding-left: 0; padding-right: 0; }
+        .node-body:not(:empty) { padding-top: 12px; border-top: 1px solid #f1f5f9; margin: 0 16px 16px; padding-left: 0; padding-right: 0; }
         
         .node-close { color: var(--text-ghost); cursor: pointer; font-size: 20px; line-height: 1; margin-left: auto; transition: 0.2s; }
         .node-close:hover { color: #ff4d4f; }
@@ -197,7 +177,7 @@
             stroke-linejoin: round;
         }
         .component-cover img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
-        .node-cover { width: 40px; min-height: 40px; border-radius: 10px; }
+        .node-cover { width: 48px; min-height: 48px; border-radius: 10px; }
         .component-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
         .component-name { font-size: 14px; font-weight: 600; color: var(--text-hi); margin-bottom: 2px; }
         .component-desc { font-size: 12px; color: var(--text-lo); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -841,25 +821,6 @@
             font-size: 12px;
             line-height: 1.5;
         }
-        .operation-review-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .operation-review-item {
-            padding: 10px 12px;
-            border: 1px solid var(--border-1);
-            border-radius: 8px;
-            background: var(--bg-subtle);
-            font-size: 12px;
-            color: var(--text-lo);
-            line-height: 1.55;
-        }
-        .operation-review-item strong {
-            display: inline-flex;
-            min-width: 54px;
-            color: var(--text-hi);
-        }
         .config-danger-icon {
             width: 28px;
             height: 28px;
@@ -1102,48 +1063,6 @@
         overflow: hidden;
         line-height: 1.4;
     }
-    .canvas-guide {
-        position: absolute;
-        left: 16px;
-        top: 16px;
-        z-index: 4;
-        width: min(560px, calc(100% - 32px));
-        padding: 12px 14px;
-        border: 1px solid var(--border-1);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.92);
-        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.08);
-        pointer-events: none;
-    }
-    .canvas-guide-title {
-        font-size: 13px;
-        font-weight: 700;
-        color: var(--text-hi);
-        margin-bottom: 6px;
-    }
-    .canvas-guide-body {
-        font-size: 12px;
-        color: var(--text-lo);
-        line-height: 1.6;
-    }
-    .canvas-guide-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 8px;
-    }
-    .canvas-guide-tag {
-        height: 20px;
-        padding: 0 7px;
-        border-radius: 999px;
-        background: var(--bg-subtle);
-        border: 1px solid var(--border-1);
-        color: var(--text-muted);
-        display: inline-flex;
-        align-items: center;
-        font-size: 11px;
-        font-weight: 600;
-    }
 
 </style>
 </head>
@@ -1193,16 +1112,6 @@
         </div>
 
         <div class="canvas-container" id="canvas" ondragover="onCanvasDragOver(event)" ondragenter="onCanvasDragOver(event)" ondrop="onDrop(event)">
-            <div class="canvas-guide">
-                <div class="canvas-guide-title">LibTV 式无限画布适配原型</div>
-                <div class="canvas-guide-body">工作流画布负责流程、批量和依赖；人工工作台负责分镜母版、变量绑定、局部精修和结果挑选。每个节点输出快照，下游依赖被重跑时自动标脏。</div>
-                <div class="canvas-guide-tags">
-                    <span class="canvas-guide-tag">人工节点显式停顿</span>
-                    <span class="canvas-guide-tag">后台节点自动执行</span>
-                    <span class="canvas-guide-tag">中间结果可重跑</span>
-                    <span class="canvas-guide-tag">输出快照可追溯</span>
-                </div>
-            </div>
             <div id="canvas-content" style="position:absolute; top:0; left:0; width:100%; height:100%; transform-origin:0 0;">
                 <svg id="svg-layer">
                     <path id="temp-edge" stroke="var(--accent-solid)" stroke-width="2" fill="none" stroke-dasharray="4,4" style="display:none;"></path>
@@ -1253,9 +1162,6 @@
 
 <script>
 const PALETTE_CATEGORIES = [
-    { key: 'canvas_manual', label: '人工工作台' },
-    { key: 'template_variable', label: '母版与变量' },
-    { key: 'production_auto', label: '批量生产' },
     { key: 'control', label: '审核' },
     { key: 'text_process', label: '文案处理' },
     { key: 'image_compose', label: '素材合成' },
@@ -1361,7 +1267,6 @@ function renderRefSelectorControl({ nodeId, tokenKey, sourceKey, acceptTypes, cu
 
 function renderWrapperConfig(node, inputDefs, outputPreview) {
     const outputsHtml = renderWrapperOutputsEditor(node);
-    const operationHtml = renderNodeOperationSection(PROCESSOR_REGISTRY[node.processorType]);
     let inputsHtml = inputDefs.map((def, index) => {
         const currentInput = node.config.inputs ? node.config.inputs[def.key] : null;
         const currentToken = currentInput ? currentInput.token : '';
@@ -1431,34 +1336,7 @@ function renderWrapperConfig(node, inputDefs, outputPreview) {
                     <div class="config-muted-note">以上输出项均可供下游节点、人工审核节点或结束节点引用。</div>
                 </div>
             </section>
-            ${operationHtml}
         </div>
-    `;
-}
-
-function renderNodeOperationSection(def) {
-    const notes = def?.operationNotes || [];
-    if (!notes.length && !def?.evidence) return '';
-    const notesHtml = notes.map(item => `
-        <div class="operation-review-item">
-            <strong>${escapeAttr(item.label)}</strong>${escapeAttr(item.text)}
-        </div>
-    `).join('');
-    const evidenceHtml = def.evidence
-        ? `<div class="operation-review-item"><strong>依据</strong>${escapeAttr(def.evidence)}</div>`
-        : '';
-    return `
-        <section class="config-section-card">
-            <div class="config-section-head">
-                <div class="config-section-title">人工与后台分工</div>
-            </div>
-            <div class="config-section-body">
-                <div class="operation-review-list">
-                    ${notesHtml}
-                    ${evidenceHtml}
-                </div>
-            </div>
-        </section>
     `;
 }
 
@@ -1626,207 +1504,6 @@ const WRAPPER_NODES = {
     }
 };
 
-const LIBTV_CANVAS_NODES = {
-    'canvas.material': {
-        title: '原料整理',
-        desc: '把产品、脚本、参考图视频整理成可被后续节点引用的原料包',
-        icon: 'database',
-        color: '#0f766e',
-        cover: { type: 'icon', icon: 'database', color: '#0F766E' },
-        category: 'production_auto',
-        execution: 'hybrid',
-        hasIn: true,
-        hasOut: true,
-        outputDefs: [
-            { key: 'material_pack', label: '原料包', type: 'text', sourceNode: '原料整理节点', desc: '包含产品、脚本、参考素材顺序和原始文件引用的结构化输入快照。' }
-        ],
-        createDefaultConfig: () => ({
-            name: '原料整理',
-            inputs: {
-                '产品与卖点': { source: '', token: '' },
-                '参考素材': { source: '', token: '' },
-                '制作要求': { source: '', token: '' }
-            }
-        }),
-        getSummary: () => renderSummary([
-            '<strong>混合</strong>：用户选原料，后台建快照',
-            '输出：原料包'
-        ]),
-        renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '产品与卖点', label: '产品与卖点', type: 'text', desc: '来自开始节点，说明 App 品类、核心卖点、投放方向。' },
-            { key: '参考素材', label: '参考素材', type: 'image', desc: '来自开始节点的参考图或关键帧，保留上传顺序。' },
-            { key: '制作要求', label: '制作要求', type: 'text', desc: '画面比例、语言地区、渠道、人设等额外制作约束。' }
-        ], '原料包'),
-        operationNotes: [
-            { label: '人工', text: '选择产品、脚本、参考素材和批量生成约束。' },
-            { label: '后台', text: '保存输入快照、文件顺序、来源关系，作为后续节点 SSOT。' }
-        ],
-        evidence: '需求池多次提到原料库、参考素材顺序、截图/视频/字幕/BGM 需要串起来。'
-    },
-    'canvas.storyboard': {
-        title: '分镜母版',
-        desc: '把原料包拆成可复用分镜结构，标记每个分镜的可编辑区域',
-        icon: 'flow',
-        color: '#7c3aed',
-        cover: { type: 'icon', icon: 'flow', color: '#7C3AED' },
-        category: 'template_variable',
-        execution: 'manual',
-        hasIn: true,
-        hasOut: true,
-        outputDefs: [
-            { key: 'storyboard_pack', label: '分镜母版包', type: 'text', sourceNode: '分镜母版节点', desc: '包含分镜顺序、画面槽位、局部可编辑区域和时间段的母版结构。' }
-        ],
-        createDefaultConfig: () => ({
-            name: '分镜母版',
-            inputs: {
-                '原料包': { source: '', token: '' }
-            }
-        }),
-        getSummary: () => renderSummary([
-            '<strong>人工</strong>：拆分分镜与可编辑区域',
-            '输出：分镜母版包'
-        ]),
-        renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '原料包', label: '原料包', type: 'text', desc: '上游整理后的产品、脚本、参考素材结构化输入。' }
-        ], '分镜母版包'),
-        operationNotes: [
-            { label: '人工', text: '在画布上调整分镜顺序、每个画面的变量区域、封面/尾版/操作演示位置。' },
-            { label: '后台', text: '记录分镜版本和区域坐标，作为批量衍生时的模板结构。' }
-        ],
-        evidence: '需求池提到视频多分镜要单独替换，历史结论要求变量表达语义、位置由每个分镜局部决定。'
-    },
-    'canvas.variable': {
-        title: '变量表',
-        desc: '维护金额、昵称、按钮、脚本、字幕等可批量替换字段',
-        icon: 'file-text',
-        color: '#2563eb',
-        cover: { type: 'icon', icon: 'file-text', color: '#2563EB' },
-        category: 'template_variable',
-        execution: 'manual',
-        hasIn: true,
-        hasOut: true,
-        outputDefs: [
-            { key: 'variable_sheet', label: '变量表', type: 'text', sourceNode: '变量表节点', desc: '每一行是一组衍生素材参数，字段按语义绑定分镜槽位。' }
-        ],
-        createDefaultConfig: () => ({
-            name: '变量表',
-            inputs: {
-                '分镜母版包': { source: '', token: '' }
-            }
-        }),
-        getSummary: () => renderSummary([
-            '<strong>人工</strong>：填金额/文案/昵称等变量',
-            '输出：变量表'
-        ]),
-        renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '分镜母版包', label: '分镜母版包', type: 'text', desc: '用于确定变量字段和分镜槽位的绑定范围。' }
-        ], '变量表'),
-        operationNotes: [
-            { label: '人工', text: '维护变量字段、批量行、默认值和局部覆盖规则。' },
-            { label: '后台', text: '按变量行展开任务，并校验必填字段和字段类型。' }
-        ],
-        evidence: '需求池提到红包/金额/昵称/按钮/文案批量替换，以及截图、垫图、视频之间需要统一变量层。'
-    },
-    'batch.generate': {
-        title: '批量生成',
-        desc: '按分镜母版和变量表批量调用模型，生成候选图片/视频',
-        icon: 'play',
-        color: '#16a34a',
-        cover: { type: 'icon', icon: 'play', color: '#16A34A' },
-        category: 'production_auto',
-        execution: 'auto',
-        hasIn: true,
-        hasOut: true,
-        outputDefs: [
-            { key: 'batch_candidates', label: '候选素材包', type: 'video', sourceNode: '批量生成节点', desc: '按变量行生成的候选图片/视频集合，带失败与重试记录。' }
-        ],
-        createDefaultConfig: () => ({
-            name: '批量生成',
-            inputs: {
-                '分镜母版包': { source: '', token: '' },
-                '变量表': { source: '', token: '' }
-            }
-        }),
-        getSummary: () => renderSummary([
-            '<strong>自动</strong>：模型调用与失败重试',
-            '输出：候选素材包'
-        ]),
-        renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '分镜母版包', label: '分镜母版包', type: 'text', desc: '分镜结构、变量槽位和局部编辑区域。' },
-            { key: '变量表', label: '变量表', type: 'text', desc: '批量生成的变量行和字段值。' }
-        ], '候选素材包'),
-        operationNotes: [
-            { label: '人工', text: '不直接操作；只在上游决定母版和变量。' },
-            { label: '后台', text: '按变量行排队、调用模型、记录每个候选结果和失败原因。' }
-        ],
-        evidence: 'LibTV/ComfyTV 类节点画布的核心是结果向下游流转；本系统现有工作流节点也已按输入输出编排。'
-    },
-    'canvas.workbench': {
-        title: '人工画布工作台',
-        desc: '暂停流程，让用户在局部画布中挑选、重绘、裁剪、调速或局部替换',
-        icon: 'user-check',
-        color: '#f97316',
-        cover: { type: 'icon', icon: 'user-check', color: '#F97316' },
-        category: 'canvas_manual',
-        execution: 'manual',
-        hasIn: true,
-        hasOut: true,
-        outputDefs: [
-            { key: 'approved_package', label: '人工处理后素材包', type: 'video', sourceNode: '人工画布工作台', desc: '用户挑选、局部精修或替换后的结果，可继续进入审核或下游处理。' }
-        ],
-        createDefaultConfig: () => ({
-            name: '人工画布工作台',
-            inputs: {
-                '候选素材包': { source: '', token: '' }
-            }
-        }),
-        getSummary: () => renderSummary([
-            '<strong>人工</strong>：挑选/精修/局部替换',
-            '提交后下游自动标脏'
-        ]),
-        renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '候选素材包', label: '候选素材包', type: 'video', desc: '上游批量生成的候选素材集合。' }
-        ], '人工处理后素材包'),
-        operationNotes: [
-            { label: '人工', text: '在节点内打开工作台，完成结果挑选、局部重绘、时间轴调整、脚本/字幕/音频确认。' },
-            { label: '后台', text: '暂停主流程，提交后生成新版本；如果用户重跑上游，当前节点和下游自动标脏。' }
-        ],
-        evidence: '需求明确要求提取人工参与部分；历史结论建议用通用人工工作台承接审核、挑选、标注、时间轴编辑、母版制作。'
-    },
-    'postprocess.package': {
-        title: '后处理与入库',
-        desc: '完成命名、压缩、清晰度、字幕/水印等交付前处理',
-        icon: 'checklist',
-        color: '#475569',
-        cover: { type: 'icon', icon: 'checklist', color: '#475569' },
-        category: 'production_auto',
-        execution: 'auto',
-        hasIn: true,
-        hasOut: true,
-        outputDefs: [
-            { key: 'final_assets', label: '最终素材包', type: 'video', sourceNode: '后处理与入库节点', desc: '可下载、入库或推送到投放系统的最终素材集合。' }
-        ],
-        createDefaultConfig: () => ({
-            name: '后处理与入库',
-            inputs: {
-                '审核通过内容': { source: '', token: '' }
-            }
-        }),
-        getSummary: () => renderSummary([
-            '<strong>自动</strong>：命名/压缩/入库',
-            '输出：最终素材包'
-        ]),
-        renderConfig: (node) => renderWrapperConfig(node, [
-            { key: '审核通过内容', label: '审核通过内容', type: 'video', desc: '人工审核后通过的素材集合。' }
-        ], '最终素材包'),
-        operationNotes: [
-            { label: '人工', text: '只确认下载、入库或推送目标，不逐条处理文件。' },
-            { label: '后台', text: '执行命名、压缩、打包、入库、失败明细记录。' }
-        ],
-        evidence: '需求池包含下载命名、文件大小处理、清晰度、入库、推送到账户等交付链路需求。'
-    }
-};
-
 const PROCESSOR_REGISTRY = {
     'system.start': {
         title: '开始节点',
@@ -1835,7 +1512,6 @@ const PROCESSOR_REGISTRY = {
         color: '#52c41a',
         cover: { type: 'icon', icon: 'play', color: '#52C41A' },
         category: 'system',
-        execution: 'hybrid',
         hasIn: false,
         hasOut: true,
         createDefaultConfig: () => ({
@@ -1857,7 +1533,6 @@ const PROCESSOR_REGISTRY = {
             </div>`
     },
     ...WRAPPER_NODES,
-    ...LIBTV_CANVAS_NODES,
     'control.review': {
         title: '人工审核',
         desc: '暂停流程，等待人工筛选通过或拒绝产物',
@@ -1865,7 +1540,6 @@ const PROCESSOR_REGISTRY = {
         color: '#ff4d4f',
         cover: { type: 'icon', icon: 'shield-check', color: '#FF4D4F' },
         category: 'control',
-        execution: 'manual',
         hasIn: true,
         hasOut: true,
         createDefaultConfig: () => ({ name: '人工审核', reviewItems: [] }),
@@ -1892,7 +1566,6 @@ const PROCESSOR_REGISTRY = {
         color: '#8c8c8c',
         cover: { type: 'icon', icon: 'checklist', color: '#8C8C8C' },
         category: 'system',
-        execution: 'auto',
         hasIn: true,
         hasOut: false,
         createDefaultConfig: () => ({ name: '结束', outputType: 'image', outputNodeId: '' }),
@@ -1979,88 +1652,32 @@ for (let i = 1; i <= 10; i++) {
 }
 
 let nodes = [
-    {
-        id: 'n1',
-        processorType: 'system.start',
-        x: 56,
-        y: 146,
-        config: {
-            name: '开始',
-            inputs: [
-                { key: 'app_brief', label: '产品与卖点', type: 'text', control: 'input', required: true, desc: 'App 品类、功能卖点、目标渠道、语言地区' },
-                { key: 'ref_image', label: '参考图', type: 'image', required: true, maxUploadCount: 9, desc: '截图、首帧、产品界面或竞品参考图' },
-                { key: 'production_request', label: '制作要求', type: 'text', control: 'input', required: true, desc: '素材比例、批量数量、需要替换的变量和风险限制' }
-            ]
-        }
-    },
-    { id: 'n2', processorType: 'canvas.material', x: 276, y: 146, config: PROCESSOR_REGISTRY['canvas.material'].createDefaultConfig() },
-    { id: 'n3', processorType: 'canvas.storyboard', x: 496, y: 146, config: PROCESSOR_REGISTRY['canvas.storyboard'].createDefaultConfig() },
-    { id: 'n4', processorType: 'canvas.variable', x: 716, y: 146, config: PROCESSOR_REGISTRY['canvas.variable'].createDefaultConfig() },
-    { id: 'n5', processorType: 'batch.generate', x: 276, y: 326, config: PROCESSOR_REGISTRY['batch.generate'].createDefaultConfig() },
-    { id: 'n6', processorType: 'canvas.workbench', x: 496, y: 326, config: PROCESSOR_REGISTRY['canvas.workbench'].createDefaultConfig() },
-    { id: 'n7', processorType: 'control.review', x: 716, y: 326, config: PROCESSOR_REGISTRY['control.review'].createDefaultConfig() },
-    { id: 'n8', processorType: 'postprocess.package', x: 496, y: 500, config: PROCESSOR_REGISTRY['postprocess.package'].createDefaultConfig() },
-    { id: 'n9', processorType: 'system.end', x: 716, y: 500, config: { name: '结束', outputType: 'video', outputNodeId: '' } }
+    { id: 'n1', processorType: 'system.start', x: 50, y: 150, config: PROCESSOR_REGISTRY['system.start'].createDefaultConfig() },
+    { id: 'n2', processorType: 'mock.expand', x: 320, y: 150, config: PROCESSOR_REGISTRY['mock.expand'].createDefaultConfig() },
+    { id: 'n3', processorType: 'mock.compose', x: 590, y: 150, config: PROCESSOR_REGISTRY['mock.compose'].createDefaultConfig() },
+    { id: 'n4', processorType: 'control.review', x: 860, y: 150, config: PROCESSOR_REGISTRY['control.review'].createDefaultConfig() },
+    { id: 'n5', processorType: 'system.end', x: 1130, y: 150, config: PROCESSOR_REGISTRY['system.end'].createDefaultConfig() }
 ];
 
 let edges = [
     { id: 'e1', source: 'n1', target: 'n2' },
     { id: 'e2', source: 'n2', target: 'n3' },
     { id: 'e3', source: 'n3', target: 'n4' },
-    { id: 'e4', source: 'n3', target: 'n5' },
-    { id: 'e5', source: 'n4', target: 'n5' },
-    { id: 'e6', source: 'n5', target: 'n6' },
-    { id: 'e7', source: 'n6', target: 'n7' },
-    { id: 'e8', source: 'n7', target: 'n8' },
-    { id: 'e9', source: 'n8', target: 'n9' }
+    { id: 'e4', source: 'n4', target: 'n5' }
 ];
 
 function hydrateDemoCanvasStates() {
     const startNode = nodes.find(node => node.processorType === 'system.start');
-    if (!startNode) return;
+    const readyNode = nodes.find(node => node.id === 'n2');
+    if (!startNode || !readyNode || !readyNode.config.inputs) return;
 
-    const materialNode = nodes.find(node => node.id === 'n2');
-    if (materialNode?.config?.inputs) {
-        materialNode.config.inputs['产品与卖点'].token = '{{start.app_brief}}';
-        materialNode.config.inputs['参考素材'].token = '{{start.ref_image}}';
-        materialNode.config.inputs['制作要求'].token = '{{start.production_request}}';
+    const textInput = (startNode.config.inputs || []).find(input => input.type === 'text');
+    const imageInput = (startNode.config.inputs || []).find(input => input.type === 'image');
+    if (textInput && readyNode.config.inputs['爆款文案']) {
+        readyNode.config.inputs['爆款文案'].token = `{{start.${textInput.key}}}`;
     }
-
-    const storyboardNode = nodes.find(node => node.id === 'n3');
-    if (storyboardNode?.config?.inputs) {
-        storyboardNode.config.inputs['原料包'].token = '{{n2.material_pack}}';
-    }
-
-    const variableNode = nodes.find(node => node.id === 'n4');
-    if (variableNode?.config?.inputs) {
-        variableNode.config.inputs['分镜母版包'].token = '{{n3.storyboard_pack}}';
-    }
-
-    const batchNode = nodes.find(node => node.id === 'n5');
-    if (batchNode?.config?.inputs) {
-        batchNode.config.inputs['分镜母版包'].token = '{{n3.storyboard_pack}}';
-        batchNode.config.inputs['变量表'].token = '{{n4.variable_sheet}}';
-    }
-
-    const workbenchNode = nodes.find(node => node.id === 'n6');
-    if (workbenchNode?.config?.inputs) {
-        workbenchNode.config.inputs['候选素材包'].token = '{{n5.batch_candidates}}';
-    }
-
-    const reviewNode = nodes.find(node => node.id === 'n7');
-    if (reviewNode?.config) {
-        reviewNode.config.name = '投放风险与结果审核';
-        reviewNode.config.reviewItems = [{ id: createReviewItemKey(), token: '{{n6.approved_package}}' }];
-    }
-
-    const packageNode = nodes.find(node => node.id === 'n8');
-    if (packageNode?.config?.inputs) {
-        packageNode.config.inputs['审核通过内容'].token = '{{n7.review_1}}';
-    }
-
-    const endNode = nodes.find(node => node.id === 'n9');
-    if (endNode?.config) {
-        endNode.config.outputNodeId = '{{n8.final_assets}}';
+    if (imageInput && readyNode.config.inputs['参考图']) {
+        readyNode.config.inputs['参考图'].token = `{{start.${imageInput.key}}}`;
     }
 }
 
@@ -2078,8 +1695,8 @@ let panelMode = 'config';
 let lastAutoSaveAt = '';
 let runState = { phase: 'idle', values: {}, result: null };
 let workflowMeta = {
-    name: 'LibTV式批量素材画布工作流',
-    description: '面向工具类和网赚类 App 推广素材的母版、变量、人工工作台和批量生成流程。',
+    name: '春季女装爆款裂变工作流',
+    description: '',
     coverName: '',
     visibility: 'private'
 };
@@ -2368,34 +1985,16 @@ function addNodeToCanvas(type, x, y) {
 }
 
 function getNodeSetupStatus(node) {
-    const def = PROCESSOR_REGISTRY[node.processorType] || {};
     if (node.processorType === 'system.start') return { text: '准备就绪', className: 'ready' };
     if (node.processorType === 'system.end') {
         return node.config.outputNodeId ? { text: '准备就绪', className: 'ready' } : { text: '待设置输入项', className: 'pending' };
     }
-    if (node.processorType === 'control.review') return { text: '待人工审核', className: 'manual' };
+    if (node.processorType === 'control.review') return { text: '准备就绪', className: 'ready' };
     const inputs = node.config.inputs || {};
     const keys = Object.keys(inputs);
-    if (!keys.length) {
-        if (def.execution === 'manual') return { text: '待人工处理', className: 'manual' };
-        if (def.execution === 'hybrid') return { text: '人工+自动', className: 'hybrid' };
-        return { text: '准备就绪', className: 'ready' };
-    }
+    if (!keys.length) return { text: '准备就绪', className: 'ready' };
     const ready = keys.every(key => inputs[key] && inputs[key].token);
-    if (!ready) return { text: '待设置输入项', className: 'pending' };
-    if (def.execution === 'manual') return { text: '待人工处理', className: 'manual' };
-    if (def.execution === 'hybrid') return { text: '人工+自动', className: 'hybrid' };
-    return { text: '准备就绪', className: 'ready' };
-}
-
-function getExecutionModeBadge(def) {
-    const mode = def?.execution || 'auto';
-    const map = {
-        auto: { text: '后台自动', className: 'auto' },
-        manual: { text: '人工操作', className: 'manual' },
-        hybrid: { text: '人工+后台', className: 'hybrid' }
-    };
-    return map[mode] || map.auto;
+    return ready ? { text: '准备就绪', className: 'ready' } : { text: '待设置输入项', className: 'pending' };
 }
 
 function renderBoard() {
@@ -2415,7 +2014,6 @@ function renderBoard() {
 
         const summary = info.getSummary ? info.getSummary(node.config, node) : '';
         const status = getNodeSetupStatus(node);
-        const modeBadge = getExecutionModeBadge(info);
 
         const canDelete = !isFixedNode(node.id);
         el.innerHTML = `
@@ -2425,7 +2023,6 @@ function renderBoard() {
                 <div class="node-title-wrapper">
                     <div class="node-name">${node.config.name || info.title}</div>
                     <span class="node-status ${status.className}">${status.text}</span>
-                    <span class="node-mode-badge ${modeBadge.className}">${modeBadge.text}</span>
                 </div>
                 ${canDelete ? `<span class="node-close" onclick="deleteNode(event, '${node.id}')">×</span>` : ''}
             </div>
@@ -3061,8 +2658,6 @@ function getNodeOutputType(node) {
     if (node.processorType.startsWith('mock.compose')) return 'image';
     if (node.processorType.startsWith('mock.video')) return 'video';
     if (node.processorType.startsWith('control.review')) return 'text';
-    const outputItems = getNodeOutputItems(node);
-    if (outputItems.length) return outputItems[0].type;
     return '';
 }
 

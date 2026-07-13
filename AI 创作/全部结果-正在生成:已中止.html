@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="../共享样式/components.css">
     <link rel="stylesheet" href="../共享样式/image-preview.css">
   <link rel="stylesheet" href="../共享样式/asset-intake-modal.css">
+  <link rel="stylesheet" href="../共享样式/download-archive-confirm.css">
     <script src="../共享样式/components.js"></script>
     <script src="../共享样式/image-preview.js"></script>
+    <script src="../共享样式/material-library.js"></script>
 <script src="../共享样式/asset-intake-modal.js"></script>
+<script src="../共享样式/download-archive-confirm.js"></script>
     <style>
         /* ══════════════════════════════════════════
            Design System Variables
@@ -127,6 +130,12 @@
             border-radius: var(--r-xl);
             overflow: hidden;
             margin-bottom: var(--space-4);
+        }
+
+        .card.archive-menu-open {
+            position: relative;
+            z-index: 20;
+            overflow: visible;
         }
 
         /* ── Row containers ── */
@@ -713,7 +722,7 @@
 
         .archive-dropdown {
             position: absolute;
-            bottom: calc(100% + var(--space-1));
+            bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
             background: var(--bg-surface);
@@ -726,11 +735,12 @@
             display: none;
         }
 
+        .archive-wrap:hover .archive-dropdown,
         .archive-dropdown.visible { display: block; }
 
         .archive-dropdown.drop-down {
             bottom: auto;
-            top: calc(100% + var(--space-1));
+            top: 100%;
         }
 
         .archive-opt {
@@ -828,7 +838,10 @@
                 <span class="sel-count" id="selCount">已选 0 项</span>
                 <button class="b b-soft" id="selAllBtn" onclick="selectAll()">全选</button>
                 <button class="b b-soft" onclick="batchDownload()">下载</button>
-                <button class="b b-soft" onclick="batchArchive()">入库</button>
+                <div class="archive-wrap" onmouseenter="showBatchArchiveMenu(this)">
+                    <button class="b b-soft" onclick="toggleArchiveMenu(this)">入库</button>
+                    <div class="archive-dropdown drop-down"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -1354,8 +1367,42 @@ function abortGeneration() {
     showToast('已中止');
 }
 
-function downloadAll()   { alert('下载全部（' + filtered().length + ' 张）'); }
-function batchDownload()  { if (!selected.size) return alert('请先选择图像'); alert('下载已选 ' + selected.size + ' 张'); }
+function resultDownloadItems(list) {
+  return (list || []).map(function(item, index) {
+    item = item || {};
+    var url = item.url || item.thumb || item.preview || '';
+    var type = item.type || item.assetType || (/\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(url) ? 'video' : 'image');
+    return {
+      id: item.id || item.itemId || ('result-download-' + index),
+      type: type,
+      assetType: type,
+      url: url,
+      thumb: item.thumb || url,
+      name: item.name || item.title || (type === 'video' ? '视频素材-' : '图片素材-') + (index + 1)
+    };
+  }).filter(function(item) { return item.url; });
+}
+
+function openResultDownloadConfirm(items, downloadText) {
+  var downloadItems = resultDownloadItems(items);
+  if (!downloadItems.length) return alert('暂无可下载内容');
+  var doDownload = function() { alert(downloadText || ('下载 ' + downloadItems.length + ' 个内容')); };
+  if (typeof openDownloadArchiveConfirm === 'function') {
+    openDownloadArchiveConfirm({ items: downloadItems, onDownload: doDownload, defaultTarget: '原料库' });
+  } else {
+    doDownload();
+  }
+}
+
+function downloadAll() {
+  var items = filtered();
+  openResultDownloadConfirm(items, '下载全部（' + items.length + ' 张）');
+}
+function batchDownload() {
+  if (!selected.size) return alert('请先选择图像');
+  var items = filtered().filter(function(item) { return selected.has(item.id); });
+  openResultDownloadConfirm(items, '下载已选 ' + selected.size + ' 张');
+}
 
 function archiveMediaUrlFor(item) {
     return mediaResultKind(item) === 'video' ? '../icon/步数1-1.mp4' : previewUrlFor(item);
@@ -1372,10 +1419,10 @@ function archiveMediaItem(item) {
     };
 }
 
-function openArchiveModalWithItems(items) {
+function openArchiveModalWithItems(items, target = '原料库') {
     if (!items || !items.length) return;
     if (typeof openAssetArchiveModal === 'function') {
-        openAssetArchiveModal({ items: items.map(archiveMediaItem) });
+        openAssetArchiveModal({ target, items: items.map(archiveMediaItem) });
     } else {
         alert('入库功能加载中');
     }
@@ -1385,20 +1432,34 @@ function batchArchive() {
     if (!selected.size) return alert('请先选择素材');
     openArchiveModalWithItems(filtered().filter(i => selected.has(i.id)));
 }
-function dlItem(id)       { alert('下载：' + find(id).name); }
+function dlItem(id) {
+  var item = find(id);
+  if (!item) return;
+  openResultDownloadConfirm([item], '下载：' + item.name);
+}
 function editItem(id)     { alert('编辑：' + find(id).name); }
 
 // ═══════════════════════════════════════════════════
 // Archive Dropdown
 // ═══════════════════════════════════════════════════
-const ARCHIVE_TARGETS = ['素材库', '物料库', '原料库'];
+const ARCHIVE_TARGETS = ['素材库', '原料库'];
 let _curArchiveCtx = null; // { type:'single'|'batch', id }
 
 function buildArchiveMenu(dropdown, ctx) {
     dropdown.innerHTML = ARCHIVE_TARGETS.map(t =>
         `<button class="archive-opt" onclick="doArchive('${t}')">${t}</button>`
     ).join('');
+    dropdown.closest('.card')?.classList.add('archive-menu-open');
     _curArchiveCtx = ctx;
+}
+
+function showBatchArchiveMenu(wrap) {
+    if (!wrap) return;
+    const dropdown = wrap.querySelector('.archive-dropdown');
+    if (!dropdown) return;
+    closeAllArchiveMenus();
+    buildArchiveMenu(dropdown, { type: 'batch' });
+    dropdown.classList.add('visible');
 }
 
 function toggleArchiveMenu(triggerBtn) {
@@ -1429,15 +1490,17 @@ function showArchiveForItem(id, triggerBtn) {
 
 function closeAllArchiveMenus() {
     document.querySelectorAll('.archive-dropdown.visible').forEach(d => d.classList.remove('visible'));
+    document.querySelectorAll('.card.archive-menu-open').forEach(card => card.classList.remove('archive-menu-open'));
 }
 
 function doArchive(target) {
     if (!_curArchiveCtx) return;
     if (_curArchiveCtx.type === 'batch') {
-        alert(`已将 ${selected.size} 张图片入库到「${target}」`);
+        if (!selected.size) { alert('请先选择素材'); return; }
+        openArchiveModalWithItems(filtered().filter(i => selected.has(i.id)), target);
     } else {
         const img = find(_curArchiveCtx.id);
-        alert(`已将「${img ? img.name : '图片'}」入库到「${target}」`);
+        if (img) openArchiveModalWithItems([img], target);
     }
     closeAllArchiveMenus();
     _curArchiveCtx = null;

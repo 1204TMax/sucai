@@ -1,1231 +1,2156 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原料库 - 量化投放系统</title>
-    <style>
-        :root {
-            --ant-primary-1: #E6F4FF;
-            --ant-primary-2: #BAE0FF;
-            --ant-primary-5: #4096FF;
-            --ant-primary-6: #1677FF;
-            --ant-primary-7: #0958D9;
-            --ant-success-1: #F6FFED;
-            --ant-success-2: #D9F7BE;
-            --ant-success-6: #52C41A;
-            --ant-warning-1: #FFFBE6;
-            --ant-warning-2: #FFF1B8;
-            --ant-warning-6: #FAAD14;
-            --ant-error-1: #FFF1F0;
-            --ant-error-2: #FFCCC7;
-            --ant-error-6: #F5222D;
-            --ant-text-color: #262626;
-            --ant-text-color-secondary: #595959;
-            --ant-text-color-tertiary: #8C8C8C;
-            --ant-text-color-inverse: #FFFFFF;
-            --ant-bg-base: #F5F5F5;
-            --ant-bg-container: #FFFFFF;
-            --ant-bg-secondary: rgba(0,0,0,0.02);
-            --ant-bg-tertiary: rgba(0,0,0,0.04);
-            --ant-border-color: #D9D9D9;
-            --ant-border-color-secondary: #F0F0F0;
-            --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
-            --ant-font-size-h4: 20px;
-            --ant-font-size-h5: 16px;
-            --ant-font-size: 14px;
-            --ant-font-size-sm: 12px;
-            --ant-size-xxs: 4px;
-            --ant-size-xs: 8px;
-            --ant-size-sm: 12px;
-            --ant-size: 16px;
-            --ant-size-md: 20px;
-            --ant-size-lg: 24px;
-            --ant-border-radius-sm: 4px;
-            --ant-border-radius: 6px;
-            --ant-border-radius-lg: 8px;
-            --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            height: calc(100vh - 4px);
-            overflow: hidden;
-            padding: var(--ant-size-xs);
-            background: var(--ant-bg-base);
-            color: var(--ant-text-color);
-            font-family: var(--ant-font-family);
-            font-size: var(--ant-font-size);
-        }
-
-        button,
-        input,
-        select {
-            font: inherit;
-        }
-
-        button {
-            border: none;
-        }
-
-        svg {
-            width: 1em;
-            height: 1em;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .page {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: var(--ant-size-xs);
-            min-height: 0;
-        }
-
-        .surface {
-            background: var(--ant-bg-container);
-            border: 1px solid var(--ant-border-color-secondary);
-            border-radius: var(--ant-border-radius-lg);
-            box-shadow: var(--ant-box-shadow);
-        }
-
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--ant-size);
-            padding: var(--ant-size) var(--ant-size-lg);
-            flex-shrink: 0;
-        }
-
-        .title-wrap {
-            min-width: 0;
-        }
-
-        .page-title {
-            font-size: var(--ant-font-size-h4);
-            font-weight: 600;
-            line-height: 1.4;
-        }
-
-        .page-desc {
-            margin-top: var(--ant-size-xxs);
-            color: var(--ant-text-color-secondary);
-            font-size: var(--ant-font-size-sm);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .btn {
-            height: 32px;
-            padding: 0 var(--ant-size);
-            border-radius: var(--ant-border-radius);
-            border: 1px solid var(--ant-border-color);
-            background: var(--ant-bg-container);
-            color: var(--ant-text-color);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--ant-size-xs);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
-        }
-
-        .btn:hover {
-            border-color: var(--ant-primary-5);
-            color: var(--ant-primary-6);
-        }
-
-        .btn-primary {
-            background: var(--ant-primary-6);
-            border-color: var(--ant-primary-6);
-            color: var(--ant-text-color-inverse);
-        }
-
-        .btn-primary:hover {
-            background: var(--ant-primary-5);
-            border-color: var(--ant-primary-5);
-            color: var(--ant-text-color-inverse);
-        }
-
-        .btn-small {
-            height: 28px;
-            padding: 0 var(--ant-size-sm);
-            font-size: var(--ant-font-size-sm);
-        }
-
-        .layout {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 252px minmax(0, 1fr);
-            gap: var(--ant-size-xs);
-            min-height: 0;
-        }
-
-        .folder-panel,
-        .main-panel {
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        .folder-panel {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .panel-title {
-            padding: var(--ant-size-sm) var(--ant-size);
-            border-bottom: 1px solid var(--ant-border-color-secondary);
-            font-size: var(--ant-font-size-h5);
-            font-weight: 600;
-        }
-
-        .folder-search,
-        .toolbar {
-            padding: var(--ant-size-sm) var(--ant-size);
-            border-bottom: 1px solid var(--ant-border-color-secondary);
-        }
-
-        .input,
-        .select {
-            height: 32px;
-            border: 1px solid var(--ant-border-color);
-            border-radius: var(--ant-border-radius);
-            background: var(--ant-bg-container);
-            color: var(--ant-text-color);
-            outline: none;
-        }
-
-        .input {
-            width: 100%;
-            padding: 0 var(--ant-size-sm);
-        }
-
-        .select {
-            min-width: 120px;
-            padding: 0 var(--ant-size-sm);
-        }
-
-        .input:focus,
-        .select:focus {
-            border-color: var(--ant-primary-6);
-            box-shadow: var(--ant-box-shadow-focus);
-        }
-
-        .tree {
-            flex: 1;
-            min-height: 0;
-            overflow: auto;
-            padding: var(--ant-size-xs);
-        }
-
-        .tree-label {
-            padding: var(--ant-size-xs) var(--ant-size-xs) var(--ant-size-xxs);
-            color: var(--ant-text-color-tertiary);
-            font-size: var(--ant-font-size-sm);
-        }
-
-        .tree-node {
-            display: grid;
-            grid-template-columns: 18px minmax(0, 1fr) auto;
-            gap: var(--ant-size-xs);
-            align-items: center;
-            min-height: 34px;
-            padding: var(--ant-size-xs) var(--ant-size-sm);
-            border-radius: var(--ant-border-radius);
-            color: var(--ant-text-color-secondary);
-            cursor: pointer;
-            transition: background 120ms ease, color 120ms ease;
-        }
-
-        .tree-node:hover {
-            background: var(--ant-bg-secondary);
-            color: var(--ant-primary-6);
-        }
-
-        .tree-node.active {
-            background: var(--ant-primary-1);
-            color: var(--ant-primary-7);
-            font-weight: 600;
-        }
-
-        .tree-name {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .tree-count {
-            color: var(--ant-text-color-tertiary);
-            font-size: var(--ant-font-size-sm);
-            font-weight: 400;
-        }
-
-        .tree-children {
-            margin-left: var(--ant-size-md);
-            padding-left: var(--ant-size-xs);
-            border-left: 1px solid var(--ant-border-color-secondary);
-        }
-
-        .main-panel {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stage-tabs {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: var(--ant-size-xs);
-            padding: var(--ant-size);
-            border-bottom: 1px solid var(--ant-border-color-secondary);
-            flex-shrink: 0;
-        }
-
-        .stage-tab {
-            min-height: 64px;
-            padding: var(--ant-size-sm);
-            border-radius: var(--ant-border-radius-lg);
-            border: 1px solid var(--ant-border-color-secondary);
-            background: var(--ant-bg-container);
-            color: var(--ant-text-color-secondary);
-            text-align: left;
-            cursor: pointer;
-            transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
-        }
-
-        .stage-tab:hover {
-            border-color: var(--ant-primary-2);
-            color: var(--ant-primary-6);
-        }
-
-        .stage-tab.active {
-            background: var(--ant-primary-1);
-            border-color: var(--ant-primary-2);
-            color: var(--ant-primary-7);
-        }
-
-        .stage-name {
-            display: flex;
-            align-items: center;
-            gap: var(--ant-size-xs);
-            font-weight: 600;
-            color: var(--ant-text-color);
-        }
-
-        .stage-tab.active .stage-name {
-            color: var(--ant-primary-7);
-        }
-
-        .stage-desc {
-            margin-top: var(--ant-size-xxs);
-            font-size: var(--ant-font-size-sm);
-            color: var(--ant-text-color-tertiary);
-            line-height: 1.45;
-        }
-
-        .context-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--ant-size);
-            padding: var(--ant-size-sm) var(--ant-size);
-            border-bottom: 1px solid var(--ant-border-color-secondary);
-            background: var(--ant-bg-secondary);
-            flex-shrink: 0;
-        }
-
-        .context-title {
-            font-weight: 600;
-        }
-
-        .context-meta {
-            margin-left: var(--ant-size-xs);
-            color: var(--ant-text-color-tertiary);
-            font-size: var(--ant-font-size-sm);
-        }
-
-        .toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: var(--ant-size-sm);
-            flex-wrap: wrap;
-            flex-shrink: 0;
-        }
-
-        .toolbar-left,
-        .toolbar-right {
-            display: flex;
-            align-items: center;
-            gap: var(--ant-size-xs);
-            flex-wrap: wrap;
-            min-width: 0;
-        }
-
-        .type-tabs {
-            display: none;
-            align-items: center;
-            gap: var(--ant-size-xxs);
-            flex-wrap: wrap;
-        }
-
-        .type-tabs.show {
-            display: flex;
-        }
-
-        .type-tab {
-            height: 28px;
-            padding: 0 var(--ant-size-sm);
-            border-radius: var(--ant-border-radius);
-            background: transparent;
-            color: var(--ant-text-color-secondary);
-            cursor: pointer;
-        }
-
-        .type-tab.active {
-            background: var(--ant-primary-1);
-            color: var(--ant-primary-7);
-            font-weight: 600;
-        }
-
-        .content {
-            flex: 1;
-            min-height: 0;
-            overflow: auto;
-            padding: var(--ant-size);
-        }
-
-        .stage-note {
-            display: flex;
-            align-items: flex-start;
-            gap: var(--ant-size-xs);
-            padding: var(--ant-size-sm) var(--ant-size);
-            margin-bottom: var(--ant-size);
-            border: 1px solid var(--ant-primary-2);
-            border-radius: var(--ant-border-radius-lg);
-            background: var(--ant-primary-1);
-            color: var(--ant-text-color-secondary);
-            line-height: 1.7;
-        }
-
-        .stage-note strong {
-            color: var(--ant-primary-7);
-        }
-
-        .list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--ant-size-sm);
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: var(--ant-size);
-            align-items: center;
-            padding: var(--ant-size);
-            border: 1px solid var(--ant-border-color-secondary);
-            border-radius: var(--ant-border-radius-lg);
-            background: var(--ant-bg-container);
-        }
-
-        .row-main {
-            display: grid;
-            grid-template-columns: auto minmax(0, 1fr);
-            gap: var(--ant-size-sm);
-            min-width: 0;
-        }
-
-        .thumb,
-        .icon-thumb {
-            width: 76px;
-            height: 76px;
-            border-radius: var(--ant-border-radius);
-            background: var(--ant-bg-tertiary);
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .thumb img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .icon-thumb {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--ant-primary-7);
-            background: var(--ant-primary-1);
-            font-size: 28px;
-        }
-
-        .role-views {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--ant-size-xxs);
-            width: 126px;
-            height: 76px;
-        }
-
-        .role-view {
-            position: relative;
-            overflow: hidden;
-            border-radius: var(--ant-border-radius-sm);
-            background: var(--ant-bg-tertiary);
-        }
-
-        .role-view img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .view-label {
-            position: absolute;
-            left: 2px;
-            bottom: 2px;
-            padding: 1px 4px;
-            border-radius: var(--ant-border-radius-sm);
-            background: rgba(0,0,0,0.62);
-            color: var(--ant-text-color-inverse);
-            font-size: 10px;
-        }
-
-        .row-title {
-            display: flex;
-            align-items: center;
-            gap: var(--ant-size-xs);
-            min-width: 0;
-            font-weight: 600;
-            color: var(--ant-text-color);
-        }
-
-        .row-title-text {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .row-desc {
-            margin-top: var(--ant-size-xs);
-            color: var(--ant-text-color-secondary);
-            line-height: 1.65;
-        }
-
-        .row-meta {
-            display: flex;
-            align-items: center;
-            gap: var(--ant-size-xs);
-            flex-wrap: wrap;
-            margin-top: var(--ant-size-xs);
-            color: var(--ant-text-color-tertiary);
-            font-size: var(--ant-font-size-sm);
-        }
-
-        .row-actions {
-            display: flex;
-            align-items: center;
-            gap: var(--ant-size-xs);
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .tag {
-            display: inline-flex;
-            align-items: center;
-            height: 24px;
-            padding: 0 var(--ant-size-xs);
-            border-radius: var(--ant-border-radius-sm);
-            border: 1px solid var(--ant-border-color-secondary);
-            background: var(--ant-bg-secondary);
-            color: var(--ant-text-color-secondary);
-            font-size: var(--ant-font-size-sm);
-            white-space: nowrap;
-        }
-
-        .tag-primary {
-            background: var(--ant-primary-1);
-            border-color: var(--ant-primary-2);
-            color: var(--ant-primary-7);
-        }
-
-        .tag-success {
-            background: var(--ant-success-1);
-            border-color: var(--ant-success-2);
-            color: var(--ant-success-6);
-        }
-
-        .tag-warning {
-            background: var(--ant-warning-1);
-            border-color: var(--ant-warning-2);
-            color: var(--ant-warning-6);
-        }
-
-        .tag-error {
-            background: var(--ant-error-1);
-            border-color: var(--ant-error-2);
-            color: var(--ant-error-6);
-        }
-
-        .copy-preview {
-            padding: var(--ant-size-sm);
-            border-radius: var(--ant-border-radius);
-            background: var(--ant-bg-secondary);
-            color: var(--ant-text-color-secondary);
-            line-height: 1.7;
-        }
-
-        .metric-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(96px, 1fr));
-            gap: var(--ant-size-xs);
-            margin-top: var(--ant-size-xs);
-        }
-
-        .metric {
-            padding: var(--ant-size-xs);
-            border-radius: var(--ant-border-radius);
-            background: var(--ant-bg-secondary);
-        }
-
-        .metric-value {
-            font-weight: 600;
-            color: var(--ant-text-color);
-        }
-
-        .metric-label {
-            margin-top: 2px;
-            color: var(--ant-text-color-tertiary);
-            font-size: var(--ant-font-size-sm);
-        }
-
-        .empty {
-            display: none;
-            min-height: 260px;
-            align-items: center;
-            justify-content: center;
-            border: 1px dashed var(--ant-border-color);
-            border-radius: var(--ant-border-radius-lg);
-            color: var(--ant-text-color-tertiary);
-            background: var(--ant-bg-secondary);
-        }
-
-        .toast {
-            position: fixed;
-            right: var(--ant-size-lg);
-            bottom: var(--ant-size-lg);
-            z-index: 20;
-            display: none;
-            padding: var(--ant-size-sm) var(--ant-size);
-            border-radius: var(--ant-border-radius-lg);
-            background: var(--ant-text-color);
-            color: var(--ant-text-color-inverse);
-            box-shadow: var(--ant-box-shadow);
-            font-size: var(--ant-font-size-sm);
-        }
-
-        .toast.show {
-            display: block;
-        }
-
-        @media (max-width: 1020px) {
-            body {
-                height: auto;
-                min-height: 100vh;
-                overflow: auto;
-            }
-
-            .page {
-                height: auto;
-            }
-
-            .layout,
-            .stage-tabs {
-                grid-template-columns: 1fr;
-            }
-
-            .folder-panel,
-            .main-panel {
-                min-height: 360px;
-            }
-
-            .row {
-                grid-template-columns: 1fr;
-            }
-
-            .row-actions {
-                justify-content: flex-start;
-            }
-
-            .metric-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原料库 - 量化投放系统</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../共享样式/download-archive-confirm.css">
+  <link rel="stylesheet" href="../共享样式/confirm-modal.css">
+  <style>
+    :root {
+      --ant-primary-1: #E8F4FF;
+      --ant-primary-2: #C4E2FF;
+      --ant-primary-3: #96C8FF;
+      --ant-primary-4: #6DAFFF;
+      --ant-primary-5: #5AA4FF;
+      --ant-primary-6: #4A9EFF;
+      --ant-primary-7: #3580DB;
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+      --ant-bg-base: #F5F5F5;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h1: 38px;
+      --ant-font-size-h2: 30px;
+      --ant-font-size-h3: 24px;
+      --ant-font-size-h4: 20px;
+      --ant-font-size-h5: 16px;
+      --ant-font-size-lg: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+      --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --ant-box-shadow-secondary: 0 4px 16px rgba(0,0,0,0.12);
+      --ant-box-shadow-popup: 0 8px 24px rgba(0,0,0,0.15);
+      --ant-box-shadow-focus: 0 0 0 2px rgba(74,158,255,0.1);
+      --accent-solid: var(--ant-primary-6);
+      --accent-solid-h: var(--ant-primary-5);
+      --accent-text: var(--ant-primary-7);
+      --accent-bg: var(--ant-primary-1);
+      --accent-border: var(--ant-primary-2);
+      --bg-surface: var(--ant-bg-container);
+      --border-2: var(--ant-border-color);
+      --text-hi: var(--ant-text-color);
+      --text-lo: var(--ant-text-color-secondary);
+      --text-muted: var(--ant-text-color-tertiary);
+      --white: var(--ant-text-color-inverse);
+      --error: var(--ant-error-6);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-family: var(--ant-font-family);
+      font-size: var(--ant-font-size);
+      line-height: 1.5715;
+    }
+
+    button,
+    input,
+    select,
+    textarea { font: inherit; }
+
+    button { cursor: pointer; }
+
+    .page {
+      width: 100%;
+      padding: var(--ant-size-xs);
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-lg);
+      line-height: 1.3;
+      font-weight: 600;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 212px minmax(0, 1fr);
+      gap: var(--ant-size-xs);
+      align-items: stretch;
+      min-height: calc(100vh - 16px);
+    }
+
+    .panel {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: var(--ant-box-shadow);
+    }
+
+    .side {
+      padding: var(--ant-size);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-sm);
+      min-height: calc(100vh - 16px);
+    }
+
+    .side-head {
+      padding-bottom: var(--ant-size-sm);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .section-title {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size-xs);
+    }
+
+    .section-title-action {
+      height: 24px;
+      padding: 0 var(--ant-size-xs);
+      border: 0;
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-primary-6);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .section-title-action:hover { background: var(--ant-primary-1); }
+
+    .type-list,
+    .scope-list {
+      display: flex;
+      gap: var(--ant-size-xs);
+    }
+
+    .type-list { flex-direction: column; }
+    .scope-list {
+      flex-wrap: nowrap;
+      gap: 0;
+      padding: 2px;
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-tertiary);
+    }
+
+    .type-item,
+    .scope-item {
+      min-height: 32px;
+      padding: 0 var(--ant-size-sm);
+      border: 1px solid transparent;
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-text-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+      gap: var(--ant-size-xs);
+    }
+
+    .type-item:hover,
+    .type-item.active {
+      border-color: var(--ant-primary-2);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-7);
+    }
+
+    .scope-item { min-height: 28px; border: 0; border-radius: var(--ant-border-radius-sm); }
+    .scope-item:hover { color: var(--ant-primary-6); }
+    .scope-item.active {
+      border: 0;
+      background: var(--ant-bg-container);
+      color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-secondary);
+    }
+
+    .type-actions {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: var(--ant-size-xs);
+    }
+
+    .inline-form {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 var(--ant-size);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xs);
+      transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .btn:hover {
+      border-color: var(--ant-primary-5);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+    }
+
+    .btn-primary {
+      border-color: var(--ant-primary-6);
+      background: var(--ant-primary-6);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .btn-primary:hover {
+      border-color: var(--ant-primary-5);
+      background: var(--ant-primary-5);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .btn-sm {
+      height: 24px;
+      padding: 0 var(--ant-size-xs);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .modal-close-icon {
+      width: 32px;
+      padding: 0;
+      flex: 0 0 32px;
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-h4);
+      line-height: 1;
+    }
+
+    .manager-tag-form {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+    }
+
+    .manager-tag-form .input { min-width: 0; flex: 1; }
+    .manager-tag-form .btn { min-width: 56px; padding: 0 var(--ant-size-sm); white-space: nowrap; }
+    .manager-group-head { display: flex; align-items: center; gap: var(--ant-size-xs); }
+    .manager-group-head .select { width: 112px; }
+    .manager-remove {
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-text-color-tertiary);
+      cursor: pointer;
+    }
+    .manager-remove:hover { background: var(--ant-error-1); color: var(--ant-error-6); }
+    .manager-tag {
+      padding-right: var(--ant-size-xxs);
+    }
+    .manager-tag .manager-remove { width: 18px; height: 18px; }
+
+    .tag-group {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      min-height: 32px;
+      padding: var(--ant-size-xxs) var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-secondary);
+    }
+
+    .tag-group-head {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: var(--ant-size-xxs);
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      white-space: nowrap;
+    }
+
+    .tag-group-head span:first-child {
+      color: var(--ant-text-color-secondary);
+      font-weight: 600;
+    }
+
+    .tag-group-head span:last-child {
+      color: var(--ant-text-color-tertiary);
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: var(--ant-size-xxs);
+    }
+
+    .tag {
+      min-height: 22px;
+      padding: 0 var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-sm);
+      background: var(--ant-bg-tertiary);
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xxs);
+    }
+
+    button.tag:hover,
+    .tag.active {
+      border-color: var(--ant-primary-2);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+      overflow: visible;
+    }
+
+    .toolbar {
+      padding: var(--ant-size-sm) var(--ant-size);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-sm);
+    }
+
+    .toolbar-primary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size-sm);
+      min-width: 0;
+      flex-wrap: nowrap;
+    }
+
+    .toolbar-filters {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      min-width: 0;
+    }
+
+    .compact-filter {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-shrink: 0;
+    }
+
+    .compact-label {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      white-space: nowrap;
+    }
+
+    .current-type {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      min-height: 32px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      white-space: nowrap;
+    }
+
+    .current-type strong {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-lg);
+      font-weight: 600;
+    }
+
+    .workflow-filter { width: 170px; flex-shrink: 0; }
+    .workflow-filter[hidden] { display: none; }
+
+    .toolbar-source {
+      width: 170px;
+      flex-shrink: 0;
+    }
+
+    .toolbar-search {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .toolbar-tags {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--ant-size-sm);
+      padding-top: var(--ant-size-sm);
+      border-top: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .toolbar-tags-label {
+      width: 40px;
+      min-height: 24px;
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    #filterGroups {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    #filterGroups .tag-group {
+      min-width: 0;
+      flex: 0 1 auto;
+    }
+
+    #filterGroups .tag-group + .tag-group {
+      padding-left: var(--ant-size-sm);
+      border-left: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .toolbar-tags .tag-group {
+      min-height: 24px;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+    }
+
+    .toolbar-tags .tag-group-head span:first-child { font-weight: 500; }
+
+    .toolbar-tags-clear {
+      flex-shrink: 0;
+      color: var(--ant-primary-6);
+    }
+
+    .tag-filter-select {
+      position: relative;
+      width: 220px;
+      min-width: 0;
+    }
+
+    .tag-filter-select summary {
+      height: 32px;
+      padding: 0 28px 0 10px;
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      white-space: nowrap;
+      position: relative;
+    }
+
+    .tag-filter-select summary::-webkit-details-marker { display: none; }
+    .tag-filter-select summary::after {
+      content: '';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      width: 6px;
+      height: 6px;
+      border-right: 1px solid var(--ant-text-color-tertiary);
+      border-bottom: 1px solid var(--ant-text-color-tertiary);
+      transform: translateY(-70%) rotate(45deg);
+      transition: transform 120ms ease;
+    }
+
+    .tag-filter-select[open] summary {
+      border-color: var(--ant-primary-5);
+      box-shadow: 0 0 0 2px rgba(74,158,255,0.1);
+    }
+
+    .tag-filter-select[open] summary::after { transform: translateY(-30%) rotate(225deg); }
+    .tag-filter-name { color: var(--ant-text-color); font-weight: 500; }
+    .tag-filter-value {
+      max-width: 120px;
+      overflow: hidden;
+      color: var(--ant-primary-6);
+      text-overflow: ellipsis;
+    }
+
+    .tag-filter-popup {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      z-index: 20;
+      width: 240px;
+      padding: var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow-popup);
+    }
+
+    .tag-filter-search {
+      width: 100%;
+      height: 30px;
+      margin-bottom: var(--ant-size-xs);
+      padding: 0 var(--ant-size-sm);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      color: var(--ant-text-color);
+      outline: none;
+    }
+
+    .tag-filter-search:focus { border-color: var(--ant-primary-5); }
+    .tag-filter-options { max-height: 224px; overflow-y: auto; }
+    .tag-filter-option {
+      width: 100%;
+      min-height: 32px;
+      padding: 6px 8px;
+      border: 0;
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-text-color-secondary);
+      font: inherit;
+      font-size: var(--ant-font-size-sm);
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+    }
+
+    .tag-filter-option:hover { background: var(--ant-bg-tertiary); }
+    .tag-filter-option.active { color: var(--ant-primary-6); background: var(--ant-primary-1); }
+    .tag-filter-check {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--ant-border-color);
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 14px;
+      font-size: 10px;
+    }
+
+    .tag-filter-option.active .tag-filter-check { border-color: var(--ant-primary-6); background: var(--ant-primary-6); color: #fff; }
+    .tag-filter-select.single .tag-filter-check { border-radius: 50%; }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 240px;
+      height: 32px;
+      padding: 0 var(--ant-size);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+    }
+
+    .search-wrap:focus-within {
+      border-color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .search-wrap input {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ant-text-color);
+    }
+
+    .search-wrap span {
+      flex-shrink: 0;
+      color: var(--ant-text-color-tertiary);
+      white-space: nowrap;
+    }
+
+    .select,
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color);
+      outline: 0;
+    }
+
+    .select,
+    .input {
+      height: 32px;
+      padding: 4px var(--ant-size);
+    }
+
+    .textarea {
+      min-height: 128px;
+      padding: var(--ant-size-sm) var(--ant-size);
+      resize: vertical;
+    }
+
+    .select:focus,
+    .input:focus,
+    .textarea:focus {
+      border-color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .body {
+      padding: var(--ant-size-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-sm);
+    }
+
+    .result-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(244px, 300px));
+      gap: var(--ant-size-sm);
+      justify-content: start;
+    }
+
+    .copy-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-sm);
+    }
+
+    .material-card,
+    .copy-card {
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-container);
+      display: flex;
+      flex-direction: column;
+      transition: border-color 120ms ease, box-shadow 120ms ease;
+    }
+
+    .material-card:hover,
+    .copy-card:hover {
+      border-color: var(--ant-primary-3);
+      box-shadow: var(--ant-box-shadow);
+    }
+
+    .media {
+      aspect-ratio: 1 / 1;
+      padding: 0;
+      border: 0;
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      border-radius: var(--ant-border-radius-lg) var(--ant-border-radius-lg) 0 0;
+      cursor: zoom-in;
+    }
+
+    .media img,
+    .media video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .media-file-name {
+      max-width: calc(100% - 16px);
+      height: 22px;
+      padding: 0 var(--ant-size-xs);
+      border-radius: var(--ant-border-radius-sm);
+      background: rgba(255,255,255,0.82);
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 400;
+      line-height: 22px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      position: absolute;
+      top: var(--ant-size-xs);
+      left: var(--ant-size-xs);
+      z-index: 2;
+      backdrop-filter: blur(6px);
+    }
+
+    .audio-preview {
+      width: 100%;
+      height: 100%;
+      padding: var(--ant-size-lg);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-sm);
+    }
+
+    .audio-preview strong { color: var(--ant-text-color); font-size: var(--ant-font-size-h5); }
+    .audio-bars { display: flex; align-items: center; gap: var(--ant-size-xxs); height: 40px; }
+    .audio-bars span { width: 4px; border-radius: var(--ant-border-radius-xs); background: var(--ant-primary-5); }
+    .audio-bars span:nth-child(1), .audio-bars span:nth-child(5) { height: 16px; }
+    .audio-bars span:nth-child(2), .audio-bars span:nth-child(4) { height: 28px; }
+    .audio-bars span:nth-child(3) { height: 40px; }
+
+    .media-play {
+      width: 40px;
+      height: 40px;
+      border-radius: 9999px;
+      background: rgba(0,0,0,0.42);
+      box-shadow: var(--ant-box-shadow-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      inset: 0;
+      margin: auto;
+    }
+
+    .media-play::before {
+      content: "";
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 12px solid var(--ant-text-color-inverse);
+      margin-left: var(--ant-size-xxs);
+    }
+
+    .card-body {
+      padding: var(--ant-size-xs) var(--ant-size-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xxs);
+      min-height: 88px;
+    }
+
+    .card-title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--ant-size-xs);
+    }
+
+    .card-title {
+      min-width: 0;
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      font-weight: 600;
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .meta-line {
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size-xs);
+      color: var(--ant-text-color-tertiary);
+      font-size: var(--ant-font-size-sm);
+      position: relative;
+    }
+
+    .footer-meta {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .footer-meta span {
+      flex-shrink: 0;
+    }
+
+    .footer-meta .source {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+    }
+
+    .visibility {
+      height: auto;
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--ant-primary-6);
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+    }
+
+    .visibility.private {
+      color: var(--ant-success-6);
+    }
+
+    .more {
+      width: 24px;
+      height: 24px;
+      border: 1px solid transparent;
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-text-color-tertiary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .action-menu {
+      position: absolute;
+      right: 0;
+      bottom: 100%;
+      min-width: 144px;
+      padding: var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow-popup);
+      display: none;
+      z-index: 10;
+    }
+
+    .action-wrap:hover .action-menu,
+    .action-wrap:focus-within .action-menu,
+    .action-menu:hover {
+      display: block;
+    }
+
+    .action-item {
+      width: 100%;
+      min-height: 32px;
+      padding: 0 var(--ant-size-sm);
+      border: 0;
+      border-radius: var(--ant-border-radius);
+      background: transparent;
+      color: var(--ant-text-color-secondary);
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+
+    .action-item:hover {
+      background: var(--ant-bg-secondary);
+      color: var(--ant-text-color);
+    }
+
+    .action-item.danger:hover {
+      background: var(--ant-error-1);
+      color: var(--ant-error-6);
+    }
+
+    .copy-card {
+      padding: var(--ant-size-sm);
+      gap: var(--ant-size-xxs);
+      max-width: 920px;
+    }
+
+    .copy-main {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--ant-size);
+      align-items: start;
+    }
+
+    .copy-excerpt {
+      max-height: 92px;
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    .empty {
+      min-height: 220px;
+      border: 1px dashed var(--ant-border-color);
+      border-radius: var(--ant-border-radius-lg);
+      color: var(--ant-text-color-tertiary);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: var(--ant-size-lg);
+    }
+
+    .empty.show { display: flex; }
+
+    .mask {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: var(--ant-size-lg);
+      background: rgba(0,0,0,0.45);
+    }
+
+    .mask.show { display: flex; }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: calc(100vh - 64px);
+      border-radius: var(--ant-border-radius-xl);
+      background: var(--ant-bg-container);
+      box-shadow: var(--ant-box-shadow-popup);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-wide { width: min(980px, 100%); }
+
+    .modal-head,
+    .modal-foot {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size);
+      flex-shrink: 0;
+    }
+
+    .modal-foot {
+      border-top: 1px solid var(--ant-border-color-secondary);
+      border-bottom: 0;
+      justify-content: flex-end;
+    }
+
+    .modal-title {
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+    }
+
+    .modal-body {
+      padding: var(--ant-size-lg);
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--ant-size);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      color: var(--ant-text-color-secondary);
+      font-weight: 500;
+    }
+
+    .upload-box {
+      min-height: 136px;
+      padding: var(--ant-size-lg);
+      border: 1px dashed var(--ant-border-color);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-secondary);
+      color: var(--ant-text-color-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xs);
+      cursor: pointer;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+
+    .upload-box:hover {
+      border-color: var(--ant-primary-5);
+      background: var(--ant-primary-1);
+    }
+
+    .upload-icon {
+      color: var(--ant-primary-6);
+      font-size: var(--ant-font-size-h3);
+      line-height: 1;
+    }
+
+    .upload-hint { color: var(--ant-text-color-tertiary); font-size: var(--ant-font-size-sm); }
+    .upload-box input { display: none; }
+
+    .ai-tag-panel {
+      padding: var(--ant-size-sm);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-bg-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size-sm);
+    }
+
+    .ai-tag-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--ant-size-sm);
+    }
+
+    .ai-tag-status {
+      min-width: 0;
+      color: var(--ant-text-color-secondary);
+      font-size: var(--ant-font-size-sm);
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+    }
+
+    .ai-tag-status strong { color: var(--ant-primary-6); font-weight: 500; }
+
+    .ai-tag-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-shrink: 0;
+    }
+
+    .ai-tag-selected {
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+    }
+
+    .ai-selected-tag {
+      min-height: 24px;
+      padding: 0 var(--ant-size-xs);
+      border: 1px solid var(--ant-primary-2);
+      border-radius: var(--ant-border-radius-sm);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-7);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--ant-size-xxs);
+      font-size: var(--ant-font-size-sm);
+    }
+
+    .ai-tag-remove {
+      width: 16px;
+      height: 16px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--ant-primary-6);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ai-tag-remove:hover { background: var(--ant-primary-2); }
+
+    .ai-tag-empty { color: var(--ant-text-color-tertiary); font-size: var(--ant-font-size-sm); }
+
+    .ai-tag-picker {
+      padding-top: var(--ant-size-sm);
+      border-top: 1px solid var(--ant-border-color-secondary);
+      display: none;
+      flex-direction: column;
+      gap: var(--ant-size-xs);
+    }
+
+    .ai-tag-picker.show { display: flex; }
+
+    .format-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--ant-size-xs);
+    }
+
+    .format-option input { display: none; }
+
+    .format-option span {
+      height: 40px;
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      background: var(--ant-bg-container);
+      color: var(--ant-text-color-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .format-option input:checked + span {
+      border-color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .tag-manager-layout {
+      min-height: 420px;
+      display: grid;
+      grid-template-columns: 200px minmax(0, 1fr);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      overflow: hidden;
+    }
+    .tag-manager-side { padding: var(--ant-size-sm); border-right: 1px solid var(--ant-border-color-secondary); background: var(--ant-bg-secondary); }
+    .tag-manager-side-title { margin-bottom: var(--ant-size-xs); color: var(--ant-text-color-tertiary); font-size: var(--ant-font-size-sm); }
+    .tag-manager-groups { display: flex; flex-direction: column; gap: var(--ant-size-xxs); }
+    .tag-manager-group {
+      width: 100%; min-height: 32px; padding: 0 var(--ant-size-xs); border: 0; border-radius: var(--ant-border-radius);
+      background: transparent; color: var(--ant-text-color-secondary); text-align: left;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .tag-manager-group:hover { background: var(--ant-bg-tertiary); }
+    .tag-manager-group.active { background: var(--ant-primary-1); color: var(--ant-primary-7); }
+    .tag-manager-add { margin-top: var(--ant-size-sm); display: flex; flex-direction: column; gap: var(--ant-size-xs); }
+    .tag-manager-main { padding: var(--ant-size); overflow: auto; }
+    .tag-manager-rule { padding-bottom: var(--ant-size); border-bottom: 1px solid var(--ant-border-color-secondary); display: flex; align-items: center; justify-content: space-between; }
+    .tag-manager-rule-title { color: var(--ant-text-color); font-weight: 600; }
+    .tag-manager-content-head { margin: var(--ant-size) 0 var(--ant-size-xs); display: flex; align-items: center; justify-content: space-between; }
+    .tag-manager-content-head .manager-remove { width: auto; padding: 0 var(--ant-size-xs); white-space: nowrap; }
+    .tag-manager-tag-list { display: flex; flex-direction: column; gap: var(--ant-size-xs); }
+    .tag-manager-tag-row { min-height: 40px; padding: var(--ant-size-xs) var(--ant-size-sm); border: 1px solid var(--ant-border-color-secondary); border-radius: var(--ant-border-radius); display: flex; align-items: center; gap: var(--ant-size-xs); }
+    .tag-manager-tag-name { min-width: 0; flex: 1; color: var(--ant-text-color-secondary); }
+    .tag-manager-tag-row .input { flex: 1; }
+
+    .preview-media {
+      max-width: 100%;
+      max-height: min(70vh, 680px);
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .preview-copy {
+      max-height: min(70vh, 680px);
+      overflow: auto;
+      color: var(--ant-text-color-secondary);
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: var(--ant-size-xl);
+      min-width: 160px;
+      height: 40px;
+      padding: 0 var(--ant-size-lg);
+      border-radius: var(--ant-border-radius-lg);
+      background: var(--ant-text-color);
+      color: var(--ant-text-color-inverse);
+      box-shadow: var(--ant-box-shadow-popup);
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .toast.show { display: flex; }
+
+    @media (max-width: 820px) {
+      .layout { grid-template-columns: 1fr; }
+      .side { position: static; }
+      .toolbar-primary { flex-wrap: wrap; }
+      .toolbar-filters { flex-wrap: wrap; }
+      .toolbar-search { min-width: 320px; }
+    }
+
+    @media (max-width: 720px) {
+      .page { padding: var(--ant-size); }
+      .header { flex-direction: column; align-items: flex-start; }
+      .search-wrap { min-width: 100%; }
+      .toolbar-primary { align-items: stretch; }
+      .toolbar-search { min-width: 100%; order: 4; }
+      .type-actions { width: 100%; order: 5; }
+      .toolbar-tags { flex-wrap: wrap; }
+      .toolbar-tags-label { width: auto; }
+      #filterGroups { width: 100%; }
+      #filterGroups .tag-group + .tag-group { padding-left: 0; border-left: 0; }
+      .form-grid { grid-template-columns: 1fr; }
+      .copy-main { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <div class="page">
-        <header class="page-header surface">
-            <div class="title-wrap">
-                <h1 class="page-title">原料库</h1>
-                <p class="page-desc">按生产、存储、使用、数据反馈四个场景管理工作流可复用原料。</p>
+  <div class="page">
+    <main class="layout">
+      <aside class="panel side">
+        <div class="side-head">
+          <h1>原料库</h1>
+        </div>
+        <section class="section">
+          <div class="section-title"><span>类型</span><button class="section-title-action" type="button" onclick="openTypeModal()">+新增</button></div>
+          <div class="type-list" id="typeList"></div>
+        </section>
+      </aside>
+
+      <section class="content">
+        <section class="panel toolbar">
+          <div class="toolbar-primary">
+            <div class="current-type">
+              <strong id="currentTypeText">图片原料</strong>
+              <span id="currentTypeCount">（0）</span>
             </div>
-            <div class="row-actions">
-                <button class="btn" data-action="新建文件夹">
-                    <svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
-                    新建文件夹
-                </button>
-                <button class="btn btn-primary" data-action="导入原料">
-                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5-5 5 5"></path><path d="M12 5v12"></path></svg>
-                    导入原料
-                </button>
+            <div class="type-actions">
+              <button class="btn btn-primary" type="button" onclick="openCreateModal()">导入原料</button>
+              <button class="btn" type="button" onclick="openTagManager()">标签库</button>
             </div>
-        </header>
+          </div>
+          <div class="toolbar-filters">
+            <div class="compact-filter">
+              <span class="compact-label">创建者</span>
+              <div class="scope-list" id="scopeList"></div>
+            </div>
+            <div class="compact-filter toolbar-source">
+              <span class="compact-label">入库来源</span>
+              <select class="select" id="sourceFilter" onchange="onSourceFilterChange()">
+                <option value="全部">全部来源</option>
+                <option value="工作流">工作流</option>
+                <option value="数据中台">数据中台</option>
+                <option value="手动">手动</option>
+                <option value="我的任务">我的任务</option>
+              </select>
+            </div>
+            <label class="workflow-filter" id="workflowFilterWrap" hidden>
+              <input class="input" id="workflowFilter" list="workflowOptions" placeholder="搜索工作流名称" oninput="render()">
+              <datalist id="workflowOptions"></datalist>
+            </label>
+            <label class="search-wrap toolbar-search" for="keyword">
+              <input id="keyword" type="search" placeholder="搜索原料名称" oninput="render()">
+            </label>
+          </div>
+          <div class="toolbar-tags">
+            <div class="toolbar-tags-label">标签</div>
+            <div id="filterGroups"></div>
+            <button class="btn btn-sm toolbar-tags-clear" id="filterClearButton" type="button" onclick="clearTagFilters()">清空</button>
+          </div>
+        </section>
+        <section class="panel body">
+          <div class="result-line">
+            <span id="resultCount">0 个原料</span>
+            <span id="activeSummary"></span>
+          </div>
+          <div id="resultContainer"></div>
+          <div class="empty" id="empty">没有匹配的原料。</div>
+        </section>
+      </section>
+    </main>
+  </div>
 
-        <main class="layout">
-            <aside class="folder-panel surface">
-                <div class="panel-title">业务文件夹</div>
-                <div class="folder-search">
-                    <input id="folderSearch" class="input" type="search" placeholder="搜索文件夹">
-                </div>
-                <div class="tree" id="folderTree">
-                    <div class="tree-label">系统视图</div>
-                    <div class="tree-node active" data-name="全部原料" data-meta="全部业务文件夹 · 全部原料" data-folder="全部">
-                        <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M3 12h18"></path><path d="M3 18h18"></path></svg>
-                        <span class="tree-name">全部原料</span>
-                        <span class="tree-count">1286</span>
-                    </div>
-                    <div class="tree-node" data-name="待入库" data-meta="生产后待确认入库的脚本和演员" data-folder="待入库">
-                        <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
-                        <span class="tree-name">待入库</span>
-                        <span class="tree-count">31</span>
-                    </div>
-                    <div class="tree-node" data-name="最近使用" data-meta="最近 7 天被下载或工作流引用" data-folder="最近使用">
-                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
-                        <span class="tree-name">最近使用</span>
-                        <span class="tree-count">76</span>
-                    </div>
-                    <div class="tree-node" data-name="未归类" data-meta="尚未放入业务文件夹的原料" data-folder="未归类">
-                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5-5 5 5"></path><path d="M12 5v12"></path></svg>
-                        <span class="tree-name">未归类</span>
-                        <span class="tree-count">18</span>
-                    </div>
-
-                    <div class="tree-label">业务分类</div>
-                    <div class="tree-node" data-name="IAA" data-meta="广告变现业务 · 用户创建的一级文件夹" data-folder="IAA">
-                        <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        <span class="tree-name">IAA</span>
-                        <span class="tree-count">618</span>
-                    </div>
-                    <div class="tree-children">
-                        <div class="tree-node" data-name="IAA / 步数赚金币" data-meta="步数、打卡、金币激励类脚本和演员" data-folder="IAA / 步数赚金币">
-                            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M7 14l4-4 4 3 5-7"></path></svg>
-                            <span class="tree-name">步数赚金币</span>
-                            <span class="tree-count">164</span>
-                        </div>
-                        <div class="tree-node" data-name="IAA / 清理加速" data-meta="清理、加速、省电、安全工具类原料" data-folder="IAA / 清理加速">
-                            <svg viewBox="0 0 24 24"><path d="M12 2v20"></path><path d="M5 7h14"></path><path d="M7 12h10"></path><path d="M9 17h6"></path></svg>
-                            <span class="tree-name">清理加速</span>
-                            <span class="tree-count">132</span>
-                        </div>
-                        <div class="tree-node" data-name="IAA / 网赚工具" data-meta="网赚、任务、提现相关原料" data-folder="IAA / 网赚工具">
-                            <svg viewBox="0 0 24 24"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                            <span class="tree-name">网赚工具</span>
-                            <span class="tree-count">98</span>
-                        </div>
-                    </div>
-                    <div class="tree-node" data-name="IAP" data-meta="内购变现业务 · 用户创建的一级文件夹" data-folder="IAP">
-                        <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                        <span class="tree-name">IAP</span>
-                        <span class="tree-count">384</span>
-                    </div>
-                    <div class="tree-children">
-                        <div class="tree-node" data-name="IAP / 小游戏" data-meta="小游戏试玩、关卡、内购转化脚本和演员" data-folder="IAP / 小游戏">
-                            <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2"></rect><path d="M8 12v3"></path><path d="M6.5 13.5h3"></path><path d="M15 13h.01"></path><path d="M18 13h.01"></path></svg>
-                            <span class="tree-name">小游戏</span>
-                            <span class="tree-count">146</span>
-                        </div>
-                        <div class="tree-node" data-name="IAP / 订阅工具" data-meta="订阅、试用、会员权益相关原料" data-folder="IAP / 订阅工具">
-                            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                            <span class="tree-name">订阅工具</span>
-                            <span class="tree-count">82</span>
-                        </div>
-                    </div>
-
-                    <div class="tree-label">项目文件夹</div>
-                    <div class="tree-node" data-name="短剧" data-meta="短剧情节、口播、人物关系相关原料" data-folder="短剧">
-                        <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"></path><rect x="1" y="5" width="15" height="14" rx="2"></rect></svg>
-                        <span class="tree-name">短剧</span>
-                        <span class="tree-count">206</span>
-                    </div>
-                    <div class="tree-node" data-name="美妆" data-meta="美妆种草、测评、短视频口播原料" data-folder="美妆">
-                        <svg viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4.2L18.5 21 12 16.8 5.5 21l2-7.8L2 9h7l3-7z"></path></svg>
-                        <span class="tree-name">美妆</span>
-                        <span class="tree-count">128</span>
-                    </div>
-                </div>
-            </aside>
-
-            <section class="main-panel surface">
-                <div class="stage-tabs" id="stageTabs">
-                    <button class="stage-tab active" data-stage="production">
-                        <div class="stage-name">
-                            <svg viewBox="0 0 24 24"><path d="M3 12h5l2 7 4-14 2 7h5"></path></svg>
-                            生产
-                        </div>
-                        <div class="stage-desc">工作流产物进入原料库前的确认、补齐和入库。</div>
-                    </button>
-                    <button class="stage-tab" data-stage="storage">
-                        <div class="stage-name">
-                            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-                            存储
-                        </div>
-                        <div class="stage-desc">按业务文件夹管理脚本、演员和二期原料。</div>
-                    </button>
-                    <button class="stage-tab" data-stage="usage">
-                        <div class="stage-name">
-                            <svg viewBox="0 0 24 24"><path d="M5 3l14 9-14 9V3z"></path></svg>
-                            使用
-                        </div>
-                        <div class="stage-desc">选择脚本或演员，作为通用生成和工作流输入。</div>
-                    </button>
-                    <button class="stage-tab" data-stage="feedback">
-                        <div class="stage-name">
-                            <svg viewBox="0 0 24 24"><path d="M3 3v18h18"></path><path d="M7 14l4-4 4 3 5-7"></path></svg>
-                            数据反馈
-                        </div>
-                        <div class="stage-desc">把投放表现、引用次数和问题反馈回原料。</div>
-                    </button>
-                </div>
-
-                <div class="context-bar">
-                    <div>
-                        <span class="context-title" id="folderName">全部原料</span>
-                        <span class="context-meta" id="folderMeta">全部项目 · 全部类型</span>
-                    </div>
-                    <button class="btn btn-small" data-action="查看文件夹规则">文件夹规则</button>
-                </div>
-
-                <div class="toolbar">
-                    <div class="toolbar-left">
-                        <input class="input" id="keyword" type="search" placeholder="搜索脚本、演员、标签、来源">
-                        <select class="select" id="statusFilter">
-                            <option value="全部">全部状态</option>
-                            <option value="可用">可用</option>
-                            <option value="待处理">待处理</option>
-                            <option value="需复核">需复核</option>
-                        </select>
-                    </div>
-                    <div class="toolbar-right">
-                        <div class="type-tabs" id="typeTabs">
-                            <button class="type-tab active" data-type="全部">全部</button>
-                            <button class="type-tab" data-type="脚本">脚本</button>
-                            <button class="type-tab" data-type="演员">演员</button>
-                            <button class="type-tab" data-type="二期原料">二期原料</button>
-                        </div>
-                        <button class="btn btn-small" id="resetBtn">重置</button>
-                    </div>
-                </div>
-
-                <div class="content">
-                    <div id="stageBody"></div>
-                    <div class="empty" id="emptyState">没有匹配的原料。</div>
-                </div>
-            </section>
-        </main>
+  <div class="mask" id="createMask" onclick="if(event.target===this)closeCreateModal()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="createTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="createTitle">导入原料</div>
+        <button class="btn modal-close-icon" type="button" aria-label="关闭" title="关闭" onclick="closeCreateModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="field">
+            <label for="materialName">原料名称</label>
+            <input class="input" id="materialName" placeholder="输入原料名称">
+          </div>
+          <div class="field">
+            <label>类型</label>
+            <input class="input" id="materialTypeText" disabled>
+          </div>
+          <div class="field full" id="contentField">
+            <label for="materialContent">文案内容</label>
+            <textarea class="textarea" id="materialContent" placeholder="粘贴可复用文案"></textarea>
+          </div>
+          <div class="field full" id="uploadField">
+            <label for="materialFile">文件</label>
+            <label class="upload-box" id="materialDropZone" for="materialFile" ondragover="handleMaterialDrag(event)" ondrop="handleMaterialDrop(event)">
+              <span class="upload-icon">+</span>
+              <strong id="uploadMainText">点击或拖拽文件到此处上传</strong>
+              <span class="upload-hint" id="uploadHint">支持当前类型对应的文件格式</span>
+              <input id="materialFile" type="file" onchange="handleMaterialFile(this)">
+            </label>
+          </div>
+          <div class="field">
+            <label for="materialSource">入库来源</label>
+            <input class="input" id="materialSource" placeholder="手动上传 / 手动录入">
+          </div>
+          <div class="field full">
+            <label>标签</label>
+            <div class="ai-tag-panel" id="createTagGroups"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" type="button" onclick="closeCreateModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="createMaterial()">导入</button>
+      </div>
     </div>
+  </div>
 
-    <div class="toast" id="toast"></div>
+  <div class="mask" id="typeMask" onclick="if(event.target===this)closeTypeModal()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="typeModalTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="typeModalTitle">新增类型</div>
+        <button class="btn modal-close-icon" type="button" aria-label="关闭" title="关闭" onclick="closeTypeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="newTypeName">类型名称</label>
+          <input class="input" id="newTypeName" placeholder="例如：背景库">
+        </div>
+        <div class="field">
+          <label>内容格式</label>
+          <div class="format-options">
+            <label class="format-option"><input type="radio" name="newTypeFormat" value="copy" checked><span>文本</span></label>
+            <label class="format-option"><input type="radio" name="newTypeFormat" value="image"><span>图片</span></label>
+            <label class="format-option"><input type="radio" name="newTypeFormat" value="video"><span>视频</span></label>
+          </div>
+          <span class="upload-hint">格式决定该类型的导入方式和预览方式，新增后不可修改。</span>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" type="button" onclick="closeTypeModal()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="createType()">确定</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        const iconMap = {
-            copy: '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M16 13H8"></path></svg>',
-            role: '<svg viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"></path><circle cx="12" cy="7" r="4"></circle></svg>',
-            cloth: '<svg viewBox="0 0 24 24"><path d="M16 3l4 2-2 5-2-1v12H8V9l-2 1-2-5 4-2a4 4 0 0 0 8 0z"></path></svg>',
-            voice: '<svg viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>',
-            scene: '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>',
-            pack: '<svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 9.2-8 10-4.5-.8-8-5-8-10V6l8-4z"></path><path d="M9 12l2 2 4-4"></path></svg>'
-        };
+  <div class="mask" id="tagMask" onclick="if(event.target===this)closeTagManager()">
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="tagTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="tagTitle">标签库</div>
+        <button class="btn modal-close-icon" type="button" aria-label="关闭" title="关闭" onclick="closeTagManager()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="result-line"><span id="tagManagerType"></span></div>
+        <div class="tag-manager-layout">
+          <aside class="tag-manager-side">
+            <div class="tag-manager-side-title">标签分组</div>
+            <div class="tag-manager-groups" id="tagManagerGroups"></div>
+            <div class="tag-manager-add">
+              <input class="input" id="groupNameInput" placeholder="输入分组名称">
+              <button class="btn" type="button" onclick="addTagGroup()">新增分组</button>
+            </div>
+          </aside>
+          <section class="tag-manager-main" id="tagManagerMain"></section>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-primary" type="button" onclick="closeTagManager()">完成</button>
+      </div>
+    </div>
+  </div>
 
-        const rows = {
-            production: [
-                {
-                    type: '演员',
-                    title: '阿澈｜步数 App 男性教练',
-                    desc: '由爆款视频逆向工作流生成，正面 / 侧面 / 背面三视图已齐，等待业务确认后进入 IAA 文件夹。',
-                    status: '待处理',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['来源：WF-827', '目标文件夹：IAA / 步数赚金币', '待处理：确认入库'],
-                    action: '确认入库',
-                    views: [
-                        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?auto=format&fit=crop&w=220&q=80'
-                    ]
-                },
-                {
-                    type: '脚本',
-                    title: '步数打卡激励脚本组',
-                    desc: '逆向脚本裂变生成 10 条候选，用户选中的 3 条直接进入脚本库，不需要重复上传。',
-                    status: '待处理',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['来源：COPY-16', '选中：3 / 10', '目标文件夹：IAA / 步数赚金币'],
-                    action: '选择入库',
-                    copy: '今天多走 1000 步，金币就多一点。把每天通勤路上的步数变成小奖励。'
-                },
-                {
-                    type: '二期原料',
-                    title: '温柔女声 A03',
-                    desc: '音色、BGM、音效后续可进入原料库，但第一版先作为二期能力占位。',
-                    status: '需复核',
-                    folder: '美妆',
-                    meta: ['来源：MiniMax 预设', '样音：12 秒', '依赖：音色/画布使用能力'],
-                    action: '复核授权'
-                }
-            ],
-            storage: [
-                {
-                    type: '演员',
-                    title: '林夏｜美妆测评虚拟人',
-                    desc: '演员作为独立原料管理，包含三视图、默认音色和基础标签；不再单独拆服装库。',
-                    status: '可用',
-                    folder: '美妆',
-                    recent: true,
-                    meta: ['文件夹：美妆', '三视图 3/3', '默认音色：温柔女声 A03'],
-                    action: '编辑',
-                    views: [
-                        'https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=220&q=80'
-                    ]
-                },
-                {
-                    type: '演员',
-                    title: '阿澈｜步数 App 男性教练',
-                    desc: '跑量素材沉淀出的演员，可在 IAA 脚本裂变时直接调用。',
-                    status: '可用',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['文件夹：IAA / 步数赚金币', '性别：男', '职业：健身教练'],
-                    action: '编辑',
-                    views: [
-                        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?auto=format&fit=crop&w=220&q=80'
-                    ]
-                },
-                {
-                    type: '脚本',
-                    title: '步数打卡激励脚本组',
-                    desc: '脚本按业务文件夹归档，可作为提示词种子或口播脚本继续裂变。',
-                    status: '可用',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['文件夹：IAA / 步数赚金币', '产品系列：网赚', '引用：33 次'],
-                    action: '编辑',
-                    copy: '今天多走 1000 步，金币就多一点。把每天通勤路上的步数变成小奖励。'
-                },
-                {
-                    type: '脚本',
-                    title: '敏感肌通勤妆前乳卖点组',
-                    desc: '脚本保留来源、标签、适用平台和数据反馈，放在用户创建的美妆文件夹下。',
-                    status: '可用',
-                    folder: '美妆',
-                    meta: ['文件夹：美妆', '小红书', '口播可用'],
-                    action: '编辑',
-                    copy: '熬夜后的脸色真的很难骗过镜头。这版主打「提亮 + 修护」双收益。'
-                },
-                {
-                    type: '脚本',
-                    title: '小游戏闯关付费点脚本',
-                    desc: 'IAP 小游戏下的付费转化脚本，适合关卡失败、限时礼包、复活权益等场景。',
-                    status: '可用',
-                    folder: 'IAP / 小游戏',
-                    meta: ['文件夹：IAP / 小游戏', '产品系列：小游戏', '引用：18 次'],
-                    action: '编辑',
-                    copy: '只差一步通关，现在复活可以直接拿到双倍奖励。'
-                },
-                {
-                    type: '二期原料',
-                    title: '爆款 BGM / 花字贴纸 / 背景',
-                    desc: '这些原料需要画布、发布或过程编辑能力承接，第一版只保留二期占位。',
-                    status: '需复核',
-                    folder: '未归类',
-                    meta: ['文件夹：未归类', '依赖：画布 / 重点字 / BGM 外部服务'],
-                    action: '查看依赖'
-                }
-            ],
-            usage: [
-                {
-                    type: '演员',
-                    title: '阿澈｜步数 App 男性教练',
-                    desc: '在 IAA 工作流里直接调用演员，作为爆款视频二创的人物输入。',
-                    status: '可用',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['文件夹：IAA / 步数赚金币', '下载：21 次', '默认音色：清爽男声'],
-                    action: '下载演员',
-                    views: [
-                        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1527980965255-d3b416303d12?auto=format&fit=crop&w=220&q=80',
-                        'https://images.unsplash.com/photo-1531891437562-4301cf35b7e4?auto=format&fit=crop&w=220&q=80'
-                    ]
-                },
-                {
-                    type: '脚本',
-                    title: '步数打卡激励脚本组',
-                    desc: '选择脚本后可作为逆向脚本裂变种子，也可下载到外部画布继续生产。',
-                    status: '可用',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['文件夹：IAA / 步数赚金币', '调用：33 次', '可裂变'],
-                    action: '作为脚本种子',
-                    copy: '今天多走 1000 步，金币就多一点。把每天通勤路上的步数变成小奖励。'
-                },
-                {
-                    type: '脚本',
-                    title: '敏感肌通勤妆前乳卖点组',
-                    desc: '作为提示词种子或口播脚本使用，进入工作流后可继续裂变。',
-                    status: '可用',
-                    folder: '美妆',
-                    meta: ['文件夹：美妆', '调用：18 次', '可裂变'],
-                    action: '作为脚本种子',
-                    copy: '把通勤、空调房、午后补妆这些真实场景串起来，适合 15 秒口播。'
-                }
-            ],
-            feedback: [
-                {
-                    type: '演员',
-                    title: '阿澈｜步数 App 男性教练',
-                    desc: 'IAA 步数业务里表现稳定，可继续作为默认演员；精准归因依赖后续内部画布。',
-                    status: '可用',
-                    folder: 'IAA / 步数赚金币',
-                    recent: true,
-                    meta: ['文件夹：IAA / 步数赚金币', '反馈动作：继续复用'],
-                    action: '查看关联任务',
-                    metrics: [['下载', '21 次'], ['调用', '14 次'], ['通过率', '96%'], ['ROI', '1.34']]
-                },
-                {
-                    type: '脚本',
-                    title: '步数打卡激励脚本组',
-                    desc: '点击表现高，但落地页转化偏低，需要回写“强引导但弱转化”。',
-                    status: '需复核',
-                    folder: 'IAA / 步数赚金币',
-                    meta: ['文件夹：IAA / 步数赚金币', '反馈动作：回写标签 / 重新裂变'],
-                    action: '回写标签',
-                    metrics: [['调用', '33 次'], ['CTR', '+18%'], ['CVR', '-6%'], ['建议', '重写']]
-                },
-                {
-                    type: '演员',
-                    title: '林夏｜美妆测评虚拟人',
-                    desc: '美妆业务素材通过率稳定，建议继续沉淀同类演员。',
-                    status: '待处理',
-                    folder: '美妆',
-                    meta: ['文件夹：美妆', '反馈动作：补充同类演员'],
-                    action: '生成同类演员',
-                    metrics: [['下载', '16 次'], ['通过率', '94%'], ['拒审', '1 次'], ['建议', '扩充']]
-                }
-            ]
-        };
+  <div class="mask" id="previewMask" onclick="if(event.target===this)closePreview()">
+    <div class="modal modal-wide" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="previewTitle">预览</div>
+        <button class="btn modal-close-icon" type="button" aria-label="关闭" title="关闭" onclick="closePreview()">×</button>
+      </div>
+      <div class="modal-body" id="previewBody"></div>
+    </div>
+  </div>
 
-        const stageNotes = {
-            production: '<strong>生产场景：</strong>工作流或人工任务产出脚本和演员后，按左侧业务文件夹确认入库。',
-            storage: '<strong>存储场景：</strong>左侧是 IAA、IAP 这类人为创建的业务文件夹；右侧再用脚本、演员等类型筛选。',
-            usage: '<strong>使用场景：</strong>从业务文件夹里选择脚本或演员，下载或作为工作流输入；外部画布使用先记录下载/调用。',
-            feedback: '<strong>数据反馈场景：</strong>投放和审核数据回流到脚本、演员；外部使用的精准归因依赖后续内部画布。'
-        };
+  <div class="mask" id="editCopyMask" onclick="if(event.target===this)closeCopyEditor()">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editCopyTitle">
+      <div class="modal-head">
+        <div class="modal-title" id="editCopyTitle">编辑文案</div>
+        <button class="btn modal-close-icon" type="button" aria-label="关闭" title="关闭" onclick="closeCopyEditor()">×</button>
+      </div>
+      <div class="modal-body">
+        <textarea class="textarea" id="editCopyContent" style="min-height:260px" placeholder="编辑文案内容"></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn" type="button" onclick="closeCopyEditor()">取消</button>
+        <button class="btn btn-primary" type="button" onclick="saveCopyEdit()">保存</button>
+      </div>
+    </div>
+  </div>
 
-        let currentStage = 'production';
-        let currentType = '全部';
-        let currentFolder = '全部';
+  <div class="toast" id="toast"></div>
 
-        function escapeHtml(text) {
-            return String(text || '').replace(/[&<>"']/g, function(match) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[match];
-            });
+  <script src="../共享样式/material-library.js?v=20260712a"></script>
+  <script src="../共享样式/download-archive-confirm.js"></script>
+  <script src="../共享样式/confirm-modal.js"></script>
+  <script>
+    const library = window.CCMaterialLibrary;
+    let materials = library.materials.slice();
+    let tagGroups = JSON.parse(JSON.stringify(library.tagGroups || {}));
+    let typeOptions = JSON.parse(JSON.stringify((library.materialTypes || []).filter(item => item.enabled !== false)));
+    let currentType = 'image';
+    let currentScope = 'mine';
+    let tagFilters = {};
+    let createTagSelections = {};
+    let createTagPickerOpen = false;
+    let aiTagState = 'idle';
+    let aiTagTimer = null;
+    let editingCopyId = '';
+    let uploadedFile = null;
+    let activeTagGroupId = '';
+    const workflowNames = ['爆款二创工作流', '演员裂变工作流', 'LibTV 批量生产工作流', '图片批量生成工作流'];
+    materials.filter(item => item.source === '工作流').forEach((item, index) => {
+      if (!item.workflowName) item.workflowName = workflowNames[index % 2];
+    });
+
+    function esc(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+      });
+    }
+
+    function typeLabel(type) {
+      const localType = typeOptions.find(item => item.key === type);
+      if (localType) return localType.label;
+      return library.typeLabel ? library.typeLabel(type) : (type === 'video' ? '视频' : type === 'copy' ? '文案' : '图片');
+    }
+
+    function typeConfig(type) {
+      return typeOptions.find(item => item.key === type) || { key:type, label:type, format:'image', formatLabel:'图片' };
+    }
+
+    function itemMaterialType(item) {
+      return item.materialType || item.type;
+    }
+
+    function currentFormat() {
+      return typeConfig(currentType).format;
+    }
+
+    function shortSource(source) {
+      return String(source || '')
+        .replace('数据中台沉淀入库', '数据中台')
+        .replace('数据中台沉淀', '数据中台')
+        .replace('工作流采用', '工作流')
+        .replace('我的任务入库', '我的任务')
+        .replace('手动录入', '手动')
+        .replace('手动上传', '手动');
+    }
+
+    function scopeItems() {
+      const typeItems = materials.filter(item => itemMaterialType(item) === currentType);
+      return [
+        { key:'mine', label:'我的', count:typeItems.filter(item => library.isMine(item)).length },
+        { key:'all', label:'全部', count:typeItems.length }
+      ];
+    }
+
+    function getGroups(type) {
+      if (!tagGroups[type]) tagGroups[type] = [];
+      return tagGroups[type];
+    }
+
+    function selectedSet(map, groupId) {
+      return new Set(map[groupId] || []);
+    }
+
+    function allSelectedTags(map) {
+      return Object.values(map).flat();
+    }
+
+    function renderTypes() {
+      document.getElementById('typeList').innerHTML = typeOptions.map(item => {
+        const count = materials.filter(row => itemMaterialType(row) === item.key).length;
+        return '<button class="type-item' + (currentType === item.key ? ' active' : '') + '" type="button" onclick="setType(\'' + item.key + '\')">'
+          + '<span>' + item.label + '</span><span>' + count + '</span></button>';
+      }).join('');
+    }
+
+    function renderScope() {
+      document.getElementById('scopeList').innerHTML = scopeItems().map(item => (
+        '<button class="scope-item' + (currentScope === item.key ? ' active' : '') + '" type="button" onclick="setScope(\'' + item.key + '\')">'
+        + '<span>' + item.label + '</span><span>' + item.count + '</span></button>'
+      )).join('');
+    }
+
+    function renderFilterGroups() {
+      document.getElementById('filterGroups').innerHTML = getGroups(currentType).map(group => {
+        const selected = selectedSet(tagFilters, group.id);
+        const selectedValues = Array.from(selected);
+        const summary = selectedValues.length
+          ? (selectedValues.length === 1 ? selectedValues[0] : '已选 ' + selectedValues.length + ' 项')
+          : '请选择';
+        const tags = group.tags.map(tag => {
+          const active = selected.has(tag);
+          return '<button class="tag-filter-option' + (active ? ' active' : '') + '" type="button" data-tag-text="' + esc(tag.toLowerCase()) + '" onclick="toggleFilterTag(decodeURIComponent(\'' + encodeURIComponent(group.id) + '\'), decodeURIComponent(\'' + encodeURIComponent(tag) + '\'))">'
+            + '<span class="tag-filter-check">' + (active ? '✓' : '') + '</span><span>' + esc(tag) + '</span></button>';
+        }).join('');
+        return '<details class="tag-filter-select' + (group.multiple ? '' : ' single') + '" data-tag-group="' + esc(group.id) + '">'
+          + '<summary><span class="tag-filter-name">' + esc(group.name) + '</span><span class="tag-filter-value">' + esc(summary) + '</span></summary>'
+          + '<div class="tag-filter-popup" onclick="event.stopPropagation()">'
+          + '<input class="tag-filter-search" placeholder="搜索标签" oninput="filterTagOptions(this)">'
+          + '<div class="tag-filter-options">' + tags + '</div></div></details>';
+      }).join('');
+      const clearButton = document.getElementById('filterClearButton');
+      if (clearButton) clearButton.style.visibility = Object.values(tagFilters).some(values => values && values.length) ? 'visible' : 'hidden';
+    }
+
+    function filterTagOptions(input) {
+      const q = input.value.trim().toLowerCase();
+      input.parentElement.querySelectorAll('.tag-filter-option').forEach(option => {
+        option.style.display = !q || option.dataset.tagText.includes(q) ? '' : 'none';
+      });
+    }
+
+    function passesTags(item) {
+      return Object.keys(tagFilters).every(groupId => {
+        const values = tagFilters[groupId] || [];
+        if (!values.length) return true;
+        return values.some(tag => (item.tags || []).includes(tag));
+      });
+    }
+
+    function getFiltered() {
+      const q = document.getElementById('keyword').value.trim().toLowerCase();
+      const source = document.getElementById('sourceFilter').value;
+      const workflowQuery = document.getElementById('workflowFilter').value.trim().toLowerCase();
+      return materials.filter(item => {
+        if (itemMaterialType(item) !== currentType) return false;
+        if (currentScope === 'mine' && !library.isMine(item)) return false;
+        if (source !== '全部' && item.source !== source) return false;
+        if (source === '工作流' && workflowQuery && !String(item.workflowName || '').toLowerCase().includes(workflowQuery)) return false;
+        if (!passesTags(item)) return false;
+        if (!q) return true;
+        return String(item.name || '').toLowerCase().includes(q);
+      });
+    }
+
+    function tagHtml(item) {
+      return (item.tags || []).slice(0, 4).map(tag => '<span class="tag">' + esc(tag) + '</span>').join('');
+    }
+
+    function fileNameFor(item) {
+      const fallbackExt = item.type === 'video' ? '.mp4' : item.type === 'audio' ? '.mp3' : '.png';
+      const raw = item.fileName || item.filename || item.name || ('material-' + item.id + fallbackExt);
+      if (/\.(mp4|mov|webm|m4v|mp3|wav|png|jpg|jpeg|webp|gif)$/i.test(raw)) return raw;
+      return raw + fallbackExt;
+    }
+
+    function actionMenu(item) {
+      if (item.type === 'copy') {
+        return '<button class="action-item" type="button" onclick="editCopy(\'' + esc(item.id) + '\')">编辑</button>'
+          + '<button class="action-item" type="button" onclick="copyText(\'' + esc(item.id) + '\')">复制</button>';
+      }
+      return '<button class="action-item" type="button" onclick="downloadMaterial(\'' + esc(item.id) + '\')">下载</button>'
+        + '<button class="action-item danger" type="button" onclick="deleteMaterial(\'' + esc(item.id) + '\')">删除</button>';
+    }
+
+    function cardFooter(item) {
+      return '<div class="card-footer">'
+        + '<div class="footer-meta"><span>' + esc(item.createdAt) + '</span><span>' + esc(item.owner) + '</span><span class="source">' + esc(shortSource(item.source)) + '</span></div>'
+        + '<div class="action-wrap"><button class="more" type="button" aria-label="操作">...</button><div class="action-menu">' + actionMenu(item) + '</div></div>'
+        + '</div>';
+    }
+
+    function mediaCard(item) {
+      const media = item.type === 'audio'
+        ? '<div class="audio-preview"><div class="audio-bars"><span></span><span></span><span></span><span></span><span></span></div><strong>' + esc(typeLabel(currentType)) + '</strong></div>'
+        : item.type === 'video'
+        ? '<video src="' + esc(item.url) + '" poster="' + esc(item.thumb || '') + '" muted playsinline preload="metadata"></video><span class="media-play"></span>'
+        : '<img src="' + esc(item.thumb || item.url) + '" alt="' + esc(item.name) + '">';
+      return '<article class="material-card">'
+        + '<button class="media" type="button" onclick="previewMaterial(\'' + esc(item.id) + '\')">'
+        + '<span class="media-file-name" title="' + esc(fileNameFor(item)) + '">' + esc(fileNameFor(item)) + '</span>'
+        + media + '</button>'
+        + '<div class="card-body">'
+        + '<div class="tag-list">' + tagHtml(item) + '</div>'
+        + cardFooter(item)
+        + '</div></article>';
+    }
+
+    function copyCard(item) {
+      return '<article class="copy-card">'
+        + '<div class="copy-main">'
+        + '<div>'
+        + '<div class="copy-excerpt">' + esc(item.content || '') + '</div>'
+        + '<div class="tag-list" style="margin-top:8px">' + tagHtml(item) + '</div>'
+        + '</div>'
+        + '<button class="btn" type="button" onclick="previewMaterial(\'' + esc(item.id) + '\')">查看全文</button>'
+        + '</div>'
+        + cardFooter(item)
+        + '</article>';
+    }
+
+    function renderResults() {
+      const list = getFiltered();
+      const container = document.getElementById('resultContainer');
+      const format = currentFormat();
+      container.className = format === 'copy' ? 'copy-list' : 'grid';
+      container.innerHTML = list.map(item => format === 'copy' ? copyCard(item) : mediaCard(item)).join('');
+      document.getElementById('resultCount').textContent = list.length + ' 个' + typeLabel(currentType) + '原料';
+      document.getElementById('activeSummary').textContent = (currentScope === 'mine' ? '我的' : '全部') + ' / ' + typeLabel(currentType);
+      document.getElementById('currentTypeText').textContent = typeLabel(currentType) + '原料';
+      document.getElementById('currentTypeCount').textContent = '（' + materials.filter(item => itemMaterialType(item) === currentType).length + '）';
+      document.getElementById('empty').classList.toggle('show', list.length === 0);
+    }
+
+    function render() {
+      renderTypes();
+      renderScope();
+      renderFilterGroups();
+      renderWorkflowFilter();
+      renderResults();
+    }
+
+    function renderWorkflowFilter() {
+      const source = document.getElementById('sourceFilter').value;
+      const wrap = document.getElementById('workflowFilterWrap');
+      const list = document.getElementById('workflowOptions');
+      wrap.hidden = source !== '工作流';
+      list.innerHTML = workflowNames.map(name => '<option value="' + esc(name) + '"></option>').join('');
+    }
+
+    function onSourceFilterChange() {
+      if (document.getElementById('sourceFilter').value !== '工作流') document.getElementById('workflowFilter').value = '';
+      render();
+    }
+
+    function setType(type) {
+      currentType = type;
+      tagFilters = {};
+      createTagSelections = {};
+      render();
+    }
+
+    function setScope(scope) {
+      currentScope = scope;
+      render();
+    }
+
+    function toggleFilterTag(groupId, tag) {
+      const group = getGroups(currentType).find(item => item.id === groupId);
+      const set = selectedSet(tagFilters, groupId);
+      if (!group || !group.multiple) {
+        tagFilters[groupId] = set.has(tag) ? [] : [tag];
+      } else {
+        if (set.has(tag)) set.delete(tag);
+        else set.add(tag);
+        tagFilters[groupId] = Array.from(set);
+      }
+      render();
+    }
+
+    function clearTagFilters() {
+      tagFilters = {};
+      render();
+    }
+
+    function renderCreateTags() {
+      const groups = getGroups(currentType);
+      const selectedTags = groups.flatMap(group => (createTagSelections[group.id] || []).map(tag => ({ groupId:group.id, tag })));
+      const selectedHtml = selectedTags.length
+        ? selectedTags.map(item => '<span class="ai-selected-tag">' + esc(item.tag)
+          + '<button class="ai-tag-remove" type="button" title="删除标签" aria-label="删除' + esc(item.tag) + '" onclick="removeCreateTag(\'' + esc(item.groupId) + '\', \'' + esc(item.tag) + '\')">×</button></span>').join('')
+        : '<span class="ai-tag-empty">' + (aiTagState === 'loading' ? '正在识别…' : '暂未添加标签') + '</span>';
+      const pickerHtml = groups.map(group => {
+        const selected = selectedSet(createTagSelections, group.id);
+        const values = Array.from(selected);
+        const summary = values.length ? (values.length === 1 ? values[0] : '已选 ' + values.length + ' 项') : (group.multiple ? '请选择（多选）' : '请选择');
+        const tags = group.tags.map(tag => {
+          const active = selected.has(tag);
+          return '<button class="tag-filter-option' + (active ? ' active' : '') + '" type="button" data-tag-text="' + esc(tag.toLowerCase()) + '" onclick="toggleCreateTag(decodeURIComponent(\'' + encodeURIComponent(group.id) + '\'),decodeURIComponent(\'' + encodeURIComponent(tag) + '\'))">'
+            + '<span class="tag-filter-check">' + (active ? '✓' : '') + '</span><span>' + esc(tag) + '</span></button>';
+        }).join('');
+        return '<details class="tag-filter-select' + (group.multiple ? '' : ' single') + '">'
+          + '<summary><span class="tag-filter-name">' + esc(group.name) + '</span><span class="tag-filter-value">' + esc(summary) + '</span></summary>'
+          + '<div class="tag-filter-popup" onclick="event.stopPropagation()"><input class="tag-filter-search" placeholder="搜索标签" oninput="filterTagOptions(this)">'
+          + '<div class="tag-filter-options">' + tags + '</div></div></details>';
+      }).join('');
+      const statusText = aiTagState === 'loading'
+        ? '<strong>AI 识别中</strong><span>正在根据' + esc(typeLabel(currentType)) + '分类添加标签</span>'
+        : '<strong>AI 已添加</strong><span>已按' + esc(typeLabel(currentType)) + '分类推荐</span>';
+      document.getElementById('createTagGroups').innerHTML = '<div class="ai-tag-head">'
+        + '<div class="ai-tag-status">' + statusText + '</div>'
+        + '<div class="ai-tag-actions">'
+        + '<button class="btn btn-sm" type="button" onclick="runAiTagging()">重新识别</button>'
+        + '<button class="btn btn-sm" type="button" onclick="toggleCreateTagPicker()">' + (createTagPickerOpen ? '收起' : '+ 新增') + '</button>'
+        + '</div></div>'
+        + '<div class="ai-tag-selected">' + selectedHtml + '</div>'
+        + '<div class="ai-tag-picker' + (createTagPickerOpen ? ' show' : '') + '">' + pickerHtml + '</div>';
+    }
+
+    function aiSuggestedTags() {
+      const suggestions = {
+        image: { age:['青年'], gender:['女性'], scene:['封面', '信息流'] },
+        video: { clipType:['口播'], format:['9:16'], source:['跑量素材', '爆款逆向'] },
+        copy: { copyType:['脚本'], business:['工具类'], reuse:['可复用'] }
+      };
+      const configured = suggestions[currentType] || {};
+      const result = {};
+      getGroups(currentType).forEach(group => {
+        const allowed = new Set(group.tags || []);
+        result[group.id] = (configured[group.id] || []).filter(tag => allowed.has(tag));
+      });
+      return result;
+    }
+
+    function runAiTagging() {
+      if (aiTagTimer) clearTimeout(aiTagTimer);
+      aiTagState = 'loading';
+      createTagSelections = {};
+      renderCreateTags();
+      aiTagTimer = setTimeout(() => {
+        createTagSelections = aiSuggestedTags();
+        aiTagState = 'done';
+        renderCreateTags();
+      }, 700);
+    }
+
+    function toggleCreateTagPicker() {
+      createTagPickerOpen = !createTagPickerOpen;
+      renderCreateTags();
+    }
+
+    function removeCreateTag(groupId, tag) {
+      createTagSelections[groupId] = (createTagSelections[groupId] || []).filter(item => item !== tag);
+      aiTagState = 'done';
+      renderCreateTags();
+    }
+
+    function toggleCreateTag(groupId, tag) {
+      const group = getGroups(currentType).find(item => item.id === groupId);
+      const set = selectedSet(createTagSelections, groupId);
+      if (!group || !group.multiple) {
+        createTagSelections[groupId] = set.has(tag) ? [] : [tag];
+      } else {
+        if (set.has(tag)) set.delete(tag);
+        else set.add(tag);
+        createTagSelections[groupId] = Array.from(set);
+      }
+      aiTagState = 'done';
+      renderCreateTags();
+    }
+
+    function openCreateModal() {
+      const format = currentFormat();
+      document.getElementById('createTitle').textContent = '导入' + typeLabel(currentType) + '原料';
+      document.getElementById('materialTypeText').value = typeLabel(currentType);
+      document.getElementById('materialSource').value = '手动';
+      document.getElementById('contentField').style.display = format === 'copy' ? 'flex' : 'none';
+      document.getElementById('uploadField').style.display = format === 'copy' ? 'none' : 'flex';
+      document.getElementById('materialFile').accept = format === 'copy' ? '.txt,.md,.doc,.docx' : format === 'image' ? 'image/*' : format === 'audio' ? 'audio/*' : 'video/*';
+      document.getElementById('materialFile').value = '';
+      document.getElementById('uploadMainText').textContent = '点击或拖拽文件到此处上传';
+      uploadedFile = null;
+      createTagSelections = {};
+      createTagPickerOpen = false;
+      document.getElementById('createMask').classList.add('show');
+      runAiTagging();
+    }
+
+    function handleMaterialFile(input) {
+      uploadedFile = input.files && input.files[0] ? input.files[0] : null;
+      applyUploadedFile();
+    }
+
+    function handleMaterialDrag(event) {
+      event.preventDefault();
+    }
+
+    function handleMaterialDrop(event) {
+      event.preventDefault();
+      uploadedFile = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : null;
+      applyUploadedFile();
+    }
+
+    function applyUploadedFile() {
+      document.getElementById('uploadMainText').textContent = uploadedFile ? uploadedFile.name : '点击或拖拽文件到此处上传';
+      if (uploadedFile && !document.getElementById('materialName').value.trim()) {
+        document.getElementById('materialName').value = uploadedFile.name.replace(/\.[^.]+$/, '');
+      }
+      if (uploadedFile && currentFormat() === 'copy' && /\.(txt|md)$/i.test(uploadedFile.name)) {
+        const reader = new FileReader();
+        reader.onload = () => { document.getElementById('materialContent').value = String(reader.result || ''); };
+        reader.readAsText(uploadedFile);
+      }
+    }
+
+    function closeCreateModal() {
+      if (aiTagTimer) clearTimeout(aiTagTimer);
+      aiTagTimer = null;
+      document.getElementById('createMask').classList.remove('show');
+    }
+
+    function createMaterial() {
+      const name = document.getElementById('materialName').value.trim();
+      if (!name) return showToast('请填写原料名称');
+      const selectedTags = allSelectedTags(createTagSelections);
+      if (!selectedTags.length) return showToast('请选择标签');
+      const content = document.getElementById('materialContent').value.trim();
+      if (!uploadedFile && !content) return showToast('请上传文件');
+      const format = currentFormat();
+      const url = uploadedFile && format !== 'copy' ? URL.createObjectURL(uploadedFile) : '';
+      materials.unshift({
+        id: 'mat-new-' + Date.now(),
+        name,
+        type: format,
+        materialType: currentType,
+        format: typeConfig(currentType).formatLabel,
+        content,
+        url,
+        thumb: url,
+        tags: selectedTags,
+        source: document.getElementById('materialSource').value.trim() || '手动',
+        owner: library.currentUser.name,
+        createdAt: '2026-07-10',
+        visibility: '全部',
+        downloads: 0,
+        references: 0,
+        status: '可用'
+      });
+      closeCreateModal();
+      render();
+      showToast('已保存');
+    }
+
+    function openTypeModal() {
+      document.getElementById('newTypeName').value = '';
+      document.querySelector('input[name="newTypeFormat"][value="copy"]').checked = true;
+      document.getElementById('typeMask').classList.add('show');
+    }
+
+    function closeTypeModal() {
+      document.getElementById('typeMask').classList.remove('show');
+    }
+
+    function createType() {
+      const name = document.getElementById('newTypeName').value.trim();
+      if (!name) return showToast('请输入类型名称');
+      if (typeOptions.some(item => item.label === name)) return showToast('该类型已存在');
+      const format = document.querySelector('input[name="newTypeFormat"]:checked').value;
+      const key = 'custom-' + Date.now();
+      typeOptions.push({ key, label:name, format, formatLabel:format === 'copy' ? '文本' : format === 'video' ? '视频' : '图片', system:false });
+      tagGroups[key] = [];
+      currentType = key;
+      currentScope = 'mine';
+      tagFilters = {};
+      closeTypeModal();
+      render();
+      showToast('已新增类型');
+    }
+
+    function openTagManager() {
+      document.getElementById('tagTitle').textContent = typeLabel(currentType) + '标签库';
+      document.getElementById('tagManagerType').textContent = '当前类型：' + typeLabel(currentType);
+      if (!getGroups(currentType).length) getGroups(currentType).push({ id:'default-' + currentType, name:'默认组', multiple:false, tags:[] });
+      activeTagGroupId = getGroups(currentType)[0].id;
+      renderTagManager();
+      document.getElementById('tagMask').classList.add('show');
+    }
+
+    function closeTagManager() {
+      document.getElementById('tagMask').classList.remove('show');
+      render();
+    }
+
+    function renderTagManager() {
+      const groups = getGroups(currentType);
+      let group = groups.find(item => item.id === activeTagGroupId) || groups[0];
+      if (group) activeTagGroupId = group.id;
+      document.getElementById('tagManagerGroups').innerHTML = groups.map(item => '<button class="tag-manager-group' + (item.id === activeTagGroupId ? ' active' : '') + '" type="button" onclick="selectTagManagerGroup(\'' + esc(item.id) + '\')"><span>' + esc(item.name) + '</span><span>' + item.tags.length + '</span></button>').join('');
+      if (!group) {
+        document.getElementById('tagManagerMain').innerHTML = '<div class="empty show">暂无标签分组</div>';
+        return;
+      }
+      const rows = group.tags.map(tag => '<div class="tag-manager-tag-row"><span class="tag-manager-tag-name">' + esc(tag) + '</span><button class="btn btn-sm" type="button" onclick="startEditTag(event,decodeURIComponent(\'' + encodeURIComponent(group.id) + '\'),decodeURIComponent(\'' + encodeURIComponent(tag) + '\'))">编辑</button><button class="btn btn-sm" type="button" onclick="removeTagFromGroup(decodeURIComponent(\'' + encodeURIComponent(group.id) + '\'),decodeURIComponent(\'' + encodeURIComponent(tag) + '\'))">删除</button></div>').join('');
+      document.getElementById('tagManagerMain').innerHTML = '<div class="tag-manager-rule"><div><div class="tag-manager-rule-title">' + esc(group.name) + '</div><div class="compact-label">选择规则</div></div><div class="scope-list"><button class="scope-item' + (!group.multiple ? ' active' : '') + '" type="button" onclick="setGroupRule(\'' + esc(group.id) + '\',\'single\')">单选</button><button class="scope-item' + (group.multiple ? ' active' : '') + '" type="button" onclick="setGroupRule(\'' + esc(group.id) + '\',\'multiple\')">多选</button></div></div>'
+        + '<div class="tag-manager-content-head"><strong>标签内容</strong><button class="manager-remove" type="button" onclick="removeTagGroup(\'' + esc(group.id) + '\')">删除分组</button></div>'
+        + '<div class="tag-manager-tag-list">' + (rows || '<div class="compact-label">暂无标签</div>') + '</div>'
+        + '<div class="manager-tag-form" style="margin-top:16px"><input class="input" id="tagInput-' + esc(group.id) + '" placeholder="输入新标签"><button class="btn btn-primary" type="button" onclick="addTagToGroup(\'' + esc(group.id) + '\')">新增标签</button></div>';
+    }
+
+    function selectTagManagerGroup(groupId) {
+      activeTagGroupId = groupId;
+      renderTagManager();
+    }
+
+    function setGroupRule(groupId, value) {
+      const group = getGroups(currentType).find(item => item.id === groupId);
+      if (group) group.multiple = value === 'multiple';
+      renderTagManager();
+    }
+
+    function addTagToGroup(groupId) {
+      const input = document.getElementById('tagInput-' + groupId);
+      const value = input.value.trim();
+      if (!value) return showToast('请输入标签名称');
+      const group = getGroups(currentType).find(item => item.id === groupId);
+      if (group && !group.tags.includes(value)) group.tags.push(value);
+      input.value = '';
+      renderTagManager();
+    }
+
+    function removeTagFromGroup(groupId, tag) {
+      const group = getGroups(currentType).find(item => item.id === groupId);
+      if (!group) return;
+      const affectedCount = materials.filter(item => itemMaterialType(item) === currentType && (item.tags || []).includes(tag)).length;
+      openConfirmModal({
+        title: '删除标签“' + tag + '”？',
+        description: affectedCount ? '删除后，该标签也会从 ' + affectedCount + ' 个原料中移除。' : '删除后无法恢复。',
+        confirmText: '删除',
+        variant: 'danger',
+        onConfirm: function() {
+          group.tags = group.tags.filter(item => item !== tag);
+          materials.forEach(item => {
+            if (itemMaterialType(item) !== currentType) return;
+            item.tags = (item.tags || []).filter(itemTag => itemTag !== tag);
+          });
+          renderTagManager();
+          render();
         }
+      });
+    }
 
-        function statusTag(status) {
-            if (status === '可用') return '<span class="tag tag-success">可用</span>';
-            if (status === '需复核') return '<span class="tag tag-warning">需复核</span>';
-            return '<span class="tag tag-primary">待处理</span>';
+    function startEditTag(event, groupId, tag) {
+      const row = event.currentTarget.closest('.tag-manager-tag-row');
+      row.innerHTML = '<input class="input" value="' + esc(tag) + '"><button class="btn btn-sm btn-primary" type="button">保存</button><button class="btn btn-sm" type="button">取消</button>';
+      const input = row.querySelector('input');
+      const buttons = row.querySelectorAll('button');
+      buttons[0].onclick = function() { renameTag(groupId, tag, input.value.trim()); };
+      buttons[1].onclick = renderTagManager;
+      input.focus();
+    }
+
+    function renameTag(groupId, oldTag, newTag) {
+      if (!newTag) return showToast('请输入标签名称');
+      const group = getGroups(currentType).find(item => item.id === groupId);
+      if (!group) return;
+      if (newTag !== oldTag && group.tags.includes(newTag)) return showToast('该标签已存在');
+      group.tags = group.tags.map(tag => tag === oldTag ? newTag : tag);
+      materials.forEach(item => {
+        if (itemMaterialType(item) !== currentType) return;
+        item.tags = (item.tags || []).map(tag => tag === oldTag ? newTag : tag);
+      });
+      renderTagManager();
+    }
+
+    function removeTagGroup(groupId) {
+      const groups = getGroups(currentType);
+      const index = groups.findIndex(item => item.id === groupId);
+      if (index < 0) return;
+      const group = groups[index];
+      const removedTags = new Set(groups[index].tags || []);
+      const affectedCount = materials.filter(item => itemMaterialType(item) === currentType && (item.tags || []).some(tag => removedTags.has(tag))).length;
+      openConfirmModal({
+        title: '删除分组“' + group.name + '”？',
+        description: '将同时删除组内 ' + group.tags.length + ' 个标签' + (affectedCount ? '，并从 ' + affectedCount + ' 个原料中移除这些标签。' : '。') ,
+        confirmText: '删除',
+        variant: 'danger',
+        onConfirm: function() {
+          groups.splice(index, 1);
+          materials.forEach(item => {
+            if (itemMaterialType(item) !== currentType) return;
+            item.tags = (item.tags || []).filter(tag => !removedTags.has(tag));
+          });
+          if (!groups.length) groups.push({ id:'default-' + currentType + '-' + Date.now(), name:'默认组', multiple:false, tags:[] });
+          activeTagGroupId = groups[0].id;
+          renderTagManager();
+          render();
         }
+      });
+    }
 
-        function renderThumb(row) {
-            if (row.views) {
-                const labels = ['正面', '侧面', '背面'];
-                return '<div class="role-views">' + row.views.map(function(src, index) {
-                    return '<div class="role-view"><img src="' + src + '" alt="' + escapeHtml(row.title + labels[index]) + '"><span class="view-label">' + labels[index] + '</span></div>';
-                }).join('') + '</div>';
-            }
-            if (row.image) {
-                return '<div class="thumb"><img src="' + row.image + '" alt="' + escapeHtml(row.title) + '"></div>';
-            }
-            return '<div class="icon-thumb">' + (row.type === '脚本' ? iconMap.copy : row.type === '演员' ? iconMap.role : iconMap.voice) + '</div>';
+    function addTagGroup() {
+      const input = document.getElementById('groupNameInput');
+      const name = input.value.trim();
+      if (!name) return showToast('请输入分组名称');
+      getGroups(currentType).push({ id: 'group-' + Date.now(), name, multiple: false, tags: [] });
+      activeTagGroupId = getGroups(currentType)[getGroups(currentType).length - 1].id;
+      input.value = '';
+      renderTagManager();
+    }
+
+    function getItem(id) {
+      return materials.find(item => item.id === id);
+    }
+
+    function previewMaterial(id) {
+      const item = getItem(id);
+      if (!item) return;
+      document.getElementById('previewTitle').textContent = item.name;
+      if (item.type === 'copy') {
+        document.getElementById('previewBody').innerHTML = '<div class="preview-copy">' + esc(item.content || '') + '</div>';
+      } else if (item.type === 'audio') {
+        document.getElementById('previewBody').innerHTML = '<audio style="width:100%" src="' + esc(item.url) + '" controls></audio>';
+      } else if (item.type === 'video') {
+        document.getElementById('previewBody').innerHTML = '<video class="preview-media" src="' + esc(item.url) + '" controls></video>';
+      } else {
+        document.getElementById('previewBody').innerHTML = '<img class="preview-media" src="' + esc(item.url || item.thumb) + '" alt="' + esc(item.name) + '">';
+      }
+      document.getElementById('previewMask').classList.add('show');
+    }
+
+    function closePreview() {
+      document.getElementById('previewMask').classList.remove('show');
+      document.getElementById('previewBody').innerHTML = '';
+    }
+
+    function editCopy(id) {
+      const item = getItem(id);
+      if (!item) return;
+      editingCopyId = id;
+      document.getElementById('editCopyTitle').textContent = '编辑文案 / ' + item.name;
+      document.getElementById('editCopyContent').value = item.content || '';
+      document.getElementById('editCopyMask').classList.add('show');
+    }
+
+    function closeCopyEditor() {
+      editingCopyId = '';
+      document.getElementById('editCopyMask').classList.remove('show');
+    }
+
+    function saveCopyEdit() {
+      const item = getItem(editingCopyId);
+      if (!item) return closeCopyEditor();
+      item.content = document.getElementById('editCopyContent').value.trim();
+      closeCopyEditor();
+      render();
+      showToast('已更新文案');
+    }
+
+    function copyText(id) {
+      const item = getItem(id);
+      if (!item) return;
+      navigator.clipboard?.writeText(item.content || '');
+      showToast('已复制');
+    }
+
+    function downloadMaterial(id) {
+      const item = getItem(id);
+      if (!item) return showToast('已下载');
+      const downloadItem = {
+        id: item.id,
+        type: item.type,
+        assetType: item.type,
+        url: item.preview || '',
+        thumb: item.preview || '',
+        name: item.name,
+        content: item.content || ''
+      };
+      const doDownload = () => showToast('已开始下载「' + item.name + '」');
+      if (typeof openDownloadArchiveConfirm === 'function') {
+        openDownloadArchiveConfirm({ items: [downloadItem], onDownload: doDownload, defaultTarget: '原料库' });
+      } else {
+        doDownload();
+      }
+    }
+
+    function deleteMaterial(id) {
+      const item = getItem(id);
+      if (!item) return;
+      openConfirmModal({
+        title: '删除该原料？',
+        description: '“' + (item.name || fileNameFor(item)) + '”删除后无法恢复。',
+        confirmText: '删除',
+        variant: 'danger',
+        onConfirm: function() {
+          materials = materials.filter(material => material.id !== id);
+          render();
+          showToast('已删除');
         }
+      });
+    }
 
-        function renderMetrics(row) {
-            if (!row.metrics) return '';
-            return '<div class="metric-grid">' + row.metrics.map(function(item) {
-                return '<div class="metric"><div class="metric-value">' + escapeHtml(item[1]) + '</div><div class="metric-label">' + escapeHtml(item[0]) + '</div></div>';
-            }).join('') + '</div>';
-        }
+    let toastTimer = null;
+    function showToast(message) {
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+    }
 
-        function renderRow(row) {
-            const copy = row.copy ? '<div class="copy-preview">' + escapeHtml(row.copy) + '</div>' : '';
-            const meta = row.meta.map(function(item) {
-                return '<span>' + escapeHtml(item) + '</span>';
-            }).join('<span>·</span>');
-
-            return '<article class="row">'
-                + '<div class="row-main">'
-                    + renderThumb(row)
-                    + '<div>'
-                        + '<div class="row-title"><span class="row-title-text">' + escapeHtml(row.title) + '</span>' + statusTag(row.status) + '<span class="tag tag-primary">' + escapeHtml(row.type) + '</span></div>'
-                        + '<div class="row-desc">' + escapeHtml(row.desc) + '</div>'
-                        + copy
-                        + '<div class="row-meta">' + meta + '</div>'
-                        + renderMetrics(row)
-                    + '</div>'
-                + '</div>'
-                + '<div class="row-actions">'
-                    + '<button class="btn btn-small" data-action="' + escapeHtml(row.action) + '">' + escapeHtml(row.action) + '</button>'
-                    + '<button class="btn btn-small" data-action="查看详情">详情</button>'
-                + '</div>'
-            + '</article>';
-        }
-
-        function getFilteredRows() {
-            const keyword = document.getElementById('keyword').value.trim().toLowerCase();
-            const status = document.getElementById('statusFilter').value;
-            return rows[currentStage].filter(function(row) {
-                const text = [row.type, row.title, row.desc, row.status, row.folder || '', row.meta.join(' '), row.copy || ''].join(' ').toLowerCase();
-                const folder = row.folder || '未归类';
-                const folderMatched = currentFolder === '全部'
-                    || (currentFolder === '待入库' && row.status === '待处理')
-                    || (currentFolder === '最近使用' && row.recent)
-                    || (currentFolder === '未归类' && folder === '未归类')
-                    || folder === currentFolder
-                    || folder.indexOf(currentFolder + ' /') === 0;
-                return (currentStage !== 'storage' || currentType === '全部' || row.type === currentType)
-                    && folderMatched
-                    && (status === '全部' || row.status === status)
-                    && (!keyword || text.includes(keyword));
-            });
-        }
-
-        function render() {
-            const body = document.getElementById('stageBody');
-            const empty = document.getElementById('emptyState');
-            const typeTabs = document.getElementById('typeTabs');
-            typeTabs.classList.toggle('show', currentStage === 'storage');
-            const list = getFilteredRows();
-            if (!list.length) {
-                body.innerHTML = '';
-                empty.style.display = 'flex';
-                return;
-            }
-            empty.style.display = 'none';
-            body.innerHTML = '<div class="stage-note">' + stageNotes[currentStage] + '</div><div class="list">' + list.map(renderRow).join('') + '</div>';
-            body.querySelectorAll('[data-action]').forEach(function(btn) {
-                btn.addEventListener('click', function() {
-                    showToast(btn.dataset.action);
-                });
-            });
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            clearTimeout(showToast.timer);
-            showToast.timer = setTimeout(function() {
-                toast.classList.remove('show');
-            }, 1400);
-        }
-
-        document.querySelectorAll('[data-action]').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                showToast(btn.dataset.action);
-            });
-        });
-
-        document.querySelectorAll('.stage-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.stage-tab').forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                tab.classList.add('active');
-                currentStage = tab.dataset.stage;
-                render();
-            });
-        });
-
-        document.querySelectorAll('.type-tab').forEach(function(tab) {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.type-tab').forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                tab.classList.add('active');
-                currentType = tab.dataset.type;
-                render();
-            });
-        });
-
-        document.querySelectorAll('#keyword, #statusFilter').forEach(function(control) {
-            control.addEventListener('input', render);
-            control.addEventListener('change', render);
-        });
-
-        document.getElementById('resetBtn').addEventListener('click', function() {
-            document.getElementById('keyword').value = '';
-            document.getElementById('statusFilter').value = '全部';
-            currentType = '全部';
-            document.querySelectorAll('.type-tab').forEach(function(item) {
-                item.classList.toggle('active', item.dataset.type === '全部');
-            });
-            render();
-        });
-
-        document.querySelectorAll('.tree-node').forEach(function(node) {
-            node.addEventListener('click', function() {
-                document.querySelectorAll('.tree-node').forEach(function(item) {
-                    item.classList.remove('active');
-                });
-                node.classList.add('active');
-                currentFolder = node.dataset.folder || '全部';
-                document.getElementById('folderName').textContent = node.dataset.name;
-                document.getElementById('folderMeta').textContent = node.dataset.meta;
-                render();
-            });
-        });
-
-        document.getElementById('folderSearch').addEventListener('input', function(event) {
-            const value = event.target.value.trim().toLowerCase();
-            document.querySelectorAll('#folderTree .tree-node').forEach(function(node) {
-                node.style.display = node.textContent.toLowerCase().includes(value) ? 'grid' : 'none';
-            });
-        });
-
-        render();
-    </script>
+    render();
+  </script>
 </body>
 </html>

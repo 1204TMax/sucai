@@ -92,7 +92,7 @@
 
 .storage-dropdown {
   position: absolute;
-  bottom: calc(100% + var(--space-2));
+  bottom: 100%;
   right: 0;
   background: var(--bg-surface);
   border-radius: var(--r-xl);
@@ -114,6 +114,10 @@
   transition: background var(--ease);
 }
 .storage-dd-item:hover { background: var(--bg-subtle); }
+.thumb-act:hover .storage-dropdown,
+.storage-dropdown:hover {
+  display: block;
+}
 
 .edit-menu {
   position: absolute;
@@ -262,7 +266,7 @@
 .img-preview-store-wrap { position: relative; }
 .img-preview-store-dd {
   position: absolute;
-  bottom: calc(100% + var(--space-3));
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-surface);
@@ -273,6 +277,7 @@
   display: none;
   z-index: 3003;
 }
+.img-preview-store-wrap:hover .img-preview-store-dd,
 .img-preview-store-dd.show { display: block; }
 .img-preview-store-dd .pv-dd-item {
   display: flex;

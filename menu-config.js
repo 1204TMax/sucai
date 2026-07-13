@@ -19,23 +19,6 @@
 
 const MENU_CONFIG = [
   {
-    id: 'home',
-    name: '首页',
-    children: [
-      {
-        name: '首页',
-        page: '首页/index.html',
-        icon: '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline>'
-      }
-    ],
-    shortcuts: {
-      title: '常用功能',
-      items: [
-        { name: '通用生成', page: 'AI 创作/通用生成.html', icon: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>' }
-      ]
-    }
-  },
-  {
     id: 'ai',
     name: 'AI创作',
     children: [
@@ -43,11 +26,6 @@ const MENU_CONFIG = [
         name: '通用生成',
         page: 'AI 创作/通用生成.html',
         icon: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>'
-      },
-      {
-        name: '原料库',
-        page: 'AI 创作/原料库.html',
-        icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path>'
       },
       {
         name: '我的任务',
@@ -59,6 +37,11 @@ const MENU_CONFIG = [
         name: '工作流广场',
         page: 'AI 创作/工作流广场.html',
         icon: '<rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect>'
+      },
+      {
+        name: '原料库',
+        page: 'AI 创作/原料库.html',
+        icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><path d="M3.27 6.96L12 12.01l8.73-5.05"></path><path d="M12 22.08V12"></path>'
       },
       {
         name: '项目管理',
@@ -129,6 +112,6 @@ const MENU_CONFIG = [
   }
 ];
 
-// 默认首页（打开系统时加载的页面）
-const DEFAULT_PAGE = '首页/index.html';
-const DEFAULT_TAB_NAME = '首页';
+// 默认页面（打开系统时加载）
+const DEFAULT_PAGE = 'AI 创作/通用生成.html';
+const DEFAULT_TAB_NAME = '通用生成';

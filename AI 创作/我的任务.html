@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="../共享样式/project-picker.css">
   <link rel="stylesheet" href="../共享样式/image-preview.css">
   <link rel="stylesheet" href="../共享样式/asset-intake-modal.css">
+  <link rel="stylesheet" href="../共享样式/download-archive-confirm.css">
   <link rel="stylesheet" href="../共享样式/confirm-modal.css">
   <style>
     :root {
@@ -936,8 +937,10 @@
 <body>
 
 <script src="../共享样式/components.js"></script>
-<script src="../共享样式/image-preview.js"></script>
+<script src="../共享样式/image-preview.js?v=20260710d"></script>
+<script src="../共享样式/material-library.js?v=20260712a"></script>
 <script src="../共享样式/asset-intake-modal.js"></script>
+<script src="../共享样式/download-archive-confirm.js"></script>
 <script src="../共享样式/confirm-modal.js"></script>
 
 <div class="toast" id="toast">
@@ -2765,17 +2768,52 @@ function downloadAllTaskOutputs(taskId) {
     closeCardMoreMenus();
     return;
   }
-  items.forEach(function(item, index) {
-    setTimeout(function() {
-      var url = item.url || item.thumb;
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = getMediaFileName(item, index, mediaKind(item, 'image'), task);
-      a.click();
-    }, index * 80);
+  var downloadItems = items.map(function(item, index) {
+    return buildArchiveItem(item, index, mediaKind(item, 'image')) || {
+      type: mediaKind(item, 'image'),
+      url: item.url || item.thumb,
+      thumb: item.thumb || item.url,
+      name: getMediaFileName(item, index, mediaKind(item, 'image'), task)
+    };
   });
-  showToast('已开始下载全部');
+  var doDownload = function() {
+    items.forEach(function(item, index) {
+      setTimeout(function() {
+        var url = item.url || item.thumb;
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = getMediaFileName(item, index, mediaKind(item, 'image'), task);
+        a.click();
+      }, index * 80);
+    });
+  };
+  if (typeof openDownloadArchiveConfirm === 'function') {
+    openDownloadArchiveConfirm({ items: downloadItems, onDownload: doDownload, defaultTarget: '原料库' });
+  } else {
+    doDownload();
+    showToast('已开始下载全部');
+  }
   closeCardMoreMenus();
+}
+
+function downloadSingleMedia(url, fileName, item) {
+  if (!url) return;
+  var mediaItem = item ? (buildArchiveItem(item, 0, mediaKind(item, 'image')) || item) : {};
+  mediaItem.url = mediaItem.url || url;
+  mediaItem.thumb = mediaItem.thumb || url;
+  mediaItem.name = mediaItem.name || fileName || '图片素材';
+  var doDownload = function() {
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = fileName || mediaItem.name || 'asset.png';
+    a.click();
+  };
+  if (typeof openDownloadArchiveConfirm === 'function') {
+    openDownloadArchiveConfirm({ items: [mediaItem], onDownload: doDownload, defaultTarget: '原料库' });
+    return;
+  }
+  doDownload();
+  showToast('已开始下载');
 }
 
 function openReviewPage(taskId, reviewTaskId) {
@@ -3465,10 +3503,7 @@ function applyPreviewReviewStatus(itemId, status) {
 
 function downloadFromPreview(url) {
   if (!url) return;
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'asset.png';
-  a.click();
+  downloadSingleMedia(url, 'asset.png', { type: url.indexOf('.mp4') > -1 ? 'video' : 'image', url: url, thumb: url, name: '预览素材' });
 }
 
 function handleAutoApprove() {
@@ -3489,6 +3524,7 @@ function encodeInlineArg(text) {
 function renderCopyItemRow(task, item, idx) {
   var content = item.content || '';
   var encodedContent = encodeInlineArg(content);
+  var encodedName = encodeInlineArg((task.name || '生成文案') + '-' + (idx + 1));
   return ''
     + '<div class="copy-row">'
       + '<span class="copy-row-index">' + (idx + 1) + '</span>'
@@ -3497,6 +3533,7 @@ function renderCopyItemRow(task, item, idx) {
       + '</div>'
       + '<div class="copy-row-actions">'
         + '<button class="copy-row-btn" title="复制文案" onclick="event.stopPropagation();copyTextResult(decodeURIComponent(\'' + encodedContent + '\'))">' + icon(SVG.txt, 12) + '复制</button>'
+        + '<button class="copy-row-btn primary" title="入库到原料库" onclick="event.stopPropagation();archiveCopyResult(decodeURIComponent(\'' + encodedContent + '\'),decodeURIComponent(\'' + encodedName + '\'))">' + icon(SVG.store, 12) + '入库</button>'
       + '</div>'
     + '</div>';
 }
@@ -3546,6 +3583,11 @@ function copyTextResult(text) {
   } else {
     showToast('当前浏览器不支持自动复制');
   }
+}
+
+function archiveCopyResult(text, name) {
+  if (typeof openCopyMaterialIntake !== 'function') return showToast('原料库弹窗加载失败');
+  openCopyMaterialIntake({ content:text, name:name });
 }
 
 function editCopyResult(taskId, index) {
@@ -3798,7 +3840,8 @@ function renderImageThumb(item, index, task, displayMeta) {
   var thumbUrl = escHtml(item.thumb||item.url);
   var fullUrl = escHtml(item.url||item.thumb);
   var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
-  var dlFn = 'event.stopPropagation();(function(u,i){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(i+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+fullUrl+'\','+index+')';
+  var fileName = '我-' + date + '-' + (index + 1) + '.png';
+  var dlFn = 'event.stopPropagation();downloadSingleMedia(\'' + fullUrl + '\',\'' + fileName + '\')';
   return '<div class="o-thumb" data-preview-url="'+fullUrl+'" style="cursor:pointer">'
     +'<img src="'+thumbUrl+'" alt="" loading="lazy">'
     +archiveStatusBadgeHtml(item)
@@ -4024,7 +4067,8 @@ function renderDetailModalBody() {
     }
     var url = escHtml(item.url||item.thumb);
     var date = new Date().toISOString().slice(0,10).replace(/-/g,'');
-    var dlFn = 'event.stopPropagation();(function(u,n){var a=document.createElement(\'a\');a.href=u;a.download=\'我-'+date+'-\'+(n+1)+\'.png\';a.click();showToast(\'已开始下载\')})(\''+url+'\','+i+')';
+    var fileName = '我-' + date + '-' + (i + 1) + '.png';
+    var dlFn = 'event.stopPropagation();downloadSingleMedia(\'' + url + '\',\'' + fileName + '\')';
     return '<div class="detail-thumb-wrap" onclick="window.__previewImage(\''+url+'\')"><img src="'+url+'" alt="" loading="lazy">'+archiveStatusBadgeHtml(item)+'<div class="thumb-overlay" style="align-items:flex-end;justify-content:flex-end;padding:4px"><button class="thumb-act" title="下载" onclick="'+dlFn+'">'+icon(SVG.download)+'</button><button class="thumb-act" title="入库" onclick="event.stopPropagation();archiveCurrentDetailItem('+(((page-1)*DM_PAGE_SIZE)+i)+')">'+icon(SVG.store)+'</button></div></div>';
   }).join('');
 

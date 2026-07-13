@@ -62,13 +62,86 @@
     { id:'f025', name:'未分组物料', product:'', series:'' }
   ];
 
+  function getMaterialTags() {
+    var libraryTags = window.CCMaterialLibrary && Array.isArray(window.CCMaterialLibrary.tags)
+      ? window.CCMaterialLibrary.tags
+      : [];
+    return libraryTags.length ? libraryTags : [
+      '跑量素材', '爆款逆向', '脚本', '演员', '卖点', '口播', '工具类',
+      '网赚', 'IAA', 'IAP', '首帧', '封面', '信息流', '三视图', '可复用'
+    ];
+  }
+
+  function getMaterialTagsForType(type) {
+    var library = window.CCMaterialLibrary;
+    if (library && typeof library.groupsForType === 'function') {
+      var grouped = library.groupsForType(type).reduce(function(result, group) {
+        return result.concat(group.tags || []);
+      }, []);
+      if (grouped.length) return unique(grouped);
+    }
+    return getMaterialTags();
+  }
+
+  function getMaterialTagGroupsForType(type) {
+    var library = window.CCMaterialLibrary;
+    if (library && typeof library.groupsForType === 'function') {
+      var groups = library.groupsForType(type) || [];
+      if (groups.length) return groups;
+    }
+    return [{ id:'tags', name:'标签', multiple:true, tags:getMaterialTagsForType(type) }];
+  }
+
+  function getSuggestedMaterialTags(type) {
+    var suggestions = {
+      image:['青年', '女性', '封面', '信息流'],
+      video:['口播', '9:16', '跑量素材', '爆款逆向'],
+      copy:['脚本', '工具类', '可复用']
+    };
+    var allowed = new Set(getMaterialTagsForType(type));
+    return (suggestions[type] || []).filter(function(tag) { return allowed.has(tag); });
+  }
+
+  function getDefaultMaterialTag() {
+    var list = getMaterialTags();
+    return list[0] || '可复用';
+  }
+
+  var MATERIAL_TYPE_OPTIONS = window.CCMaterialLibrary && Array.isArray(window.CCMaterialLibrary.materialTypes)
+    ? window.CCMaterialLibrary.materialTypes.filter(function(item) { return item.enabled !== false; }).map(function(item) { return { value:item.key, label:item.label }; })
+    : [
+        { value:'image', label:'图片' }, { value:'video', label:'视频' }, { value:'copy', label:'文案' },
+        { value:'actor', label:'演员库' }, { value:'script', label:'脚本库' }, { value:'bgm', label:'BGM' },
+        { value:'sound', label:'音效' }, { value:'caption', label:'花字' }, { value:'sticker', label:'贴纸' }
+      ];
+
+  function getMaterialTypeValueForItem(item) {
+    item = item || {};
+    if (item.materialType && MATERIAL_TYPE_OPTIONS.some(function(option) { return option.value === item.materialType; })) return item.materialType;
+    if (item.type === 'video') return 'video';
+    if (item.type === 'copy' || item.type === 'text') return 'copy';
+    return 'image';
+  }
+
+  function getDefaultMaterialType(items) {
+    return items && items.length ? getMaterialTypeValueForItem(items[0]) : 'image';
+  }
+
+  function getMaterialTypeLabel(value) {
+    var option = MATERIAL_TYPE_OPTIONS.find(function(item) { return item.value === value; });
+    return option ? option.label : '未选择';
+  }
+
   var state = createInitialState([]);
   var toastTimer = null;
+  var materialAiTagTimer = null;
 
   function createInitialState(items) {
+    var normalizedItems = normalizeItems(items);
+    var defaultArchiveName = normalizedItems.length === 1 ? normalizedItems[0].name : '';
     return {
-      items: buildMockIntakeItems(normalizeItems(items), 100),
-      target: '素材库',
+      items: normalizedItems,
+      target: '原料库',
       selectedFolders: new Set(),
       filterMode: 'product',
       nameSearchMode: 'folder',
@@ -82,10 +155,13 @@
       platformQuery: '',
       selectedPlatforms: new Set(),
       aiCheck: true,
+      materialType: getDefaultMaterialType(normalizedItems),
+      materialTags: new Set(),
+      materialAiTagState: 'idle',
       remark: '',
       renameVisible: false,
-      archiveName: '',
-      draftArchiveName: '',
+      archiveName: defaultArchiveName,
+      draftArchiveName: defaultArchiveName,
       folderEditorVisible: false,
       folderEditorMode: 'create',
       folderEditorTargetId: '',
@@ -104,13 +180,16 @@
       item = item || {};
       var url = item.url || item.src || item.thumb || '';
       var type = item.type || item.assetType || inferType(url);
-      var name = item.name || item.fileName || item.filename || (type === 'video' ? '视频素材-' : '图片素材-') + (index + 1);
+      if (type === 'text') type = 'copy';
+      var defaultName = type === 'video' ? '视频素材-' : type === 'copy' ? '文案原料-' : '图片素材-';
+      var name = item.name || item.fileName || item.filename || defaultName + (index + 1);
       return {
         id: item.id || 'asset-' + index + '-' + Math.random().toString(16).slice(2),
         type: type,
         url: url,
         thumb: item.thumb || item.poster || item.url || '',
         name: name,
+        content: item.content || item.text || '',
         meta: item.meta || '',
         archived: isArchivedItem(item)
       };
@@ -237,8 +316,42 @@
       + '          <div class="ai-intake-section-head">'
       + '            <div class="ai-intake-section-title">基础信息</div>'
       + '          </div>'
-      + '          <div class="ai-intake-section-body">'
-      + '            <label class="ai-intake-field">'
+            + '          <div class="ai-intake-section-body">'
+            + '            <div class="ai-intake-material-fields" id="aiIntakeMaterialFields">'
+            + '              <label class="ai-intake-field ai-intake-material-name-field">'
+            + '                <span class="ai-intake-label">原料名称 <span class="ai-intake-required">*</span></span>'
+            + '                <div class="ai-intake-material-name-control">'
+            + '                  <input class="ai-intake-input" id="aiIntakeMaterialNameInput" maxlength="40" placeholder="输入原料名称" oninput="ccAssetIntakeSetArchiveName(this.value)">'
+            + '                  <span class="ai-intake-name-count" id="aiIntakeMaterialNameCount">0/40</span>'
+            + '                </div>'
+            + '                <div class="ai-intake-name-preview" id="aiIntakeMaterialNamePreview"></div>'
+            + '                <div class="ai-intake-error" id="aiIntakeMaterialNameError"></div>'
+            + '              </label>'
+            + '              <label class="ai-intake-field">'
+            + '                <span class="ai-intake-label">原料类型</span>'
+            + '                <div class="ant-select ant-select-single ant-select-outlined ai-intake-ant-select" id="aiIntakeMaterialTypeSelect">'
+            + '                  <button class="ant-select-selector" id="aiIntakeMaterialTypeTrigger" type="button" onclick="ccAssetIntakeToggleMaterialType()">'
+            + '                    <span class="ant-select-selection-item" id="aiIntakeMaterialTypeText"></span><span class="ant-select-arrow">⌄</span>'
+            + '                  </button>'
+            + '                  <div class="ant-select-dropdown" onclick="event.stopPropagation()">'
+            + '                    <div class="ai-intake-material-type-list" id="aiIntakeMaterialTypeList"></div>'
+            + '                  </div>'
+            + '                </div>'
+            + '              </label>'
+            + '              <label class="ai-intake-field">'
+            + '                <span class="ai-intake-label">标签 <strong class="ai-intake-ai-tag-status" id="aiIntakeMaterialTagStatus"></strong></span>'
+            + '                <div class="ant-select ant-select-multiple ant-select-outlined ai-intake-ant-select" id="aiIntakeMaterialTagSelect">'
+            + '                  <button class="ant-select-selector" id="aiIntakeMaterialTagTrigger" type="button" onclick="ccAssetIntakeToggleMaterialTags()">'
+            + '                    <span class="ant-select-selection-overflow" id="aiIntakeMaterialTagText"></span><span class="ant-select-arrow">⌄</span>'
+            + '                  </button>'
+            + '                  <div class="ant-select-dropdown ai-intake-material-tag-panel" onclick="event.stopPropagation()">'
+            + '                    <input class="ai-intake-material-tag-search" placeholder="搜索标签" oninput="ccAssetIntakeFilterMaterialTags(this.value)">'
+            + '                    <div class="ai-intake-material-tag-list" id="aiIntakeMaterialTagList"></div>'
+            + '                  </div>'
+            + '                </div>'
+            + '              </label>'
+      + '            </div>'
+      + '            <label class="ai-intake-field" id="aiIntakeDesignerField">'
       + '              <span class="ai-intake-label">设计师 <span class="ai-intake-required">*</span></span>'
       + '              <div class="ai-intake-combobox" id="aiIntakeDesignerSelect">'
       + '                <button class="ai-intake-select-trigger ai-intake-combobox-trigger" id="aiIntakeDesignerTrigger" type="button" onclick="ccAssetIntakeOpenDesignerDropdown()">'
@@ -251,7 +364,7 @@
       + '              </div>'
       + '            </label>'
       + '            <div class="ai-intake-error" id="aiIntakeDesignerError"></div>'
-      + '            <label class="ai-intake-field">'
+      + '            <label class="ai-intake-field" id="aiIntakePlatformField">'
       + '              <span class="ai-intake-label">推广平台</span>'
       + '            <div class="ai-intake-multiselect" id="aiIntakePlatformSelect">'
       + '              <button class="ai-intake-select-trigger" type="button" onclick="ccAssetIntakeTogglePlatforms()">'
@@ -263,14 +376,14 @@
       + '              </div>'
       + '            </div>'
       + '            </label>'
-      + '            <div class="ai-intake-switch-row">'
+      + '            <div class="ai-intake-switch-row" id="aiIntakeAiRow">'
       + '              <span class="ai-intake-label">AI 同质化检测</span>'
       + '              <button class="ai-intake-switch" id="aiIntakeAiSwitch" type="button" onclick="ccAssetIntakeToggleAiCheck()" aria-label="AI 同质化检测"></button>'
       + '            </div>'
-      + '            <label class="ai-intake-field">'
-      + '              <span class="ai-intake-label">备注</span>'
-      + '            <textarea class="ai-intake-textarea" id="aiIntakeRemark" placeholder="填写本次入库说明" oninput="ccAssetIntakeSetRemark(this.value)"></textarea>'
-      + '            </label>'
+            + '            <label class="ai-intake-field" id="aiIntakeRemarkField">'
+            + '              <span class="ai-intake-label">备注</span>'
+            + '            <textarea class="ai-intake-textarea" id="aiIntakeRemark" placeholder="填写本次入库说明" oninput="ccAssetIntakeSetRemark(this.value)"></textarea>'
+            + '            </label>'
       + '          </div>'
       + '        </section>'
       + '      </div>'
@@ -284,8 +397,8 @@
       + '        </div>'
       + '      </div>'
       + '      <div class="ai-intake-footer-actions">'
-      + '        <button class="ai-intake-btn" type="button" onclick="ccAssetIntakeReset()">重置</button>'
-      + '        <button class="ai-intake-btn ai-intake-btn-primary" type="button" onclick="ccAssetIntakeSubmit()">确认</button>'
+      + '        <button class="ai-intake-btn" id="aiIntakeCancelResetBtn" type="button" onclick="ccAssetIntakeReset()">重置</button>'
+      + '        <button class="ai-intake-btn ai-intake-btn-primary" id="aiIntakeSubmitBtn" type="button" onclick="ccAssetIntakeSubmit()">确认</button>'
       + '      </div>'
       + '    </div>'
       + '    <div class="ai-intake-name-mask" id="aiIntakeNameMask" onclick="if(event.target===this)ccAssetIntakeCloseRename()">'
@@ -361,8 +474,10 @@
     ensureModal();
     var items = input && Array.isArray(input.items) ? input.items : (Array.isArray(input) ? input : []);
     state = createInitialState(items);
+    if (input && (input.target === '素材库' || input.target === '原料库')) state.target = input.target;
     renderAll();
     document.getElementById('aiIntakeMask').classList.add('show');
+    if (state.target === '原料库') runMaterialAiTagging();
   }
 
   function closeModal() {
@@ -373,8 +488,12 @@
     closePlatformPanel();
     closeFilterDropdown();
     closeDesignerDropdown();
+    closeMaterialTags();
+    closeMaterialType();
     closeRenameEditor();
     closeFolderEditor();
+    if (materialAiTagTimer) clearTimeout(materialAiTagTimer);
+    materialAiTagTimer = null;
   }
 
   function renderAll() {
@@ -382,6 +501,8 @@
     renderTargets();
     renderNameSearchControls();
     renderFilterControls();
+    renderMaterialFields();
+    renderTargetMode();
     renderInputs();
     renderDesignerOptions();
     renderFolders();
@@ -399,24 +520,139 @@
     var parts = [];
     if (imageCount) parts.push(imageCount + ' 张图片');
     if (videoCount) parts.push(videoCount + ' 个视频');
+    document.getElementById('aiIntakeTitle').textContent = state.target === '原料库'
+      ? (state.items.length > 1 ? '批量保存原料' : '保存原料')
+      : '批量素材入库';
     document.getElementById('aiIntakeSubtitle').textContent = '本次将入库 ' + (parts.join('、') || '0 个素材');
-    document.getElementById('aiIntakeFooterHint').textContent = '已选位置 ' + state.selectedFolders.size + ' 个，素材 ' + state.items.length + ' 个';
+    document.getElementById('aiIntakeFooterHint').textContent = state.target === '原料库'
+      ? '将入库到原料库，素材 ' + state.items.length + ' 个'
+      : '已选位置 ' + state.selectedFolders.size + ' 个，素材 ' + state.items.length + ' 个';
     renderSelectedFolders();
   }
 
   function renderTargets() {
-    var imageOnly = isImageOnly();
-    if (imageOnly) state.target = '素材库';
-    document.getElementById('aiIntakeTargets').innerHTML = ['素材库', '物料库'].map(function(target) {
-      var disabled = imageOnly && target === '物料库';
-      return '<label class="ai-intake-target-choice' + (state.target === target ? ' on' : '') + (disabled ? ' disabled' : '') + '">'
-        + '<input type="radio" name="aiIntakeTarget" value="' + target + '" ' + (state.target === target ? 'checked' : '') + ' '
-        + (disabled ? 'disabled title="图片内容只能入库到素材库"' : 'onchange="ccAssetIntakeSetTarget(\'' + target + '\')"')
-        + '>'
+    var targets = ['素材库', '原料库'];
+    if (targets.indexOf(state.target) === -1) state.target = '原料库';
+    document.getElementById('aiIntakeTargets').innerHTML = targets.map(function(target) {
+      return '<label class="ai-intake-target-choice' + (state.target === target ? ' on' : '') + '">'
+        + '<input type="radio" name="aiIntakeTarget" value="' + target + '" ' + (state.target === target ? 'checked' : '') + ' onchange="ccAssetIntakeSetTarget(\'' + target + '\')">'
         + '<span>' + target + '</span>'
         + '</label>';
     }).join('');
-    document.getElementById('aiIntakeTargetHint').textContent = '';
+    document.getElementById('aiIntakeTargetHint').textContent = state.target === '原料库'
+      ? '原料库第一期不使用文件夹，入库后通过名称、类型和标签管理。'
+      : '';
+  }
+
+  function getMaterialTypeText() {
+    return getMaterialTypeLabel(state.materialType);
+  }
+
+  function getMaterialTypeTextForItem(item) {
+    var labels = {
+      image: '图片',
+      video: '视频',
+      copy: '文案',
+      text: '文案'
+    };
+    item = item || {};
+    return labels[item.type] || (item.type === 'video' ? '视频' : '图片');
+  }
+
+  function renderMaterialNameFields() {
+    var input = document.getElementById('aiIntakeMaterialNameInput');
+    var count = document.getElementById('aiIntakeMaterialNameCount');
+    var preview = document.getElementById('aiIntakeMaterialNamePreview');
+    var typeText = document.getElementById('aiIntakeMaterialTypeText');
+    if (input && input.value !== state.archiveName) input.value = state.archiveName;
+    if (count) count.textContent = String(state.archiveName || '').length + '/40';
+    if (preview) preview.textContent = getArchiveNamePreview(state.archiveName);
+    if (typeText) typeText.textContent = getMaterialTypeText();
+  }
+
+  function renderMaterialFields() {
+    var typeText = document.getElementById('aiIntakeMaterialTypeText');
+    var typeList = document.getElementById('aiIntakeMaterialTypeList');
+    var tagList = document.getElementById('aiIntakeMaterialTagList');
+    var tagText = document.getElementById('aiIntakeMaterialTagText');
+    var tagTrigger = document.getElementById('aiIntakeMaterialTagTrigger');
+    var status = document.getElementById('aiIntakeMaterialTagStatus');
+    var tags = getMaterialTagsForType(state.materialType);
+    var tagGroups = getMaterialTagGroupsForType(state.materialType);
+    renderMaterialNameFields();
+    if (typeText) typeText.textContent = getMaterialTypeLabel(state.materialType);
+    if (typeList) {
+      typeList.innerHTML = MATERIAL_TYPE_OPTIONS.map(function(option) {
+        var selected = option.value === state.materialType;
+        return '<div class="ant-select-item ant-select-item-option' + (selected ? ' ant-select-item-option-selected' : '') + '" role="option" aria-selected="' + (selected ? 'true' : 'false') + '" onclick="ccAssetIntakeSetMaterialType(\'' + option.value + '\')">'
+          + '<span class="ant-select-item-option-content">' + escHtml(option.label) + '</span>'
+          + '<span class="ant-select-item-option-state">' + (selected ? '✓' : '') + '</span>'
+          + '</div>';
+      }).join('');
+    }
+    if (tagList) {
+      if (!state.materialTags || !(state.materialTags instanceof Set)) state.materialTags = new Set();
+      tagList.innerHTML = tagGroups.map(function(group) {
+        var options = (group.tags || []).map(function(tag) {
+          var selected = state.materialTags.has(tag);
+          return '<div class="ant-select-item ant-select-item-option' + (selected ? ' ant-select-item-option-selected' : '') + '" data-tag-text="' + escHtml(String(tag).toLowerCase()) + '" role="option" aria-selected="' + (selected ? 'true' : 'false') + '" onclick="ccAssetIntakeToggleMaterialTag(\'' + escJsString(tag) + '\')">'
+            + '<span class="ant-select-item-option-content">' + escHtml(tag) + '</span>'
+            + '<span class="ant-select-item-option-state">' + (selected ? '✓' : '') + '</span>'
+            + '</div>';
+        }).join('');
+        return '<div class="ai-intake-tag-group"><div class="ai-intake-tag-group-title">' + escHtml(group.name) + '<span>' + (group.multiple ? '多选' : '单选') + '</span></div>' + options + '</div>';
+      }).join('');
+    }
+    if (tagText) {
+      var selectedTags = Array.from(state.materialTags || []);
+      tagText.innerHTML = selectedTags.length
+        ? selectedTags.map(function(tag) {
+            return '<span class="ant-select-selection-item" title="' + escHtml(tag) + '">'
+              + '<span class="ant-select-selection-item-content">' + escHtml(tag) + '</span>'
+              + '<span class="ant-select-selection-item-remove" onclick="event.stopPropagation();ccAssetIntakeToggleMaterialTag(\'' + escJsString(tag) + '\')">×</span>'
+              + '</span>';
+          }).join('')
+        : '<span class="ant-select-selection-placeholder">请选择标签</span>';
+    }
+    if (tagTrigger) tagTrigger.classList.toggle('placeholder', !(state.materialTags && state.materialTags.size));
+    if (status) status.textContent = state.materialAiTagState === 'loading' ? 'AI 识别中' : 'AI 已添加';
+  }
+
+  function setDisplay(id, show) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = show ? '' : 'none';
+  }
+
+  function renderTargetMode() {
+    var isMaterial = state.target === '原料库';
+    var dialog = document.querySelector('.ai-intake-dialog');
+    var nameSearch = document.getElementById('aiIntakeNameSearchInput');
+    var nameControl = nameSearch && nameSearch.closest ? nameSearch.closest('.ai-intake-name-search-control') : null;
+    var folderActions = document.querySelector('.ai-intake-folder-head .ai-intake-section-actions');
+    var folderList = document.getElementById('aiIntakeFolderList');
+    var selectedSummary = document.querySelector('.ai-intake-selected-summary');
+    var cancelResetBtn = document.getElementById('aiIntakeCancelResetBtn');
+    var submitBtn = document.getElementById('aiIntakeSubmitBtn');
+
+    if (dialog) dialog.classList.toggle('is-material-target', isMaterial);
+    if (nameControl) nameControl.style.display = isMaterial ? 'none' : '';
+    setDisplay('aiIntakeFilterControl', !isMaterial);
+    if (folderActions) folderActions.style.display = isMaterial ? 'none' : '';
+    if (folderList) folderList.style.display = isMaterial ? 'none' : '';
+    setDisplay('aiIntakeFolderError', !isMaterial);
+    if (selectedSummary) selectedSummary.style.display = isMaterial ? 'none' : '';
+
+    setDisplay('aiIntakeMaterialFields', isMaterial);
+    setDisplay('aiIntakeDesignerField', !isMaterial);
+    setDisplay('aiIntakeDesignerError', !isMaterial);
+    setDisplay('aiIntakePlatformField', !isMaterial);
+    setDisplay('aiIntakeAiRow', !isMaterial);
+    setDisplay('aiIntakeRemarkField', !isMaterial);
+    if (cancelResetBtn) {
+      cancelResetBtn.textContent = isMaterial ? '取消' : '重置';
+      cancelResetBtn.setAttribute('onclick', isMaterial ? 'ccAssetIntakeClose()' : 'ccAssetIntakeReset()');
+    }
+    if (submitBtn) submitBtn.textContent = isMaterial ? '保存' : '确认';
   }
 
   function renderFilterControls() {
@@ -576,6 +812,10 @@
     var container = document.getElementById('aiIntakeSelectedFolders');
     if (!container) return;
     var ids = Array.from(state.selectedFolders);
+    if (state.target === '原料库') {
+      container.innerHTML = '<span class="ai-intake-selected-empty">原料库不使用文件夹</span>';
+      return;
+    }
     if (!ids.length) {
       container.innerHTML = '<span class="ai-intake-selected-empty">未选择入库位置</span>';
       return;
@@ -797,7 +1037,7 @@
     var baseName = String(value == null ? state.archiveName : value).trim();
     if (!baseName) return '';
     if (!state.items.length) return '';
-    if (state.items.length <= 1) return '入库后名称：' + formatArchiveName(baseName, state.items[0], 0);
+    if (state.items.length <= 1) return '';
     var sample = state.items.slice(0, 3).map(function(item, index) {
       return formatArchiveName(baseName, item, index);
     }).join('、');
@@ -1020,6 +1260,8 @@
       mediaHtml = item.thumb && item.thumb !== item.url
         ? '<img src="' + escHtml(item.thumb) + '" alt="" loading="lazy" onerror="ccAssetIntakeMediaError(this)">'
         : '<span class="ai-intake-asset-placeholder">视频素材</span>';
+    } else if (item.type === 'copy' || item.type === 'text') {
+      mediaHtml = '<span class="ai-intake-asset-placeholder">文案素材</span>';
     } else if (item.thumb || item.url) {
       mediaHtml = '<img src="' + escHtml(item.thumb || item.url) + '" alt="" loading="lazy" onerror="ccAssetIntakeMediaError(this)">';
     } else {
@@ -1028,10 +1270,10 @@
     return '<div class="ai-intake-asset" role="button" tabindex="0" onclick="ccAssetIntakePreview(' + index + ')" onkeydown="ccAssetIntakeAssetKey(event, ' + index + ')">'
       + '<button class="ai-intake-asset-delete" type="button" title="删除" aria-label="删除文件" onclick="ccAssetIntakeDeleteAsset(event, ' + index + ')">' + TRASH_ICON + '</button>'
       + (item.archived ? '<span class="ai-intake-asset-status">已入库</span>' : '')
-      + '<span class="ai-intake-asset-media">' + mediaHtml + '</span>'
+      + '<span class="ai-intake-asset-media">' + mediaHtml + (item.type === 'video' ? '<span class="ai-intake-asset-play">▶</span>' : '') + '</span>'
       + '<span class="ai-intake-asset-info">'
       + '  <span class="ai-intake-asset-name" title="' + escHtml(item.name) + '">' + escHtml(item.name) + '</span>'
-      + '  <span class="ai-intake-asset-type">' + (item.type === 'video' ? '视频' : '图片') + '</span>'
+      + '  <span class="ai-intake-asset-type">' + escHtml(getMaterialTypeTextForItem(item)) + '</span>'
       + '</span>'
       + '</div>';
   }
@@ -1063,14 +1305,20 @@
   function clearErrors() {
     var folderError = document.getElementById('aiIntakeFolderError');
     var designerError = document.getElementById('aiIntakeDesignerError');
+    var materialNameError = document.getElementById('aiIntakeMaterialNameError');
     if (folderError) folderError.textContent = '';
     if (designerError) designerError.textContent = '';
+    if (materialNameError) materialNameError.textContent = '';
   }
 
   function setTarget(target) {
-    if (target === '物料库' && isImageOnly()) return;
+    if (target !== '素材库' && target !== '原料库') return;
     state.target = target;
+    if (target === '原料库') state.selectedFolders.clear();
     renderTargets();
+    renderMaterialFields();
+    renderTargetMode();
+    renderFolders();
     renderSummary();
   }
 
@@ -1243,6 +1491,7 @@
     state.items.splice(index, 1);
     renderSummary();
     renderTargets();
+    renderMaterialFields();
     renderNameEditor();
     renderAssets();
     if (state.subMode === 'assets') renderSub();
@@ -1252,6 +1501,70 @@
 
   function setRemark(value) {
     state.remark = value;
+  }
+
+  function toggleMaterialTag(value) {
+    if (!state.materialTags || !(state.materialTags instanceof Set)) state.materialTags = new Set();
+    if (state.materialTags.has(value)) state.materialTags.delete(value);
+    else {
+      var group = getMaterialTagGroupsForType(state.materialType).find(function(item) { return (item.tags || []).indexOf(value) >= 0; });
+      if (group && !group.multiple) (group.tags || []).forEach(function(tag) { state.materialTags.delete(tag); });
+      state.materialTags.add(value);
+    }
+    state.materialAiTagState = 'done';
+    renderMaterialFields();
+  }
+
+  function filterMaterialTags(value) {
+    var q = String(value || '').trim().toLowerCase();
+    var list = document.getElementById('aiIntakeMaterialTagList');
+    if (!list) return;
+    Array.prototype.forEach.call(list.querySelectorAll('.ant-select-item-option'), function(option) {
+      option.style.display = !q || String(option.dataset.tagText || '').indexOf(q) >= 0 ? '' : 'none';
+    });
+    Array.prototype.forEach.call(list.querySelectorAll('.ai-intake-tag-group'), function(group) {
+      group.style.display = Array.prototype.some.call(group.querySelectorAll('.ant-select-item-option'), function(option) { return option.style.display !== 'none'; }) ? '' : 'none';
+    });
+  }
+
+  function runMaterialAiTagging() {
+    if (materialAiTagTimer) clearTimeout(materialAiTagTimer);
+    state.materialAiTagState = 'loading';
+    state.materialTags = new Set();
+    renderMaterialFields();
+    materialAiTagTimer = setTimeout(function() {
+      state.materialTags = new Set(getSuggestedMaterialTags(state.materialType));
+      state.materialAiTagState = 'done';
+      materialAiTagTimer = null;
+      renderMaterialFields();
+    }, 700);
+  }
+
+  function toggleMaterialTags() {
+    var el = document.getElementById('aiIntakeMaterialTagSelect');
+    if (el) el.classList.toggle('open');
+  }
+
+  function closeMaterialTags() {
+    var el = document.getElementById('aiIntakeMaterialTagSelect');
+    if (el) el.classList.remove('open');
+  }
+
+  function toggleMaterialType() {
+    var el = document.getElementById('aiIntakeMaterialTypeSelect');
+    if (el) el.classList.toggle('open');
+  }
+
+  function closeMaterialType() {
+    var el = document.getElementById('aiIntakeMaterialTypeSelect');
+    if (el) el.classList.remove('open');
+  }
+
+  function setMaterialType(value) {
+    if (!MATERIAL_TYPE_OPTIONS.some(function(option) { return option.value === value; })) return;
+    state.materialType = value;
+    closeMaterialType();
+    runMaterialAiTagging();
   }
 
   function showRenameEditor() {
@@ -1269,6 +1582,8 @@
 
   function setArchiveName(value) {
     state.draftArchiveName = value;
+    if (!state.renameVisible) state.archiveName = value;
+    renderMaterialNameFields();
     renderArchiveNamePreview();
   }
 
@@ -1333,6 +1648,8 @@
       stage.innerHTML = item.url
         ? '<video src="' + escHtml(item.url) + '" controls autoplay playsinline></video>'
         : '<div class="ai-intake-empty">暂无视频地址</div>';
+    } else if (item.type === 'copy' || item.type === 'text') {
+      stage.innerHTML = '<div class="ai-intake-copy-preview">' + escHtml(item.content || '暂无文案内容') + '</div>';
     } else {
       stage.innerHTML = item.url || item.thumb
         ? '<img src="' + escHtml(item.url || item.thumb) + '" alt="">'
@@ -1357,11 +1674,17 @@
   function submit() {
     clearErrors();
     var valid = true;
-    if (!state.selectedFolders.size) {
+    if (state.target === '原料库' && !state.archiveName.trim()) {
+      document.getElementById('aiIntakeMaterialNameError').textContent = '请输入原料名称';
+      var materialNameInput = document.getElementById('aiIntakeMaterialNameInput');
+      if (materialNameInput) materialNameInput.focus();
+      valid = false;
+    }
+    if (state.target !== '原料库' && !state.selectedFolders.size) {
       document.getElementById('aiIntakeFolderError').textContent = '请选择至少一个入库位置';
       valid = false;
     }
-    if (!state.designer.trim()) {
+    if (state.target !== '原料库' && !state.designer.trim()) {
       document.getElementById('aiIntakeDesignerError').textContent = '请选择设计师';
       valid = false;
     }
@@ -1371,16 +1694,19 @@
       target: state.target,
       folderIds: Array.from(state.selectedFolders),
       designer: state.designer.trim(),
+      materialType: state.target === '原料库' ? state.materialType : '',
       platforms: Array.from(state.selectedPlatforms),
       aiSimilarityCheck: state.aiCheck,
+      tags: state.target === '原料库' ? Array.from(state.materialTags || []) : [],
+      visibility: state.target === '原料库' ? '全部' : '',
       remark: state.remark,
       archiveName: state.archiveName.trim(),
       assets: state.items.map(function(item, index) {
-        return { id:item.id, type:item.type, name:item.name, archiveName:getArchiveName(item, index), url:item.url };
+        return { id:item.id, type:item.type, name:item.name, archiveName:getArchiveName(item, index), url:item.url, content:item.content || '' };
       })
     };
     closeModal();
-    showArchiveToast('已开始入库，您可在素材管理系统-我的任务中查看。');
+    showArchiveToast(state.target === '原料库' ? '已入库到原料库。' : '已开始入库，您可在素材管理系统-我的任务中查看。');
   }
 
   function showArchiveToast(message) {
@@ -1395,10 +1721,26 @@
     }, 3200);
   }
 
+  function openCopyMaterialIntake(input) {
+    input = input || {};
+    openModal({
+      target: '原料库',
+      items: [{
+        id: input.id || 'copy-' + Date.now(),
+        type: 'copy',
+        materialType: 'copy',
+        name: input.name || '文案原料',
+        content: input.content || input.text || ''
+      }]
+    });
+  }
+
   document.addEventListener('click', function(e) {
     if (!e.target.closest('#aiIntakePlatformSelect')) closePlatformPanel();
     if (!e.target.closest('#aiIntakeFilterSelect')) closeFilterDropdown();
     if (!e.target.closest('#aiIntakeDesignerSelect')) closeDesignerDropdown();
+    if (!e.target.closest('#aiIntakeMaterialTagSelect')) closeMaterialTags();
+    if (!e.target.closest('#aiIntakeMaterialTypeSelect')) closeMaterialType();
   });
 
   document.addEventListener('keydown', function(e) {
@@ -1415,6 +1757,7 @@
 
   window.openAssetArchiveModal = openModal;
   window.openAssetIntakeModal = openModal;
+  window.openCopyMaterialIntake = openCopyMaterialIntake;
   window.ccAssetIntakeClose = closeModal;
   window.ccAssetIntakeSetTarget = setTarget;
   window.ccAssetIntakeClearFolders = clearFolders;
@@ -1442,6 +1785,11 @@
   window.ccAssetIntakeSetPlatformQuery = setPlatformQuery;
   window.ccAssetIntakeTogglePlatform = togglePlatform;
   window.ccAssetIntakeToggleAiCheck = toggleAiCheck;
+  window.ccAssetIntakeToggleMaterialTag = toggleMaterialTag;
+  window.ccAssetIntakeFilterMaterialTags = filterMaterialTags;
+  window.ccAssetIntakeToggleMaterialTags = toggleMaterialTags;
+  window.ccAssetIntakeToggleMaterialType = toggleMaterialType;
+  window.ccAssetIntakeSetMaterialType = setMaterialType;
   window.ccAssetIntakeSetRemark = setRemark;
   window.ccAssetIntakeShowRename = showRenameEditor;
   window.ccAssetIntakeSetArchiveName = setArchiveName;

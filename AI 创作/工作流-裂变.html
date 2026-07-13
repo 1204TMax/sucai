@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>视频裂变工作流 - 量化投放系统</title>
+    <link rel="icon" href="data:,">
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -118,6 +119,849 @@
             font-size: 13px;
         }
 
+        .reference-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .reference-btn {
+            height: 32px;
+            padding: 0 14px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #ffffff;
+            color: #595959;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+        }
+
+        .reference-btn:hover {
+            color: #4A9EFF;
+            border-color: #5AA4FF;
+            background: #E8F4FF;
+        }
+
+        .copy-resource-control {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .copy-resource-control .ant-form-item {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .copy-resource-button {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+        }
+
+        .reference-picker-content {
+            display: flex;
+            align-items: stretch;
+            gap: 16px;
+            min-height: 280px;
+        }
+
+        .reference-picker-main {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .reference-selected-panel {
+            width: 184px;
+            flex: 0 0 184px;
+            padding-left: 16px;
+            border-left: 1px solid #f0f0f0;
+        }
+
+        .reference-selected-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 32px;
+            margin-bottom: 8px;
+            color: #595959;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .reference-selected-clear {
+            border: 0;
+            background: transparent;
+            color: #8c8c8c;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .reference-selected-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .reference-selected-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px;
+            border-radius: 6px;
+            background: #fafafa;
+        }
+
+        .reference-selected-preview {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f0f0f0;
+            color: #595959;
+            font-size: 10px;
+            line-height: 1.35;
+        }
+
+        .reference-selected-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .reference-selected-preview.copy {
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8c8c8c;
+        }
+
+        .reference-selected-name {
+            min-width: 0;
+            flex: 1;
+            overflow: hidden;
+            color: #595959;
+            font-size: 12px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .reference-selected-remove {
+            width: 24px;
+            height: 24px;
+            flex: 0 0 24px;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: #8c8c8c;
+            cursor: pointer;
+        }
+
+        .reference-selected-remove:hover,
+        .reference-selected-clear:hover {
+            color: #ff4d4f;
+        }
+
+        /* 系统资源选择器与通用生成保持同一套信息架构 */
+        .system-resource-modal .ant-modal-content {
+            height: min(780px, 86vh);
+            padding: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .system-resource-modal .ant-modal-header {
+            flex: 0 0 auto;
+            margin: 0;
+            padding: 16px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .system-resource-modal .ant-modal-title {
+            color: #1a1a1a;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .system-resource-modal .ant-modal-close {
+            top: 12px;
+            right: 12px;
+        }
+
+        .system-resource-modal .ant-modal-body {
+            min-height: 0;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .system-resource-modal .ant-modal-footer {
+            flex: 0 0 auto;
+            margin: 0;
+            padding: 12px 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .reference-picker-shell {
+            height: 100%;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .reference-source-sidebar {
+            width: 168px;
+            flex: 0 0 168px;
+            padding: 12px 8px;
+            overflow-y: auto;
+            border-right: 1px solid #f0f0f0;
+            background: #fff;
+        }
+
+        .reference-source-section + .reference-source-section {
+            margin-top: 16px;
+        }
+
+        .reference-source-label {
+            padding: 0 8px 6px;
+            color: #8c8c8c;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .reference-source-item {
+            width: 100%;
+            min-height: 36px;
+            padding: 8px;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: #595959;
+            font: inherit;
+            font-size: 13px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 150ms ease, background 150ms ease;
+        }
+
+        .reference-source-item:hover {
+            color: #1a1a1a;
+            background: #fafafa;
+        }
+
+        .reference-source-item.active {
+            color: #1a1a1a;
+            background: #E8F4FF;
+            font-weight: 500;
+        }
+
+        .reference-source-item:focus {
+            outline: none;
+        }
+
+        .reference-source-item:focus-visible {
+            box-shadow: 0 0 0 2px rgba(74,158,255, 0.2);
+        }
+
+        .reference-source-item .anticon {
+            width: 16px;
+            font-size: 16px;
+        }
+
+        .reference-source-count {
+            margin-left: auto;
+            color: #8c8c8c;
+            font-size: 12px;
+            font-weight: 400;
+        }
+
+        .reference-picker-stage {
+            min-width: 0;
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .reference-picker-column {
+            min-width: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .reference-picker-column .reference-filter-panel {
+            flex: 0 0 auto;
+            gap: 10px;
+            margin: 0;
+            padding: 12px 16px;
+            border: 0;
+            border-bottom: 1px solid #f0f0f0;
+            border-radius: 0;
+            background: #fff;
+        }
+
+        .reference-picker-column .reference-picker-content {
+            min-height: 0;
+            flex: 1;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        .reference-picker-column .reference-picker-main {
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .reference-picker-column .reference-selected-panel {
+            width: 220px;
+            flex-basis: 220px;
+            padding: 12px 10px 10px;
+        }
+
+        .reference-picker-column .reference-task-list {
+            max-height: none;
+            gap: 0;
+            padding: 0;
+        }
+
+        .reference-picker-column .reference-task-card {
+            padding: 14px 16px;
+            border: 0;
+            border-bottom: 1px solid #f0f0f0;
+            border-radius: 0;
+            box-shadow: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reference-picker-column .reference-task-card:hover {
+            border-color: #f0f0f0;
+            background: #fafcff;
+            box-shadow: none;
+        }
+
+        .reference-task-leading {
+            width: 40px;
+            height: 40px;
+            flex: 0 0 40px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #f5f5f5;
+            color: #52c41a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .reference-task-leading img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .reference-task-body {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .reference-task-chevron {
+            flex: 0 0 auto;
+            color: #bfbfbf;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .reference-modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .reference-modal-count {
+            color: #8c8c8c;
+            font-size: 13px;
+        }
+
+        .reference-modal-count strong {
+            color: #4A9EFF;
+            font-weight: 600;
+        }
+
+        .reference-modal-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .reference-copy-thumb {
+            width: 100%;
+            height: 100%;
+            padding: 12px;
+            overflow: hidden;
+            background: #f7faff;
+            color: #595959;
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .reference-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .reference-filter-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .reference-filter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 32px;
+            flex-wrap: wrap;
+        }
+
+        .reference-filter-label {
+            width: 64px;
+            flex-shrink: 0;
+            color: #8c8c8c;
+            font-size: 12px;
+        }
+
+        .reference-filter-mode {
+            color: #bfbfbf;
+            font-size: 12px;
+        }
+
+        .reference-filter-row .reference-search {
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .reference-tag-trigger {
+            min-width: 220px;
+            justify-content: space-between;
+        }
+
+        .reference-tag-trigger span:last-child {
+            margin-left: 16px;
+            color: #8c8c8c;
+            font-weight: 400;
+        }
+
+        .reference-tag-panel {
+            width: 420px;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+
+        .reference-tag-panel-search { margin-bottom: 8px; }
+        .reference-tag-panel-group + .reference-tag-panel-group {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .reference-tag-panel-head {
+            margin-bottom: 8px;
+            color: #595959;
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .reference-tag-panel-head span { color: #bfbfbf; font-weight: 400; }
+        .reference-tag-panel .ant-checkbox-group { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+        .reference-tag-panel .ant-radio-group { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+        .reference-tag-applied { display: flex; flex-wrap: wrap; gap: 6px; }
+        .reference-tag-applied-item {
+            height: 24px; padding: 0 6px 0 8px; border-radius: 4px; background: #E8F4FF;
+            color: #4A9EFF; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .reference-tag-applied-item button { border: 0; background: transparent; color: inherit; cursor: pointer; }
+        .reference-tag-dialog-layout { height: 360px; display: grid; grid-template-columns: 180px minmax(0,1fr); border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; }
+        .reference-tag-dialog-groups { padding: 8px; border-right: 1px solid #f0f0f0; overflow-y: auto; }
+        .reference-tag-dialog-group {
+            width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 6px;
+            background: transparent; color: #595959; text-align: left; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .reference-tag-dialog-group.active { background: #E8F4FF; color: #4A9EFF; }
+        .reference-tag-dialog-main { padding: 16px; overflow-y: auto; }
+        .reference-tag-dialog-head { margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; color: #262626; }
+        .reference-tag-dialog-head span { color: #8c8c8c; font-size: 12px; }
+        .reference-tag-dialog-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+        .reference-tag-dialog-option {
+            min-height: 32px; padding: 6px 8px; border: 0; border-radius: 5px;
+            background: transparent; color: #595959; text-align: left; cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .reference-tag-dialog-option:hover { background: #f5f5f5; }
+        .reference-tag-dialog-option.active { background: #E8F4FF; color: #3580DB; }
+        .reference-tag-dialog-check {
+            width: 14px; height: 14px; flex: 0 0 14px; border: 1px solid #d9d9d9; border-radius: 3px;
+            display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 10px;
+        }
+        .reference-tag-dialog-option.active .reference-tag-dialog-check { border-color: #4A9EFF; background: #4A9EFF; }
+        .reference-tag-dialog-option.single .reference-tag-dialog-check { border-radius: 50%; }
+        .reference-tag-dialog-selected { margin-top: 12px; padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px; }
+        .reference-tag-dialog-selected-title { margin-bottom: 8px; color: #8c8c8c; font-size: 12px; }
+        .reference-tag-dialog-footer { display: flex; align-items: center; justify-content: space-between; }
+        .reference-tag-dialog-footer-actions { display: flex; gap: 8px; }
+        .reference-tag-empty { color: #bfbfbf; font-size: 12px; }
+
+        .reference-search {
+            flex: 1;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            color: #262626;
+            outline: none;
+        }
+
+        .reference-search:focus {
+            border-color: #4A9EFF;
+            box-shadow: 0 0 0 2px rgba(74,158,255,0.1);
+        }
+
+        .reference-owner-select {
+            height: 36px;
+            min-width: 132px;
+            padding: 0 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #262626;
+            outline: none;
+        }
+
+        .reference-back {
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 6px;
+            border: 1px solid #d9d9d9;
+            background: #ffffff;
+            color: #595959;
+            cursor: pointer;
+        }
+
+        .reference-back:hover {
+            border-color: #5AA4FF;
+            color: #4A9EFF;
+            background: #E8F4FF;
+        }
+
+        .reference-task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 420px;
+            overflow: auto;
+            padding: 4px;
+        }
+
+        .reference-task-card {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #f0f0f0;
+            border-radius: 8px;
+            background: #ffffff;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+        }
+
+        .reference-task-card:hover {
+            border-color: #91caff;
+            background: #f7fbff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .reference-task-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .reference-task-name {
+            min-width: 0;
+            color: #262626;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reference-task-status {
+            flex-shrink: 0;
+            height: 24px;
+            padding: 0 8px;
+            border-radius: 4px;
+            background: #f6ffed;
+            color: #52c41a;
+            font-size: 12px;
+            line-height: 24px;
+        }
+
+        .reference-task-meta {
+            margin-top: 8px;
+            color: #8c8c8c;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .reference-result-head {
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #fafafa;
+            color: #595959;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            max-height: 420px;
+            overflow: auto;
+            padding: 4px;
+        }
+
+        .reference-grid.copy-mode {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .reference-card {
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: #fafafa;
+            overflow: hidden;
+            cursor: pointer;
+            transition: border-color 120ms ease, box-shadow 120ms ease;
+        }
+
+        .reference-card:hover {
+            border-color: #91caff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .reference-card.selected {
+            border-color: #4A9EFF;
+            box-shadow: 0 0 0 1px #4A9EFF;
+        }
+
+        .reference-card.copy-card {
+            padding: 14px 16px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas:
+                "content actions"
+                "tags actions"
+                "meta actions";
+            column-gap: 16px;
+            row-gap: 8px;
+        }
+
+        .reference-card.copy-card .reference-thumb {
+            grid-area: content;
+            min-height: 0;
+            aspect-ratio: auto;
+            background: transparent;
+            display: block;
+        }
+
+        .reference-card.copy-card .reference-copy-thumb {
+            height: auto;
+            max-height: 58px;
+            padding: 0;
+            background: transparent;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+
+        .reference-card.copy-card .reference-tags {
+            grid-area: tags;
+            padding: 0;
+        }
+
+        .reference-card.copy-card .reference-meta {
+            grid-area: meta;
+            padding: 0;
+        }
+
+        .reference-card.copy-card .reference-card-actions {
+            grid-area: actions;
+            align-self: center;
+            padding: 0;
+        }
+
+        .reference-thumb {
+            aspect-ratio: 16 / 10;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reference-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .reference-file-name {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            z-index: 2;
+            max-width: calc(100% - 16px);
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.84);
+            color: #8c8c8c;
+            font-size: 12px;
+            line-height: 18px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            backdrop-filter: blur(4px);
+        }
+
+        .reference-copy {
+            padding: 12px;
+            color: #595959;
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .reference-play {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.42);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+            pointer-events: none;
+        }
+
+        .reference-name {
+            padding: 8px;
+            color: #262626;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reference-tags {
+            padding: 0 8px 8px;
+            color: #8c8c8c;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reference-meta {
+            padding: 0 8px 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #8c8c8c;
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .reference-meta-dot { color: #d9d9d9; flex-shrink: 0; }
+
+        .reference-owner {
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reference-card-actions {
+            padding: 0 8px 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .reference-preview-btn {
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 4px;
+            border: 1px solid #d9d9d9;
+            background: #ffffff;
+            color: #595959;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .reference-preview-btn:hover {
+            border-color: #5AA4FF;
+            color: #4A9EFF;
+            background: #E8F4FF;
+        }
+
+        .reference-empty {
+            grid-column: 1 / -1;
+            color: #8c8c8c;
+            text-align: center;
+            padding: 32px;
+        }
+
         .resolution-field {
             display: flex;
             flex-direction: column;
@@ -229,10 +1073,11 @@
 </head>
 <body>
     <div id="root"></div>
+    <script src="../共享样式/material-library.js?v=20260712a"></script>
     <script type="text/babel">
         const { useState, useEffect, useCallback } = React;
-        const { Input, Upload, Button, Form, InputNumber, Radio, Modal, message, ConfigProvider, Select, Tooltip } = antd;
-        const { CheckOutlined, UploadOutlined } = icons;
+        const { Input, Upload, Button, Form, InputNumber, Radio, Modal, message, ConfigProvider, Select, Tooltip, Segmented } = antd;
+        const { CheckOutlined, UploadOutlined, DatabaseOutlined, AppstoreOutlined, FileDoneOutlined } = icons;
         const { Dragger } = Upload;
 
         const CUSTOM_RESOLUTION = 'custom';
@@ -263,6 +1108,12 @@
                 required: false,
             },
             {
+                key: 'copyContent',
+                title: '文案内容',
+                description: '输入文案，或从原料库引用已有文案。',
+                required: false,
+            },
+            {
                 key: 'resolution',
                 title: '输出分辨率（px）',
                 description: '可选择常用比例，也可手动输入图片或视频的宽度和高度。',
@@ -289,6 +1140,26 @@
             }
         ];
         const fieldMeta = Object.fromEntries(fieldSchema.map(field => [field.key, field]));
+        const materialLibrary = window.CCMaterialLibrary || { materials: [], taskItems: [], tasks: [], typeLabel: type => type === 'video' ? '视频' : type === 'copy' ? '文案' : '图片' };
+        const productResourceList = [
+            { id: 'prod1', name: '水光精华露', category: '护肤', sku: 'PG-2001', thumb: 'https://picsum.photos/seed/wf-product-1/200/200', materials: [
+                { id: 'pm1', name: 'icon_主图.jpg', type: 'image', thumb: 'https://picsum.photos/seed/wf-pm-1/320/240', url: 'https://picsum.photos/seed/wf-pm-1/960/720', tags: ['icon', '主图'], owner: '商品组', source: '产品物料', createdAt: '2026-07-03' },
+                { id: 'pm2', name: '截图_详情页_01.jpg', type: 'image', thumb: 'https://picsum.photos/seed/wf-pm-2/320/240', url: 'https://picsum.photos/seed/wf-pm-2/960/720', tags: ['截图', '详情页'], owner: '商品组', source: '产品物料', createdAt: '2026-07-03' },
+                { id: 'pm3', name: '录屏_开箱.mp4', type: 'video', thumb: 'https://picsum.photos/seed/wf-pm-3/320/240', url: '../icon/步数1-1.mp4', tags: ['录屏', '开箱'], owner: '商品组', source: '产品物料', createdAt: '2026-07-03' },
+            ]},
+            { id: 'prod2', name: '玻尿酸面膜', category: '护肤', sku: 'PG-2002', thumb: 'https://picsum.photos/seed/wf-product-2/200/200', materials: [
+                { id: 'pm4', name: 'icon_白底.jpg', type: 'image', thumb: 'https://picsum.photos/seed/wf-pm-4/320/240', url: 'https://picsum.photos/seed/wf-pm-4/960/720', tags: ['icon', '白底'], owner: '商品组', source: '产品物料', createdAt: '2026-07-02' },
+                { id: 'pm5', name: '录屏_使用教程.mp4', type: 'video', thumb: 'https://picsum.photos/seed/wf-pm-5/320/240', url: '../icon/步数1-1.mp4', tags: ['录屏', '教程'], owner: '商品组', source: '产品物料', createdAt: '2026-07-02' },
+            ]},
+            { id: 'prod3', name: '持久哑光唇釉', category: '彩妆', sku: 'PG-3001', thumb: 'https://picsum.photos/seed/wf-product-3/200/200', materials: [
+                { id: 'pm6', name: '截图_色号展示.jpg', type: 'image', thumb: 'https://picsum.photos/seed/wf-pm-6/320/240', url: 'https://picsum.photos/seed/wf-pm-6/960/720', tags: ['截图', '色号'], owner: '商品组', source: '产品物料', createdAt: '2026-07-01' },
+            ]},
+        ];
+        const referenceSources = {
+            product: { label: '产品物料', items: productResourceList },
+            library: { label: '原料库', items: materialLibrary.materials || [] },
+            task: { label: '我的任务', items: materialLibrary.tasks || [] },
+        };
 
         const normalizeFileList = event => {
             if (Array.isArray(event)) {
@@ -327,6 +1198,25 @@
             const [videoFiles, setVideoFiles] = useState([]);
             const [resolutionPreset, setResolutionPreset] = useState(CUSTOM_RESOLUTION);
             const [preview, setPreview] = useState({ open: false, title: '', url: '', type: '' });
+            const [referenceQuery, setReferenceQuery] = useState('');
+            const [referenceOwner, setReferenceOwner] = useState('mine');
+            const [referenceTags, setReferenceTags] = useState({});
+            const [referenceTagDialog, setReferenceTagDialog] = useState({
+                open: false,
+                activeGroupId: '',
+                draft: {},
+            });
+            const [referenceTaskStatus, setReferenceTaskStatus] = useState('all');
+            const [referencePicker, setReferencePicker] = useState({
+                open: false,
+                field: '',
+                mediaType: 'image',
+                materialCategory: 'actor',
+                source: 'library',
+                lockSource: false,
+                selectedTaskId: '',
+                selectedIds: [],
+            });
 
             const handlePaste = useCallback((e) => {
                 const clipboardFiles = e.clipboardData?.files;
@@ -439,6 +1329,272 @@
                 }
             };
 
+            const openReferencePicker = (field, mediaType, source) => {
+                const categories = materialLibrary.pickerCategories
+                    ? materialLibrary.pickerCategories(mediaType)
+                    : [{ key: 'actor', label: '演员', tagGroup: 'actor' }];
+                setReferenceQuery('');
+                setReferenceOwner('mine');
+                setReferenceTags({});
+                setReferenceTaskStatus('all');
+                setReferencePicker({
+                    open: true,
+                    field,
+                    mediaType,
+                    materialCategory: categories[0]?.key || '',
+                    source,
+                    lockSource: field === 'copyContent',
+                    selectedTaskId: '',
+                    selectedIds: [],
+                });
+            };
+
+            const closeReferencePicker = () => {
+                setReferencePicker(prev => ({ ...prev, open: false, selectedTaskId: '', selectedIds: [] }));
+            };
+
+            const matchReferenceOwner = item => {
+                if (!materialLibrary.matchOwnership) return true;
+                return materialLibrary.matchOwnership(item, referenceOwner);
+            };
+
+            const parseReferenceTime = value => new Date(String(value || '').replace(/-/g, '/')).getTime() || 0;
+
+            const referenceMaterialCategories = materialLibrary.pickerCategories
+                ? materialLibrary.pickerCategories(referencePicker.mediaType)
+                : [{ key: 'actor', label: '演员', tagGroup: 'actor' }];
+
+            const activeReferenceCategory = referenceMaterialCategories.find(item => item.key === referencePicker.materialCategory);
+            const referenceTagGroupKey = activeReferenceCategory?.tagGroup || referencePicker.materialCategory;
+
+            const referenceTagGroups = materialLibrary.groupsForType
+                ? materialLibrary.groupsForType(referenceTagGroupKey)
+                : (materialLibrary.tagGroups?.[referenceTagGroupKey] || []);
+
+            const setReferenceMaterialCategory = category => {
+                setReferenceTags({});
+                setReferencePicker(prev => ({ ...prev, materialCategory: category, selectedIds: [] }));
+            };
+
+            const openReferenceTagDialog = () => {
+                setReferenceTagDialog({
+                    open: true,
+                    activeGroupId: referenceTagGroups[0]?.id || '',
+                    draft: Object.fromEntries(Object.entries(referenceTags).map(([key, values]) => [key, [...values]])),
+                });
+            };
+
+            const toggleReferenceTagDraft = (group, tag) => {
+                setReferenceTagDialog(prev => {
+                    const selected = prev.draft[group.id] || [];
+                    const values = group.multiple
+                        ? (selected.includes(tag) ? selected.filter(item => item !== tag) : [...selected, tag])
+                        : (selected.includes(tag) ? [] : [tag]);
+                    return { ...prev, draft: { ...prev.draft, [group.id]: values } };
+                });
+            };
+
+            const clearReferenceTagDraft = () => {
+                setReferenceTagDialog(prev => ({ ...prev, draft: {} }));
+            };
+
+            const cancelReferenceTagDialog = () => {
+                setReferenceTagDialog(prev => ({ ...prev, open: false }));
+            };
+
+            const confirmReferenceTagDialog = () => {
+                setReferenceTags(referenceTagDialog.draft);
+                setReferenceTagDialog(prev => ({ ...prev, open: false }));
+            };
+
+            const removeReferenceTag = (groupId, tag) => {
+                setReferenceTags(prev => ({
+                    ...prev,
+                    [groupId]: (prev[groupId] || []).filter(item => item !== tag),
+                }));
+            };
+
+            const taskResultsByType = task => (task?.results || []).filter(item => item.type === referencePicker.mediaType);
+            const productMaterialsByType = product => (product?.materials || []).filter(item => item.type === referencePicker.mediaType);
+
+            const selectedReferenceTask = referencePicker.source === 'task'
+                ? (referenceSources.task.items || []).find(task => task.id === referencePicker.selectedTaskId)
+                : null;
+
+            const selectedReferenceProduct = referencePicker.source === 'product'
+                ? (referenceSources.product.items || []).find(product => product.id === referencePicker.selectedTaskId)
+                : null;
+
+            const referenceTaskList = (referenceSources.task.items || [])
+                .filter(task => taskResultsByType(task).length > 0)
+                .filter(task => referenceTaskStatus === 'all' || task.status === referenceTaskStatus)
+                .filter(task => {
+                    const q = referenceQuery.trim().toLowerCase();
+                    if (!q) return true;
+                    return [
+                        task.name,
+                        task.status,
+                        task.createdAt,
+                        taskResultsByType(task).map(item => [item.name, (item.tags || []).join(' ')].join(' ')).join(' ')
+                    ].join(' ').toLowerCase().includes(q);
+                })
+                .sort((a, b) => parseReferenceTime(b.createdAt) - parseReferenceTime(a.createdAt));
+
+            const referenceProductList = (referenceSources.product.items || [])
+                .filter(product => productMaterialsByType(product).length > 0)
+                .filter(product => {
+                    const q = referenceQuery.trim().toLowerCase();
+                    if (!q) return true;
+                    return [
+                        product.name,
+                        product.category,
+                        product.sku,
+                        productMaterialsByType(product).map(item => [item.name, (item.tags || []).join(' ')].join(' ')).join(' ')
+                    ].join(' ').toLowerCase().includes(q);
+                });
+
+            const availableReferenceItems = referencePicker.source === 'task'
+                ? taskResultsByType(selectedReferenceTask)
+                : referencePicker.source === 'product'
+                    ? productMaterialsByType(selectedReferenceProduct)
+                    : (referenceSources[referencePicker.source]?.items || []).filter(item => (
+                        item.type === referencePicker.mediaType && item.materialType === referencePicker.materialCategory
+                    ));
+
+            const selectedReferenceItems = availableReferenceItems.filter(item => referencePicker.selectedIds.includes(item.id));
+
+            const referenceItems = availableReferenceItems
+                .filter(item => referencePicker.source !== 'library' || matchReferenceOwner(item))
+                .filter(item => referencePicker.source !== 'library' || !materialLibrary.matchTagSelections || materialLibrary.matchTagSelections(item, referenceTags))
+                .filter(item => {
+                    const q = referenceQuery.trim().toLowerCase();
+                    if (!q) return true;
+                    return [
+                        item.name,
+                        item.owner,
+                        item.source,
+                        item.content,
+                        (item.tags || []).join(' ')
+                    ].join(' ').toLowerCase().includes(q);
+                });
+
+            const chooseReferenceTask = task => {
+                setReferenceQuery('');
+                setReferencePicker(prev => ({ ...prev, selectedTaskId: task.id, selectedIds: [] }));
+            };
+
+            const chooseReferenceProduct = product => {
+                setReferenceQuery('');
+                setReferencePicker(prev => ({ ...prev, selectedTaskId: product.id, selectedIds: [] }));
+            };
+
+            const backToReferenceTasks = () => {
+                setReferenceQuery('');
+                setReferencePicker(prev => ({ ...prev, selectedTaskId: '', selectedIds: [] }));
+            };
+
+            const setReferenceSource = source => {
+                setReferenceQuery('');
+                setReferenceTags({});
+                setReferenceTaskStatus('all');
+                setReferencePicker(prev => ({ ...prev, source, selectedTaskId: '', selectedIds: [] }));
+            };
+
+            const toggleReferenceItem = id => {
+                setReferencePicker(prev => {
+                    const set = new Set(prev.selectedIds);
+                    if (set.has(id)) set.delete(id);
+                    else set.add(id);
+                    return { ...prev, selectedIds: Array.from(set) };
+                });
+            };
+
+            const referenceToFile = item => ({
+                uid: `library-${item.id}-${Date.now()}`,
+                name: item.name,
+                type: item.type === 'video' ? 'video/mp4' : 'image/png',
+                size: 0,
+                status: 'done',
+                url: item.url || item.thumb,
+                thumbUrl: item.thumb || item.url,
+                librarySource: item.source,
+            });
+
+            const confirmReferencePicker = () => {
+                if (!selectedReferenceItems.length) return;
+                if (referencePicker.field === 'copyContent') {
+                    const existing = String(form.getFieldValue('copyContent') || '').trim();
+                    const copyText = selectedReferenceItems.map(item => item.content || item.name).filter(Boolean).join('\n\n');
+                    form.setFieldsValue({ copyContent: [existing, copyText].filter(Boolean).join('\n\n') });
+                    message.success(`已引用 ${selectedReferenceItems.length} 条文案`);
+                    closeReferencePicker();
+                    return;
+                }
+                const selected = selectedReferenceItems.map(referenceToFile);
+                if (referencePicker.field === 'imageMaterials') {
+                    const nextFiles = [...imageFiles, ...selected].slice(0, MAX_IMAGE_MATERIALS);
+                    setImageFiles(nextFiles);
+                    form.setFieldsValue({ imageMaterials: nextFiles });
+                } else {
+                    const nextFiles = [...videoFiles, ...selected];
+                    setVideoFiles(nextFiles);
+                    form.setFieldsValue({ videoMaterials: nextFiles });
+                }
+                message.success(`已引用 ${selected.length} 个${referencePicker.mediaType === 'video' ? '视频' : '图片'}`);
+                closeReferencePicker();
+            };
+
+            const getReferenceOwnerLabel = item => {
+                if (materialLibrary.ownershipLabel) return materialLibrary.ownershipLabel(item);
+                return item.owner || '';
+            };
+
+            const getReferenceTitle = () => {
+                const mediaLabel = referencePicker.mediaType === 'copy' ? '文案' : referencePicker.mediaType === 'video' ? '视频' : '图片';
+                if (referencePicker.source === 'task' && selectedReferenceTask) {
+                    return `${selectedReferenceTask.name} / 选择${mediaLabel}`;
+                }
+                if (referencePicker.source === 'product' && selectedReferenceProduct) {
+                    return `${selectedReferenceProduct.name} / 选择${mediaLabel}`;
+                }
+                return `从${referenceSources[referencePicker.source]?.label || ''}选择${mediaLabel}`;
+            };
+
+            const previewReferenceItem = (event, item) => {
+                event.stopPropagation();
+                setPreview({
+                    open: true,
+                    title: item.name || '素材预览',
+                    url: item.url || item.thumb,
+                    type: item.type,
+                    content: item.content || '',
+                });
+            };
+
+            const renderReferenceMedia = item => {
+                if (item.type === 'copy') {
+                    return <div className="reference-thumb"><div className="reference-copy-thumb">{item.content || item.name}</div></div>;
+                }
+                const rawFileName = /\.[a-z0-9]+$/i.test(item.name || '')
+                    ? item.name
+                    : `${item.name || '原料'}.${item.type === 'video' ? 'mp4' : 'png'}`;
+                if (item.type === 'video') {
+                    return (
+                        <div className="reference-thumb">
+                            <img src={item.thumb || item.url} alt={item.name} />
+                            {referencePicker.source === 'library' && <span className="reference-file-name">{rawFileName}</span>}
+                            <span className="reference-play">▶</span>
+                        </div>
+                    );
+                }
+                return (
+                    <div className="reference-thumb">
+                        <img src={item.thumb || item.url} alt={item.name} />
+                        {referencePicker.source === 'library' && <span className="reference-file-name">{rawFileName}</span>}
+                    </div>
+                );
+            };
+
             const handlePreview = async file => {
                 const mediaType = getMediaType(file);
                 if (!mediaType) {
@@ -510,6 +1666,7 @@
                             className="workflow-form"
                             initialValues={{ 
                                 taskName: '',
+                                copyContent: '',
                                 imageMaterials: [],
                                 videoMaterials: [],
                                 resolutionPreset: CUSTOM_RESOLUTION,
@@ -538,12 +1695,40 @@
                             <div className="field-row">
                                 <div className="field-meta">
                                     <div className="field-title-line">
+                                        <span className="field-title">{fieldMeta.copyContent.title}</span>
+                                    </div>
+                                    <p className="field-description">{fieldMeta.copyContent.description}</p>
+                                </div>
+                                <div className="field-control">
+                                    <div className="copy-resource-control">
+                                        <Form.Item name="copyContent">
+                                            <Input.TextArea rows={4} placeholder="请输入文案内容" showCount maxLength={5000} />
+                                        </Form.Item>
+                                        <Tooltip title="从原料库选择文案">
+                                            <Button
+                                                className="copy-resource-button"
+                                                type="default"
+                                                icon={<DatabaseOutlined />}
+                                                aria-label="从原料库选择文案"
+                                                onClick={() => openReferencePicker('copyContent', 'copy', 'library')}
+                                            />
+                                        </Tooltip>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
                                         <span className="field-title">{fieldMeta.imageMaterials.title}</span>
                                         <span className="required">*</span>
                                     </div>
                                     <p className="field-description">{fieldMeta.imageMaterials.description}</p>
                                 </div>
                                 <div className="field-control">
+                                    <div className="reference-actions">
+                                        <button className="reference-btn" type="button" onClick={() => openReferencePicker('imageMaterials', 'image', 'product')}>选择系统资源</button>
+                                    </div>
                                     <Form.Item
                                         name="imageMaterials"
                                         valuePropName="fileList"
@@ -582,6 +1767,9 @@
                                     <p className="field-description">{fieldMeta.videoMaterials.description}</p>
                                 </div>
                                 <div className="field-control">
+                                    <div className="reference-actions">
+                                        <button className="reference-btn" type="button" onClick={() => openReferencePicker('videoMaterials', 'video', 'product')}>选择系统资源</button>
+                                    </div>
                                     <Form.Item name="videoMaterials" valuePropName="fileList" getValueFromEvent={normalizeFileList}>
                                         <Dragger
                                             className="custom-dragger"
@@ -742,7 +1930,329 @@
                                 </Button>
                             </div>
                         </Form>
+                    <Modal
+                        open={referencePicker.open}
+                        title={getReferenceTitle()}
+                        width={1240}
+                        className="system-resource-modal"
+                        onCancel={closeReferencePicker}
+                        footer={(
+                            <div className="reference-modal-footer">
+                                <span className="reference-modal-count">已选择 <strong>{referencePicker.selectedIds.length}</strong> 项</span>
+                                <div className="reference-modal-actions">
+                                    <Button onClick={closeReferencePicker}>取消</Button>
+                                    <Button type="primary" disabled={referencePicker.selectedIds.length === 0} onClick={confirmReferencePicker}>确认添加</Button>
+                                </div>
+                            </div>
+                        )}
+                        destroyOnClose
+                    >
+                      <div className="reference-picker-shell">
+                        <aside className="reference-source-sidebar">
+                            <div className="reference-source-section">
+                                <div className="reference-source-label">来源</div>
+                                {!referencePicker.lockSource && (
+                                    <>
+                                        <button className={`reference-source-item ${referencePicker.source === 'product' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('product')}>
+                                            <AppstoreOutlined /> <span>产品物料</span>
+                                        </button>
+                                        <button className={`reference-source-item ${referencePicker.source === 'task' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('task')}>
+                                            <FileDoneOutlined /> <span>我的任务</span>
+                                        </button>
+                                    </>
+                                )}
+                                <button className={`reference-source-item ${referencePicker.source === 'library' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('library')}>
+                                    <DatabaseOutlined /> <span>原料库</span>
+                                </button>
+                            </div>
+                            {referencePicker.source === 'library' && (
+                                <div className="reference-source-section">
+                                    <div className="reference-source-label">分类</div>
+                                    {referenceMaterialCategories.map(item => (
+                                        <button
+                                            key={item.key}
+                                            className={`reference-source-item ${referencePicker.materialCategory === item.key ? 'active' : ''}`}
+                                            type="button"
+                                            onClick={() => setReferenceMaterialCategory(item.key)}
+                                        >
+                                            <span>{item.label}</span>
+                                            <span className="reference-source-count">{(materialLibrary.materials || []).filter(material => material.type === referencePicker.mediaType && material.materialType === item.key).length}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </aside>
+                        <div className="reference-picker-stage">
+                          <div className="reference-picker-column">
+                        <div className="reference-filter-panel">
+                            {referencePicker.source === 'library' && (
+                                <>
+                                    <div className="reference-filter-row">
+                                        <span className="reference-filter-label">创建者</span>
+                                        <Segmented
+                                            value={referenceOwner}
+                                            onChange={setReferenceOwner}
+                                            options={[{ label: '我的', value: 'mine' }, { label: '全部', value: 'all' }]}
+                                        />
+                                        <Input
+                                            className="reference-search"
+                                            value={referenceQuery}
+                                            onChange={event => setReferenceQuery(event.target.value)}
+                                            placeholder="搜索名称、内容、人员、来源"
+                                            allowClear
+                                        />
+                                    </div>
+                                    <div className="reference-filter-row">
+                                        <span className="reference-filter-label">标签</span>
+                                        <Button className="reference-tag-trigger" onClick={openReferenceTagDialog}>
+                                            <span>选择标签</span>
+                                            <span>{Object.values(referenceTags).reduce((sum, values) => sum + values.length, 0) ? `已选 ${Object.values(referenceTags).reduce((sum, values) => sum + values.length, 0)} 项` : '请选择'}</span>
+                                        </Button>
+                                        <div className="reference-tag-applied">
+                                            {referenceTagGroups.flatMap(group => (referenceTags[group.id] || []).map(tag => (
+                                                <span className="reference-tag-applied-item" key={`${group.id}-${tag}`}>
+                                                    {tag}
+                                                    <button type="button" aria-label={`移除${tag}`} onClick={() => removeReferenceTag(group.id, tag)}>×</button>
+                                                </span>
+                                            )))}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                            {referencePicker.source === 'product' && (
+                                <div className="reference-toolbar">
+                                    {selectedReferenceProduct && (
+                                        <button className="reference-back" type="button" onClick={backToReferenceTasks}>返回产品列表</button>
+                                    )}
+                                    <Input
+                                        className="reference-search"
+                                        value={referenceQuery}
+                                        onChange={event => setReferenceQuery(event.target.value)}
+                                        placeholder={!selectedReferenceProduct ? '搜索产品名称、品类、SKU' : '搜索物料名称、标签'}
+                                        allowClear
+                                    />
+                                </div>
+                            )}
+                            {referencePicker.source === 'task' && (
+                                <div className="reference-toolbar">
+                                    {selectedReferenceTask && (
+                                        <button className="reference-back" type="button" onClick={backToReferenceTasks}>返回任务列表</button>
+                                    )}
+                                    <Input
+                                        className="reference-search"
+                                        value={referenceQuery}
+                                        onChange={event => setReferenceQuery(event.target.value)}
+                                        placeholder={!selectedReferenceTask ? '搜索任务名称、时间、状态' : '搜索结果名称、标签'}
+                                        allowClear
+                                    />
+                                    {!selectedReferenceTask && (
+                                        <Select
+                                            value={referenceTaskStatus}
+                                            onChange={setReferenceTaskStatus}
+                                            options={[
+                                                { value: 'all', label: '全部状态' },
+                                                { value: '已完成', label: '已完成' },
+                                                { value: '生成中', label: '生成中' },
+                                            ]}
+                                            style={{ width: 132 }}
+                                        />
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                        <div className="reference-picker-content">
+                          <div className="reference-picker-main">
+                          {referencePicker.source === 'product' && !selectedReferenceProduct ? (
+                            <div className="reference-task-list">
+                                {referenceProductList.map(product => (
+                                    <button key={product.id} className="reference-task-card" type="button" onClick={() => chooseReferenceProduct(product)}>
+                                        <div className="reference-task-leading"><img src={product.thumb} alt="" /></div>
+                                        <div className="reference-task-body">
+                                            <div className="reference-task-main">
+                                                <span className="reference-task-name" title={product.name}>{product.name}</span>
+                                            </div>
+                                            <div className="reference-task-meta">
+                                                <span>{product.category}</span>
+                                                <span>{product.sku}</span>
+                                                <span>{productMaterialsByType(product).length} 个{referencePicker.mediaType === 'video' ? '视频' : '图片'}物料</span>
+                                            </div>
+                                        </div>
+                                        <span className="reference-task-chevron">›</span>
+                                    </button>
+                                ))}
+                                {!referenceProductList.length && (
+                                    <div className="reference-empty">没有匹配的产品物料</div>
+                                )}
+                            </div>
+                        ) : referencePicker.source === 'task' && !selectedReferenceTask ? (
+                            <div className="reference-task-list">
+                                {referenceTaskList.map(task => {
+                                    const results = taskResultsByType(task);
+                                    return (
+                                        <button key={task.id} className="reference-task-card" type="button" onClick={() => chooseReferenceTask(task)}>
+                                            <div className="reference-task-leading">✓</div>
+                                            <div className="reference-task-body">
+                                                <div className="reference-task-main">
+                                                    <span className="reference-task-name" title={task.name}>{task.name}</span>
+                                                    <span className="reference-task-status">{task.status}</span>
+                                                </div>
+                                                <div className="reference-task-meta">
+                                                    <span>{task.createdAt}</span>
+                                                    <span>{results.length} 个{referencePicker.mediaType === 'copy' ? '文案' : referencePicker.mediaType === 'video' ? '视频' : '图片'}结果</span>
+                                                </div>
+                                            </div>
+                                            <span className="reference-task-chevron">›</span>
+                                        </button>
+                                    );
+                                })}
+                                {!referenceTaskList.length && (
+                                    <div className="reference-empty">没有匹配的任务</div>
+                                )}
+                            </div>
+                        ) : (
+                            <>
+                                {referencePicker.source === 'task' && selectedReferenceTask && (
+                                    <div className="reference-result-head">
+                                        <span>{selectedReferenceTask.createdAt} · {selectedReferenceTask.status}</span>
+                                        <span>{availableReferenceItems.length} 个可选结果</span>
+                                    </div>
+                                )}
+                                {referencePicker.source === 'product' && selectedReferenceProduct && (
+                                    <div className="reference-result-head">
+                                        <span>{selectedReferenceProduct.category} · {selectedReferenceProduct.sku}</span>
+                                        <span>{availableReferenceItems.length} 个可选物料</span>
+                                    </div>
+                                )}
+                                <div className={`reference-grid ${referencePicker.mediaType === 'copy' ? 'copy-mode' : ''}`}>
+                                    {referenceItems.map(item => (
+                                        <div
+                                            key={item.id}
+                                            className={`reference-card ${item.type === 'copy' ? 'copy-card' : ''} ${referencePicker.selectedIds.includes(item.id) ? 'selected' : ''}`}
+                                            onClick={() => toggleReferenceItem(item.id)}
+                                        >
+                                            {renderReferenceMedia(item)}
+                                            {item.type !== 'copy' && referencePicker.source !== 'library' && <div className="reference-name" title={item.name}>{item.name}</div>}
+                                            <div className="reference-tags">{(item.tags || []).slice(0, 3).join(' / ')}</div>
+                                            <div className="reference-meta">
+                                                <span>{item.createdAt || ''}</span>
+                                                <span className="reference-meta-dot">·</span><span>{item.owner || ''}</span>
+                                                <span className="reference-meta-dot">·</span><span>{item.source || ''}</span>
+                                            </div>
+                                            <div className="reference-card-actions">
+                                                <button className="reference-preview-btn" type="button" onClick={event => previewReferenceItem(event, item)}>预览</button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {!referenceItems.length && (
+                                        <div className="reference-empty">没有可引用的内容</div>
+                                    )}
+                                </div>
+                            </>
+                          )}
+                          </div>
+                          {selectedReferenceItems.length > 0 && (
+                              <aside className="reference-selected-panel">
+                                  <div className="reference-selected-head">
+                                      <span>已选 {selectedReferenceItems.length} 项</span>
+                                      <button
+                                          className="reference-selected-clear"
+                                          type="button"
+                                          onClick={() => setReferencePicker(prev => ({ ...prev, selectedIds: [] }))}
+                                      >清空</button>
+                                  </div>
+                                  <div className="reference-selected-list">
+                                      {selectedReferenceItems.map(item => (
+                                          <div className="reference-selected-item" key={item.id}>
+                                              {item.type === 'copy' ? (
+                                                  <div className="reference-selected-preview copy">文案</div>
+                                              ) : (
+                                                  <div className="reference-selected-preview"><img src={item.thumb || item.url} alt="" /></div>
+                                              )}
+                                              <span className="reference-selected-name" title={item.type === 'copy' ? item.content : item.name}>{item.type === 'copy' ? item.content : item.name}</span>
+                                              <button
+                                                  className="reference-selected-remove"
+                                                  type="button"
+                                                  aria-label={`移除${item.name}`}
+                                                  onClick={() => toggleReferenceItem(item.id)}
+                                              >×</button>
+                                          </div>
+                                      ))}
+                                  </div>
+                              </aside>
+                          )}
+                        </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Modal>
                     </div>
+                    <Modal
+                        open={referenceTagDialog.open}
+                        title="选择标签"
+                        width={760}
+                        destroyOnClose
+                        onCancel={cancelReferenceTagDialog}
+                        footer={(
+                            <div className="reference-tag-dialog-footer">
+                                <Button type="link" onClick={clearReferenceTagDraft}>一键清空</Button>
+                                <div className="reference-tag-dialog-footer-actions">
+                                    <Button onClick={cancelReferenceTagDialog}>取消</Button>
+                                    <Button type="primary" onClick={confirmReferenceTagDialog}>确认</Button>
+                                </div>
+                            </div>
+                        )}
+                    >
+                        <div className="reference-tag-dialog-layout">
+                            <div className="reference-tag-dialog-groups">
+                                {referenceTagGroups.map(group => (
+                                    <button
+                                        className={`reference-tag-dialog-group ${referenceTagDialog.activeGroupId === group.id ? 'active' : ''}`}
+                                        type="button"
+                                        key={group.id}
+                                        onClick={() => setReferenceTagDialog(prev => ({ ...prev, activeGroupId: group.id }))}
+                                    >
+                                        <span>{group.name}</span>
+                                        <span>{(referenceTagDialog.draft[group.id] || []).length || ''}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="reference-tag-dialog-main">
+                                {referenceTagGroups.filter(group => group.id === referenceTagDialog.activeGroupId).map(group => (
+                                    <React.Fragment key={group.id}>
+                                        <div className="reference-tag-dialog-head">
+                                            <strong>{group.name}</strong>
+                                            <span>{group.multiple ? '可多选' : '单选'}</span>
+                                        </div>
+                                        <div className="reference-tag-dialog-options">
+                                            {(group.tags || []).map(tag => (
+                                                <button
+                                                    className={`reference-tag-dialog-option ${group.multiple ? '' : 'single'} ${(referenceTagDialog.draft[group.id] || []).includes(tag) ? 'active' : ''}`}
+                                                    type="button"
+                                                    key={tag}
+                                                    onClick={() => toggleReferenceTagDraft(group, tag)}
+                                                >
+                                                    <span className="reference-tag-dialog-check">{(referenceTagDialog.draft[group.id] || []).includes(tag) ? '✓' : ''}</span>
+                                                    <span>{tag}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="reference-tag-dialog-selected">
+                            <div className="reference-tag-dialog-selected-title">已选标签</div>
+                            <div className="reference-tag-applied">
+                                {referenceTagGroups.flatMap(group => (referenceTagDialog.draft[group.id] || []).map(tag => (
+                                    <span className="reference-tag-applied-item" key={`${group.id}-${tag}`}>
+                                        {tag}
+                                        <button type="button" aria-label={`移除${tag}`} onClick={() => toggleReferenceTagDraft(group, tag)}>×</button>
+                                    </span>
+                                )))}
+                                {!Object.values(referenceTagDialog.draft).some(values => values.length) && <span className="reference-tag-empty">暂未选择</span>}
+                            </div>
+                        </div>
+                    </Modal>
                     <Modal
                         open={preview.open}
                         title={preview.title}
@@ -753,6 +2263,7 @@
                     >
                         {preview.type === 'image' && <img src={preview.url} alt={preview.title} className="preview-media" />}
                         {preview.type === 'video' && <video src={preview.url} className="preview-media" controls />}
+                        {preview.type === 'copy' && <div className="reference-copy-thumb">{preview.content || '暂无文案内容'}</div>}
                         {!preview.type && <p className="preview-empty">当前文件暂不支持预览</p>}
                     </Modal>
                 </ConfigProvider>

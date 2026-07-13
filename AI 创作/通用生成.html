@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>通用生成 - 量化投放系统</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="../共享样式/components.css">
     <link rel="stylesheet" href="../共享样式/project-picker.css">
     <link rel="stylesheet" href="../共享样式/confirm-modal.css">
@@ -86,7 +87,7 @@
             justify-content: center; cursor: pointer; color: #c8c8c8;
             transition: border-color 0.15s, color 0.15s, background-color 0.15s;
         }
-        .upload-block:hover { border-color: #1677ff; color: #1677ff; background-color: #f0f7ff; }
+        .upload-block:hover { border-color: #4A9EFF; color: #4A9EFF; background-color: #f0f7ff; }
         #uploadInput, #uploadFirst, #uploadLast, #chatMediaInput, #chatFileInput { display: none; }
 
         textarea.prompt {
@@ -116,7 +117,7 @@
             cursor: pointer; color: #c8c8c8;
             transition: border-color 0.15s, color 0.15s, background-color 0.15s;
         }
-        .ref-add:hover { border-color: #1677ff; color: #1677ff; background-color: #f0f7ff; }
+        .ref-add:hover { border-color: #4A9EFF; color: #4A9EFF; background-color: #f0f7ff; }
 
         .ref-item {
             position: relative; width: 60px; height: 60px;
@@ -156,7 +157,7 @@
             cursor: pointer; color: #c8c8c8;
             transition: border-color 0.15s, color 0.15s, background 0.15s;
         }
-        .keyframe-add:hover { border-color: #1677ff; color: #1677ff; background: #f0f7ff; }
+        .keyframe-add:hover { border-color: #4A9EFF; color: #4A9EFF; background: #f0f7ff; }
         .keyframe-thumb {
             width: 60px; height: 60px; border-radius: 8px;
             overflow: hidden; border: 1px solid rgba(0,0,0,0.08); background: #f0f0f0;
@@ -309,7 +310,7 @@
         /* 切换 pill（思考/搜索） */
         .toggle-pill { gap: 5px; }
         .toggle-pill .arr { display: none; }
-        .toggle-pill.on { background: rgba(22,119,255,0.08); border-color: rgba(22,119,255,0.28); color: #1677ff; }
+        .toggle-pill.on { background: rgba(74,158,255,0.08); border-color: rgba(74,158,255,0.28); color: #4A9EFF; }
 
         .model-config-wrap {
             margin-left: auto;
@@ -533,10 +534,10 @@
             transition: background 0.2s, transform 0.1s;
             flex-shrink: 0; display: flex; align-items: center; gap: 6px;
         }
-        .gen-btn.has-text       { background: #1677ff; color: #fff; }
-        .gen-btn.has-text:hover { background: #4096ff; transform: scale(1.03); }
-        .gen-btn.has-text:active{ background: #0958d9; transform: scale(0.97); }
-        .gen-btn.loading        { background: #1677ff; color: #fff; opacity: 0.8; cursor: not-allowed; }
+        .gen-btn.has-text       { background: #4A9EFF; color: #fff; }
+        .gen-btn.has-text:hover { background: #5AA4FF; transform: scale(1.03); }
+        .gen-btn.has-text:active{ background: #3580DB; transform: scale(0.97); }
+        .gen-btn.loading        { background: #4A9EFF; color: #fff; opacity: 0.8; cursor: not-allowed; }
         #genText {
             display: inline-flex; align-items: center; gap: 6px;
         }
@@ -622,11 +623,11 @@
             border: 2px solid transparent; transition: border-color 0.12s;
         }
         .toolbox-img-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-        .toolbox-img-thumb.selected { border-color: #1677ff; }
+        .toolbox-img-thumb.selected { border-color: #4A9EFF; }
         .toolbox-img-thumb .thumb-check {
             display: none; position: absolute; top: 2px; right: 2px;
             width: 16px; height: 16px; border-radius: 50%;
-            background: #1677ff; align-items: center; justify-content: center;
+            background: #4A9EFF; align-items: center; justify-content: center;
         }
         .toolbox-img-thumb.selected .thumb-check { display: flex; }
         .toolbox-img-thumb .thumb-preview {
@@ -640,11 +641,11 @@
         .toolbox-img-thumb .thumb-preview:hover { background: rgba(0,0,0,0.72); }
         .toolbox-img-confirm {
             width: 100%; height: 28px; border-radius: 6px;
-            border: none; background: #1677ff; color: #fff;
+            border: none; background: #4A9EFF; color: #fff;
             font-size: 12px; font-family: inherit; cursor: pointer;
             transition: background 0.12s;
         }
-        .toolbox-img-confirm:hover { background: #0958d9; }
+        .toolbox-img-confirm:hover { background: #3580DB; }
         .toolbox-img-confirm:disabled { background: #bbb; cursor: not-allowed; }
 
         /* 对话工具按钮 */
@@ -739,7 +740,7 @@
         }
         .asset-modal-mask.show { display: flex; }
         .asset-modal {
-            width: 900px; max-width: 92vw; height: 600px; max-height: 80vh;
+            width: 1240px; max-width: 94vw; height: 780px; max-height: 86vh;
             background: #fff; border-radius: 12px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.2);
             display: flex; flex-direction: column; overflow: hidden;
@@ -757,7 +758,7 @@
             background: #fafafa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") 9px center no-repeat;
             transition: border-color 0.15s;
         }
-        .asset-header-search:focus { border-color: #1677ff; background-color: #fff; }
+        .asset-header-search:focus { border-color: #4A9EFF; background-color: #fff; }
         .asset-modal-close {
             width: 28px; height: 28px; border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
@@ -769,28 +770,139 @@
         }
         /* 左侧分类 */
         .asset-sidebar {
-            width: 140px; flex-shrink: 0;
+            width: 168px; flex-shrink: 0;
             border-right: 1px solid #f0f0f0;
-            padding: 8px 0; overflow-y: auto;
+            padding: 12px 8px; overflow-y: auto;
             transition: opacity 0.2s, filter 0.2s;
+        }
+        .asset-sidebar-section + .asset-sidebar-section { margin-top: 16px; }
+        .asset-sidebar-label {
+            padding: 0 8px 6px; color: #8c8c8c; font-size: 12px; font-weight: 500;
         }
         .searching .asset-sidebar {
             opacity: 0.35; filter: grayscale(0.6); pointer-events: none;
         }
         .asset-sidebar-item {
             display: flex; align-items: center; gap: 8px;
-            padding: 10px 16px; font-size: 13px; color: #666;
-            cursor: pointer; transition: all 0.15s;
+            min-height: 36px; padding: 8px; border-radius: 6px;
+            font-size: 13px; color: #595959; cursor: pointer; transition: all 0.15s;
         }
         .asset-sidebar-item:hover { color: #1a1a1a; background: #fafafa; }
-        .asset-sidebar-item.active { color: #1a1a1a; background: #f0f5ff; font-weight: 500; }
+        .asset-sidebar-item.active { color: #1a1a1a; background: #E8F4FF; font-weight: 500; }
         .asset-sidebar-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .asset-sidebar-count { margin-left: auto; color: #8c8c8c; font-size: 12px; }
         /* 右侧内容 */
-        .asset-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .asset-main { min-width: 0; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .asset-filter-bar {
-            display: flex; align-items: center; gap: 10px;
+            display: flex; flex-direction: column; align-items: stretch; gap: 10px;
             padding: 12px 16px; border-bottom: 1px solid #f0f0f0; flex-shrink: 0;
-            flex-wrap: wrap;
+        }
+        .asset-filter-row {
+            display: flex; align-items: center; gap: 8px; min-height: 32px; flex-wrap: wrap;
+        }
+        .asset-filter-row-main { flex-wrap: nowrap; }
+        .asset-filter-label { width: 56px; flex-shrink: 0; color: #8c8c8c; font-size: 12px; }
+        .asset-scope-group { display: inline-flex; align-items: center; padding: 2px; border-radius: 6px; background: #f5f5f5; }
+        .asset-scope-btn {
+            height: 28px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent;
+            color: #595959; font: inherit; font-size: 13px; cursor: pointer;
+        }
+        .asset-scope-btn.active { background: #fff; color: #4A9EFF; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .asset-tag-select { position: relative; width: 220px; min-width: 0; }
+        .asset-tag-select summary {
+            height: 32px; padding: 0 28px 0 10px; border: 1px solid #e0e0e0; border-radius: 6px;
+            background: #fff; color: #595959; font-size: 13px; cursor: pointer; list-style: none;
+            display: flex; align-items: center; gap: 6px; position: relative; white-space: nowrap;
+        }
+        .asset-tag-select summary::-webkit-details-marker { display: none; }
+        .asset-tag-select summary::after {
+            content: ''; position: absolute; right: 10px; top: 50%; width: 6px; height: 6px;
+            border-right: 1px solid #8c8c8c; border-bottom: 1px solid #8c8c8c;
+            transform: translateY(-70%) rotate(45deg); transition: transform 0.12s ease;
+        }
+        .asset-tag-select[open] summary { border-color: #5AA4FF; box-shadow: 0 0 0 2px rgba(74,158,255,0.1); }
+        .asset-tag-select[open] summary::after { transform: translateY(-30%) rotate(225deg); }
+        .asset-tag-select-name { color: #262626; font-weight: 500; }
+        .asset-tag-select-value { max-width: 120px; overflow: hidden; color: #4A9EFF; text-overflow: ellipsis; }
+        .asset-tag-popup {
+            position: absolute; top: calc(100% + 4px); left: 0; z-index: 30; width: 420px;
+            max-width: min(420px, calc(100vw - 260px)); max-height: 360px; overflow-y: auto;
+            padding: 8px; border: 1px solid #f0f0f0; border-radius: 8px; background: #fff;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+        .asset-tag-search {
+            width: 100%; height: 30px; margin-bottom: 6px; padding: 0 9px; border: 1px solid #d9d9d9;
+            border-radius: 6px; color: #262626; font: inherit; font-size: 12px; outline: none;
+        }
+        .asset-tag-search:focus { border-color: #5AA4FF; }
+        .asset-tag-options { max-height: 224px; overflow-y: auto; }
+        .asset-tag-group + .asset-tag-group { margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+        .asset-tag-group-head {
+            height: 28px; padding: 0 8px; color: #595959; font-size: 12px; font-weight: 500;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .asset-tag-group-head span { color: #bfbfbf; font-weight: 400; }
+        .asset-tag-option {
+            width: 100%; min-height: 32px; padding: 6px 8px; border: 0; border-radius: 5px;
+            background: transparent; color: #595959; font: inherit; font-size: 12px; text-align: left;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+        }
+        .asset-tag-option:hover { background: #f5f5f5; }
+        .asset-tag-option.active { color: #4A9EFF; background: #E8F4FF; }
+        .asset-tag-check {
+            width: 14px; height: 14px; flex: 0 0 14px; border: 1px solid #d9d9d9; border-radius: 3px;
+            display: inline-flex; align-items: center; justify-content: center; font-size: 10px;
+        }
+        .asset-tag-option.active .asset-tag-check { border-color: #4A9EFF; background: #4A9EFF; color: #fff; }
+        .asset-tag-option.single .asset-tag-check { border-radius: 50%; }
+        .asset-tag-select.single .asset-tag-check { border-radius: 50%; }
+        .asset-tag-group.single .asset-tag-check { border-radius: 50%; }
+        .asset-tag-trigger-btn {
+            height: 32px; min-width: 220px; padding: 0 12px; border: 1px solid #d9d9d9;
+            border-radius: 6px; background: #fff; color: #595959; font: inherit; font-size: 13px;
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: space-between;
+        }
+        .asset-tag-trigger-btn:hover { border-color: #5AA4FF; color: #4A9EFF; }
+        .asset-tag-applied { display: flex; flex-wrap: wrap; gap: 6px; }
+        .asset-tag-applied-item {
+            height: 24px; padding: 0 6px 0 8px; border-radius: 4px; background: #E8F4FF;
+            color: #4A9EFF; font-size: 12px; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .asset-tag-applied-item button { border: 0; background: transparent; color: inherit; cursor: pointer; }
+        .asset-tag-dialog-mask {
+            position: fixed; inset: 0; z-index: 2300; display: none; align-items: center; justify-content: center;
+            background: rgba(0,0,0,.45);
+        }
+        .asset-tag-dialog-mask.show { display: flex; }
+        .asset-tag-dialog {
+            width: min(760px, calc(100vw - 64px)); height: min(580px, calc(100vh - 64px));
+            border-radius: 10px; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,.22);
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        .asset-tag-dialog-head, .asset-tag-dialog-foot {
+            height: 56px; padding: 0 20px; border-bottom: 1px solid #f0f0f0;
+            display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        .asset-tag-dialog-title { color: #262626; font-size: 16px; font-weight: 600; }
+        .asset-tag-dialog-close { width: 28px; height: 28px; border: 0; background: transparent; color: #8c8c8c; cursor: pointer; }
+        .asset-tag-dialog-body { min-height: 0; flex: 1; display: grid; grid-template-columns: 180px minmax(0,1fr); }
+        .asset-tag-dialog-groups { padding: 12px 8px; border-right: 1px solid #f0f0f0; overflow-y: auto; }
+        .asset-tag-dialog-group {
+            width: 100%; min-height: 36px; padding: 0 10px; border: 0; border-radius: 6px;
+            background: transparent; color: #595959; font: inherit; text-align: left; cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .asset-tag-dialog-group.active { background: #E8F4FF; color: #4A9EFF; }
+        .asset-tag-dialog-main { min-width: 0; padding: 16px; overflow-y: auto; }
+        .asset-tag-dialog-options { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+        .asset-tag-dialog-selected { padding: 12px 20px; border-top: 1px solid #f0f0f0; flex-shrink: 0; }
+        .asset-tag-dialog-selected-title { margin-bottom: 8px; color: #8c8c8c; font-size: 12px; }
+        .asset-tag-dialog-selected-list { min-height: 24px; display: flex; flex-wrap: wrap; gap: 6px; }
+        .asset-tag-dialog-foot { border-top: 1px solid #f0f0f0; border-bottom: 0; }
+        .asset-tag-dialog-actions { display: flex; gap: 8px; }
+        .asset-filter-clear {
+            height: 24px; padding: 0 8px; border: 0; background: transparent; color: #4A9EFF;
+            font: inherit; font-size: 12px; cursor: pointer;
         }
         .asset-search {
             flex: 1; min-width: 160px; height: 32px; padding: 0 10px 0 32px;
@@ -799,7 +911,7 @@
             outline: none; background: #fafafa url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E") 10px center no-repeat;
             transition: border-color 0.15s;
         }
-        .asset-search:focus { border-color: #1677ff; background-color: #fff; }
+        .asset-search:focus { border-color: #4A9EFF; background-color: #fff; }
         .asset-filter-select {
             height: 32px; padding: 0 28px 0 10px; border: 1px solid #e0e0e0;
             border-radius: 6px; font-size: 13px; font-family: inherit;
@@ -808,7 +920,7 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: right 10px center;
         }
-        .asset-filter-select:focus { border-color: #1677ff; }
+        .asset-filter-select:focus { border-color: #4A9EFF; }
         .date-range-custom {
             display: none; align-items: center; gap: 4px;
         }
@@ -818,22 +930,49 @@
             border-radius: 6px; font-size: 13px; font-family: inherit;
             color: #555; background: #fafafa; outline: none; cursor: pointer; width: 118px;
         }
-        .date-input:focus { border-color: #1677ff; }
+        .date-input:focus { border-color: #4A9EFF; }
         .date-range-sep { color: #bbb; font-size: 13px; }
         /* 内容网格 */
         .asset-grid-wrap { flex: 1; overflow-y: auto; padding: 16px; }
         .asset-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 14px;
         }
+        .asset-grid.copy-mode { grid-template-columns: minmax(0, 1fr); }
         .asset-card {
             border-radius: 8px; overflow: hidden; cursor: pointer;
             border: 2px solid transparent; transition: border-color 0.15s, box-shadow 0.15s;
             background: #f5f5f5;
         }
         .asset-card:hover { border-color: #d0d0d0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-        .asset-card.selected { border-color: #1677ff; box-shadow: 0 0 0 1px #1677ff; }
+        .asset-card.selected { border-color: #4A9EFF; box-shadow: 0 0 0 1px #4A9EFF; }
+        .asset-grid.copy-mode .asset-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            background: #fafafa;
+        }
+        .asset-grid.copy-mode .asset-card-thumb {
+            min-height: 70px;
+            aspect-ratio: auto;
+            justify-content: flex-start;
+            background: #f7faff;
+        }
+        .asset-grid.copy-mode .asset-copy-thumb {
+            height: auto;
+            max-height: 76px;
+            padding: 14px 52px 14px 14px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+        .asset-grid.copy-mode .asset-card-overlay {
+            justify-content: flex-end;
+            padding-right: 10px;
+            background: transparent !important;
+            opacity: 1;
+            pointer-events: auto;
+        }
         .asset-card-check {
             position: absolute; bottom: 4px; right: 4px;
             width: 16px; height: 16px; border-radius: 50%;
@@ -842,13 +981,57 @@
         }
         .asset-card.selected .asset-card-check { display: flex; }
         .asset-card-thumb {
-            width: 100%; aspect-ratio: 1; background: #eee;
+            width: 100%; aspect-ratio: 16 / 10; background: #eee;
             display: flex; align-items: center; justify-content: center;
             overflow: hidden; position: relative;
         }
         .asset-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .asset-card-thumb video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .asset-file-name {
+            position: absolute; top: 8px; left: 8px; z-index: 3;
+            max-width: calc(100% - 16px); padding: 2px 7px;
+            border-radius: 4px; background: rgba(255,255,255,0.84);
+            color: #8c8c8c; font-size: 12px; line-height: 18px;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            backdrop-filter: blur(4px);
+        }
+        .asset-copy-thumb {
+            width: 100%; height: 100%; padding: 16px;
+            display: flex; align-items: center; justify-content: center;
+            color: #262626; font-size: 13px; line-height: 1.55;
+            background:
+                radial-gradient(circle at right top, rgba(74,158,255,0.14), transparent 34%),
+                linear-gradient(180deg, #fff 0%, #f7faff 100%);
+            text-align: left;
+            font-weight: 500;
+        }
+        .asset-video-mark {
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 42px; height: 42px; border-radius: 50%;
+            background: rgba(0,0,0,0.42); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; pointer-events: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+        }
         .asset-card-name {
-            padding: 6px 8px; font-size: 12px; color: #555;
+            padding: 9px 10px; font-size: 13px; color: #333;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .asset-card-meta {
+            padding: 0 10px 8px;
+            display: flex; align-items: center; gap: 6px;
+            color: #8c8c8c; font-size: 12px;
+            white-space: nowrap; overflow: hidden;
+        }
+        .asset-card-owner {
+            min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .asset-card-usage { flex-shrink: 0; }
+        .asset-card-meta-dot { color: #d9d9d9; flex-shrink: 0; }
+        .asset-card-tags {
+            padding: 0 10px 10px;
+            color: #8c8c8c; font-size: 12px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         /* hover 预览按钮 */
@@ -869,14 +1052,14 @@
         .asset-card-preview-btn:hover { background: #fff; }
         /* 已选面板 */
         .asset-modal { transition: width 0.2s ease; }
-        .asset-modal.has-selection { width: 1100px; }
+        .asset-modal.has-selection { width: 1340px; }
         .asset-selected-panel {
             width: 0; overflow: hidden; flex-shrink: 0;
             background: #fff; border-left: 1px solid #f0f0f0;
             display: flex; flex-direction: column;
             transition: width 0.2s ease;
         }
-        .asset-selected-panel.show { width: 200px; }
+        .asset-selected-panel.show { width: 220px; }
         .sel-panel-header {
             padding: 12px 14px 8px; font-size: 13px; font-weight: 500; color: #555;
             flex-shrink: 0; white-space: nowrap;
@@ -889,29 +1072,42 @@
         .sel-panel-clear:hover { color: #ff4d4f; }
         .sel-panel-grid {
             flex: 1; overflow-y: auto; padding: 0 10px 10px;
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
-            align-content: start;
+            display: flex; flex-direction: column; gap: 8px;
         }
         .sel-panel-item {
-            position: relative; aspect-ratio: 1; border-radius: 6px;
-            overflow: hidden; cursor: pointer; background: #f0f0f0;
+            min-width: 0; min-height: 56px; padding: 6px; border-radius: 6px;
+            display: flex; align-items: center; gap: 8px;
+            cursor: pointer; background: #fafafa;
         }
-        .sel-panel-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .sel-panel-preview {
+            width: 44px; height: 44px; flex: 0 0 44px;
+            border-radius: 4px; overflow: hidden; background: #f0f0f0;
+        }
+        .sel-panel-preview img, .sel-panel-preview video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .sel-panel-copy {
+            width: 100%; height: 100%;
+            color: #4A9EFF; background: #E8F4FF; font-size: 11px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .sel-panel-name {
+            min-width: 0; flex: 1;
+            color: #595959; font-size: 12px; line-height: 1.4;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
         .sel-panel-del {
-            position: absolute; top: 4px; right: 4px;
-            width: 18px; height: 18px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); color: #fff; font-size: 9px;
-            display: none; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 1;
+            width: 24px; height: 24px; flex: 0 0 24px;
+            border: 0; border-radius: 4px; background: transparent;
+            color: #8c8c8c; font-size: 14px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
-        .sel-panel-item:hover .sel-panel-del { display: flex; }
+        .sel-panel-del:hover { color: #ff4d4f; background: #fff1f0; }
         /* 底部操作栏 */
         .asset-modal-footer {
             display: flex; align-items: center; justify-content: space-between;
             padding: 12px 20px; border-top: 1px solid #f0f0f0; flex-shrink: 0;
         }
         .asset-selected-count { font-size: 13px; color: #999; }
-        .asset-selected-count strong { color: #1677ff; font-weight: 600; }
+        .asset-selected-count strong { color: #4A9EFF; font-weight: 600; }
         .asset-footer-btns { display: flex; gap: 8px; }
         .asset-btn-cancel {
             height: 32px; padding: 0 16px; border-radius: 6px;
@@ -922,11 +1118,11 @@
         .asset-btn-cancel:hover { border-color: #bbb; color: #333; }
         .asset-btn-confirm {
             height: 32px; padding: 0 16px; border-radius: 6px;
-            border: none; background: #1677ff; color: #fff;
+            border: none; background: #4A9EFF; color: #fff;
             font-size: 13px; font-weight: 500; font-family: inherit;
             cursor: pointer; transition: background 0.15s;
         }
-        .asset-btn-confirm:hover { background: #4096ff; }
+        .asset-btn-confirm:hover { background: #5AA4FF; }
         .asset-btn-confirm:disabled { background: #d8d8d8; cursor: not-allowed; }
 
         /* 预览浮层 */
@@ -940,6 +1136,19 @@
             max-width: 80vw; max-height: 80vh; border-radius: 8px;
             box-shadow: 0 8px 40px rgba(0,0,0,0.4);
         }
+        .asset-preview-video {
+            max-width: 80vw; max-height: 80vh; border-radius: 8px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+            background: #000;
+        }
+        .asset-preview-copy {
+            width: min(680px, 82vw);
+            max-height: 72vh; overflow: auto;
+            border-radius: 8px; background: #fff;
+            color: #1a1a1a; padding: 24px;
+            font-size: 16px; line-height: 1.8;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+        }
         .asset-preview-close {
             position: absolute; top: 20px; right: 20px;
             width: 36px; height: 36px; border-radius: 50%;
@@ -951,6 +1160,10 @@
 
         /* ── 任务列表 ── */
         .task-list { display: flex; flex-direction: column; gap: 1px; background: #f0f0f0; }
+        .asset-list-empty {
+            padding: 48px 16px; background: #fff;
+            color: #8c8c8c; font-size: 13px; text-align: center;
+        }
         .task-row {
             display: flex; align-items: center; gap: 12px;
             padding: 14px 16px; background: #fff; cursor: pointer;
@@ -962,7 +1175,8 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 15px;
         }
-        .task-row-icon.generating { background: #e6f7ff; color: #1677ff; }
+        .task-row-icon.generating,
+        .task-row-icon.running    { background: #e6f7ff; color: #4A9EFF; }
         .task-row-icon.done       { background: #f6ffed; color: #52c41a; }
         .task-row-icon.failed     { background: #fff2f0; color: #ff4d4f; }
         .task-row-body { flex: 1; min-width: 0; }
@@ -976,7 +1190,7 @@
             font-size: 12px; padding: 2px 8px; border-radius: 4px; flex-shrink: 0;
         }
         .task-row-status.done    { background: #f6ffed; color: #52c41a; }
-        .task-row-status.running { background: #e6f7ff; color: #1677ff; }
+        .task-row-status.running { background: #e6f7ff; color: #4A9EFF; }
         .task-row-status.failed  { background: #fff2f0; color: #ff4d4f; }
 
         /* 任务详情页 */
@@ -988,7 +1202,7 @@
         }
         .task-detail-back {
             display: flex; align-items: center; gap: 4px;
-            font-size: 13px; color: #1677ff; cursor: pointer;
+            font-size: 13px; color: #4A9EFF; cursor: pointer;
             transition: opacity 0.15s; flex-shrink: 0;
         }
         .task-detail-back:hover { opacity: 0.7; }
@@ -1324,7 +1538,7 @@
             width: 96px; height: 96px; border-radius: var(--r-xl);
             display: flex; align-items: center; justify-content: center;
             color: var(--white); font-size: var(--text-xl); font-weight: 700; line-height: 1.25;
-            text-align: center; padding: var(--space-3); background: linear-gradient(135deg, #1677ff, #13c2c2);
+            text-align: center; padding: var(--space-3); background: linear-gradient(135deg, #4A9EFF, #13c2c2);
             box-shadow: inset 0 0 0 1px rgba(255,255,255,0.22);
         }
         .cover-side { display: flex; flex-direction: column; gap: var(--space-2); }
@@ -1517,25 +1731,21 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         本地上传
     </div>
-    <div class="upload-dropdown-item" onclick="openAssetModal('素材库')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    <div class="upload-dropdown-item" onclick="openAssetModal('产品物料')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         系统资源
-    </div>
-    <div class="upload-dropdown-item" onclick="openAssetModal('我的任务')" style="display:none">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
-        我的任务
     </div>
 </div>
 
 <!-- 对话附件来源下拉菜单 -->
 <div class="upload-dropdown" id="chatAttachDropdown">
-    <div class="upload-dropdown-item" onclick="document.getElementById('chatAttachDropdown').classList.remove('show');document.getElementById('chatMediaInput').click()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        图片/视频
-    </div>
     <div class="upload-dropdown-item" onclick="document.getElementById('chatAttachDropdown').classList.remove('show');document.getElementById('chatFileInput').click()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        文件
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        本地上传
+    </div>
+    <div class="upload-dropdown-item" onclick="document.getElementById('chatAttachDropdown').classList.remove('show');openAssetModal('产品物料')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        系统资源
     </div>
 </div>
 
@@ -1543,32 +1753,31 @@
 <div class="asset-modal-mask" id="assetModalMask" onclick="if(event.target===this)closeAssetModal()">
     <div class="asset-modal">
         <div class="asset-modal-header">
-            <div class="asset-modal-title" id="assetModalTitle">选择参考图/视频</div>
+            <div class="asset-modal-title" id="assetModalTitle">选择引用内容</div>
             <div class="asset-modal-close" onclick="closeAssetModal()">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </div>
         </div>
         <div class="asset-modal-body">
             <div class="asset-sidebar" id="assetSidebar">
-                <div class="asset-sidebar-item active" data-cat="素材库" onclick="switchAssetCat(this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    素材库
+                <div class="asset-sidebar-section">
+                    <div class="asset-sidebar-label">来源</div>
+                    <div class="asset-sidebar-item active" data-cat="产品物料" onclick="switchAssetCat(this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        产品物料
+                    </div>
+                    <div class="asset-sidebar-item" data-cat="我的任务" onclick="switchAssetCat(this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
+                        我的任务
+                    </div>
+                    <div class="asset-sidebar-item" data-cat="原料库" onclick="switchAssetCat(this)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                        原料库
+                    </div>
                 </div>
-                <div class="asset-sidebar-item" data-cat="物料库" onclick="switchAssetCat(this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                    物料库
-                </div>
-                <div class="asset-sidebar-item" data-cat="原料库" onclick="switchAssetCat(this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                    原料库
-                </div>
-                <div class="asset-sidebar-item" data-cat="产品物料" onclick="switchAssetCat(this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                    产品物料
-                </div>
-                <div class="asset-sidebar-item" data-cat="我的任务" onclick="switchAssetCat(this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 14l2 2 4-4"/></svg>
-                    我的任务
+                <div class="asset-sidebar-section" id="assetTypeSection">
+                    <div class="asset-sidebar-label">分类</div>
+                    <div id="assetTypeList"></div>
                 </div>
             </div>
             <div class="asset-main">
@@ -1607,10 +1816,34 @@
     </div>
 </div>
 
+<div class="asset-tag-dialog-mask" id="assetTagDialogMask" onclick="if(event.target===this)cancelAssetTagDialog()">
+    <div class="asset-tag-dialog" role="dialog" aria-modal="true" aria-labelledby="assetTagDialogTitle">
+        <div class="asset-tag-dialog-head">
+            <div class="asset-tag-dialog-title" id="assetTagDialogTitle">选择标签</div>
+            <button class="asset-tag-dialog-close" type="button" aria-label="关闭" onclick="cancelAssetTagDialog()">×</button>
+        </div>
+        <div class="asset-tag-dialog-body">
+            <div class="asset-tag-dialog-groups" id="assetTagDialogGroups"></div>
+            <div class="asset-tag-dialog-main" id="assetTagDialogOptions"></div>
+        </div>
+        <div class="asset-tag-dialog-selected">
+            <div class="asset-tag-dialog-selected-title">已选标签</div>
+            <div class="asset-tag-dialog-selected-list" id="assetTagDialogSelected"></div>
+        </div>
+        <div class="asset-tag-dialog-foot">
+            <button class="asset-btn-cancel" type="button" onclick="clearAssetTagDraft()">一键清空</button>
+            <div class="asset-tag-dialog-actions">
+                <button class="asset-btn-cancel" type="button" onclick="cancelAssetTagDialog()">取消</button>
+                <button class="asset-btn-confirm" type="button" onclick="confirmAssetTagDialog()">确认</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- 预览浮层 -->
 <div class="asset-preview-mask" id="assetPreviewMask" onclick="closeAssetPreview()">
     <div class="asset-preview-close" onclick="closeAssetPreview()">✕</div>
-    <img class="asset-preview-img" id="assetPreviewImg" src="" alt="">
+    <div id="assetPreviewStage"></div>
 </div>
 
     <!-- 创建工作流弹窗 -->
@@ -1686,6 +1919,7 @@
     </div>
 
 <script src="../共享样式/components.js"></script>
+<script src="../共享样式/material-library.js?v=20260712a"></script>
 <script>
 const createWfModal = document.getElementById('createWfModal');
 
@@ -1758,10 +1992,10 @@ function updateCoverPreview() {
     const text = getCoverText(nameInput.value);
     preview.innerHTML = text.length > 3 ? `${text.slice(0, 3)}<br>${text.slice(3)}` : text;
     const palettes = [
-        ['#1677ff', '#13c2c2'],
+        ['#4A9EFF', '#13c2c2'],
         ['#722ed1', '#eb2f96'],
         ['#fa8c16', '#fadb14'],
-        ['#52c41a', '#1677ff']
+        ['#52c41a', '#4A9EFF']
     ];
     const idx = text.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % palettes.length;
     preview.style.background = `linear-gradient(135deg, ${palettes[idx][0]}, ${palettes[idx][1]})`;
@@ -2369,11 +2603,38 @@ function removeKeyframe(frameKey) {
 }
 
 function previewImage(url) {
-    document.getElementById('assetPreviewImg').src = url;
-    document.getElementById('assetPreviewMask').classList.add('show');
+    showAssetPreview(url);
 }
 
 // ── 素材库弹窗 ──
+const SHARED_MATERIAL_LIBRARY = window.CCMaterialLibrary || { materials: [], taskItems: [], typeLabel: function(type) { return type === 'copy' ? '文案' : type === 'video' ? '视频' : '图片'; } };
+
+function normalizeAssetItem(item, source) {
+    item = item || {};
+    const type = item.type || 'image';
+    const normalized = {
+        id: item.id,
+        name: item.name || '未命名原料',
+        type,
+        materialType: item.materialType || '',
+        format: item.format || SHARED_MATERIAL_LIBRARY.typeLabel(type),
+        thumb: item.thumb || item.url || '',
+        url: item.url || item.thumb || '',
+        content: item.content || '',
+        tags: item.tags || [],
+        source: item.source || source || '',
+        owner: item.owner || (source === '我的任务' ? SHARED_MATERIAL_LIBRARY.currentUser?.name : ''),
+        visibility: item.visibility || (source === '我的任务' ? '仅自己' : ''),
+        createdAt: item.createdAt || '',
+        downloads: item.downloads || 0,
+        references: item.references || 0
+    };
+    normalized.ownershipLabel = SHARED_MATERIAL_LIBRARY.ownershipLabel ? SHARED_MATERIAL_LIBRARY.ownershipLabel(normalized) : '';
+    return {
+        ...normalized
+    };
+}
+
 const MOCK_ASSETS = {
     '素材库': [
         { id: 's1', name: '城市夜景.jpg',   thumb: 'https://picsum.photos/seed/city1/200/200',  type: 'image' },
@@ -2393,43 +2654,37 @@ const MOCK_ASSETS = {
         { id: 'm5', name: 'Banner模板.jpg', thumb: 'https://picsum.photos/seed/ban1/200/200',   type: 'image' },
         { id: 'm6', name: '详情页头图.jpg', thumb: 'https://picsum.photos/seed/detail1/200/200',type: 'image' },
     ],
-    '原料库': [
-        { id: 'r1', name: '肌理纹理_01.jpg', thumb: 'https://picsum.photos/seed/tex1/200/200', type: 'image' },
-        { id: 'r2', name: '肌理纹理_02.jpg', thumb: 'https://picsum.photos/seed/tex2/200/200', type: 'image' },
-        { id: 'r3', name: '光效素材_01.jpg', thumb: 'https://picsum.photos/seed/light1/200/200',type: 'image' },
-        { id: 'r4', name: '渐变背景_01.jpg', thumb: 'https://picsum.photos/seed/grad1/200/200', type: 'image' },
-        { id: 'r5', name: '噪点背景_01.jpg', thumb: 'https://picsum.photos/seed/noise1/200/200',type: 'image' },
-    ],
+    '原料库': SHARED_MATERIAL_LIBRARY.materials.map(item => normalizeAssetItem(item, '原料库')),
     '产品物料': [],
-    '我的任务': [],
+    '我的任务': SHARED_MATERIAL_LIBRARY.taskItems.map(item => normalizeAssetItem(item, '我的任务')),
 };
 
 const MOCK_PRODUCTS = [
     { id: 'prod1', name: '水光精华露', category: '护肤', sku: 'SKU-2001', thumb: 'https://picsum.photos/seed/pico1/200/200', materials: [
-        { id: 'pm1', name: 'icon_主图.jpg',    thumb: 'https://picsum.photos/seed/pi1/200/200', tag: 'icon' },
-        { id: 'pm2', name: 'icon_白底.jpg',    thumb: 'https://picsum.photos/seed/pi2/200/200', tag: 'icon' },
-        { id: 'pm3', name: '截图_详情页_01.jpg', thumb: 'https://picsum.photos/seed/psc1/200/200', tag: '截图' },
-        { id: 'pm4', name: '截图_详情页_02.jpg', thumb: 'https://picsum.photos/seed/psc2/200/200', tag: '截图' },
-        { id: 'pm5', name: '录屏_开箱.mp4',    thumb: 'https://picsum.photos/seed/pv1/200/200', tag: '录屏' },
+        { id: 'pm1', name: 'icon_主图.jpg',    thumb: 'https://picsum.photos/seed/pi1/200/200', tag: 'icon', type: 'image' },
+        { id: 'pm2', name: 'icon_白底.jpg',    thumb: 'https://picsum.photos/seed/pi2/200/200', tag: 'icon', type: 'image' },
+        { id: 'pm3', name: '截图_详情页_01.jpg', thumb: 'https://picsum.photos/seed/psc1/200/200', tag: '截图', type: 'image' },
+        { id: 'pm4', name: '截图_详情页_02.jpg', thumb: 'https://picsum.photos/seed/psc2/200/200', tag: '截图', type: 'image' },
+        { id: 'pm5', name: '录屏_开箱.mp4',    thumb: 'https://picsum.photos/seed/pv1/200/200', tag: '录屏', type: 'video' },
     ]},
     { id: 'prod2', name: '玻尿酸面膜', category: '护肤', sku: 'SKU-2002', thumb: 'https://picsum.photos/seed/pico2/200/200', materials: [
-        { id: 'pm6', name: 'icon_主图.jpg',    thumb: 'https://picsum.photos/seed/pi3/200/200', tag: 'icon' },
-        { id: 'pm7', name: '截图_效果对比.jpg', thumb: 'https://picsum.photos/seed/psc3/200/200', tag: '截图' },
-        { id: 'pm8', name: '截图_成分表.jpg',  thumb: 'https://picsum.photos/seed/psc4/200/200', tag: '截图' },
-        { id: 'pm9', name: '录屏_使用教程.mp4', thumb: 'https://picsum.photos/seed/pv2/200/200', tag: '录屏' },
+        { id: 'pm6', name: 'icon_主图.jpg',    thumb: 'https://picsum.photos/seed/pi3/200/200', tag: 'icon', type: 'image' },
+        { id: 'pm7', name: '截图_效果对比.jpg', thumb: 'https://picsum.photos/seed/psc3/200/200', tag: '截图', type: 'image' },
+        { id: 'pm8', name: '截图_成分表.jpg',  thumb: 'https://picsum.photos/seed/psc4/200/200', tag: '截图', type: 'image' },
+        { id: 'pm9', name: '录屏_使用教程.mp4', thumb: 'https://picsum.photos/seed/pv2/200/200', tag: '录屏', type: 'video' },
     ]},
     { id: 'prod3', name: '持久哑光唇釉', category: '彩妆', sku: 'SKU-3001', thumb: 'https://picsum.photos/seed/pico3/200/200', materials: [
-        { id: 'pm10', name: 'icon_色号展示.jpg', thumb: 'https://picsum.photos/seed/pi4/200/200', tag: 'icon' },
-        { id: 'pm11', name: '截图_试色_01.jpg', thumb: 'https://picsum.photos/seed/psc5/200/200', tag: '截图' },
-        { id: 'pm12', name: '截图_试色_02.jpg', thumb: 'https://picsum.photos/seed/psc6/200/200', tag: '截图' },
-        { id: 'pm13', name: '截图_包装.jpg',   thumb: 'https://picsum.photos/seed/psc7/200/200', tag: '截图' },
-        { id: 'pm14', name: '录屏_上嘴效果.mp4', thumb: 'https://picsum.photos/seed/pv3/200/200', tag: '录屏' },
-        { id: 'pm15', name: '录屏_持久测试.mp4', thumb: 'https://picsum.photos/seed/pv4/200/200', tag: '录屏' },
+        { id: 'pm10', name: 'icon_色号展示.jpg', thumb: 'https://picsum.photos/seed/pi4/200/200', tag: 'icon', type: 'image' },
+        { id: 'pm11', name: '截图_试色_01.jpg', thumb: 'https://picsum.photos/seed/psc5/200/200', tag: '截图', type: 'image' },
+        { id: 'pm12', name: '截图_试色_02.jpg', thumb: 'https://picsum.photos/seed/psc6/200/200', tag: '截图', type: 'image' },
+        { id: 'pm13', name: '截图_包装.jpg',   thumb: 'https://picsum.photos/seed/psc7/200/200', tag: '截图', type: 'image' },
+        { id: 'pm14', name: '录屏_上嘴效果.mp4', thumb: 'https://picsum.photos/seed/pv3/200/200', tag: '录屏', type: 'video' },
+        { id: 'pm15', name: '录屏_持久测试.mp4', thumb: 'https://picsum.photos/seed/pv4/200/200', tag: '录屏', type: 'video' },
     ]},
     { id: 'prod4', name: '坚果能量棒', category: '食品', sku: 'SKU-4001', thumb: 'https://picsum.photos/seed/pico4/200/200', materials: [
-        { id: 'pm16', name: 'icon_产品图.jpg', thumb: 'https://picsum.photos/seed/pi5/200/200', tag: 'icon' },
-        { id: 'pm17', name: '截图_营养表.jpg', thumb: 'https://picsum.photos/seed/psc8/200/200', tag: '截图' },
-        { id: 'pm18', name: '录屏_拆包.mp4',  thumb: 'https://picsum.photos/seed/pv5/200/200', tag: '录屏' },
+        { id: 'pm16', name: 'icon_产品图.jpg', thumb: 'https://picsum.photos/seed/pi5/200/200', tag: 'icon', type: 'image' },
+        { id: 'pm17', name: '截图_营养表.jpg', thumb: 'https://picsum.photos/seed/psc8/200/200', tag: '截图', type: 'image' },
+        { id: 'pm18', name: '录屏_拆包.mp4',  thumb: 'https://picsum.photos/seed/pv5/200/200', tag: '录屏', type: 'video' },
     ]},
 ];
 
@@ -2467,36 +2722,273 @@ const FILTER_DEFAULT = `
     <select class="asset-filter-select" onchange="filterAssets()"><option value="">全部CP</option><option value="cp1">CP-01</option><option value="cp2">CP-02</option><option value="cp3">CP-03</option></select>
     <select class="asset-filter-select" onchange="filterAssets()"><option value="">全部比例</option><option value="1:1">1:1</option><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="4:3">4:3</option><option value="3:4">3:4</option></select>`;
 
-const FILTER_TASK = `
-    <select class="asset-filter-select" onchange="onDateRangeChange(this)"><option value="">创建时间</option><option value="7d">近7天</option><option value="30d">近30天</option><option value="90d">近90天</option><option value="custom">自定义…</option></select>
-    <span class="date-range-custom"><input type="date" class="date-input" oninput="filterAssets()"><span class="date-range-sep">—</span><input type="date" class="date-input" oninput="filterAssets()"></span>
-    <select class="asset-filter-select" onchange="filterAssets()"><option value="">全部任务类型</option><option value="img">图片生成</option><option value="vid">视频生成</option></select>`;
-
 const FILTER_PRODUCT = `
-    <select class="asset-filter-select" onchange="filterAssets()"><option value="">全部品类</option><option value="skincare">护肤</option><option value="makeup">彩妆</option><option value="food">食品</option><option value="digital">数码</option></select>
-    <select class="asset-filter-select" onchange="filterAssets()"><option value="">全部产品</option><option value="prod1">水光精华露</option><option value="prod2">玻尿酸面膜</option><option value="prod3">持久哑光唇釉</option><option value="prod4">坚果能量棒</option></select>`;
+    <select class="asset-filter-select" onchange="setAssetProductCategory(this.value)"><option value="">全部品类</option><option value="护肤">护肤</option><option value="彩妆">彩妆</option><option value="食品">食品</option></select>
+    <select class="asset-filter-select" onchange="setAssetProductId(this.value)"><option value="">全部产品</option><option value="prod1">水光精华露</option><option value="prod2">玻尿酸面膜</option><option value="prod3">持久哑光唇釉</option><option value="prod4">坚果能量棒</option></select>`;
 
 let assetSelected = new Set();
 let assetSelectedMap = new Map(); // id → { thumb, name }
-let assetCurrentCat = '素材库';
+let assetCurrentCat = '原料库';
+let assetCurrentType = 'image';
+let assetCurrentMaterialCategory = 'actor';
+let assetOwnerScope = 'mine';
+let assetTagSelections = {};
+let assetTagPanelOpen = false;
+let assetTagQuery = '';
+let assetTagDraft = {};
+let assetTagDialogGroupId = '';
+let assetSearchQuery = '';
+let assetTaskStatus = 'all';
+let assetProductCategory = '';
+let assetProductId = '';
+
+function assetModalTitle(cat) {
+    if (cat === '产品物料') return '选择产品物料';
+    if (cat === '我的任务') return '选择我的任务';
+    return '选择原料库';
+}
+
+function selectableReferenceTypes() {
+    if (SHARED_MATERIAL_LIBRARY.selectableTypes) return SHARED_MATERIAL_LIBRARY.selectableTypes();
+    return (SHARED_MATERIAL_LIBRARY.materialTypes || []).filter(item => ['image', 'video', 'copy'].includes(item.format));
+}
+
+function selectableMaterialCategories() {
+    if (SHARED_MATERIAL_LIBRARY.pickerCategories) return SHARED_MATERIAL_LIBRARY.pickerCategories(assetCurrentType);
+    return [{ key:'actor', label:'演员', tagGroup:'actor' }];
+}
+
+function typeCount(type) {
+    return (MOCK_ASSETS['原料库'] || []).filter(item => (
+        item.type === assetCurrentType
+        && item.materialType === type
+        && (!SHARED_MATERIAL_LIBRARY.matchOwnership || SHARED_MATERIAL_LIBRARY.matchOwnership(item, assetOwnerScope))
+    )).length;
+}
+
+function renderAssetTypeList() {
+    const list = document.getElementById('assetTypeList');
+    const section = document.getElementById('assetTypeSection');
+    if (section) section.style.display = assetCurrentCat === '原料库' ? '' : 'none';
+    if (!list) return;
+    const categories = selectableMaterialCategories();
+    if (!categories.some(item => item.key === assetCurrentMaterialCategory)) {
+        assetCurrentMaterialCategory = categories[0]?.key || '';
+    }
+    list.innerHTML = categories.map(item => `
+        <div class="asset-sidebar-item${assetCurrentMaterialCategory === item.key ? ' active' : ''}" data-material-category="${refAttr(item.key)}" onclick="selectMaterialCategory('${refAttr(item.key)}')">
+            <span>${refAttr(item.label)}</span><span class="asset-sidebar-count">${typeCount(item.key)}</span>
+        </div>`).join('');
+}
+
+function selectMaterialCategory(category) {
+    assetCurrentMaterialCategory = category;
+    assetTagSelections = {};
+    assetTagPanelOpen = false;
+    assetTagQuery = '';
+    renderAssetTypeList();
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function setAssetOwnerScope(scope) {
+    assetOwnerScope = scope;
+    renderAssetTypeList();
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function toggleAssetTag(groupId, tag, multiple) {
+    const current = new Set(assetTagSelections[groupId] || []);
+    if (current.has(tag)) current.delete(tag);
+    else if (multiple) current.add(tag);
+    else {
+        current.clear();
+        current.add(tag);
+    }
+    assetTagSelections[groupId] = Array.from(current);
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function clearAssetTags() {
+    assetTagSelections = {};
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function assetTagGroups() {
+    return SHARED_MATERIAL_LIBRARY.groupsForType
+        ? SHARED_MATERIAL_LIBRARY.groupsForType(assetCurrentMaterialCategory)
+        : (SHARED_MATERIAL_LIBRARY.tagGroups?.[assetCurrentMaterialCategory] || []);
+}
+
+function openAssetTagDialog() {
+    const groups = assetTagGroups();
+    assetTagDraft = JSON.parse(JSON.stringify(assetTagSelections || {}));
+    assetTagDialogGroupId = groups[0]?.id || '';
+    renderAssetTagDialog();
+    document.getElementById('assetTagDialogMask').classList.add('show');
+}
+
+function renderAssetTagDialog() {
+    const groups = assetTagGroups();
+    const activeGroup = groups.find(group => group.id === assetTagDialogGroupId) || groups[0];
+    if (activeGroup) assetTagDialogGroupId = activeGroup.id;
+    document.getElementById('assetTagDialogGroups').innerHTML = groups.map(group => {
+        const count = (assetTagDraft[group.id] || []).length;
+        return `<button class="asset-tag-dialog-group${group.id === assetTagDialogGroupId ? ' active' : ''}" type="button" onclick="setAssetTagDialogGroup(decodeURIComponent('${encodeURIComponent(group.id)}'))"><span>${refAttr(group.name)}</span><span>${count || ''}</span></button>`;
+    }).join('');
+    document.getElementById('assetTagDialogOptions').innerHTML = activeGroup
+        ? `<div class="asset-tag-group-head">${refAttr(activeGroup.name)}<span>${activeGroup.multiple ? '多选' : '单选'}</span></div><div class="asset-tag-dialog-options">${(activeGroup.tags || []).map(tag => {
+            const active = (assetTagDraft[activeGroup.id] || []).includes(tag);
+            return `<button class="asset-tag-option${activeGroup.multiple ? '' : ' single'}${active ? ' active' : ''}" type="button" onclick="toggleAssetTagDraft(decodeURIComponent('${encodeURIComponent(activeGroup.id)}'),decodeURIComponent('${encodeURIComponent(tag)}'))"><span class="asset-tag-check">${active ? '✓' : ''}</span><span>${refAttr(tag)}</span></button>`;
+        }).join('')}</div>`
+        : '<div class="asset-list-empty">当前分类暂无标签分组</div>';
+    const selected = groups.flatMap(group => (assetTagDraft[group.id] || []).map(tag => ({ groupId:group.id, tag })));
+    document.getElementById('assetTagDialogSelected').innerHTML = selected.length
+        ? selected.map(item => `<span class="asset-tag-applied-item">${refAttr(item.tag)}<button type="button" onclick="toggleAssetTagDraft(decodeURIComponent('${encodeURIComponent(item.groupId)}'),decodeURIComponent('${encodeURIComponent(item.tag)}'))">×</button></span>`).join('')
+        : '<span class="asset-tag-dialog-selected-title">暂未选择标签</span>';
+}
+
+function setAssetTagDialogGroup(groupId) {
+    assetTagDialogGroupId = groupId;
+    renderAssetTagDialog();
+}
+
+function toggleAssetTagDraft(groupId, tag) {
+    const group = assetTagGroups().find(item => item.id === groupId);
+    const current = new Set(assetTagDraft[groupId] || []);
+    if (current.has(tag)) current.delete(tag);
+    else if (group?.multiple) current.add(tag);
+    else { current.clear(); current.add(tag); }
+    assetTagDraft[groupId] = Array.from(current);
+    renderAssetTagDialog();
+}
+
+function clearAssetTagDraft() {
+    assetTagDraft = {};
+    renderAssetTagDialog();
+}
+
+function cancelAssetTagDialog() {
+    document.getElementById('assetTagDialogMask').classList.remove('show');
+}
+
+function confirmAssetTagDialog() {
+    assetTagSelections = JSON.parse(JSON.stringify(assetTagDraft));
+    cancelAssetTagDialog();
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function removeAppliedAssetTag(groupId, tag) {
+    assetTagSelections[groupId] = (assetTagSelections[groupId] || []).filter(item => item !== tag);
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function onAssetSearch(value) {
+    assetSearchQuery = value;
+    filterAssets();
+}
+
+function renderReferenceFilters() {
+    const groups = SHARED_MATERIAL_LIBRARY.groupsForType
+        ? SHARED_MATERIAL_LIBRARY.groupsForType(assetCurrentMaterialCategory)
+        : (SHARED_MATERIAL_LIBRARY.tagGroups?.[assetCurrentMaterialCategory] || []);
+    const hasTags = Object.values(assetTagSelections).some(items => items.length);
+    const selectedCount = Object.values(assetTagSelections).reduce((sum, items) => sum + (items || []).length, 0);
+    const appliedTags = groups.flatMap(group => (assetTagSelections[group.id] || []).map(tag => ({ groupId:group.id, tag })));
+    return `
+        <div class="asset-filter-row asset-filter-row-main">
+            <span class="asset-filter-label">创建者</span>
+            <div class="asset-scope-group">
+                <button type="button" class="asset-scope-btn${assetOwnerScope === 'mine' ? ' active' : ''}" onclick="setAssetOwnerScope('mine')">我的</button>
+                <button type="button" class="asset-scope-btn${assetOwnerScope === 'all' ? ' active' : ''}" onclick="setAssetOwnerScope('all')">全部</button>
+            </div>
+            <input class="asset-search" id="assetSearchInput" value="${refAttr(assetSearchQuery)}" placeholder="搜索名称、内容、人员、来源" oninput="onAssetSearch(this.value)">
+        </div>
+        <div class="asset-filter-row">
+            <span class="asset-filter-label">标签</span>
+            <button class="asset-tag-trigger-btn" type="button" onclick="openAssetTagDialog()"><span>标签筛选</span><span>${selectedCount ? `已选 ${selectedCount} 项` : '请选择标签'}</span></button>
+            <div class="asset-tag-applied">${appliedTags.map(item => `<span class="asset-tag-applied-item">${refAttr(item.tag)}<button type="button" aria-label="移除${refAttr(item.tag)}" onclick="removeAppliedAssetTag(decodeURIComponent('${encodeURIComponent(item.groupId)}'),decodeURIComponent('${encodeURIComponent(item.tag)}'))">×</button></span>`).join('')}</div>
+        </div>`;
+}
+
+function filterAssetTagOptions(input) {
+    const q = input.value.trim().toLowerCase();
+    assetTagQuery = q;
+    input.parentElement.querySelectorAll('.asset-tag-group').forEach(group => {
+        const groupText = group.querySelector('.asset-tag-group-head').textContent.toLowerCase();
+        let visible = false;
+        group.querySelectorAll('.asset-tag-option').forEach(option => {
+            const show = !q || groupText.includes(q) || option.dataset.tagText.includes(q);
+            option.style.display = show ? '' : 'none';
+            visible = visible || show;
+        });
+        group.style.display = visible ? '' : 'none';
+    });
+}
+
+function setAssetTagPanelOpen(open) {
+    assetTagPanelOpen = open;
+}
 
 function renderFilterBar() {
     const bar = document.getElementById('assetFilterBar');
-    const searchBox = `<input class="asset-search" id="assetSearchInput" placeholder="输入名称进行搜索…" oninput="filterAssets()" style="flex:0 0 180px">`;
-    if (assetCurrentCat === '我的任务') bar.innerHTML = searchBox + FILTER_TASK;
-    else if (assetCurrentCat === '产品物料') bar.innerHTML = searchBox + FILTER_PRODUCT;
+    const searchBox = `<input class="asset-search" id="assetSearchInput" value="${refAttr(assetSearchQuery)}" placeholder="输入名称进行搜索…" oninput="onAssetSearch(this.value)">`;
+    if (assetCurrentCat === '原料库') bar.innerHTML = renderReferenceFilters();
+    else if (assetCurrentCat === '我的任务') {
+        bar.innerHTML = `<div class="asset-filter-row asset-filter-row-main">
+            ${searchBox}
+            <select class="asset-filter-select" onchange="setAssetTaskStatus(this.value)">
+                <option value="all"${assetTaskStatus === 'all' ? ' selected' : ''}>全部状态</option>
+                <option value="已完成"${assetTaskStatus === '已完成' ? ' selected' : ''}>已完成</option>
+                <option value="生成中"${assetTaskStatus === '生成中' ? ' selected' : ''}>生成中</option>
+            </select>
+        </div>`;
+    }
+    else if (assetCurrentCat === '产品物料') bar.innerHTML = `<div class="asset-filter-row asset-filter-row-main">${searchBox}${FILTER_PRODUCT}</div>`;
     else bar.innerHTML = searchBox + FILTER_DEFAULT;
+}
+
+function setAssetTaskStatus(status) {
+    assetTaskStatus = status || 'all';
+    renderTaskList();
+}
+
+function setAssetProductCategory(category) {
+    assetProductCategory = category;
+    renderProductList();
+}
+
+function setAssetProductId(id) {
+    assetProductId = id;
+    renderProductList();
 }
 
 function openAssetModal(cat) {
     document.getElementById('uploadDropdown').classList.remove('show');
     assetCurrentCat = cat;
+    assetCurrentType = curType === 'chat' ? 'copy' : curType;
+    if (!selectableReferenceTypes().some(item => item.key === assetCurrentType)) assetCurrentType = 'image';
+    assetCurrentMaterialCategory = selectableMaterialCategories()[0]?.key || '';
+    assetOwnerScope = 'mine';
+    assetTagSelections = {};
+    assetTagPanelOpen = false;
+    assetTagQuery = '';
+    assetSearchQuery = '';
+    assetTaskStatus = 'all';
+    assetProductCategory = '';
+    assetProductId = '';
     assetSelected.clear();
     assetSelectedMap.clear();
-    document.getElementById('assetModalTitle').textContent = cat === '我的任务' ? '我的任务' : '选择' + cat.replace('库', '');
+    document.getElementById('assetModalTitle').textContent = assetModalTitle(cat);
     document.querySelectorAll('.asset-sidebar-item').forEach(el => {
         el.classList.toggle('active', el.dataset.cat === cat);
     });
+    renderAssetTypeList();
     renderFilterBar();
     renderAssetContent();
     updateAssetFooter();
@@ -2513,7 +3005,14 @@ function switchAssetCat(el) {
     document.querySelectorAll('.asset-sidebar-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
     assetCurrentCat = el.dataset.cat;
-    document.getElementById('assetModalTitle').textContent = assetCurrentCat === '我的任务' ? '我的任务' : '选择' + assetCurrentCat.replace('库', '');
+    assetCurrentMaterialCategory = selectableMaterialCategories()[0]?.key || '';
+    assetTagSelections = {};
+    assetSearchQuery = '';
+    assetTaskStatus = 'all';
+    assetProductCategory = '';
+    assetProductId = '';
+    document.getElementById('assetModalTitle').textContent = assetModalTitle(assetCurrentCat);
+    renderAssetTypeList();
     renderFilterBar();
     backToTaskList();
     renderAssetContent();
@@ -2523,8 +3022,11 @@ function switchAssetCat(el) {
 function renderAssetContent() {
     document.getElementById('taskDetail').classList.remove('show');
     if (assetCurrentCat === '我的任务') {
-        document.getElementById('assetGridWrap').style.display = 'none';
+        document.getElementById('assetGridWrap').style.display = '';
         renderTaskList();
+    } else if (assetCurrentCat === '原料库') {
+        document.getElementById('assetGridWrap').style.display = '';
+        renderAssetGrid();
     } else if (assetCurrentCat === '产品物料') {
         document.getElementById('assetGridWrap').style.display = 'none';
         renderProductList();
@@ -2536,33 +3038,71 @@ function renderAssetContent() {
 
 function renderTaskList() {
     const wrap = document.getElementById('assetGridWrap');
+    const grid = document.getElementById('assetGrid');
     wrap.style.display = '';
-    const statusLabel = { done: '已完成', running: '生成中', failed: '失败' };
-    wrap.innerHTML = `<div class="task-list">${MOCK_TASKS.map(t => `
+    grid.className = 'task-list';
+    const query = assetSearchQuery.trim().toLowerCase();
+    const tasks = (SHARED_MATERIAL_LIBRARY.tasks || []).filter(task => {
+        const results = taskResultsForCurrentType(task);
+        if (!results.length) return false;
+        if (assetTaskStatus !== 'all' && task.status !== assetTaskStatus) return false;
+        if (!query) return true;
+        return [task.name, task.createdAt, task.status, ...results.map(item => item.name)].join(' ').toLowerCase().includes(query);
+    }).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+    if (!tasks.length) {
+        grid.innerHTML = '<div class="asset-list-empty">没有匹配的任务</div>';
+        return;
+    }
+    grid.innerHTML = tasks.map(t => {
+        const results = taskResultsForCurrentType(t);
+        const statusKey = t.status === '已完成' ? 'done' : t.status === '生成中' ? 'running' : 'failed';
+        return `
         <div class="task-row" onclick="openTaskDetail('${t.id}')">
-            <div class="task-row-icon ${t.status}">
-                ${t.status === 'done' ? '✓' : t.status === 'running' ? '⟳' : '✕'}
+            <div class="task-row-icon ${statusKey}">
+                ${statusKey === 'done' ? '✓' : statusKey === 'running' ? '⟳' : '✕'}
             </div>
             <div class="task-row-body">
                 <div class="task-row-title">${t.name}</div>
                 <div class="task-row-meta">
-                    <span>${t.type}</span>
-                    <span>${t.time}</span>
-                    <span>${t.count} 张</span>
+                    <span>${t.createdAt || ''}</span>
+                    <span>${results.length} 个${SHARED_MATERIAL_LIBRARY.typeLabel(assetCurrentType)}结果</span>
                 </div>
             </div>
-            <span class="task-row-status ${t.status}">${statusLabel[t.status]}</span>
+            <span class="task-row-status ${statusKey}">${t.status || ''}</span>
             <span class="task-row-arrow">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </span>
         </div>
-    `).join('')}</div>`;
+    `; }).join('');
+}
+
+function taskResultsForCurrentType(task) {
+    return (task?.results || []).filter(item => item.type === assetCurrentType).map(item => normalizeAssetItem(item, '我的任务'));
+}
+
+function productMaterialsForCurrentType(product) {
+    return (product?.materials || []).filter(item => item.type === assetCurrentType);
 }
 
 function renderProductList() {
     const wrap = document.getElementById('assetGridWrap');
+    const grid = document.getElementById('assetGrid');
     wrap.style.display = '';
-    wrap.innerHTML = `<div class="task-list">${MOCK_PRODUCTS.map(p => `
+    grid.className = 'task-list';
+    const query = assetSearchQuery.trim().toLowerCase();
+    const products = MOCK_PRODUCTS.filter(product => {
+        const materials = productMaterialsForCurrentType(product);
+        if (!materials.length) return false;
+        if (assetProductCategory && product.category !== assetProductCategory) return false;
+        if (assetProductId && product.id !== assetProductId) return false;
+        if (!query) return true;
+        return [product.name, product.category, product.sku, ...materials.map(item => item.name)].join(' ').toLowerCase().includes(query);
+    });
+    if (!products.length) {
+        grid.innerHTML = '<div class="asset-list-empty">没有匹配的产品物料</div>';
+        return;
+    }
+    grid.innerHTML = products.map(p => `
         <div class="task-row" onclick="openProductDetail('${p.id}')">
             <div style="width:40px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;background:#f0f0f0">
                 <img src="${p.thumb}" style="width:100%;height:100%;object-fit:cover;display:block" alt="">
@@ -2572,25 +3112,26 @@ function renderProductList() {
                 <div class="task-row-meta">
                     <span>${p.category}</span>
                     <span>${p.sku}</span>
-                    <span>${p.materials.length} 个物料</span>
+                    <span>${productMaterialsForCurrentType(p).length} 个${SHARED_MATERIAL_LIBRARY.typeLabel(assetCurrentType)}物料</span>
                 </div>
             </div>
             <span class="task-row-arrow">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             </span>
         </div>
-    `).join('')}</div>`;
+    `).join('');
 }
 
 function openProductDetail(prodId) {
     const prod = MOCK_PRODUCTS.find(p => p.id === prodId);
-    if (!prod || !prod.materials.length) return;
+    const materials = productMaterialsForCurrentType(prod);
+    if (!prod || !materials.length) return;
     document.getElementById('assetGridWrap').style.display = 'none';
     document.getElementById('assetFilterBar').style.display = 'none';
     document.getElementById('taskDetailName').textContent = prod.name;
     const grid = document.getElementById('taskDetailGrid');
-    grid.innerHTML = prod.materials.map(a => `
-        <div class="asset-card${assetSelected.has(a.id) ? ' selected' : ''}" data-id="${a.id}" onclick="toggleAssetCard(event,'${a.id}','${a.thumb}','${a.name}')">
+    grid.innerHTML = materials.map(a => `
+        <div class="asset-card${assetSelected.has(a.id) ? ' selected' : ''}" data-id="${a.id}" onclick="toggleAssetCard(event,'${a.id}','${a.thumb}','${a.name}','${a.type || 'image'}')">
             <div class="asset-card-thumb">
                 <img src="${a.thumb}" alt="${a.name}" loading="lazy">
                 <div class="asset-card-overlay">
@@ -2600,31 +3141,33 @@ function openProductDetail(prodId) {
                 </div>
                 <div class="asset-card-check"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <div class="asset-card-name" title="${a.name}"><span style="color:#1677ff;font-size:11px;margin-right:3px">${a.tag}</span>${a.name}</div>
+            <div class="asset-card-name" title="${a.name}"><span style="color:#4A9EFF;font-size:11px;margin-right:3px">${a.tag}</span>${a.name}</div>
         </div>
     `).join('');
     document.getElementById('taskDetail').classList.add('show');
 }
 
 function openTaskDetail(taskId) {
-    const task = MOCK_TASKS.find(t => t.id === taskId);
-    if (!task || !task.thumbs.length) return;
+    const task = (SHARED_MATERIAL_LIBRARY.tasks || []).find(t => t.id === taskId);
+    const results = taskResultsForCurrentType(task);
+    if (!task || !results.length) return;
     document.getElementById('assetGridWrap').style.display = 'none';
     document.getElementById('assetFilterBar').style.display = 'none';
     document.getElementById('taskDetailName').textContent = task.name;
     const grid = document.getElementById('taskDetailGrid');
-    grid.innerHTML = task.thumbs.map(a => `
-        <div class="asset-card${assetSelected.has(a.id) ? ' selected' : ''}" data-id="${a.id}" onclick="toggleAssetCard(event,'${a.id}','${a.thumb}','${a.name}')">
+    grid.innerHTML = results.map(a => `
+        <div class="asset-card${assetSelected.has(a.id) ? ' selected' : ''}" data-id="${a.id}" onclick="toggleAssetCard(event,'${a.id}')">
             <div class="asset-card-thumb">
-                <img src="${a.thumb}" alt="${a.name}" loading="lazy">
+                ${assetMediaHtml(a)}
                 <div class="asset-card-overlay">
-                    <div class="asset-card-preview-btn" onclick="event.stopPropagation();showAssetPreview('${a.thumb}')">
+                    <div class="asset-card-preview-btn" onclick="event.stopPropagation();showAssetPreviewById('${a.id}')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </div>
                 </div>
                 <div class="asset-card-check"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <div class="asset-card-name" title="${a.name}">${a.name}</div>
+            ${a.type === 'copy' ? '' : `<div class="asset-card-name" title="${refAttr(a.name)}">${refAttr(a.name)}</div>`}
+            <div class="asset-card-tags">${refAttr(assetTagLine(a))}</div>
         </div>
     `).join('');
     document.getElementById('taskDetail').classList.add('show');
@@ -2634,38 +3177,105 @@ function backToTaskList() {
     document.getElementById('taskDetail').classList.remove('show');
     document.getElementById('assetFilterBar').style.display = '';
     if (assetCurrentCat === '我的任务') renderTaskList();
+    else if (assetCurrentCat === '原料库') renderAssetGrid();
     else if (assetCurrentCat === '产品物料') renderProductList();
     else document.getElementById('assetGridWrap').style.display = '';
 }
 
+function getAssetById(id) {
+    const pools = [MOCK_ASSETS[assetCurrentCat] || [], MOCK_ASSETS['原料库'] || [], MOCK_ASSETS['我的任务'] || []];
+    for (const pool of pools) {
+        const found = pool.find(item => item.id === id);
+        if (found) return found;
+    }
+    for (const task of (SHARED_MATERIAL_LIBRARY.tasks || [])) {
+        const found = (task.results || []).find(item => item.id === id);
+        if (found) return normalizeAssetItem(found, '我的任务');
+    }
+    for (const product of MOCK_PRODUCTS) {
+        const found = product.materials.find(item => item.id === id);
+        if (found) return normalizeAssetItem(found, '产品物料');
+    }
+    return null;
+}
+
+function getVisibleAssetItems() {
+    const items = MOCK_ASSETS[assetCurrentCat] || [];
+    const q = assetSearchQuery.trim().toLowerCase();
+    return items.filter(item => {
+        if (item.type !== assetCurrentType) return false;
+        if (assetCurrentCat === '原料库' && item.materialType !== assetCurrentMaterialCategory) return false;
+        if (SHARED_MATERIAL_LIBRARY.matchOwnership && !SHARED_MATERIAL_LIBRARY.matchOwnership(item, assetOwnerScope)) return false;
+        if (SHARED_MATERIAL_LIBRARY.matchTagSelections && !SHARED_MATERIAL_LIBRARY.matchTagSelections(item, assetTagSelections)) return false;
+        if (!q) return true;
+        const text = [item.name, item.format, item.source, item.owner, item.content || '', (item.tags || []).join(' ')].join(' ').toLowerCase();
+        return text.includes(q);
+    });
+}
+
+function assetMediaHtml(a) {
+    if (a.type === 'copy') {
+        return `<div class="asset-copy-thumb">${refAttr(a.content || a.name)}</div>`;
+    }
+    const rawFileName = /\.[a-z0-9]+$/i.test(a.name || '')
+        ? a.name
+        : `${a.name || '原料'}.${a.type === 'video' ? 'mp4' : 'png'}`;
+    const fileLabel = assetCurrentCat === '原料库'
+        ? `<span class="asset-file-name" title="${refAttr(rawFileName)}">${refAttr(rawFileName)}</span>`
+        : '';
+    if (a.type === 'video') {
+        return `<img src="${refAttr(a.thumb || a.url)}" alt="${refAttr(a.name)}" loading="lazy">${fileLabel}<span class="asset-video-mark">▶</span>`;
+    }
+    return `<img src="${refAttr(a.thumb || a.url)}" alt="${refAttr(a.name)}" loading="lazy">${fileLabel}`;
+}
+
+function assetTagLine(a) {
+    const tags = (a.tags || []).slice(0, 3);
+    if (tags.length) return tags.join(' / ');
+    return a.source || '';
+}
+
 function renderAssetGrid() {
     const grid = document.getElementById('assetGrid');
-    const items = MOCK_ASSETS[assetCurrentCat] || [];
+    if (!grid) return;
+    grid.className = `asset-grid${assetCurrentType === 'copy' ? ' copy-mode' : ''}`;
+    const items = getVisibleAssetItems();
+    if (!items.length) {
+        grid.innerHTML = '<div class="asset-list-empty" style="grid-column:1/-1">没有匹配的内容</div>';
+        return;
+    }
     grid.innerHTML = items.map(a => `
-        <div class="asset-card${assetSelected.has(a.id) ? ' selected' : ''}" data-id="${a.id}" onclick="toggleAssetCard(event,'${a.id}','${a.thumb}','${a.name}')">
+        <div class="asset-card${assetSelected.has(a.id) ? ' selected' : ''}" data-id="${a.id}" onclick="toggleAssetCard(event,'${a.id}')">
             <div class="asset-card-thumb">
-                <img src="${a.thumb}" alt="${a.name}" loading="lazy">
+                ${assetMediaHtml(a)}
                 <div class="asset-card-overlay">
-                    <div class="asset-card-preview-btn" onclick="event.stopPropagation();showAssetPreview('${a.thumb}')">
+                    <div class="asset-card-preview-btn" onclick="event.stopPropagation();showAssetPreviewById('${a.id}')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     </div>
                 </div>
                 <div class="asset-card-check"><svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
-            <div class="asset-card-name" title="${a.name}">${a.name}</div>
+            ${a.type === 'copy' || assetCurrentCat === '原料库' ? '' : `<div class="asset-card-name" title="${refAttr(a.name)}">${refAttr(a.name)}</div>`}
+            <div class="asset-card-meta">
+                <span>${refAttr(a.createdAt || '')}</span>
+                <span class="asset-card-meta-dot">·</span><span>${refAttr(a.owner || '')}</span>
+                <span class="asset-card-meta-dot">·</span><span>${refAttr(a.source || '')}</span>
+            </div>
+            <div class="asset-card-tags" title="${refAttr(assetTagLine(a))}">${refAttr(assetTagLine(a))}</div>
         </div>
     `).join('');
 }
 
-function toggleAssetCard(e, id, thumb, name) {
+function toggleAssetCard(e, id, thumb, name, type) {
     const card = e.currentTarget;
     if (assetSelected.has(id)) {
         assetSelected.delete(id);
         assetSelectedMap.delete(id);
         card.classList.remove('selected');
     } else {
+        const item = getAssetById(id) || normalizeAssetItem({ id, thumb, name, type }, assetCurrentCat);
         assetSelected.add(id);
-        assetSelectedMap.set(id, { thumb, name });
+        assetSelectedMap.set(id, item);
         card.classList.add('selected');
     }
     updateAssetFooter();
@@ -2691,11 +3301,18 @@ function updateSelectionPanel() {
     modal.classList.add('has-selection');
     document.getElementById('selPanelCount').textContent = items.length;
     grid.innerHTML = items.map(([id, a]) => `
-        <div class="sel-panel-item" onclick="showAssetPreview('${a.thumb}')">
-            <img src="${a.thumb}" alt="${a.name}">
-            <div class="sel-panel-del" onclick="event.stopPropagation();removeSelItem('${id}')">✕</div>
+        <div class="sel-panel-item" onclick="showAssetPreviewById('${id}')">
+            <div class="sel-panel-preview">${selectedPanelMediaHtml(a)}</div>
+            <div class="sel-panel-name" title="${refAttr(a.type === 'copy' ? (a.content || a.name) : a.name)}">${refAttr(a.type === 'copy' ? (a.content || a.name) : a.name)}</div>
+            <button class="sel-panel-del" type="button" aria-label="移除${refAttr(a.name)}" onclick="event.stopPropagation();removeSelItem('${id}')">×</button>
         </div>
     `).join('');
+}
+
+function selectedPanelMediaHtml(a) {
+    if (a.type === 'copy') return '<div class="sel-panel-copy">文案</div>';
+    if (a.type === 'video') return '<img src="' + refAttr(a.thumb || a.url) + '" alt="' + refAttr(a.name) + '">';
+    return '<img src="' + refAttr(a.thumb || a.url) + '" alt="' + refAttr(a.name) + '">';
 }
 
 function removeSelItem(id) {
@@ -2715,19 +3332,51 @@ function clearAllSelected() {
 }
 
 function confirmAssetSelect() {
-    const items = MOCK_ASSETS[assetCurrentCat] || [];
-    items.forEach(a => { if (assetSelected.has(a.id)) addRefFromAsset(a); });
-    MOCK_TASKS.forEach(t => t.thumbs.forEach(a => { if (assetSelected.has(a.id)) addRefFromAsset(a); }));
-    MOCK_PRODUCTS.forEach(p => p.materials.forEach(a => { if (assetSelected.has(a.id)) addRefFromAsset(a); }));
+    const selectedItems = Array.from(assetSelectedMap.values());
+    let copyCount = 0;
+    let mediaCount = 0;
+    selectedItems.forEach(a => {
+        if (a.type === 'copy') {
+            appendCopyToPrompt(a.content || a.name);
+            copyCount += 1;
+        } else {
+            addRefFromAsset(a);
+            mediaCount += 1;
+        }
+    });
     closeAssetModal();
+    if (copyCount && mediaCount) showToast(`已添加 ${mediaCount} 个参考素材，插入 ${copyCount} 条文案`);
+    else if (copyCount) showToast(`已插入 ${copyCount} 条文案`);
+    else showToast(`已添加 ${mediaCount} 个参考素材`);
 }
 
 function showAssetPreview(src) {
-    document.getElementById('assetPreviewImg').src = src;
+    const stage = document.getElementById('assetPreviewStage');
+    stage.innerHTML = `<img class="asset-preview-img" src="${refAttr(src)}" alt="">`;
+    document.getElementById('assetPreviewMask').classList.add('show');
+}
+function showAssetPreviewById(id) {
+    const item = getAssetById(id);
+    if (!item) return;
+    const stage = document.getElementById('assetPreviewStage');
+    if (item.type === 'copy') {
+        stage.innerHTML = `<div class="asset-preview-copy">${refAttr(item.content || item.name)}</div>`;
+    } else if (item.type === 'video') {
+        stage.innerHTML = `<video class="asset-preview-video" src="${refAttr(item.url)}" controls autoplay playsinline></video>`;
+    } else {
+        stage.innerHTML = `<img class="asset-preview-img" src="${refAttr(item.url || item.thumb)}" alt="${refAttr(item.name)}">`;
+    }
     document.getElementById('assetPreviewMask').classList.add('show');
 }
 function closeAssetPreview() {
     document.getElementById('assetPreviewMask').classList.remove('show');
+    document.getElementById('assetPreviewStage').innerHTML = '';
+}
+
+function appendCopyToPrompt(text) {
+    const current = getPromptText();
+    const next = current ? current + '\n\n' + text : text;
+    setPromptText(next);
 }
 
 function onDateRangeChange(sel) {
@@ -2737,9 +3386,11 @@ function onDateRangeChange(sel) {
 }
 
 function filterAssets() {
-    const q = (document.getElementById('assetSearchInput')?.value || '').trim();
+    const q = assetSearchQuery.trim();
     document.querySelector('.asset-modal').classList.toggle('searching', q.length > 0);
-    renderAssetGrid();
+    if (assetCurrentCat === '我的任务') renderTaskList();
+    else if (assetCurrentCat === '产品物料') renderProductList();
+    else renderAssetGrid();
 }
 
 // ── 提示词工具箱 ──
