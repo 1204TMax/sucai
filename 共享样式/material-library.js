@@ -40,9 +40,9 @@
     { key: 'image', label: '图片', format: 'image', formatLabel: '图片', system: true, enabled: true },
     { key: 'video', label: '视频', format: 'video', formatLabel: '视频', system: true, enabled: true },
     { key: 'copy', label: '文案', format: 'copy', formatLabel: '文本', system: true, enabled: true },
-    { key: 'actor', label: '演员库', format: 'image', formatLabel: '图片', system: true, enabled: false },
+    { key: 'actor', label: '演员', format: 'image', formatLabel: '图片', system: false, enabled: true },
     { key: 'script', label: '脚本库', format: 'copy', formatLabel: '文本', system: true, enabled: false },
-    { key: 'bgm', label: 'BGM', format: 'audio', formatLabel: '音频', system: true, enabled: false },
+    { key: 'bgm', label: 'BGM', format: 'audio', formatLabel: '音频', system: false, enabled: true },
     { key: 'sound', label: '音效', format: 'audio', formatLabel: '音频', system: true, enabled: false },
     { key: 'caption', label: '花字', format: 'image', formatLabel: '图片', system: true, enabled: false },
     { key: 'sticker', label: '贴纸', format: 'image', formatLabel: '图片', system: true, enabled: false }

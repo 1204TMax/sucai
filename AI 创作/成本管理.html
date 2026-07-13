@@ -204,6 +204,41 @@
       display: block;
     }
 
+    .date-custom {
+      display: none;
+      gap: var(--ant-size-xs);
+      padding: var(--ant-size-sm);
+      border-top: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .date-custom.show { display: grid; }
+
+    .date-custom-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 16px minmax(0, 1fr);
+      gap: var(--ant-size-xxs);
+      align-items: center;
+    }
+
+    .date-custom input {
+      min-width: 0;
+      height: 32px;
+      padding: 0 var(--ant-size-xs);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      color: var(--ant-text-color);
+      outline: none;
+    }
+
+    .date-custom input:focus {
+      border-color: var(--ant-primary-5);
+      box-shadow: 0 0 0 2px rgba(74,158,255,.14);
+    }
+
+    .date-custom-actions { display: flex; justify-content: flex-end; gap: var(--ant-size-xs); }
+    .date-custom-actions button { height: 30px; padding: 0 var(--ant-size-sm); border: 1px solid var(--ant-border-color); border-radius: var(--ant-border-radius); background: var(--ant-bg-container); color: var(--ant-text-color-secondary); cursor: pointer; }
+    .date-custom-actions .primary { border-color: var(--ant-primary-6); background: var(--ant-primary-6); color: #fff; }
+
     .date-option {
       display: flex;
       align-items: center;
@@ -930,12 +965,15 @@
       { key: 'month', label: '本月' },
       { key: 'lastMonth', label: '上月' },
       { key: 'halfYear', label: '半年' },
-      { key: 'year', label: '今年' }
+      { key: 'year', label: '今年' },
+      { key: 'custom', label: '自定义范围' }
     ];
 
     const state = {
       mode: 'user',
       dateKey: 'week',
+      dateStart: '',
+      dateEnd: '',
       selectedOrg: '发行平台',
       search: '',
       expanded: {
@@ -1021,6 +1059,13 @@
 
     function getDateSpan(key) {
       const today = cloneDate(new Date());
+      if (key === 'custom' && state.dateStart && state.dateEnd) {
+        const startParts = state.dateStart.split('-').map(Number);
+        const endParts = state.dateEnd.split('-').map(Number);
+        const start = new Date(startParts[0], startParts[1] - 1, startParts[2]);
+        const end = new Date(endParts[0], endParts[1] - 1, endParts[2]);
+        return { start, end, days: Math.round((end - start) / 86400000) + 1 };
+      }
       if (key === 'today') return { start: today, end: today, days: 1 };
       if (key === 'yesterday') {
         const yesterday = addDays(today, -1);
@@ -1066,13 +1111,17 @@
 
     function renderDateMenu() {
       const menu = document.getElementById('dateMenu');
+      menu.style.width = state.dateKey === 'custom' ? '360px' : '';
       menu.innerHTML = datePresets.map(function (preset) {
         const active = preset.key === state.dateKey ? ' active' : '';
-        return '<button class="date-option' + active + '" type="button" onclick="setDateKey(\'' + preset.key + '\')">'
+        return '<button class="date-option' + active + '" type="button" onclick="setDateKey(\'' + preset.key + '\', event)">'
           + '<span>' + preset.label + '</span>'
           + (active ? '<span>✓</span>' : '')
           + '</button>';
-      }).join('');
+      }).join('')
+        + '<div class="date-custom' + (state.dateKey === 'custom' ? ' show' : '') + '" onclick="event.stopPropagation()">'
+        + '<div class="date-custom-row"><input id="customDateStart" type="date" value="' + state.dateStart + '"><span>至</span><input id="customDateEnd" type="date" value="' + state.dateEnd + '"></div>'
+        + '<div class="date-custom-actions"><button type="button" onclick="closeDateMenu()">取消</button><button class="primary" type="button" onclick="applyCustomDate()">确定</button></div></div>';
     }
 
     function renderOrgTree() {
@@ -1237,8 +1286,31 @@
       document.getElementById('dateTrigger').classList.remove('open');
     }
 
-    function setDateKey(key) {
+    function setDateKey(key, event) {
+      if (event) event.stopPropagation();
       state.dateKey = key;
+      if (key === 'custom') {
+        if (!state.dateStart || !state.dateEnd) {
+          const today = cloneDate(new Date());
+          state.dateStart = formatDate(addDays(today, -6));
+          state.dateEnd = formatDate(today);
+        }
+        document.getElementById('dateMenu').style.width = '360px';
+        renderDateMenu();
+        return;
+      }
+      document.getElementById('dateMenu').style.width = '';
+      closeDateMenu();
+      render();
+    }
+
+    function applyCustomDate() {
+      const start = document.getElementById('customDateStart').value;
+      const end = document.getElementById('customDateEnd').value;
+      if (!start || !end || start > end) return;
+      state.dateStart = start;
+      state.dateEnd = end;
+      state.dateKey = 'custom';
       closeDateMenu();
       render();
     }
@@ -1246,6 +1318,8 @@
     function resetFilters() {
       state.mode = 'user';
       state.dateKey = 'week';
+      state.dateStart = '';
+      state.dateEnd = '';
       state.selectedOrg = '发行平台';
       state.search = '';
       state.expanded['发行平台'] = true;

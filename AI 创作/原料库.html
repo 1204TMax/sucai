@@ -200,6 +200,16 @@
       color: var(--ant-primary-7);
     }
 
+    .type-row { position: relative; display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; }
+    .type-row .type-item { width: 100%; }
+    .type-main { min-width: 0; display: flex; align-items: center; gap: var(--ant-size-xs); }
+    .type-format-icon { width: 18px; height: 18px; color: var(--ant-text-color-tertiary); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .type-format-icon svg { width: 16px; height: 16px; }
+    .type-row-actions { display: none; align-items: center; margin-left: -32px; margin-right: 6px; z-index: 1; }
+    .type-row:hover .type-row-actions, .type-row:focus-within .type-row-actions { display: flex; }
+    .type-row-actions button { width: 24px; height: 24px; padding: 0; border: 0; border-radius: var(--ant-border-radius-sm); background: var(--ant-bg-container); color: var(--ant-text-color-secondary); cursor: pointer; }
+    .type-row-actions button:hover { color: var(--ant-primary-6); background: var(--ant-primary-1); }
+
     .scope-item { min-height: 28px; border: 0; border-radius: var(--ant-border-radius-sm); }
     .scope-item:hover { color: var(--ant-primary-6); }
     .scope-item.active {
@@ -960,6 +970,11 @@
     }
 
     .empty.show { display: flex; }
+    .empty-content { max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: var(--ant-size-xs); }
+    .empty-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--ant-bg-secondary); color: var(--ant-text-color-tertiary); display: flex; align-items: center; justify-content: center; }
+    .empty-icon svg { width: 20px; height: 20px; }
+    .empty-title { color: var(--ant-text-color); font-weight: 600; }
+    .empty-desc { color: var(--ant-text-color-tertiary); font-size: var(--ant-font-size-sm); line-height: 1.5; }
 
     .mask {
       position: fixed;
@@ -1066,6 +1081,7 @@
 
     .upload-hint { color: var(--ant-text-color-tertiary); font-size: var(--ant-font-size-sm); }
     .upload-box input { display: none; }
+    .batch-rule { grid-column: 1 / -1; margin-top: calc(-1 * var(--ant-size-xs)); padding: var(--ant-size-xs) var(--ant-size-sm); border-radius: var(--ant-border-radius); background: var(--ant-primary-1); color: var(--ant-text-color-secondary); font-size: var(--ant-font-size-sm); line-height: 1.5; }
 
     .ai-tag-panel {
       padding: var(--ant-size-sm);
@@ -1152,7 +1168,7 @@
 
     .format-options {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: var(--ant-size-xs);
     }
 
@@ -1326,7 +1342,7 @@
             <span id="activeSummary"></span>
           </div>
           <div id="resultContainer"></div>
-          <div class="empty" id="empty">没有匹配的原料。</div>
+          <div class="empty" id="empty"></div>
         </section>
       </section>
     </main>
@@ -1350,7 +1366,7 @@
           </div>
           <div class="field full" id="contentField">
             <label for="materialContent">文案内容</label>
-            <textarea class="textarea" id="materialContent" placeholder="粘贴可复用文案"></textarea>
+            <textarea class="textarea" id="materialContent" placeholder="粘贴可复用文案；多条文案之间空一行，系统会识别并分别入库"></textarea>
           </div>
           <div class="field full" id="uploadField">
             <label for="materialFile">文件</label>
@@ -1358,9 +1374,10 @@
               <span class="upload-icon">+</span>
               <strong id="uploadMainText">点击或拖拽文件到此处上传</strong>
               <span class="upload-hint" id="uploadHint">支持当前类型对应的文件格式</span>
-              <input id="materialFile" type="file" onchange="handleMaterialFile(this)">
+              <input id="materialFile" type="file" multiple onchange="handleMaterialFile(this)">
             </label>
           </div>
+          <div class="batch-rule" id="batchRule">多个文件会按文件分别入库；多条文案按空行拆分。AI 会为每个原料分别识别标签，入库前可增删。</div>
           <div class="field">
             <label for="materialSource">入库来源</label>
             <input class="input" id="materialSource" placeholder="手动上传 / 手动录入">
@@ -1395,6 +1412,7 @@
             <label class="format-option"><input type="radio" name="newTypeFormat" value="copy" checked><span>文本</span></label>
             <label class="format-option"><input type="radio" name="newTypeFormat" value="image"><span>图片</span></label>
             <label class="format-option"><input type="radio" name="newTypeFormat" value="video"><span>视频</span></label>
+            <label class="format-option"><input type="radio" name="newTypeFormat" value="audio"><span>音频</span></label>
           </div>
           <span class="upload-hint">格式决定该类型的导入方式和预览方式，新增后不可修改。</span>
         </div>
@@ -1476,7 +1494,8 @@
     let aiTagState = 'idle';
     let aiTagTimer = null;
     let editingCopyId = '';
-    let uploadedFile = null;
+    let uploadedFiles = [];
+    let editingTypeKey = '';
     let activeTagGroupId = '';
     const workflowNames = ['爆款二创工作流', '演员裂变工作流', 'LibTV 批量生产工作流', '图片批量生成工作流'];
     materials.filter(item => item.source === '工作流').forEach((item, index) => {
@@ -1497,6 +1516,16 @@
 
     function typeConfig(type) {
       return typeOptions.find(item => item.key === type) || { key:type, label:type, format:'image', formatLabel:'图片' };
+    }
+
+    function formatIcon(format) {
+      const icons = {
+        image: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9" r="1.5"/><path d="m4 17 5-5 4 4 2-2 5 5"/></svg>',
+        video: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="14" height="14" rx="2"/><path d="m17 10 4-2v8l-4-2z"/></svg>',
+        copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6M9 7h3"/></svg>',
+        audio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 18V5l10-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="16" cy="16" r="3"/></svg>'
+      };
+      return icons[format] || icons.image;
     }
 
     function itemMaterialType(item) {
@@ -1541,8 +1570,9 @@
     function renderTypes() {
       document.getElementById('typeList').innerHTML = typeOptions.map(item => {
         const count = materials.filter(row => itemMaterialType(row) === item.key).length;
-        return '<button class="type-item' + (currentType === item.key ? ' active' : '') + '" type="button" onclick="setType(\'' + item.key + '\')">'
-          + '<span>' + item.label + '</span><span>' + count + '</span></button>';
+        return '<div class="type-row"><button class="type-item' + (currentType === item.key ? ' active' : '') + '" type="button" onclick="setType(\'' + item.key + '\')">'
+          + '<span class="type-main"><span class="type-format-icon" title="' + esc(item.formatLabel) + '">' + formatIcon(item.format) + '</span><span>' + esc(item.label) + '</span></span><span>' + count + '</span></button>'
+          + (!item.system ? '<span class="type-row-actions"><button type="button" title="编辑类型" aria-label="编辑' + esc(item.label) + '" onclick="event.stopPropagation();openTypeModal(\'' + item.key + '\')">...</button></span>' : '') + '</div>';
       }).join('');
     }
 
@@ -1671,7 +1701,23 @@
       document.getElementById('activeSummary').textContent = (currentScope === 'mine' ? '我的' : '全部') + ' / ' + typeLabel(currentType);
       document.getElementById('currentTypeText').textContent = typeLabel(currentType) + '原料';
       document.getElementById('currentTypeCount').textContent = '（' + materials.filter(item => itemMaterialType(item) === currentType).length + '）';
-      document.getElementById('empty').classList.toggle('show', list.length === 0);
+      const empty = document.getElementById('empty');
+      const hasAnyForType = materials.some(item => itemMaterialType(item) === currentType);
+      const hasFilters = currentScope === 'mine' || document.getElementById('sourceFilter').value !== '全部' || document.getElementById('keyword').value.trim() || Object.values(tagFilters).some(values => values && values.length);
+      empty.innerHTML = '<div class="empty-content"><span class="empty-icon">' + formatIcon(format) + '</span>'
+        + '<div class="empty-title">' + (hasAnyForType ? '没有符合条件的原料' : '还没有' + esc(typeLabel(currentType)) + '原料') + '</div>'
+        + '<div class="empty-desc">' + (hasAnyForType ? '调整创建者、来源、标签或关键词后再试。' : '导入后即可在通用生成和工作流中直接引用。') + '</div>'
+        + (hasAnyForType && hasFilters ? '<button class="btn" type="button" onclick="resetResultFilters()">清空筛选</button>' : '<button class="btn btn-primary" type="button" onclick="openCreateModal()">导入原料</button>') + '</div>';
+      empty.classList.toggle('show', list.length === 0);
+    }
+
+    function resetResultFilters() {
+      currentScope = 'all';
+      tagFilters = {};
+      document.getElementById('sourceFilter').value = '全部';
+      document.getElementById('workflowFilter').value = '';
+      document.getElementById('keyword').value = '';
+      render();
     }
 
     function render() {
@@ -1813,6 +1859,8 @@
 
     function openCreateModal() {
       const format = currentFormat();
+      document.getElementById('materialName').value = '';
+      document.getElementById('materialContent').value = '';
       document.getElementById('createTitle').textContent = '导入' + typeLabel(currentType) + '原料';
       document.getElementById('materialTypeText').value = typeLabel(currentType);
       document.getElementById('materialSource').value = '手动';
@@ -1821,7 +1869,8 @@
       document.getElementById('materialFile').accept = format === 'copy' ? '.txt,.md,.doc,.docx' : format === 'image' ? 'image/*' : format === 'audio' ? 'audio/*' : 'video/*';
       document.getElementById('materialFile').value = '';
       document.getElementById('uploadMainText').textContent = '点击或拖拽文件到此处上传';
-      uploadedFile = null;
+      document.getElementById('uploadHint').textContent = '支持当前类型对应的文件格式，可一次选择多个文件';
+      uploadedFiles = [];
       createTagSelections = {};
       createTagPickerOpen = false;
       document.getElementById('createMask').classList.add('show');
@@ -1829,7 +1878,7 @@
     }
 
     function handleMaterialFile(input) {
-      uploadedFile = input.files && input.files[0] ? input.files[0] : null;
+      uploadedFiles = input.files ? Array.from(input.files) : [];
       applyUploadedFile();
     }
 
@@ -1839,19 +1888,21 @@
 
     function handleMaterialDrop(event) {
       event.preventDefault();
-      uploadedFile = event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files[0] : null;
+      uploadedFiles = event.dataTransfer && event.dataTransfer.files ? Array.from(event.dataTransfer.files) : [];
       applyUploadedFile();
     }
 
     function applyUploadedFile() {
-      document.getElementById('uploadMainText').textContent = uploadedFile ? uploadedFile.name : '点击或拖拽文件到此处上传';
-      if (uploadedFile && !document.getElementById('materialName').value.trim()) {
-        document.getElementById('materialName').value = uploadedFile.name.replace(/\.[^.]+$/, '');
+      const firstFile = uploadedFiles[0];
+      document.getElementById('uploadMainText').textContent = uploadedFiles.length > 1 ? '已识别 ' + uploadedFiles.length + ' 个文件，将分别入库' : firstFile ? firstFile.name : '点击或拖拽文件到此处上传';
+      document.getElementById('uploadHint').textContent = uploadedFiles.length > 1 ? uploadedFiles.map(file => file.name).join('、') : '支持当前类型对应的文件格式，可一次选择多个文件';
+      if (firstFile && !document.getElementById('materialName').value.trim()) {
+        document.getElementById('materialName').value = firstFile.name.replace(/\.[^.]+$/, '');
       }
-      if (uploadedFile && currentFormat() === 'copy' && /\.(txt|md)$/i.test(uploadedFile.name)) {
+      if (firstFile && currentFormat() === 'copy' && /\.(txt|md)$/i.test(firstFile.name)) {
         const reader = new FileReader();
         reader.onload = () => { document.getElementById('materialContent').value = String(reader.result || ''); };
-        reader.readAsText(uploadedFile);
+        reader.readAsText(firstFile);
       }
     }
 
@@ -1863,39 +1914,53 @@
 
     function createMaterial() {
       const name = document.getElementById('materialName').value.trim();
-      if (!name) return showToast('请填写原料名称');
       const selectedTags = allSelectedTags(createTagSelections);
       if (!selectedTags.length) return showToast('请选择标签');
       const content = document.getElementById('materialContent').value.trim();
-      if (!uploadedFile && !content) return showToast('请上传文件');
       const format = currentFormat();
-      const url = uploadedFile && format !== 'copy' ? URL.createObjectURL(uploadedFile) : '';
-      materials.unshift({
-        id: 'mat-new-' + Date.now(),
-        name,
-        type: format,
-        materialType: currentType,
-        format: typeConfig(currentType).formatLabel,
-        content,
-        url,
-        thumb: url,
-        tags: selectedTags,
-        source: document.getElementById('materialSource').value.trim() || '手动',
-        owner: library.currentUser.name,
-        createdAt: '2026-07-10',
-        visibility: '全部',
-        downloads: 0,
-        references: 0,
-        status: '可用'
+      const copyParts = format === 'copy' ? content.split(/\n\s*\n+/).map(item => item.trim()).filter(Boolean) : [];
+      const candidates = format === 'copy'
+        ? copyParts.map((text, index) => ({ name: name || '文案 ' + (index + 1), content:text, file:null }))
+        : uploadedFiles.map(file => ({ name:file.name.replace(/\.[^.]+$/, ''), content:'', file }));
+      if (!candidates.length) return showToast(format === 'copy' ? '请输入文案内容' : '请上传文件');
+      if (candidates.length === 1 && !name && format !== 'copy') candidates[0].name = candidates[0].name || '未命名原料';
+      candidates.reverse().forEach((candidate, index) => {
+        const url = candidate.file ? URL.createObjectURL(candidate.file) : '';
+        materials.unshift({
+          id: 'mat-new-' + Date.now() + '-' + index,
+          name: candidates.length === 1 && name ? name : candidate.name,
+          fileName: candidate.file ? candidate.file.name : '',
+          type: format,
+          materialType: currentType,
+          format: typeConfig(currentType).formatLabel,
+          content: candidate.content,
+          url,
+          thumb: url,
+          tags: selectedTags.slice(),
+          source: document.getElementById('materialSource').value.trim() || '手动',
+          owner: library.currentUser.name,
+          createdAt: '2026-07-13',
+          visibility: '全部',
+          downloads: 0,
+          references: 0,
+          status: '可用'
+        });
       });
       closeCreateModal();
       render();
-      showToast('已保存');
+      showToast('已分别保存 ' + candidates.length + ' 个原料');
     }
 
-    function openTypeModal() {
-      document.getElementById('newTypeName').value = '';
-      document.querySelector('input[name="newTypeFormat"][value="copy"]').checked = true;
+    function openTypeModal(typeKey) {
+      editingTypeKey = typeKey || '';
+      const current = typeOptions.find(item => item.key === editingTypeKey);
+      document.getElementById('typeModalTitle').textContent = current ? '编辑类型' : '新增类型';
+      document.getElementById('newTypeName').value = current ? current.label : '';
+      document.querySelector('input[name="newTypeFormat"][value="' + (current ? current.format : 'copy') + '"]').checked = true;
+      document.querySelectorAll('input[name="newTypeFormat"]').forEach(input => input.disabled = Boolean(current));
+      const footer = document.querySelector('#typeMask .modal-foot');
+      footer.innerHTML = (current ? '<button class="btn" style="margin-right:auto;color:var(--ant-error-6)" type="button" onclick="deleteType()">删除类型</button>' : '')
+        + '<button class="btn" type="button" onclick="closeTypeModal()">取消</button><button class="btn btn-primary" type="button" onclick="createType()">确定</button>';
       document.getElementById('typeMask').classList.add('show');
     }
 
@@ -1906,10 +1971,17 @@
     function createType() {
       const name = document.getElementById('newTypeName').value.trim();
       if (!name) return showToast('请输入类型名称');
-      if (typeOptions.some(item => item.label === name)) return showToast('该类型已存在');
+      if (typeOptions.some(item => item.label === name && item.key !== editingTypeKey)) return showToast('该类型已存在');
+      if (editingTypeKey) {
+        const current = typeOptions.find(item => item.key === editingTypeKey);
+        if (current) current.label = name;
+        closeTypeModal();
+        render();
+        return showToast('已更新类型');
+      }
       const format = document.querySelector('input[name="newTypeFormat"]:checked').value;
       const key = 'custom-' + Date.now();
-      typeOptions.push({ key, label:name, format, formatLabel:format === 'copy' ? '文本' : format === 'video' ? '视频' : '图片', system:false });
+      typeOptions.push({ key, label:name, format, formatLabel:format === 'copy' ? '文本' : format === 'video' ? '视频' : format === 'audio' ? '音频' : '图片', system:false });
       tagGroups[key] = [];
       currentType = key;
       currentScope = 'mine';
@@ -1917,6 +1989,28 @@
       closeTypeModal();
       render();
       showToast('已新增类型');
+    }
+
+    function deleteType() {
+      const target = typeOptions.find(item => item.key === editingTypeKey);
+      if (!target || target.system) return;
+      const count = materials.filter(item => itemMaterialType(item) === editingTypeKey).length;
+      closeTypeModal();
+      openConfirmModal({
+        title: '删除“' + target.label + '”？',
+        description: count ? '该类型下的 ' + count + ' 个原料和对应标签将一起删除，删除后无法恢复。' : '该类型及其标签配置将被删除，删除后无法恢复。',
+        confirmText: '删除',
+        variant: 'danger',
+        onConfirm: function() {
+          materials = materials.filter(item => itemMaterialType(item) !== editingTypeKey);
+          typeOptions = typeOptions.filter(item => item.key !== editingTypeKey);
+          delete tagGroups[editingTypeKey];
+          currentType = typeOptions[0] ? typeOptions[0].key : '';
+          editingTypeKey = '';
+          render();
+          showToast('已删除类型');
+        }
+      });
     }
 
     function openTagManager() {

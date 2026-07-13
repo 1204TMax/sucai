@@ -959,8 +959,20 @@
             grid-column: 1 / -1;
             color: #8c8c8c;
             text-align: center;
+            min-height: 180px;
             padding: 32px;
+            border: 1px dashed #d9d9d9;
+            border-radius: 8px;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
+
+        .reference-empty strong { color: #262626; font-size: 14px; font-weight: 600; }
+        .reference-empty span { font-size: 12px; }
 
         .resolution-field {
             display: flex;
@@ -1952,15 +1964,13 @@
                             <div className="reference-source-section">
                                 <div className="reference-source-label">来源</div>
                                 {!referencePicker.lockSource && (
-                                    <>
-                                        <button className={`reference-source-item ${referencePicker.source === 'product' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('product')}>
-                                            <AppstoreOutlined /> <span>产品物料</span>
-                                        </button>
-                                        <button className={`reference-source-item ${referencePicker.source === 'task' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('task')}>
-                                            <FileDoneOutlined /> <span>我的任务</span>
-                                        </button>
-                                    </>
+                                    <button className={`reference-source-item ${referencePicker.source === 'product' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('product')}>
+                                        <AppstoreOutlined /> <span>产品物料</span>
+                                    </button>
                                 )}
+                                <button className={`reference-source-item ${referencePicker.source === 'task' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('task')}>
+                                    <FileDoneOutlined /> <span>我的任务</span>
+                                </button>
                                 <button className={`reference-source-item ${referencePicker.source === 'library' ? 'active' : ''}`} type="button" onClick={() => setReferenceSource('library')}>
                                     <DatabaseOutlined /> <span>原料库</span>
                                 </button>
@@ -2081,7 +2091,7 @@
                                     </button>
                                 ))}
                                 {!referenceProductList.length && (
-                                    <div className="reference-empty">没有匹配的产品物料</div>
+                                    <div className="reference-empty"><strong>没有匹配的产品物料</strong><span>调整搜索条件，或选择其他来源。</span></div>
                                 )}
                             </div>
                         ) : referencePicker.source === 'task' && !selectedReferenceTask ? (
@@ -2106,7 +2116,7 @@
                                     );
                                 })}
                                 {!referenceTaskList.length && (
-                                    <div className="reference-empty">没有匹配的任务</div>
+                                    <div className="reference-empty"><strong>没有匹配的任务</strong><span>仅展示包含当前字段所需内容的任务，请调整搜索或状态。</span></div>
                                 )}
                             </div>
                         ) : (
@@ -2144,7 +2154,7 @@
                                         </div>
                                     ))}
                                     {!referenceItems.length && (
-                                        <div className="reference-empty">没有可引用的内容</div>
+                                        <div className="reference-empty"><strong>没有可引用的内容</strong><span>调整创建者、标签或搜索条件后再试。</span></div>
                                     )}
                                 </div>
                             </>

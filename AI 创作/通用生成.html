@@ -3050,7 +3050,7 @@ function renderTaskList() {
         return [task.name, task.createdAt, task.status, ...results.map(item => item.name)].join(' ').toLowerCase().includes(query);
     }).sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
     if (!tasks.length) {
-        grid.innerHTML = '<div class="asset-list-empty">没有匹配的任务</div>';
+        grid.innerHTML = '<div class="asset-list-empty"><strong>没有匹配的任务</strong><br><span>调整搜索条件，或选择其他系统资源。</span></div>';
         return;
     }
     grid.innerHTML = tasks.map(t => {
@@ -3099,7 +3099,7 @@ function renderProductList() {
         return [product.name, product.category, product.sku, ...materials.map(item => item.name)].join(' ').toLowerCase().includes(query);
     });
     if (!products.length) {
-        grid.innerHTML = '<div class="asset-list-empty">没有匹配的产品物料</div>';
+        grid.innerHTML = '<div class="asset-list-empty"><strong>没有匹配的产品物料</strong><br><span>调整搜索条件，或选择其他系统资源。</span></div>';
         return;
     }
     grid.innerHTML = products.map(p => `
@@ -3241,7 +3241,7 @@ function renderAssetGrid() {
     grid.className = `asset-grid${assetCurrentType === 'copy' ? ' copy-mode' : ''}`;
     const items = getVisibleAssetItems();
     if (!items.length) {
-        grid.innerHTML = '<div class="asset-list-empty" style="grid-column:1/-1">没有匹配的内容</div>';
+        grid.innerHTML = '<div class="asset-list-empty" style="grid-column:1/-1"><strong>没有匹配的内容</strong><br><span>调整创建者、标签或搜索条件后再试。</span></div>';
         return;
     }
     grid.innerHTML = items.map(a => `
