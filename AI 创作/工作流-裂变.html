@@ -46,6 +46,33 @@
             border-bottom: 1px solid #f0f0f0;
         }
 
+        .reedit-notice-wrap {
+            padding: 20px 32px 0;
+        }
+
+        .reedit-notice {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 14px 16px;
+            border: 1px solid #b8d8ff;
+            border-radius: 8px;
+            background: #f0f7ff;
+        }
+
+        .reedit-notice-main { min-width: 0; }
+        .reedit-notice-title { color: #1f1f1f; font-weight: 600; margin-bottom: 4px; }
+        .reedit-notice-copy { color: #595959; line-height: 1.65; }
+        .reedit-notice-action { flex-shrink: 0; height: 32px; padding: 0 14px; border: 1px solid #4a9eff; border-radius: 6px; background: #fff; color: #1677ff; cursor: pointer; }
+        .reedit-showcase { display: grid; gap: 10px; }
+        .reedit-showcase-label { color: #8c8c8c; font-size: 12px; margin-bottom: 5px; }
+        .reedit-cut-context { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 14px 16px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fafafa; }
+        .reedit-cut-context-title { color: #1f1f1f; font-weight: 600; margin-bottom: 4px; }
+        .reedit-cut-context-copy { color: #595959; line-height: 1.65; }
+        .reedit-cut-context-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .reedit-cut-context-actions button { height: 32px; padding: 0 12px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #1677ff; cursor: pointer; }
+
         .workflow-form {
             padding: 0;
         }
@@ -563,6 +590,10 @@
             min-width: 240px;
         }
 
+        .reference-filter-panel .ant-segmented-item-selected { box-shadow: none; }
+        .reference-source-select { width: 150px; }
+        .reference-workflow-select { width: 240px; }
+
         .reference-tag-trigger {
             min-width: 220px;
             justify-content: space-between;
@@ -1046,6 +1077,9 @@
                 padding: 24px 20px 18px;
             }
 
+            .reedit-notice-wrap { padding: 16px 20px 0; }
+            .reedit-notice { flex-direction: column; }
+
             .field-row {
                 grid-template-columns: 1fr;
                 gap: 14px;
@@ -1210,8 +1244,13 @@
             const [videoFiles, setVideoFiles] = useState([]);
             const [resolutionPreset, setResolutionPreset] = useState(CUSTOM_RESOLUTION);
             const [preview, setPreview] = useState({ open: false, title: '', url: '', type: '' });
+            const [reeditContext, setReeditContext] = useState(null);
+            const [reeditChanged, setReeditChanged] = useState(false);
+            const [reusePreviousCutResult, setReusePreviousCutResult] = useState(true);
             const [referenceQuery, setReferenceQuery] = useState('');
             const [referenceOwner, setReferenceOwner] = useState('mine');
+            const [referenceSourceFilter, setReferenceSourceFilter] = useState('全部');
+            const [referenceWorkflowName, setReferenceWorkflowName] = useState();
             const [referenceTags, setReferenceTags] = useState({});
             const [referenceTagDialog, setReferenceTagDialog] = useState({
                 open: false,
@@ -1285,11 +1324,88 @@
                 };
             }, [handlePaste]);
 
+            useEffect(() => {
+                let data = null;
+                try {
+                    const raw = localStorage.getItem('pendingWorkflow');
+                    if (raw) data = JSON.parse(raw);
+                } catch (error) {}
+                if (!data) return;
+                const noticeKey = `workflow-reedit-notice-${data.taskId || 'current'}`;
+                const canShowNotice = !sessionStorage.getItem(noticeKey);
+                setReeditContext({ ...data, showNotice: canShowNotice });
+                if (canShowNotice) sessionStorage.setItem(noticeKey, 'shown');
+                const input = data.workflowInput || data.opts || {};
+                const restoreFile = (item, index, mediaType) => ({
+                    uid: `reedit-${data.taskId || 'task'}-${mediaType}-${index}`,
+                    name: item.name || `${mediaType === 'video' ? '视频' : '图片'}素材${index + 1}`,
+                    status: 'done',
+                    type: item.mimeType || (mediaType === 'video' ? 'video/mp4' : 'image/png'),
+                    url: item.url || item.thumb || '',
+                    thumbUrl: item.thumb || item.url || '',
+                });
+                const restoredImages = (input.imageMaterials || []).map((item, index) => restoreFile(item, index, 'image'));
+                const restoredVideos = (input.videoMaterials || []).map((item, index) => restoreFile(item, index, 'video'));
+                setImageFiles(restoredImages);
+                setVideoFiles(restoredVideos);
+                setReusePreviousCutResult(Boolean(data.previousCutResult));
+                setResolutionPreset(input.resolutionPreset || CUSTOM_RESOLUTION);
+                form.setFieldsValue({
+                    taskName: input.taskName || data.taskName || '',
+                    copyContent: input.copyContent || data.prompt || '',
+                    imageMaterials: restoredImages,
+                    videoMaterials: restoredVideos,
+                    resolutionPreset: input.resolutionPreset || CUSTOM_RESOLUTION,
+                    resolutionWidth: input.resolutionWidth || null,
+                    resolutionHeight: input.resolutionHeight || null,
+                    durationMinSeconds: input.durationMinSeconds || null,
+                    durationMaxSeconds: input.durationMaxSeconds || null,
+                    videoStyle: input.videoStyle || '写实风格',
+                });
+                setReeditChanged(false);
+            }, [form]);
+
+            const getReeditNotice = context => {
+                const notice = context?.businessNotice || {};
+                if (notice.kind === 'missing') {
+                    const positions = (notice.missingPositions || []).join('、') || '必要位置';
+                    return { copy: `原任务的${positions}未识别到可用片段。你可以查看卡断结果，补充素材或重新卡断后创建新任务。`, action: '查看卡断结果' };
+                }
+                if (notice.kind === 'zero') return { copy: '原任务未形成可用混剪组合。你可以查看混剪规则和片段池，调整混剪配置、补充素材或重新卡断后创建新任务。', action: '查看混剪结果' };
+                return { copy: `原任务匹配出 ${notice.matched || 60}/${notice.target || 100} 组可用组合，比目标少 ${(notice.target || 100) - (notice.matched || 60)} 组。你可以调整混剪配置、补充素材或重新卡断后创建新任务。`, action: '查看混剪结果' };
+            };
+
+            const openPreviousResult = (context, action) => {
+                const type = action === '查看卡断结果' ? 'cut' : 'mix';
+                const url = `AI 创作/我的任务.html?openTask=${encodeURIComponent(context?.taskId || '')}&openNode=${type}`;
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({ action: 'openTab', title: action, url }, '*');
+                } else {
+                    window.location.href = `我的任务.html?openTask=${encodeURIComponent(context?.taskId || '')}&openNode=${type}`;
+                }
+            };
+
+            const renderReeditNotice = (context, label) => {
+                const content = getReeditNotice(context);
+                return <div>
+                    {label && <div className="reedit-showcase-label">{label}</div>}
+                    <div className="reedit-notice">
+                        <div className="reedit-notice-main"><div className="reedit-notice-title">原任务结果需要确认</div><div className="reedit-notice-copy">{content.copy}</div></div>
+                        <button className="reedit-notice-action" type="button" onClick={() => openPreviousResult(context, content.action)}>{content.action}</button>
+                    </div>
+                </div>;
+            };
+
             const onFinish = (values) => {
+                if (reeditContext && !reeditChanged) {
+                    message.warning('请补充或调整内容后，再创建新任务');
+                    return;
+                }
                 const payload = {
                     ...values,
                     imageMaterials: formatFiles(values.imageMaterials),
                     videoMaterials: formatFiles(values.videoMaterials),
+                    reusePreviousCutResult,
                 };
                 console.log('Success:', payload);
                 
@@ -1298,7 +1414,7 @@
                 const fromPage = urlParams.get('from') || '通用生成';
                 const fromUrl = fromPage === '工作流广场' ? 'AI 创作/工作流广场.html' : 'AI 创作/通用生成.html';
 
-                message.success('任务已开始，您可在我的任务页中查看任务进度');
+                message.success(reeditContext ? '已创建新任务，原任务仍会继续运行' : '任务已开始，您可在我的任务页中查看任务进度');
                 
                 // 延迟执行跳转和关闭，确保 Toast 能被看到并且正确回到原页面
                 setTimeout(() => {
@@ -1339,6 +1455,7 @@
                     setVideoFiles(nextFiles);
                     form.setFieldsValue({ videoMaterials: nextFiles });
                 }
+                setReeditChanged(true);
             };
 
             const openReferencePicker = (field, mediaType, source) => {
@@ -1347,6 +1464,8 @@
                     : [{ key: 'actor', label: '演员', tagGroup: 'actor' }];
                 setReferenceQuery('');
                 setReferenceOwner('mine');
+                setReferenceSourceFilter('全部');
+                setReferenceWorkflowName(undefined);
                 setReferenceTags({});
                 setReferenceTaskStatus('all');
                 setReferencePicker({
@@ -1382,6 +1501,12 @@
             const referenceTagGroups = materialLibrary.groupsForType
                 ? materialLibrary.groupsForType(referenceTagGroupKey)
                 : (materialLibrary.tagGroups?.[referenceTagGroupKey] || []);
+
+            const referenceLibraryItems = (referenceSources.library?.items || []).filter(item => (
+                item.type === referencePicker.mediaType && item.materialType === referencePicker.materialCategory
+            ));
+            const referenceMineCount = referenceLibraryItems.filter(item => !materialLibrary.matchOwnership || materialLibrary.matchOwnership(item, 'mine')).length;
+            const referenceWorkflowOptions = [...new Set(referenceLibraryItems.filter(item => item.source === '工作流').map(item => item.workflowName).filter(Boolean))];
 
             const setReferenceMaterialCategory = category => {
                 setReferenceTags({});
@@ -1477,8 +1602,11 @@
 
             const referenceItems = availableReferenceItems
                 .filter(item => referencePicker.source !== 'library' || matchReferenceOwner(item))
+                .filter(item => referencePicker.source !== 'library' || referenceSourceFilter === '全部' || item.source === referenceSourceFilter)
+                .filter(item => referencePicker.source !== 'library' || referenceSourceFilter !== '工作流' || !referenceWorkflowName || item.workflowName === referenceWorkflowName)
                 .filter(item => referencePicker.source !== 'library' || !materialLibrary.matchTagSelections || materialLibrary.matchTagSelections(item, referenceTags))
                 .filter(item => {
+                    if (referencePicker.source === 'library') return true;
                     const q = referenceQuery.trim().toLowerCase();
                     if (!q) return true;
                     return [
@@ -1507,6 +1635,8 @@
 
             const setReferenceSource = source => {
                 setReferenceQuery('');
+                setReferenceSourceFilter('全部');
+                setReferenceWorkflowName(undefined);
                 setReferenceTags({});
                 setReferenceTaskStatus('all');
                 setReferencePicker(prev => ({ ...prev, source, selectedTaskId: '', selectedIds: [] }));
@@ -1670,11 +1800,13 @@
                 >
                     <div className="page-container">
                         <div className="page-title">视频裂变工作流</div>
+                        {reeditContext?.showNotice && <div className="reedit-notice-wrap">{renderReeditNotice(reeditContext)}</div>}
                         
                         <Form 
                             form={form} 
                             layout="vertical" 
                             onFinish={onFinish}
+                            onValuesChange={() => setReeditChanged(true)}
                             className="workflow-form"
                             initialValues={{ 
                                 taskName: '',
@@ -1802,6 +1934,29 @@
                                     </div>
                                 </div>
                             </div>
+
+                            {reeditContext && <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line"><span className="field-title">卡断结果</span></div>
+                                    <p className="field-description">新任务默认复用原任务的卡断结果；如素材或卡断判断有问题，可要求新任务重新卡断。</p>
+                                </div>
+                                <div className="field-control">
+                                    <div className="reedit-cut-context">
+                                        <div>
+                                            <div className="reedit-cut-context-title">{reusePreviousCutResult ? '将复用上次卡断结果' : '新任务将重新卡断全部视频'}</div>
+                                            <div className="reedit-cut-context-copy">
+                                                {reusePreviousCutResult
+                                                    ? `上次已处理 ${reeditContext.previousCutResult?.sources?.length || 0} 个视频。原任务不会停止，新任务会基于你本次补充的内容继续创建。`
+                                                    : '提交后会对当前视频素材重新进行卡断，再进入混剪和合成。'}
+                                            </div>
+                                        </div>
+                                        <div className="reedit-cut-context-actions">
+                                            {reeditContext.previousCutResult && <button type="button" onClick={() => openPreviousResult(reeditContext, '查看卡断结果')}>查看卡断结果</button>}
+                                            <button type="button" onClick={() => { setReusePreviousCutResult(false); setReeditChanged(true); }}>重新卡断全部视频</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>}
 
                             <div className="field-row">
                                 <div className="field-meta">
@@ -1937,8 +2092,8 @@
 
                             <div className="actions">
                                 <Button size="large" onClick={resetForm}>取消</Button>
-                                <Button type="primary" htmlType="submit" size="large" icon={<CheckOutlined />}>
-                                    提交表单
+                                <Button type="primary" htmlType="submit" size="large" icon={<CheckOutlined />} disabled={Boolean(reeditContext) && !reeditChanged}>
+                                    {reeditContext ? '补充后创建新任务' : '提交表单'}
                                 </Button>
                             </div>
                         </Form>
@@ -2002,15 +2157,30 @@
                                         <Segmented
                                             value={referenceOwner}
                                             onChange={setReferenceOwner}
-                                            options={[{ label: '我的', value: 'mine' }, { label: '全部', value: 'all' }]}
+                                            options={[{ label: `我的 ${referenceMineCount}`, value: 'mine' }, { label: `全部 ${referenceLibraryItems.length}`, value: 'all' }]}
                                         />
-                                        <Input
-                                            className="reference-search"
-                                            value={referenceQuery}
-                                            onChange={event => setReferenceQuery(event.target.value)}
-                                            placeholder="搜索名称、内容、人员、来源"
-                                            allowClear
+                                        <span className="reference-filter-label">入库来源</span>
+                                        <Select
+                                            className="reference-source-select"
+                                            value={referenceSourceFilter}
+                                            onChange={value => {
+                                                setReferenceSourceFilter(value);
+                                                if (value !== '工作流') setReferenceWorkflowName(undefined);
+                                            }}
+                                            options={['全部', '工作流', '数据中台', '手动', '我的任务'].map(value => ({ value, label: value === '全部' ? '全部来源' : value }))}
                                         />
+                                        {referenceSourceFilter === '工作流' && (
+                                            <Select
+                                                className="reference-workflow-select"
+                                                value={referenceWorkflowName}
+                                                onChange={setReferenceWorkflowName}
+                                                options={referenceWorkflowOptions.map(value => ({ value, label: value }))}
+                                                placeholder="搜索工作流名称"
+                                                showSearch
+                                                allowClear
+                                                optionFilterProp="label"
+                                            />
+                                        )}
                                     </div>
                                     <div className="reference-filter-row">
                                         <span className="reference-filter-label">标签</span>

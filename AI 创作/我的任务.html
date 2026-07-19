@@ -362,10 +362,15 @@
     .card-bottom-meta { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-muted); margin-left: auto; }
     .card-bottom-meta .c-tag { margin: 0; }
     .card-bottom-count { color: var(--text-lo); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
+    .workflow-business-notice { margin: 0 var(--space-5) var(--space-3); padding: var(--space-3) var(--space-4); border: 1px solid var(--accent-border); border-radius: var(--r-md); background: var(--accent-bg); color: var(--text-lo); font-size: var(--text-sm); line-height: 1.6; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+    .workflow-business-notice-copy { min-width: 0; }
+    .workflow-business-notice-actions { flex-shrink: 0; display: flex; gap: var(--space-2); }
+    .workflow-business-notice button { height: var(--h-sm); padding: 0 var(--space-3); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--accent-text); font-size: var(--text-sm); cursor: pointer; }
+    .workflow-business-notice button:hover { border-color: var(--accent-solid); background: var(--bg-surface); color: var(--accent-solid); }
     .card-act-btn { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); position: relative; }
     .card-act-btn:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
-    .card-act-btn.card-act-error { border-color: rgba(229,72,77,0.24); background: rgba(229,72,77,0.04); color: var(--error); }
-    .card-act-btn.card-act-error:hover { border-color: rgba(229,72,77,0.56); background: rgba(229,72,77,0.08); color: var(--error); }
+    .card-act-btn.card-act-detail { border-color: var(--border-2); background: var(--bg-surface); color: var(--text-lo); }
+    .card-act-btn.card-act-detail:hover { border-color: var(--accent-solid); background: var(--accent-bg); color: var(--accent-solid); }
     .card-act-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
     .card-act-more { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); }
     .card-act-more:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
@@ -643,7 +648,16 @@
     .wf-error-node-item { padding: var(--space-3) var(--space-4); background: var(--bg-surface); border: 1px solid var(--border-1); border-radius: var(--r-md); }
     .wf-error-node-title { font-weight: 600; color: var(--text-hi); margin-bottom: var(--space-2); font-size: var(--text-sm); border-bottom: 1px dashed var(--border-1); padding-bottom: var(--space-1); }
     .wf-error-node-summary { margin: 0; color: var(--text-lo); font-size: var(--text-sm); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+    .wf-error-node-details { display: flex; flex-direction: column; gap: var(--space-2); margin-top: var(--space-3); }
+    .wf-error-node-detail { display: grid; grid-template-columns: 72px 1fr; gap: var(--space-3); align-items: start; font-size: var(--text-sm); line-height: 1.6; }
+    .wf-error-node-detail-label { color: var(--text-muted); white-space: nowrap; }
+    .wf-error-node-detail-value { color: var(--text-lo); word-break: break-word; }
+    .wf-error-node-action { margin-top: var(--space-3); height: var(--h-sm); padding: 0 var(--space-3); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--accent-text); font-size: var(--text-sm); font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-1); transition: all var(--ease); }
+    .wf-error-node-action:hover { border-color: var(--accent-solid); background: var(--accent-bg); color: var(--accent-solid); }
     .wf-error-empty { color: var(--text-ghost); font-style: italic; font-size: var(--text-sm); margin: var(--space-2) 0; }
+    .wf-run-summary { padding: var(--space-4) var(--space-5); border: 1px solid var(--accent-border); border-radius: var(--r-lg); background: var(--accent-bg); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+    .wf-run-summary-copy { color: var(--text-hi); font-size: var(--text-sm); line-height: 1.65; font-weight: 500; }
+    .wf-run-summary-action { flex-shrink: 0; height: var(--h-md); padding: 0 var(--space-4); border: 1px solid var(--accent-solid); border-radius: var(--r-md); background: var(--accent-solid); color: #fff; font-size: var(--text-sm); cursor: pointer; }
     .wf-error-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-1); display: flex; justify-content: flex-end; background: var(--bg-surface); flex-shrink: 0; }
     .wf-error-footer button { height: var(--h-lg); padding: 0 var(--space-6); border-radius: var(--r-md); border: 1px solid var(--border-2); background: var(--bg-surface); color: var(--text-hi); font-size: var(--text-base); font-weight: 500; cursor: pointer; transition: all var(--ease); }
     .wf-error-footer button:hover { border-color: var(--accent-solid); color: var(--accent-solid); background: var(--accent-bg); }
@@ -654,6 +668,69 @@
       .wf-error-body { padding: var(--space-4) var(--space-5); }
       .wf-error-footer { padding: var(--space-3) var(--space-5) var(--space-6); }
       .wf-error-info { grid-template-columns: 96px 1fr; gap: var(--space-2) var(--space-3); }
+    }
+    .wf-node-result-mask { position: fixed; inset: 0; z-index: 10001; display: flex; align-items: center; justify-content: center; padding: var(--space-4); background: rgba(0,0,0,0.45); }
+    .wf-node-result-modal { width: min(1080px, calc(100vw - var(--space-7))); max-height: min(90vh, 880px); background: var(--bg-surface); border-radius: var(--r-xl); box-shadow: 0 20px 50px rgba(0,0,0,0.15); display: flex; flex-direction: column; overflow: hidden; }
+    .wf-node-result-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-1); flex-shrink: 0; }
+    .wf-node-result-heading { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+    .wf-node-result-title { color: var(--text-hi); font-size: var(--text-lg); font-weight: 600; }
+    .wf-node-result-subtitle { color: var(--text-muted); font-size: var(--text-sm); }
+    .wf-node-result-close { width: var(--h-md); height: var(--h-md); border: 0; border-radius: var(--r-md); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--ease); }
+    .wf-node-result-close:hover { background: var(--bg-subtle); color: var(--text-hi); }
+    .wf-node-result-body { padding: var(--space-5) var(--space-6); background: var(--bg-page); overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-4); }
+    .wf-node-result-overview { padding: var(--space-4); border: 1px solid var(--border-1); border-radius: var(--r-lg); background: var(--bg-surface); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); }
+    .wf-node-result-overview-main { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+    .wf-node-result-overview-title { color: var(--text-hi); font-size: var(--text-md); font-weight: 600; }
+    .wf-node-result-overview-copy { color: var(--text-lo); font-size: var(--text-sm); line-height: 1.6; }
+    .wf-node-result-stats { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; flex-shrink: 0; }
+    .wf-node-result-stat { height: var(--h-sm); padding: 0 var(--space-3); border-radius: var(--r-full); background: var(--bg-subtle); color: var(--text-lo); font-size: var(--text-sm); display: inline-flex; align-items: center; white-space: nowrap; }
+    .wf-cut-list, .wf-mix-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .wf-cut-source { padding: var(--space-4); border: 1px solid var(--border-1); border-radius: var(--r-lg); background: var(--bg-surface); display: flex; flex-direction: column; gap: var(--space-3); }
+    .wf-cut-source-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+    .wf-cut-source-main { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
+    .wf-cut-source-thumb { width: 64px; height: 40px; border-radius: var(--r-md); background: var(--bg-active); color: var(--text-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .wf-cut-source-thumb svg { width: 18px; height: 18px; }
+    .wf-cut-source-name { color: var(--text-hi); font-size: var(--text-sm); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wf-cut-source-meta { color: var(--text-muted); font-size: var(--text-xs); margin-top: var(--space-1); }
+    .wf-cut-source-count { color: var(--text-muted); font-size: var(--text-sm); white-space: nowrap; }
+    .wf-cut-timeline { min-height: 32px; padding: var(--space-1); border-radius: var(--r-md); background: var(--bg-subtle); display: flex; align-items: stretch; gap: var(--space-1); overflow: hidden; }
+    .wf-cut-segment { min-width: 56px; padding: var(--space-1) var(--space-2); border: 1px solid var(--border-1); border-radius: var(--r-sm); background: var(--bg-surface); color: var(--text-lo); font-size: var(--text-xs); display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+    .wf-cut-segment.is-opening { border-color: var(--accent-border); background: var(--accent-bg); color: var(--accent-text); }
+    .wf-cut-segment.is-demo { border-style: dashed; color: var(--accent-text); }
+    .wf-cut-clips { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+    .wf-cut-clip { min-height: var(--h-sm); padding: var(--space-1) var(--space-2); border: 1px solid var(--border-1); border-radius: var(--r-md); background: var(--bg-surface); color: var(--text-lo); font-size: var(--text-xs); display: inline-flex; align-items: center; gap: var(--space-1); }
+    .wf-cut-clip-type { color: var(--text-hi); font-weight: 600; }
+    .wf-cut-source.is-empty .wf-cut-timeline { border: 1px dashed var(--border-2); color: var(--text-muted); justify-content: center; align-items: center; font-size: var(--text-sm); }
+    .wf-cut-source.is-failed { border-style: dashed; }
+    .wf-cut-failure { padding: var(--space-3); border-radius: var(--r-md); background: var(--bg-subtle); color: var(--text-lo); font-size: var(--text-sm); }
+    .wf-cut-video { width: 100%; height: 132px; border-radius: var(--r-md); background: linear-gradient(135deg, #dfe7f2, #eef3f8); display: block; }
+    .wf-cut-actions { display: flex; justify-content: flex-end; }
+    .wf-cut-actions button, .wf-node-primary-action { height: var(--h-sm); padding: 0 var(--space-3); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--accent-text); font-size: var(--text-sm); cursor: pointer; }
+    .wf-mix-rule { padding: var(--space-3) var(--space-4); border: 1px solid var(--accent-border); border-radius: var(--r-lg); background: var(--accent-bg); color: var(--accent-text); font-size: var(--text-sm); line-height: 1.6; }
+    .wf-mix-combo { padding: var(--space-4); border: 1px solid var(--border-1); border-radius: var(--r-lg); background: var(--bg-surface); display: flex; flex-direction: column; gap: var(--space-3); }
+    .wf-mix-combo-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+    .wf-mix-combo-title { color: var(--text-hi); font-size: var(--text-sm); font-weight: 600; }
+    .wf-mix-combo-meta { color: var(--text-muted); font-size: var(--text-xs); }
+    .wf-mix-track { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); }
+    .wf-mix-slot { min-width: 0; padding: var(--space-3); border: 1px solid var(--border-1); border-radius: var(--r-md); background: var(--bg-subtle); display: flex; flex-direction: column; gap: var(--space-1); }
+    .wf-mix-slot-type { color: var(--text-muted); font-size: var(--text-xs); }
+    .wf-mix-slot-source { color: var(--text-hi); font-size: var(--text-sm); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wf-mix-slot-time { color: var(--text-muted); font-size: var(--text-xs); }
+    .wf-mix-slot.is-empty { border-style: dashed; background: var(--bg-surface); }
+    .wf-zero-result { padding: var(--space-6); border: 1px dashed var(--border-2); border-radius: var(--r-lg); background: var(--bg-surface); text-align: center; color: var(--text-lo); font-size: var(--text-sm); line-height: 1.7; }
+    .wf-synth-list { display: flex; flex-direction: column; gap: var(--space-2); }
+    .wf-synth-row { padding: var(--space-3) var(--space-4); border: 1px solid var(--border-1); border-radius: var(--r-md); background: var(--bg-surface); display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); font-size: var(--text-sm); }
+    .wf-synth-row strong { color: var(--text-hi); }
+    .wf-synth-row span { color: var(--text-muted); }
+    .wf-node-result-footer { padding: var(--space-3) var(--space-6); border-top: 1px solid var(--border-1); background: var(--bg-surface); display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; }
+    .wf-node-result-footer button { height: var(--h-lg); padding: 0 var(--space-6); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--text-hi); font-size: var(--text-base); cursor: pointer; transition: all var(--ease); }
+    .wf-node-result-footer button:hover { border-color: var(--accent-solid); background: var(--accent-bg); color: var(--accent-solid); }
+    @media (max-width: 760px) {
+      .wf-node-result-mask { padding: 0; align-items: flex-end; }
+      .wf-node-result-modal { width: 100%; max-height: 94vh; border-radius: var(--r-xl) var(--r-xl) 0 0; }
+      .wf-node-result-header, .wf-node-result-body { padding-left: var(--space-4); padding-right: var(--space-4); }
+      .wf-node-result-overview { flex-direction: column; }
+      .wf-mix-track { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     .dm-pagination { display: flex; align-items: center; justify-content: center; gap: var(--space-1); margin-top: var(--space-4); }
     .dm-pg-btn { padding: var(--space-1) var(--space-3); border-radius: var(--r-sm); border: 1px solid var(--border-2); background: var(--bg-surface); font-size: var(--text-base); cursor: pointer; color: var(--text-hi); transition: all var(--ease); min-width: 32px; text-align: center; }
@@ -1179,7 +1256,7 @@ function makeWorkflowDemoTask(cfg) {
     name: cfg.name,
     type: 'workflow',
     taskType: 'workflow_run',
-    resultType: 'image',
+    resultType: 'video',
     status,
     createdTime: cfg.createdTime,
     finishedTime: cfg.finishedTime || '',
@@ -1191,10 +1268,11 @@ function makeWorkflowDemoTask(cfg) {
       workflowName: cfg.name,
       currentNodeId: isReviewing ? 'review-1' : (isCompleted ? 'end' : (isFailed ? 'failed-node' : (isAborted ? 'aborted-node' : 'image-1'))),
       endBehavior: { destination: 'task_system' },
-      summary: { total: 50, generated: cfg.generated || 0, pendingReview: isReviewing ? 5 : 0, approved: isCompleted ? 50 : 0, downstreamRunning: status === 'generating' ? 18 : 0 },
+      summary: { total: cfg.total || 50, generated: cfg.generated || 0, pendingReview: isReviewing ? 5 : 0, approved: isCompleted ? (cfg.generated || cfg.total || 50) : 0, downstreamRunning: status === 'generating' ? 18 : 0 },
       globalErrors: cfg.globalErrors || [],
       errorMessage: cfg.errorMessage || '',
       nodeSummaries: cfg.nodeSummaries || [],
+      nodeResults: cfg.nodeResults || {},
       nodes: [
         { nodeId: 'start', processorType: 'system.start', title: '开始', status: status === 'pending' ? 'pending' : 'completed' },
         { nodeId: 'image-1', processorType: 'image.generate', title: cfg.activeTitle || '图片生产', status: status === 'pending' ? 'pending' : (isFailed ? 'failed' : (isAborted ? 'aborted' : (isReviewing || isCompleted ? 'completed' : 'generating'))), errorMessage: isFailed ? (cfg.nodeErrorMessage || 'ComfyUI 原始报错：PromptParsingException: Invalid syntax') : '' },
@@ -1206,18 +1284,63 @@ function makeWorkflowDemoTask(cfg) {
         { reviewTaskId: 'rv-' + cfg.id, sourceNodeId: 'image-1', resultType: 'image', status: 'pending_review', pendingCount: 5, approvedCount: 12, rejectedCount: 0 }
       ] : []
     },
-    input: { prompt: cfg.prompt || cfg.name, models: ['工作流'], ratio: cfg.ratio || '1920×1080', count: 50 },
+    input: Object.assign({ prompt: cfg.prompt || cfg.name, models: ['工作流'], ratio: cfg.ratio || '1920×1080', count: cfg.total || 50 }, cfg.input || {}),
     output: isCompleted
       ? { byModel: { '工作流': { total: cfg.generated !== undefined ? cfg.generated : 50, items: baseItems } }, items: [] }
       : { byModel: { '工作流': { total: cfg.generated || 0, items: baseItems.slice(0, Math.min(cfg.generated || 0, 4)) } }, items: isReviewing ? [
           { itemId: cfg.id + '-item-1', type: 'image', assetType: 'image', thumb: baseItems[0].thumb, url: baseItems[0].url, sourceNodeId: 'image-1', reviewTaskId: 'rv-' + cfg.id, reviewStatus: 'pending', createdTime: cfg.createdTime },
           { itemId: cfg.id + '-item-2', type: 'image', assetType: 'image', thumb: baseItems[1].thumb, url: baseItems[1].url, sourceNodeId: 'image-1', reviewTaskId: 'rv-' + cfg.id, reviewStatus: 'pending', createdTime: cfg.createdTime }
-        ] : [] }
+        ] : [] },
+    businessNotice: cfg.businessNotice || null
   };
 }
 
 // ═══ Mock 数据 ═══
 const INITIAL_TASKS = [
+  makeWorkflowDemoTask({
+    id:'wf-v23-generating', name:'夏日防晒霜短视频混剪', status:'generating', createdTime:'2026-07-18 14:20', seed:'wf-v23-generating', activeTitle:'视频合成中', total:100, generated:24,
+    businessNotice:{ kind:'shortfall', matched:60, target:100, message:'当前匹配出 60/100 组可用组合，比目标少 40 组。任务仍在生成。', actionType:'mix' },
+    input:{
+      prompt:'夏日防晒霜上脸演示，突出清爽不黏腻和通勤场景。',
+      imageMaterials:[{name:'防晒霜主图.png',url:'https://picsum.photos/seed/sunscreen-main/720/1280',type:'image'}],
+      videoMaterials:[{name:'防晒霜展示01.mp4',url:DEMO_VIDEO_URL,type:'video'},{name:'上脸演示04.mp4',url:DEMO_VIDEO_URL,type:'video'}],
+      resolutionPreset:'vertical-9-16', resolutionWidth:1080, resolutionHeight:1920, durationMinSeconds:12, durationMaxSeconds:18, videoStyle:'写实风格'
+    },
+    nodeResults:buildV23NodeResults({ matched:60, generated:24, synthFailed:2 })
+  }),
+  makeWorkflowDemoTask({
+    id:'wf-v23-completed', name:'夏日防晒霜短视频混剪', status:'completed', createdTime:'2026-07-18 13:02', finishedTime:'2026-07-18 14:16', seed:'wf-v23-completed', total:100, generated:58,
+    businessNotice:{ kind:'shortfall', matched:60, target:100, finalGenerated:58, message:'本次匹配出 60/100 组可用组合，最终生成 58 条，比目标少 42 条。', actionType:'mix' },
+    input:{
+      prompt:'夏日防晒霜上脸演示，突出清爽不黏腻和通勤场景。',
+      imageMaterials:[{name:'防晒霜主图.png',url:'https://picsum.photos/seed/sunscreen-main/720/1280',type:'image'}],
+      videoMaterials:[{name:'防晒霜展示01.mp4',url:DEMO_VIDEO_URL,type:'video'},{name:'上脸演示04.mp4',url:DEMO_VIDEO_URL,type:'video'}],
+      resolutionPreset:'vertical-9-16', resolutionWidth:1080, resolutionHeight:1920, durationMinSeconds:12, durationMaxSeconds:18, videoStyle:'写实风格'
+    },
+    nodeResults:buildV23NodeResults({ matched:60, generated:58, synthFailed:2 })
+  }),
+  makeWorkflowDemoTask({
+    id:'wf-v23-missing', name:'夏日防晒霜短视频混剪（待补素材）', status:'completed', createdTime:'2026-07-18 12:34', finishedTime:'2026-07-18 12:46', seed:'wf-v23-missing', total:20, generated:0,
+    businessNotice:{ kind:'missing', missingPositions:['结尾位置', '操作演示位置'], message:'结尾位置、操作演示位置未识别到可用片段，因此未形成可用混剪组合。', actionType:'cut' },
+    input:{
+      prompt:'夏日防晒霜上脸演示，突出清爽不黏腻和通勤场景。',
+      imageMaterials:[{name:'防晒霜主图.png',url:'https://picsum.photos/seed/sunscreen-main/720/1280',type:'image'}],
+      videoMaterials:[{name:'防晒霜展示01.mp4',url:DEMO_VIDEO_URL,type:'video'},{name:'上脸演示04.mp4',url:DEMO_VIDEO_URL,type:'video'}],
+      resolutionPreset:'vertical-9-16', resolutionWidth:1080, resolutionHeight:1920, durationMinSeconds:12, durationMaxSeconds:18, videoStyle:'写实风格'
+    },
+    nodeResults:buildV23NodeResults({ matched:0, generated:0, positionCounts:{ '开头':12, '产品展示':12, '操作演示':0, '结尾':0 } })
+  }),
+  makeWorkflowDemoTask({
+    id:'wf-v23-zero', name:'夏日防晒霜短视频混剪（无可用组合）', status:'completed', createdTime:'2026-07-18 11:50', finishedTime:'2026-07-18 12:09', seed:'wf-v23-zero', total:20, generated:0,
+    businessNotice:{ kind:'zero', target:20, message:'已完成卡断，但本次未形成可用混剪组合，因此未生成视频。', actionType:'mix' },
+    input:{
+      prompt:'夏日防晒霜上脸演示，突出清爽不黏腻和通勤场景。',
+      imageMaterials:[{name:'防晒霜主图.png',url:'https://picsum.photos/seed/sunscreen-main/720/1280',type:'image'}],
+      videoMaterials:[{name:'防晒霜展示01.mp4',url:DEMO_VIDEO_URL,type:'video'},{name:'上脸演示04.mp4',url:DEMO_VIDEO_URL,type:'video'}],
+      resolutionPreset:'vertical-9-16', resolutionWidth:1080, resolutionHeight:1920, durationMinSeconds:12, durationMaxSeconds:18, videoStyle:'写实风格'
+    },
+    nodeResults:buildV23NodeResults({ matched:0, generated:0 })
+  }),
   makeWorkflowDemoTask({ id:'wf-pending-demo', name:'工作流状态样例：等待中', status:'pending', createdTime:'2026-04-27 09:00', seed:'wf-pending', activeTitle:'等待启动', generated:0 }),
   makeWorkflowDemoTask({ id:'wf-generating-demo', name:'工作流状态样例：生成中', status:'generating', createdTime:'2026-04-27 09:12', seed:'wf-generating', activeTitle:'图片生产中', generated:18 }),
   { id:'wf-1', name:'美妆爆款短视频自动化生产', type:'workflow', taskType:'workflow_run', resultType:'mixed', status:'pending_review', createdTime:'2026-04-20 14:00', creator:'我',
@@ -1251,7 +1374,43 @@ const INITIAL_TASKS = [
       ]
     }
   },
-  makeWorkflowDemoTask({ id:'wf-completed-demo', name:'工作流状态样例：已完成', status:'completed', createdTime:'2026-04-27 10:20', seed:'wf-completed', generated:50 }),
+  makeWorkflowDemoTask({
+    id:'wf-completed-demo',
+    name:'工作流状态样例：已完成',
+    status:'completed',
+    createdTime:'2026-04-27 10:20',
+    seed:'wf-completed',
+    generated:18,
+    nodeSummaries:[
+      {
+        title:'卡断节点',
+        text:'共处理 10 个视频，输出 48 个片段。',
+        action:{ type:'cut', label:'查看卡断结果', count:48 },
+        details:[
+          { label:'识别结果', value:'前贴识别到 12 个片段；开头识别到 12 个片段；中间识别到 12 个片段；结尾识别到 8 个片段；操作演示识别到 4 个片段。' },
+          { label:'处理结果', value:'10 个视频均完成卡断，点击下方按钮可逐个查看卡断位置。' }
+        ]
+      },
+      {
+        title:'混剪节点',
+        text:'共接收 48 个片段，匹配出 22 组可用组合。',
+        action:{ type:'mix', label:'查看混剪结果', count:22 },
+        details:[
+          { label:'本次规则', value:'前贴可选，开头、中间、结尾必选；同一条成片不重复使用同一来源视频。' },
+          { label:'可用片段', value:'前贴共有 12 个可用片段；开头共有 12 个可用片段；中间共有 12 个可用片段；结尾共有 8 个可用片段；操作演示共有 4 个可用片段。' },
+          { label:'匹配结果', value:'形成 22 组符合本次规则的组合，并传入合成节点。' }
+        ]
+      },
+      {
+        title:'合成节点',
+        text:'共接收 22 个合成请求，成功 18 个，失败 4 个。',
+        details:[
+          { label:'合成结果', value:'已生成 18 个视频，4 个请求未生成视频。' },
+          { label:'失败说明', value:'4 个请求在重试后仍合成超时。' }
+        ]
+      }
+    ]
+  }),
   makeWorkflowDemoTask({
     id:'wf-failed-demo',
     name:'工作流状态样例：已失败',
@@ -1266,9 +1425,33 @@ const INITIAL_TASKS = [
       '超时：当前视频模型的所有可用渠道均响应超时。'
     ],
     nodeSummaries:[
-      { title:'拆分节点', text:'共处理 50 个，成功 48 个，失败 2 个。' },
-      { title:'混编节点', text:'共接收 48 个片段，12 个前贴、12 个开头、12 个中间、8 个结尾、4 个操作演示，符合条件的为 22 个。' },
-      { title:'合成节点', text:'共接收 22 个视频合成请求，成功 18 个，失败 4 个。' },
+      {
+        title:'卡断节点',
+        text:'共处理 10 个视频，输出 48 个片段。',
+        action:{ type:'cut', label:'查看卡断结果', count:48 },
+        details:[
+          { label:'识别结果', value:'前贴识别到 12 个片段；开头识别到 12 个片段；中间识别到 12 个片段；结尾识别到 8 个片段；操作演示识别到 4 个片段。' },
+          { label:'处理结果', value:'10 个视频均完成卡断，点击下方按钮可逐个查看卡断位置。' }
+        ]
+      },
+      {
+        title:'混剪节点',
+        text:'共接收 48 个片段，匹配出 22 组可用组合。',
+        action:{ type:'mix', label:'查看混剪结果', count:22 },
+        details:[
+          { label:'本次规则', value:'前贴可选，开头、中间、结尾必选；同一条成片不重复使用同一来源视频。' },
+          { label:'可用片段', value:'前贴共有 12 个可用片段；开头共有 12 个可用片段；中间共有 12 个可用片段；结尾共有 8 个可用片段；操作演示共有 4 个可用片段。' },
+          { label:'匹配结果', value:'形成 22 组符合本次规则的组合，并传入合成节点。' }
+        ]
+      },
+      {
+        title:'合成节点',
+        text:'共接收 22 个合成请求，成功 18 个，失败 4 个。',
+        details:[
+          { label:'合成结果', value:'已生成 18 个视频，4 个请求未生成视频。' },
+          { label:'失败说明', value:'4 个请求在重试后仍合成超时。' }
+        ]
+      },
       { title:'图片大小压缩节点', text:'共接收 18 个文件压缩请求，成功 18 个，失败 0 个。' },
       { title:'视频生成节点', text:'共接受 18 个文本生成请求，成功 16 个，失败 2 个。\n视频生成失败：当前视频模型的所有可用渠道均响应超时。' },
       { title:'图像生成节点', text:'共接受 50 个请求，失败 2 个请求。' }
@@ -2418,7 +2601,18 @@ function normalizeWorkflowNodeSummaries(value) {
     if (typeof item === 'string') return { title: '节点名称', text: item };
     var title = item.title || item.nodeName || item.name || item.nodeId || '节点名称';
     var text = item.text || item.summary || item.message || '';
-    return text ? { title: title, text: text } : null;
+    var details = Array.isArray(item.details) ? item.details.map(function(detail) {
+      if (!detail) return null;
+      var label = detail.label || detail.title || '';
+      var value = detail.value || detail.text || detail.message || '';
+      return value ? { label: label, value: value } : null;
+    }).filter(Boolean) : [];
+    var action = item.action && item.action.type ? {
+      type: item.action.type,
+      label: item.action.label || '查看详情',
+      count: item.action.count
+    } : null;
+    return (text || details.length) ? { title: title, text: text, details: details, action: action } : null;
   }).filter(Boolean);
 }
 function buildFallbackWorkflowNodeSummaries(nodeGroups) {
@@ -2429,9 +2623,36 @@ function buildFallbackWorkflowNodeSummaries(nodeGroups) {
     return { title: group.title || '节点名称', text: text };
   });
 }
+function buildWorkflowResultNodeSummaries(run) {
+  var results = run && run.nodeResults || {};
+  var summaries = [];
+  if (results.cut && Array.isArray(results.cut.sources)) {
+    var sources = results.cut.sources;
+    var failedSources = sources.filter(function(source) { return source.failed; }).length;
+    var positionCounts = results.cut.positionCounts || {};
+    var positionText = Object.keys(positionCounts).map(function(position) { return position + '识别到 ' + Number(positionCounts[position] || 0) + ' 个片段'; }).join('；');
+    summaries.push({ title:'卡断节点', text:'共收到 ' + sources.length + ' 个视频：成功处理 ' + (sources.length - failedSources) + ' 个，失败 ' + failedSources + ' 个。', action:{type:'cut',label:'查看卡断结果',count:Object.keys(positionCounts).reduce(function(total, position) { return total + Number(positionCounts[position] || 0); }, 0)}, details:positionText ? [{label:'位置结果',value:positionText + '。'}] : [] });
+  }
+  if (results.mix) {
+    var mix = results.mix;
+    var combinations = Array.isArray(mix.combinations) ? mix.combinations : [];
+    var poolText = Object.keys(mix.positionCounts || {}).map(function(position) { return position + '共有 ' + Number(mix.positionCounts[position] || 0) + ' 个可用片段'; }).join('；');
+    summaries.push({ title:'混剪节点', text:combinations.length ? '本次使用的混剪规则：' + (mix.ruleName || '未返回') + '。' : '本次未形成可用混剪组合。', action:{type:'mix',label:'查看混剪结果',count:combinations.length}, details:[{label:'片段池',value:poolText ? poolText + '。' : '未返回片段池结果。'}, {label:'组合结果',value:'本次共形成 ' + combinations.length + ' 组可用组合。'}] });
+  }
+  if (results.synth && Array.isArray(results.synth.requests)) {
+    var requests = results.synth.requests;
+    var success = requests.filter(function(item) { return item.status === 'success'; }).length;
+    var processing = requests.filter(function(item) { return item.status === 'processing'; }).length;
+    var failed = requests.filter(function(item) { return item.status === 'failed'; }).length;
+    summaries.push({ title:'合成节点', text:'共收到 ' + requests.length + ' 组合成请求：成功 ' + success + ' 条，正在处理 ' + processing + ' 条，失败 ' + failed + ' 条。', action:{type:'synth',label:'查看合成结果',count:requests.length}, details:[] });
+  }
+  return summaries;
+}
 function getWorkflowNodeSummaries(run, nodeGroups) {
   var summaries = normalizeWorkflowNodeSummaries(run && run.nodeSummaries);
-  return summaries.length ? summaries : buildFallbackWorkflowNodeSummaries(nodeGroups);
+  if (summaries.length) return summaries;
+  var resultSummaries = buildWorkflowResultNodeSummaries(run);
+  return resultSummaries.length ? resultSummaries : buildFallbackWorkflowNodeSummaries(nodeGroups);
 }
 function getWorkflowFinishedTime(task, run) {
   return task.finishedTime || task.completedTime || task.endTime || (run && (run.finishedTime || run.completedTime || run.endTime)) || '-';
@@ -2443,6 +2664,184 @@ function copyWorkflowTaskId(taskId) {
     showToast('当前浏览器不支持自动复制');
   }
 }
+function formatWorkflowResultTime(seconds) {
+  var value = Math.max(Number(seconds) || 0, 0);
+  var minute = Math.floor(value / 60);
+  var second = value % 60;
+  return String(minute).padStart(2, '0') + ':' + String(second).padStart(2, '0');
+}
+function getWorkflowNodeResult(task, type) {
+  return task && task.workflowRun && task.workflowRun.nodeResults && task.workflowRun.nodeResults[type] || null;
+}
+function buildV23NodeResults(config) {
+  var positionCounts = config.positionCounts || { '开头':12, '产品展示':12, '操作演示':6, '结尾':8 };
+  var sourceNames = ['防晒霜展示01.mp4', '防晒霜展示02.mp4', '户外实拍03.mp4', '上脸演示04.mp4', '产品特写05.mp4', '通勤场景06.mp4', '夏日海边07.mp4', '使用步骤08.mp4', '补充素材09.mp4', '原视频10.mp4'];
+  var clipTypes = [];
+  Object.keys(positionCounts).forEach(function(type) {
+    for (var i = 0; i < positionCounts[type]; i++) clipTypes.push(type);
+  });
+  var sources = sourceNames.map(function(name, index) {
+    return { sourceId:'source-' + (index + 1), name:name, url:DEMO_VIDEO_URL, duration:index === 9 ? 22 : 18, clips:[] };
+  });
+  clipTypes.forEach(function(type, index) {
+    var source = sources[index % 8];
+    var clipIndex = source.clips.length;
+    source.clips.push({ type:type, start:clipIndex * 3, end:clipIndex * 3 + 3 });
+  });
+  if (config.failedSource) {
+    sources[9].failed = true;
+    sources[9].failureReason = config.failedSource;
+  }
+  var matched = Number(config.matched || 0);
+  var combinations = Array.from({ length: matched }, function(_, index) {
+    var number = index + 1;
+    return {
+      number:number,
+      slots:[
+        { type:'开头', source:sources[index % 8].name, time:'00:00–00:03' },
+        { type:'产品展示', source:sources[(index + 1) % 8].name, time:'00:03–00:06' },
+        { type:'操作演示', source:sources[(index + 2) % 8].name, time:'00:06–00:09' },
+        { type:'结尾', source:sources[(index + 3) % 8].name, time:'00:09–00:12' }
+      ]
+    };
+  });
+  var generated = Number(config.generated || 0);
+  var failed = Number(config.synthFailed || 0);
+  var requests = Array.from({ length: matched }, function(_, index) {
+    var number = index + 1;
+    if (number <= generated) return { number:number, status:'success' };
+    if (number <= generated + failed) return { number:number, status:'failed', reason:'渲染超时' };
+    return { number:number, status:'processing' };
+  });
+  return {
+    cut:{ sources:sources, positionCounts:positionCounts },
+    mix:{ ruleName:'四段式产品演示', requiredPositions:['开头', '产品展示', '操作演示', '结尾'], positionCounts:positionCounts, combinations:combinations },
+    synth:{ requests:requests }
+  };
+}
+function getWorkflowCutSegmentClass(type) {
+  if (type === '开头') return ' is-opening';
+  if (type === '操作演示') return ' is-demo';
+  return '';
+}
+function renderWorkflowCutResultBody(task) {
+  var result = getWorkflowNodeResult(task, 'cut');
+  var sources = result && Array.isArray(result.sources) ? result.sources : [];
+  if (!sources.length) return '<div class="wf-zero-result"><strong>暂无卡断结果</strong><br>该任务尚未返回可展示的卡断结果。</div>';
+  var succeeded = sources.filter(function(source) { return !source.failed; }).length;
+  var failed = sources.length - succeeded;
+  var html = '<div class="wf-node-result-overview">'
+    + '<div class="wf-node-result-overview-main">'
+    + '<div class="wf-node-result-overview-title">卡断结果总览</div>'
+    + '<div class="wf-node-result-overview-copy">按原视频展示卡断位置、片段类型和起止时间。这里展示的是节点实际识别结果。</div>'
+    + '</div>'
+    + '<div class="wf-node-result-stats">'
+    + '<span class="wf-node-result-stat">共处理 ' + sources.length + ' 个视频</span>'
+    + '<span class="wf-node-result-stat">成功 ' + succeeded + ' 个</span>'
+    + '<span class="wf-node-result-stat">失败 ' + failed + ' 个</span>'
+    + '</div></div>'
+    + '<div class="wf-cut-list">';
+  sources.forEach(function(source, sourceIndex) {
+    var clips = Array.isArray(source.clips) ? source.clips : [];
+    html += '<div class="wf-cut-source' + (source.failed ? ' is-failed' : (clips.length ? '' : ' is-empty')) + '">'
+      + '<div class="wf-cut-source-header">'
+      + '<div class="wf-cut-source-main">'
+      + '<div class="wf-cut-source-thumb">' + icon(SVG.box, 18) + '</div>'
+      + '<div><div class="wf-cut-source-name">' + escHtml(source.name) + '｜' + (source.failed ? '卡断失败：' + escHtml(source.failureReason || '系统异常，请稍后重试') : '识别到 ' + clips.length + ' 个片段') + '</div>'
+      + '<div class="wf-cut-source-meta">原视频 ' + formatWorkflowResultTime(source.duration) + '</div></div>'
+      + '</div>'
+      + '<div class="wf-cut-source-count">' + (source.failed ? '卡断失败' : '识别到 ' + clips.length + ' 个片段') + '</div>'
+      + '</div>';
+    if (source.failed) {
+      html += '<div class="wf-cut-failure">卡断失败：' + escHtml(source.failureReason || '系统异常，请稍后重试') + '</div>';
+    } else {
+      html += '<video class="wf-cut-video" id="wfCutVideo' + sourceIndex + '" controls preload="metadata" src="' + escHtml(source.url || DEMO_VIDEO_URL) + '"></video><div class="wf-cut-timeline">';
+    clips.forEach(function(clip) {
+      html += '<div class="wf-cut-segment' + getWorkflowCutSegmentClass(clip.type) + '" style="flex-grow:' + (clip.end - clip.start) + '">' + escHtml(clip.type) + '</div>';
+    });
+      if (!clips.length) html += '未识别到片段';
+    html += '</div><div class="wf-cut-clips">';
+    clips.forEach(function(clip) {
+      html += '<div class="wf-cut-clip" onclick="var v=document.getElementById(\'wfCutVideo' + sourceIndex + '\');if(v){v.currentTime=' + Number(clip.start || 0) + ';v.play();}"><span class="wf-cut-clip-type">' + escHtml(clip.type) + '</span><span>' + escHtml(clip.type) + '位置</span><span>'
+        + formatWorkflowResultTime(clip.start) + '–' + formatWorkflowResultTime(clip.end) + '</span></div>';
+    });
+      html += '</div>';
+    }
+    html += '<div class="wf-cut-actions"><button onclick="showToast(\'已提交此视频重新卡断\')">重新卡断此视频</button></div></div>';
+  });
+  return html + '</div>';
+}
+function renderWorkflowMixResultBody(task) {
+  var result = getWorkflowNodeResult(task, 'mix') || {};
+  var combinations = Array.isArray(result.combinations) ? result.combinations : [];
+  var positionCounts = result.positionCounts || {};
+  var countText = Object.keys(positionCounts).map(function(position) { return '<span class="wf-node-result-stat">' + escHtml(position) + '共有 ' + Number(positionCounts[position] || 0) + ' 个可用片段</span>'; }).join('');
+  var html = '<div class="wf-node-result-overview">'
+    + '<div class="wf-node-result-overview-main">'
+    + '<div class="wf-node-result-overview-title">混剪组合总览</div>'
+    + '<div class="wf-node-result-overview-copy">逐组展示实际使用的来源视频、片段位置和时间范围。</div>'
+    + '</div>'
+    + '<div class="wf-node-result-stats">' + countText + '</div>'
+    + '</div>'
+    + '<div class="wf-mix-rule"><strong>本次使用的混剪规则：' + escHtml(result.ruleName || '未返回') + '。</strong><br>' + escHtml((result.requiredPositions || []).join('、')) + '为必要位置；同一条成片不重复使用同一来源视频。</div>';
+  if (!combinations.length) return html + '<div class="wf-zero-result"><strong>本次未形成可用组合</strong><br>仍可查看本次使用的混剪规则和各位置片段池；系统不自行推测未形成组合的原因。</div>';
+  html += '<div class="wf-error-node-summary">本次共形成 ' + combinations.length + ' 组可用组合。</div><div class="wf-mix-list">';
+  combinations.forEach(function(combination) {
+    html += '<div class="wf-mix-combo">'
+      + '<div class="wf-mix-combo-header"><div class="wf-mix-combo-title">组合 ' + String(combination.number).padStart(2, '0') + '</div><div class="wf-mix-combo-meta">4 个位置</div></div>'
+      + '<div class="wf-mix-track">';
+    combination.slots.forEach(function(slot) {
+      html += '<div class="wf-mix-slot' + (slot.empty ? ' is-empty' : '') + '">'
+        + '<div class="wf-mix-slot-source">组合 ' + String(combination.number).padStart(2, '0') + '｜' + escHtml(slot.type) + '：' + (slot.empty ? '本组未使用' : escHtml(slot.source) + ' ' + escHtml(slot.time)) + '</div>'
+        + '</div>';
+    });
+    html += '</div></div>';
+  });
+  return html + '</div>';
+}
+function renderWorkflowSynthResultBody(task) {
+  var result = getWorkflowNodeResult(task, 'synth') || {};
+  var requests = Array.isArray(result.requests) ? result.requests : [];
+  var requestCount = requests.length;
+  if (requestCount === 0) {
+    return '<div class="wf-node-result-overview"><div class="wf-node-result-overview-main"><div class="wf-node-result-overview-title">合成结果</div><div class="wf-node-result-overview-copy">共收到 0 组合成请求</div></div></div>';
+  }
+  var generated = requests.filter(function(item) { return item.status === 'success'; }).length;
+  var failed = requests.filter(function(item) { return item.status === 'failed'; }).length;
+  var processing = requests.filter(function(item) { return item.status === 'processing'; }).length;
+  var summary = '共收到 ' + requestCount + ' 组合成请求：已成功 ' + generated + ' 条，正在处理 ' + processing + ' 条，已确认失败 ' + failed + ' 条。';
+  var html = '<div class="wf-node-result-overview"><div class="wf-node-result-overview-main"><div class="wf-node-result-overview-title">合成结果</div><div class="wf-node-result-overview-copy">' + escHtml(summary) + '</div></div></div><div class="wf-synth-list">'
+  requests.forEach(function(request) {
+    var label = request.status === 'success' ? '合成成功' : (request.status === 'failed' ? '合成失败：' + (request.reason || '系统异常') : '正在合成');
+    html += '<div class="wf-synth-row"><strong>组合 ' + String(request.number).padStart(2, '0') + '｜' + escHtml(label) + '</strong></div>';
+  });
+  return html + '</div>';
+}
+function closeWorkflowNodeResult() {
+  var modal = document.getElementById('wfNodeResultMask');
+  if (modal) modal.remove();
+}
+function openWorkflowNodeResult(taskId, type) {
+  var task = getTaskById(taskId);
+  if (!task) return;
+  closeWorkflowNodeResult();
+  var isCut = type === 'cut';
+  var isSynth = type === 'synth';
+  var title = isCut ? '卡断结果' : (isSynth ? '合成结果' : '混剪结果');
+  var subtitle = (task.name || '工作流任务') + ' · ' + (isCut ? '卡断节点' : (isSynth ? '合成节点' : '混剪节点'));
+  var body = isCut ? renderWorkflowCutResultBody(task) : (isSynth ? renderWorkflowSynthResultBody(task) : renderWorkflowMixResultBody(task));
+  var html = '<div class="wf-node-result-mask" id="wfNodeResultMask" onclick="if(event.target===this)closeWorkflowNodeResult()">'
+    + '<div class="wf-node-result-modal" onclick="event.stopPropagation()">'
+    + '<div class="wf-node-result-header">'
+    + '<div class="wf-node-result-heading"><div class="wf-node-result-title">' + escHtml(title) + '</div><div class="wf-node-result-subtitle">' + escHtml(subtitle) + '</div></div>'
+    + '<button class="wf-node-result-close" onclick="closeWorkflowNodeResult()">×</button>'
+    + '</div><div class="wf-node-result-body">' + body + '</div>'
+    + '<div class="wf-node-result-footer">' + (isCut ? '<button class="wf-node-primary-action" onclick="showToast(\'已提交全部视频重新卡断\')">重新卡断全部视频</button>' : '') + '<button onclick="closeWorkflowNodeResult()">关闭</button></div>'
+    + '</div></div>';
+  var wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  document.body.appendChild(wrap.firstElementChild);
+}
 function openWorkflowDetail(taskId) {
   var task = getTaskById(taskId);
   if (!task) return;
@@ -2453,14 +2852,38 @@ function openWorkflowDetail(taskId) {
   var nodeGroups = getWorkflowNodeErrorGroups(nodes);
   var nodeSummaries = getWorkflowNodeSummaries(run, nodeGroups);
   var encodedTaskId = encodeURIComponent(task.id || '');
+  var total = Number((run.summary && run.summary.total) || (task.input && task.input.count) || 0);
+  var generated = Number((run.summary && run.summary.generated) || 0);
+  var matched = task.businessNotice && Number(task.businessNotice.matched);
+  var isEnded = task.status === 'completed' || task.status === 'failed' || task.status === 'aborted';
+  var topCopy = '';
+  if (task.businessNotice && task.businessNotice.kind === 'missing') {
+    var missingPositions = task.businessNotice.missingPositions || [];
+    topCopy = '目标生成 ' + total + ' 条，' + (missingPositions.length ? missingPositions.join('、') : '必要位置') + '未识别到可用片段，因此未形成可用混剪组合，最终生成 ' + generated + ' 条。';
+  } else if (task.businessNotice && task.businessNotice.kind === 'zero') {
+    topCopy = isEnded
+      ? '目标生成 ' + total + ' 条，本次未形成可用混剪组合，最终生成 0 条。'
+      : '目标生成 ' + total + ' 条，本次未形成可用混剪组合。任务仍在运行并按现有结果结束。';
+  } else if (Number.isFinite(matched)) {
+    topCopy = isEnded
+      ? '目标生成 ' + total + ' 条，本次匹配出 ' + matched + ' 组可用组合，最终生成 ' + generated + ' 条。'
+      : '目标生成 ' + total + ' 条，当前匹配出 ' + matched + ' 组可用组合，已生成 ' + generated + ' 条。任务仍在运行。';
+  } else if (task.status === 'failed') {
+    topCopy = '目标生成 ' + total + ' 条，任务处理失败。具体原因请查看对应节点。';
+  } else {
+    topCopy = '目标生成 ' + total + ' 条，任务正在运行，混剪结果尚未生成。';
+  }
 
   var html = '<div class="wf-error-modal-mask" id="wfRunModalMask" onclick="if(event.target===this)this.remove()">'
            + '<div class="wf-error-modal" onclick="event.stopPropagation()">'
            + '<div class="wf-error-header">'
-           + '<div class="wf-error-title">错误详情</div>'
+           + '<div class="wf-error-title">运行详情</div>'
            + '<button class="wf-error-close" onclick="document.getElementById(\'wfRunModalMask\').remove()">×</button>'
            + '</div>'
            + '<div class="wf-error-body">'
+           + '<div class="wf-run-summary"><div class="wf-run-summary-copy">' + escHtml(topCopy) + '</div>'
+           + (task.businessNotice ? '<button class="wf-run-summary-action" onclick="event.stopPropagation();handleReEditById(decodeURIComponent(\'' + encodedTaskId + '\'))">补充后重新开始</button>' : '')
+           + '</div>'
            + '<div class="wf-error-block">'
            + '<div class="wf-error-block-title">基础信息</div>'
            + '<div class="wf-error-info">'
@@ -2470,8 +2893,8 @@ function openWorkflowDetail(taskId) {
            + '<div class="wf-error-label">任务结束时间</div><div class="wf-error-value">' + escHtml(getWorkflowFinishedTime(task, run)) + '</div>'
            + '</div></div>';
 
-  html += '<div class="wf-error-block"><div class="wf-error-block-title">异常说明</div>'
-        + '<div class="wf-error-subtitle">全局错误</div>';
+  html += '<div class="wf-error-block"><div class="wf-error-block-title">运行说明</div>'
+        + '<div class="wf-error-subtitle">任务说明</div>';
   if (globalErrors.length) {
     html += '<div class="wf-error-global-group"><ol class="wf-error-list">';
     globalErrors.forEach(function(reason) {
@@ -2479,7 +2902,7 @@ function openWorkflowDetail(taskId) {
     });
     html += '</ol></div>';
   } else {
-    html += '<p class="wf-error-empty">无全局异常信息</p>';
+    html += '<p class="wf-error-empty">本次运行无任务级说明</p>';
   }
 
   html += '<div class="wf-error-subtitle">节点明细</div>';
@@ -2490,8 +2913,24 @@ function openWorkflowDetail(taskId) {
     nodeSummaries.forEach(function(summary) {
       html += '<div class="wf-error-node-item">'
         + '<div class="wf-error-node-title">' + escHtml(summary.title) + '</div>'
-        + '<p class="wf-error-node-summary">' + escHtml(summary.text) + '</p>'
-        + '</div>';
+        + (summary.text ? '<p class="wf-error-node-summary">' + escHtml(summary.text) + '</p>' : '');
+      if (summary.details && summary.details.length) {
+        html += '<div class="wf-error-node-details">';
+        summary.details.forEach(function(detail) {
+          html += '<div class="wf-error-node-detail">'
+            + '<div class="wf-error-node-detail-label">' + escHtml(detail.label || '说明') + '</div>'
+            + '<div class="wf-error-node-detail-value">' + escHtml(detail.value) + '</div>'
+            + '</div>';
+        });
+        html += '</div>';
+      }
+      if (summary.action) {
+        html += '<button class="wf-error-node-action" onclick="event.stopPropagation();openWorkflowNodeResult(decodeURIComponent(\'' + encodedTaskId + '\'),\'' + escJs(summary.action.type) + '\')">'
+          + icon(SVG.eye, 12) + ' ' + escHtml(summary.action.label)
+          + (summary.action.count !== undefined ? '（' + escHtml(summary.action.count) + '）' : '')
+          + '</button>';
+      }
+      html += '</div>';
     });
     html += '</div>';
   }
@@ -2573,8 +3012,21 @@ function renderTaskCard(task) {
     +'</div>'
     +modelTabsHtml
     +'<div class="card-output">'+renderOutputArea(task, currentOutput, collapsed, vm)+'</div>'
+    +renderWorkflowBusinessNotice(task)
     +'<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+statusLabel+pulseDot+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span>'+renderCardMoreMenu(task)+'</div></div>'
     +'</div>';
+}
+
+function renderWorkflowBusinessNotice(task) {
+  var notice = task && task.businessNotice;
+  if (!notice || !notice.message) return '';
+  var id = escJs(task.id || '');
+  return '<div class="workflow-business-notice">'
+    + '<div class="workflow-business-notice-copy">' + escHtml(notice.message) + '</div>'
+    + '<div class="workflow-business-notice-actions">'
+    + '<button onclick="event.stopPropagation();openWorkflowDetail(\'' + id + '\')">查看运行详情</button>'
+    + '<button onclick="event.stopPropagation();handleReEditById(\'' + id + '\')">补充后重新开始</button>'
+    + '</div></div>';
 }
 
 function renderOutputArea(task, currentOutput, collapsed, vm) {
@@ -3889,7 +4341,8 @@ function renderCardActions(task, vm) {
   if (task.type === 'workflow') {
     if (s === 'generating' || s === 'pending') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+        +(task.businessNotice ? '' : '<button class="card-act-btn card-act-detail" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 运行详情</button>')
+        +(task.businessNotice ? '' : '<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>')
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
         +'<button class="card-act-stop" onclick="handleStopById(\''+id+'\')">'+imageIcon('../icon/停止生成.svg', 14, '停止生成')+' 停止生成</button>'
         +'</div>';
@@ -3910,15 +4363,15 @@ function renderCardActions(task, vm) {
     }
     if (s === 'completed') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn card-act-error" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 错误详情</button>'
+        +(task.businessNotice ? '' : '<button class="card-act-btn card-act-detail" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 运行详情</button>')
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
-        +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
+        +(task.businessNotice ? '' : '<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>')
         +'<button class="card-act-more" onclick="openWorkflowResult(\''+id+'\')">查看全部</button>'
         +'</div>';
     }
     if (s === 'failed' || task.status === 'failed') {
       return '<div class="card-actions">'
-        +'<button class="card-act-btn card-act-error" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 错误详情</button>'
+        +(task.businessNotice ? '' : '<button class="card-act-btn card-act-detail" onclick="openWorkflowDetail(\''+id+'\')">'+icon(SVG.eye)+' 运行详情</button>')
         +'<button class="card-act-btn" onclick="handleRetryById(\''+id+'\')">'+icon(SVG.retry)+' 再次生成</button>'
         +'<button class="card-act-btn" onclick="handleReEditById(\''+id+'\')">'+icon(SVG.edit)+' 重新编辑</button>'
         +'</div>';
@@ -4585,10 +5038,29 @@ function restoreTaskToInput(task) {
 }
 
 function navigateToWorkflow(task) {
+  var input = task.input || {};
+  var run = task.workflowRun || {};
   localStorage.setItem('pendingWorkflow', JSON.stringify({
     type: task.type,
-    prompt: task.input.prompt,
-    opts: task.input,
+    prompt: input.prompt,
+    opts: input,
+    taskId: task.id,
+    taskName: task.name,
+    businessNotice: task.businessNotice || null,
+    workflowInput: {
+      taskName: task.name,
+      copyContent: input.prompt || '',
+      imageMaterials: input.imageMaterials || input.refImages || [],
+      videoMaterials: input.videoMaterials || [],
+      resolutionPreset: input.resolutionPreset || 'vertical-9-16',
+      resolutionWidth: input.resolutionWidth || 1080,
+      resolutionHeight: input.resolutionHeight || 1920,
+      durationMinSeconds: input.durationMinSeconds || null,
+      durationMaxSeconds: input.durationMaxSeconds || null,
+      videoStyle: input.videoStyle || '写实风格'
+    },
+    previousCutResult: run.nodeResults && run.nodeResults.cut || null,
+    mode: 'reedit',
   }));
   parent.postMessage({
     action: 'openTab',
@@ -5067,6 +5539,12 @@ function closeAssetPreview() { document.getElementById('assetPreviewMask').class
 })();
 
 renderAll();
+setTimeout(function(){
+  var params = new URLSearchParams(location.search);
+  var openTask = params.get('openTask');
+  var openNode = params.get('openNode');
+  if (openTask && openNode) openWorkflowNodeResult(openTask, openNode);
+}, 0);
 // 页面加载后默认滚动到底部
 setTimeout(function(){
   if (window.__scrollToBottom) {

@@ -7,6 +7,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="../共享样式/download-archive-confirm.css">
   <link rel="stylesheet" href="../共享样式/confirm-modal.css">
+  <link rel="stylesheet" href="../共享样式/workflow-search-select.css">
   <style>
     :root {
       --ant-primary-1: #E8F4FF;
@@ -216,7 +217,6 @@
       border: 0;
       background: var(--ant-bg-container);
       color: var(--ant-primary-6);
-      box-shadow: var(--ant-box-shadow-secondary);
     }
 
     .type-actions {
@@ -422,17 +422,12 @@
       font-weight: 600;
     }
 
-    .workflow-filter { width: 170px; flex-shrink: 0; }
+    .workflow-filter { display: flex; align-items: center; gap: var(--ant-size-xs); flex-shrink: 0; }
     .workflow-filter[hidden] { display: none; }
 
     .toolbar-source {
       width: 170px;
       flex-shrink: 0;
-    }
-
-    .toolbar-search {
-      flex: 1;
-      min-width: 0;
     }
 
     .toolbar-tags {
@@ -525,7 +520,6 @@
 
     .tag-filter-select[open] summary {
       border-color: var(--ant-primary-5);
-      box-shadow: 0 0 0 2px rgba(74,158,255,0.1);
     }
 
     .tag-filter-select[open] summary::after { transform: translateY(-30%) rotate(225deg); }
@@ -657,8 +651,24 @@
     .input:focus,
     .textarea:focus {
       border-color: var(--ant-primary-6);
-      box-shadow: var(--ant-box-shadow-focus);
     }
+
+    .input-clear-wrap { position: relative; }
+    .input-clear-wrap .input { padding-right: 36px; }
+    .input-clear {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 0;
+      border-radius: var(--ant-border-radius-sm);
+      background: transparent;
+      color: var(--ant-text-color-tertiary);
+      line-height: 1;
+    }
+    .input-clear:hover { background: var(--ant-bg-tertiary); color: var(--ant-text-color-secondary); }
 
     .body {
       padding: var(--ant-size-sm);
@@ -1322,13 +1332,10 @@
                 <option value="我的任务">我的任务</option>
               </select>
             </div>
-            <label class="workflow-filter" id="workflowFilterWrap" hidden>
-              <input class="input" id="workflowFilter" list="workflowOptions" placeholder="搜索工作流名称" oninput="render()">
-              <datalist id="workflowOptions"></datalist>
-            </label>
-            <label class="search-wrap toolbar-search" for="keyword">
-              <input id="keyword" type="search" placeholder="搜索原料名称" oninput="render()">
-            </label>
+              <div class="workflow-filter" id="workflowFilterWrap" hidden>
+                <span class="compact-label">工作流搜索</span>
+                <div id="workflowPicker"></div>
+              </div>
           </div>
           <div class="toolbar-tags">
             <div class="toolbar-tags-label">标签</div>
@@ -1358,11 +1365,14 @@
         <div class="form-grid">
           <div class="field">
             <label for="materialName">原料名称</label>
-            <input class="input" id="materialName" placeholder="输入原料名称">
+            <div class="input-clear-wrap">
+              <input class="input" id="materialName" placeholder="选择文件后自动填入">
+              <button class="input-clear" type="button" aria-label="清空原料名称" title="清空" onclick="document.getElementById('materialName').value=''">×</button>
+            </div>
           </div>
           <div class="field">
-            <label>类型</label>
-            <input class="input" id="materialTypeText" disabled>
+            <label for="materialTypeSelect">类型</label>
+            <select class="select" id="materialTypeSelect" onchange="setImportType(this.value)"></select>
           </div>
           <div class="field full" id="contentField">
             <label for="materialContent">文案内容</label>
@@ -1373,15 +1383,11 @@
             <label class="upload-box" id="materialDropZone" for="materialFile" ondragover="handleMaterialDrag(event)" ondrop="handleMaterialDrop(event)">
               <span class="upload-icon">+</span>
               <strong id="uploadMainText">点击或拖拽文件到此处上传</strong>
-              <span class="upload-hint" id="uploadHint">支持当前类型对应的文件格式</span>
+              <span class="upload-hint" id="uploadHint">支持单个或批量文件，不支持文件夹</span>
               <input id="materialFile" type="file" multiple onchange="handleMaterialFile(this)">
             </label>
           </div>
           <div class="batch-rule" id="batchRule">多个文件会按文件分别入库；多条文案按空行拆分。AI 会为每个原料分别识别标签，入库前可增删。</div>
-          <div class="field">
-            <label for="materialSource">入库来源</label>
-            <input class="input" id="materialSource" placeholder="手动上传 / 手动录入">
-          </div>
           <div class="field full">
             <label>标签</label>
             <div class="ai-tag-panel" id="createTagGroups"></div>
@@ -1479,6 +1485,7 @@
   <div class="toast" id="toast"></div>
 
   <script src="../共享样式/material-library.js?v=20260712a"></script>
+  <script src="../共享样式/workflow-search-select.js"></script>
   <script src="../共享样式/download-archive-confirm.js"></script>
   <script src="../共享样式/confirm-modal.js"></script>
   <script>
@@ -1487,6 +1494,8 @@
     let tagGroups = JSON.parse(JSON.stringify(library.tagGroups || {}));
     let typeOptions = JSON.parse(JSON.stringify((library.materialTypes || []).filter(item => item.enabled !== false)));
     let currentType = 'image';
+    let importType = 'image';
+    let workflowFilterValue = '';
     let currentScope = 'mine';
     let tagFilters = {};
     let createTagSelections = {};
@@ -1621,17 +1630,14 @@
     }
 
     function getFiltered() {
-      const q = document.getElementById('keyword').value.trim().toLowerCase();
       const source = document.getElementById('sourceFilter').value;
-      const workflowQuery = document.getElementById('workflowFilter').value.trim().toLowerCase();
       return materials.filter(item => {
         if (itemMaterialType(item) !== currentType) return false;
         if (currentScope === 'mine' && !library.isMine(item)) return false;
         if (source !== '全部' && item.source !== source) return false;
-        if (source === '工作流' && workflowQuery && !String(item.workflowName || '').toLowerCase().includes(workflowQuery)) return false;
+        if (source === '工作流' && workflowFilterValue && item.workflowName !== workflowFilterValue) return false;
         if (!passesTags(item)) return false;
-        if (!q) return true;
-        return String(item.name || '').toLowerCase().includes(q);
+        return true;
       });
     }
 
@@ -1703,10 +1709,10 @@
       document.getElementById('currentTypeCount').textContent = '（' + materials.filter(item => itemMaterialType(item) === currentType).length + '）';
       const empty = document.getElementById('empty');
       const hasAnyForType = materials.some(item => itemMaterialType(item) === currentType);
-      const hasFilters = currentScope === 'mine' || document.getElementById('sourceFilter').value !== '全部' || document.getElementById('keyword').value.trim() || Object.values(tagFilters).some(values => values && values.length);
+      const hasFilters = currentScope === 'mine' || document.getElementById('sourceFilter').value !== '全部' || Object.values(tagFilters).some(values => values && values.length);
       empty.innerHTML = '<div class="empty-content"><span class="empty-icon">' + formatIcon(format) + '</span>'
         + '<div class="empty-title">' + (hasAnyForType ? '没有符合条件的原料' : '还没有' + esc(typeLabel(currentType)) + '原料') + '</div>'
-        + '<div class="empty-desc">' + (hasAnyForType ? '调整创建者、来源、标签或关键词后再试。' : '导入后即可在通用生成和工作流中直接引用。') + '</div>'
+        + '<div class="empty-desc">' + (hasAnyForType ? '调整创建者、入库来源或标签后再试。' : '导入后即可在通用生成和工作流中直接引用。') + '</div>'
         + (hasAnyForType && hasFilters ? '<button class="btn" type="button" onclick="resetResultFilters()">清空筛选</button>' : '<button class="btn btn-primary" type="button" onclick="openCreateModal()">导入原料</button>') + '</div>';
       empty.classList.toggle('show', list.length === 0);
     }
@@ -1715,8 +1721,7 @@
       currentScope = 'all';
       tagFilters = {};
       document.getElementById('sourceFilter').value = '全部';
-      document.getElementById('workflowFilter').value = '';
-      document.getElementById('keyword').value = '';
+      workflowFilterValue = '';
       render();
     }
 
@@ -1731,13 +1736,21 @@
     function renderWorkflowFilter() {
       const source = document.getElementById('sourceFilter').value;
       const wrap = document.getElementById('workflowFilterWrap');
-      const list = document.getElementById('workflowOptions');
       wrap.hidden = source !== '工作流';
-      list.innerHTML = workflowNames.map(name => '<option value="' + esc(name) + '"></option>').join('');
+      if (source === '工作流') {
+        window.CCWorkflowSearchSelect.render(document.getElementById('workflowPicker'), {
+          options: workflowNames,
+          value: workflowFilterValue,
+          onChange: function(value) {
+            workflowFilterValue = value;
+            render();
+          }
+        });
+      }
     }
 
     function onSourceFilterChange() {
-      if (document.getElementById('sourceFilter').value !== '工作流') document.getElementById('workflowFilter').value = '';
+      if (document.getElementById('sourceFilter').value !== '工作流') workflowFilterValue = '';
       render();
     }
 
@@ -1772,7 +1785,7 @@
     }
 
     function renderCreateTags() {
-      const groups = getGroups(currentType);
+      const groups = getGroups(importType);
       const selectedTags = groups.flatMap(group => (createTagSelections[group.id] || []).map(tag => ({ groupId:group.id, tag })));
       const selectedHtml = selectedTags.length
         ? selectedTags.map(item => '<span class="ai-selected-tag">' + esc(item.tag)
@@ -1793,8 +1806,8 @@
           + '<div class="tag-filter-options">' + tags + '</div></div></details>';
       }).join('');
       const statusText = aiTagState === 'loading'
-        ? '<strong>AI 识别中</strong><span>正在根据' + esc(typeLabel(currentType)) + '分类添加标签</span>'
-        : '<strong>AI 已添加</strong><span>已按' + esc(typeLabel(currentType)) + '分类推荐</span>';
+        ? '<strong>AI 识别中</strong><span>正在根据' + esc(typeLabel(importType)) + '分类添加标签</span>'
+        : '<strong>AI 已添加</strong><span>已按' + esc(typeLabel(importType)) + '分类推荐</span>';
       document.getElementById('createTagGroups').innerHTML = '<div class="ai-tag-head">'
         + '<div class="ai-tag-status">' + statusText + '</div>'
         + '<div class="ai-tag-actions">'
@@ -1811,9 +1824,9 @@
         video: { clipType:['口播'], format:['9:16'], source:['跑量素材', '爆款逆向'] },
         copy: { copyType:['脚本'], business:['工具类'], reuse:['可复用'] }
       };
-      const configured = suggestions[currentType] || {};
+      const configured = suggestions[importType] || {};
       const result = {};
-      getGroups(currentType).forEach(group => {
+      getGroups(importType).forEach(group => {
         const allowed = new Set(group.tags || []);
         result[group.id] = (configured[group.id] || []).filter(tag => allowed.has(tag));
       });
@@ -1844,7 +1857,7 @@
     }
 
     function toggleCreateTag(groupId, tag) {
-      const group = getGroups(currentType).find(item => item.id === groupId);
+      const group = getGroups(importType).find(item => item.id === groupId);
       const set = selectedSet(createTagSelections, groupId);
       if (!group || !group.multiple) {
         createTagSelections[groupId] = set.has(tag) ? [] : [tag];
@@ -1858,22 +1871,38 @@
     }
 
     function openCreateModal() {
-      const format = currentFormat();
+      importType = currentType;
       document.getElementById('materialName').value = '';
       document.getElementById('materialContent').value = '';
-      document.getElementById('createTitle').textContent = '导入' + typeLabel(currentType) + '原料';
-      document.getElementById('materialTypeText').value = typeLabel(currentType);
-      document.getElementById('materialSource').value = '手动';
+      document.getElementById('createTitle').textContent = '导入' + typeLabel(importType) + '原料';
+      document.getElementById('materialTypeSelect').innerHTML = typeOptions.map(item => '<option value="' + esc(item.key) + '"' + (item.key === importType ? ' selected' : '') + '>' + esc(item.label) + '</option>').join('');
+      configureImportForm();
+      uploadedFiles = [];
+      createTagSelections = {};
+      createTagPickerOpen = false;
+      document.getElementById('createMask').classList.add('show');
+      runAiTagging();
+    }
+
+    function configureImportForm() {
+      const format = typeConfig(importType).format;
       document.getElementById('contentField').style.display = format === 'copy' ? 'flex' : 'none';
       document.getElementById('uploadField').style.display = format === 'copy' ? 'none' : 'flex';
       document.getElementById('materialFile').accept = format === 'copy' ? '.txt,.md,.doc,.docx' : format === 'image' ? 'image/*' : format === 'audio' ? 'audio/*' : 'video/*';
       document.getElementById('materialFile').value = '';
       document.getElementById('uploadMainText').textContent = '点击或拖拽文件到此处上传';
-      document.getElementById('uploadHint').textContent = '支持当前类型对应的文件格式，可一次选择多个文件';
+      document.getElementById('uploadHint').textContent = '支持单个或批量文件，不支持文件夹';
+    }
+
+    function setImportType(type) {
+      importType = type;
+      document.getElementById('createTitle').textContent = '导入' + typeLabel(importType) + '原料';
+      document.getElementById('materialName').value = '';
+      document.getElementById('materialContent').value = '';
       uploadedFiles = [];
       createTagSelections = {};
       createTagPickerOpen = false;
-      document.getElementById('createMask').classList.add('show');
+      configureImportForm();
       runAiTagging();
     }
 
@@ -1888,6 +1917,11 @@
 
     function handleMaterialDrop(event) {
       event.preventDefault();
+      const entries = Array.from(event.dataTransfer?.items || []).map(item => item.webkitGetAsEntry ? item.webkitGetAsEntry() : null);
+      if (entries.some(entry => entry && entry.isDirectory)) {
+        showToast('暂不支持拖入文件夹，请选择单个或一批文件');
+        return;
+      }
       uploadedFiles = event.dataTransfer && event.dataTransfer.files ? Array.from(event.dataTransfer.files) : [];
       applyUploadedFile();
     }
@@ -1895,11 +1929,9 @@
     function applyUploadedFile() {
       const firstFile = uploadedFiles[0];
       document.getElementById('uploadMainText').textContent = uploadedFiles.length > 1 ? '已识别 ' + uploadedFiles.length + ' 个文件，将分别入库' : firstFile ? firstFile.name : '点击或拖拽文件到此处上传';
-      document.getElementById('uploadHint').textContent = uploadedFiles.length > 1 ? uploadedFiles.map(file => file.name).join('、') : '支持当前类型对应的文件格式，可一次选择多个文件';
-      if (firstFile && !document.getElementById('materialName').value.trim()) {
-        document.getElementById('materialName').value = firstFile.name.replace(/\.[^.]+$/, '');
-      }
-      if (firstFile && currentFormat() === 'copy' && /\.(txt|md)$/i.test(firstFile.name)) {
+      document.getElementById('uploadHint').textContent = uploadedFiles.length > 1 ? uploadedFiles.map(file => file.name).join('、') : '支持单个或批量文件，不支持文件夹';
+      if (firstFile) document.getElementById('materialName').value = firstFile.name.replace(/\.[^.]+$/, '');
+      if (firstFile && typeConfig(importType).format === 'copy' && /\.(txt|md)$/i.test(firstFile.name)) {
         const reader = new FileReader();
         reader.onload = () => { document.getElementById('materialContent').value = String(reader.result || ''); };
         reader.readAsText(firstFile);
@@ -1917,7 +1949,7 @@
       const selectedTags = allSelectedTags(createTagSelections);
       if (!selectedTags.length) return showToast('请选择标签');
       const content = document.getElementById('materialContent').value.trim();
-      const format = currentFormat();
+      const format = typeConfig(importType).format;
       const copyParts = format === 'copy' ? content.split(/\n\s*\n+/).map(item => item.trim()).filter(Boolean) : [];
       const candidates = format === 'copy'
         ? copyParts.map((text, index) => ({ name: name || '文案 ' + (index + 1), content:text, file:null }))
@@ -1931,13 +1963,13 @@
           name: candidates.length === 1 && name ? name : candidate.name,
           fileName: candidate.file ? candidate.file.name : '',
           type: format,
-          materialType: currentType,
-          format: typeConfig(currentType).formatLabel,
+          materialType: importType,
+          format: typeConfig(importType).formatLabel,
           content: candidate.content,
           url,
           thumb: url,
           tags: selectedTags.slice(),
-          source: document.getElementById('materialSource').value.trim() || '手动',
+          source: '手动',
           owner: library.currentUser.name,
           createdAt: '2026-07-13',
           visibility: '全部',

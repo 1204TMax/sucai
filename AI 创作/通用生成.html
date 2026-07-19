@@ -807,7 +807,7 @@
             height: 28px; padding: 0 12px; border: 0; border-radius: 4px; background: transparent;
             color: #595959; font: inherit; font-size: 13px; cursor: pointer;
         }
-        .asset-scope-btn.active { background: #fff; color: #4A9EFF; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .asset-scope-btn.active { background: #fff; color: #4A9EFF; }
         .asset-tag-select { position: relative; width: 220px; min-width: 0; }
         .asset-tag-select summary {
             height: 32px; padding: 0 28px 0 10px; border: 1px solid #e0e0e0; border-radius: 6px;
@@ -820,7 +820,7 @@
             border-right: 1px solid #8c8c8c; border-bottom: 1px solid #8c8c8c;
             transform: translateY(-70%) rotate(45deg); transition: transform 0.12s ease;
         }
-        .asset-tag-select[open] summary { border-color: #5AA4FF; box-shadow: 0 0 0 2px rgba(74,158,255,0.1); }
+        .asset-tag-select[open] summary { border-color: #5AA4FF; }
         .asset-tag-select[open] summary::after { transform: translateY(-30%) rotate(225deg); }
         .asset-tag-select-name { color: #262626; font-weight: 500; }
         .asset-tag-select-value { max-width: 120px; overflow: hidden; color: #4A9EFF; text-overflow: ellipsis; }
@@ -921,6 +921,8 @@
             background-repeat: no-repeat; background-position: right 10px center;
         }
         .asset-filter-select:focus { border-color: #4A9EFF; }
+        .asset-library-source { width: 150px; flex: 0 0 150px; }
+        .asset-workflow-search { width: 220px; flex: 0 0 220px; }
         .date-range-custom {
             display: none; align-items: center; gap: 4px;
         }
@@ -2732,6 +2734,8 @@ let assetCurrentCat = '原料库';
 let assetCurrentType = 'image';
 let assetCurrentMaterialCategory = 'actor';
 let assetOwnerScope = 'mine';
+let assetSourceFilter = '全部';
+let assetWorkflowQuery = '';
 let assetTagSelections = {};
 let assetTagPanelOpen = false;
 let assetTagQuery = '';
@@ -2795,6 +2799,18 @@ function setAssetOwnerScope(scope) {
     assetOwnerScope = scope;
     renderAssetTypeList();
     renderFilterBar();
+    renderAssetGrid();
+}
+
+function setAssetSourceFilter(source) {
+    assetSourceFilter = source || '全部';
+    if (assetSourceFilter !== '工作流') assetWorkflowQuery = '';
+    renderFilterBar();
+    renderAssetGrid();
+}
+
+function setAssetWorkflowQuery(value) {
+    assetWorkflowQuery = value || '';
     renderAssetGrid();
 }
 
@@ -2900,14 +2916,25 @@ function renderReferenceFilters() {
     const hasTags = Object.values(assetTagSelections).some(items => items.length);
     const selectedCount = Object.values(assetTagSelections).reduce((sum, items) => sum + (items || []).length, 0);
     const appliedTags = groups.flatMap(group => (assetTagSelections[group.id] || []).map(tag => ({ groupId:group.id, tag })));
+    const currentItems = (MOCK_ASSETS['原料库'] || []).filter(item => item.type === assetCurrentType && item.materialType === assetCurrentMaterialCategory);
+    const mineCount = currentItems.filter(item => !SHARED_MATERIAL_LIBRARY.matchOwnership || SHARED_MATERIAL_LIBRARY.matchOwnership(item, 'mine')).length;
+    const workflowNames = [...new Set(currentItems.filter(item => item.source === '工作流').map(item => item.workflowName).filter(Boolean))];
     return `
         <div class="asset-filter-row asset-filter-row-main">
             <span class="asset-filter-label">创建者</span>
             <div class="asset-scope-group">
-                <button type="button" class="asset-scope-btn${assetOwnerScope === 'mine' ? ' active' : ''}" onclick="setAssetOwnerScope('mine')">我的</button>
-                <button type="button" class="asset-scope-btn${assetOwnerScope === 'all' ? ' active' : ''}" onclick="setAssetOwnerScope('all')">全部</button>
+                <button type="button" class="asset-scope-btn${assetOwnerScope === 'mine' ? ' active' : ''}" onclick="setAssetOwnerScope('mine')">我的 ${mineCount}</button>
+                <button type="button" class="asset-scope-btn${assetOwnerScope === 'all' ? ' active' : ''}" onclick="setAssetOwnerScope('all')">全部 ${currentItems.length}</button>
             </div>
-            <input class="asset-search" id="assetSearchInput" value="${refAttr(assetSearchQuery)}" placeholder="搜索名称、内容、人员、来源" oninput="onAssetSearch(this.value)">
+            <span class="asset-filter-label">入库来源</span>
+            <select class="asset-filter-select asset-library-source" onchange="setAssetSourceFilter(this.value)">
+                <option value="全部"${assetSourceFilter === '全部' ? ' selected' : ''}>全部来源</option>
+                <option value="工作流"${assetSourceFilter === '工作流' ? ' selected' : ''}>工作流</option>
+                <option value="数据中台"${assetSourceFilter === '数据中台' ? ' selected' : ''}>数据中台</option>
+                <option value="手动"${assetSourceFilter === '手动' ? ' selected' : ''}>手动</option>
+                <option value="我的任务"${assetSourceFilter === '我的任务' ? ' selected' : ''}>我的任务</option>
+            </select>
+            ${assetSourceFilter === '工作流' ? `<input class="asset-search asset-workflow-search" list="assetWorkflowOptions" value="${refAttr(assetWorkflowQuery)}" placeholder="搜索工作流名称" oninput="setAssetWorkflowQuery(this.value)"><datalist id="assetWorkflowOptions">${workflowNames.map(name => `<option value="${refAttr(name)}"></option>`).join('')}</datalist>` : ''}
         </div>
         <div class="asset-filter-row">
             <span class="asset-filter-label">标签</span>
@@ -2975,6 +3002,8 @@ function openAssetModal(cat) {
     if (!selectableReferenceTypes().some(item => item.key === assetCurrentType)) assetCurrentType = 'image';
     assetCurrentMaterialCategory = selectableMaterialCategories()[0]?.key || '';
     assetOwnerScope = 'mine';
+    assetSourceFilter = '全部';
+    assetWorkflowQuery = '';
     assetTagSelections = {};
     assetTagPanelOpen = false;
     assetTagQuery = '';
@@ -3206,6 +3235,8 @@ function getVisibleAssetItems() {
         if (item.type !== assetCurrentType) return false;
         if (assetCurrentCat === '原料库' && item.materialType !== assetCurrentMaterialCategory) return false;
         if (SHARED_MATERIAL_LIBRARY.matchOwnership && !SHARED_MATERIAL_LIBRARY.matchOwnership(item, assetOwnerScope)) return false;
+        if (assetCurrentCat === '原料库' && assetSourceFilter !== '全部' && item.source !== assetSourceFilter) return false;
+        if (assetCurrentCat === '原料库' && assetSourceFilter === '工作流' && assetWorkflowQuery && !String(item.workflowName || '').toLowerCase().includes(assetWorkflowQuery.toLowerCase())) return false;
         if (SHARED_MATERIAL_LIBRARY.matchTagSelections && !SHARED_MATERIAL_LIBRARY.matchTagSelections(item, assetTagSelections)) return false;
         if (!q) return true;
         const text = [item.name, item.format, item.source, item.owner, item.content || '', (item.tags || []).join(' ')].join(' ').toLowerCase();
