@@ -61,10 +61,22 @@
             background: #f0f7ff;
         }
 
-        .reedit-notice-main { min-width: 0; }
+        .reedit-notice-main { min-width: 0; flex: 1; }
         .reedit-notice-title { color: #1f1f1f; font-weight: 600; margin-bottom: 4px; }
         .reedit-notice-copy { color: #595959; line-height: 1.65; }
-        .reedit-notice-action { flex-shrink: 0; height: 32px; padding: 0 14px; border: 1px solid #4a9eff; border-radius: 6px; background: #fff; color: #1677ff; cursor: pointer; }
+        .reedit-notice-body { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+        .reedit-notice-body .reedit-notice-main { flex: 1; min-width: 0; }
+        .reedit-notice-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .reedit-notice-toggle { height: 32px; padding: 0; border: none; background: none; color: #1677ff; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .reedit-notice-toggle:hover { text-decoration: underline; }
+        .reedit-notice-action { flex-shrink: 0; height: 32px; padding: 0 14px; border: 1px solid #4a9eff; border-radius: 6px; background: #fff; color: #1677ff; cursor: pointer; white-space: nowrap; }
+        .reedit-notice-close { width: 24px; height: 24px; padding: 0; border: none; background: none; color: #8c8c8c; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 4px; flex-shrink: 0; font-size: 16px; line-height: 1; }
+        .reedit-notice-close:hover { background: rgba(0,0,0,0.06); color: #434343; }
+        .reedit-notice-suggestions { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #b8d8ff; }
+        .reedit-notice.expanded .reedit-notice-suggestions { display: block; }
+        .reedit-notice-suggestions-title { font-weight: 500; color: #1f1f1f; margin-bottom: 6px; font-size: 13px; }
+        .reedit-notice-suggestion { display: flex; align-items: center; gap: 8px; color: #595959; font-size: 13px; margin-bottom: 4px; }
+        .reedit-notice-suggestion::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: #4a9eff; flex-shrink: 0; }
         .reedit-showcase { display: grid; gap: 10px; }
         .reedit-showcase-label { color: #8c8c8c; font-size: 12px; margin-bottom: 5px; }
         .reedit-cut-context { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 14px 16px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fafafa; }
@@ -1247,6 +1259,7 @@
             const [reeditContext, setReeditContext] = useState(null);
             const [reeditChanged, setReeditChanged] = useState(false);
             const [reusePreviousCutResult, setReusePreviousCutResult] = useState(true);
+            const [reeditNoticeExpanded, setReeditNoticeExpanded] = useState(false);
             const [referenceQuery, setReferenceQuery] = useState('');
             const [referenceOwner, setReferenceOwner] = useState('mine');
             const [referenceSourceFilter, setReferenceSourceFilter] = useState('全部');
@@ -1367,12 +1380,25 @@
 
             const getReeditNotice = context => {
                 const notice = context?.businessNotice || {};
-                if (notice.kind === 'missing') {
-                    const positions = (notice.missingPositions || []).join('、') || '必要位置';
-                    return { copy: `原任务的${positions}未识别到可用片段。你可以查看卡断结果，补充素材或重新卡断后创建新任务。`, action: '查看卡断结果' };
-                }
-                if (notice.kind === 'zero') return { copy: '原任务未形成可用混剪组合。你可以查看混剪规则和片段池，调整混剪配置、补充素材或重新卡断后创建新任务。', action: '查看混剪结果' };
-                return { copy: `原任务匹配出 ${notice.matched || 60}/${notice.target || 100} 组可用组合，比目标少 ${(notice.target || 100) - (notice.matched || 60)} 组。你可以调整混剪配置、补充素材或重新卡断后创建新任务。`, action: '查看混剪结果' };
+                var matched = notice.matched || 8;
+                var target = notice.target || 10;
+                var shortfall = Math.max(target - matched, 0);
+                var suggestions = notice.suggestions && notice.suggestions.length
+                    ? notice.suggestions
+                    : ['开头片段 2 个', '中段片段 3 个', '结尾片段 2 个', '带操作演示内容的中段片段 1 个'];
+                var summary = '原任务当前可用 ' + matched + '/' + target + ' 组，距离目标还差 ' + shortfall + ' 组。';
+                return {
+                    title: '可用组合数未达到目标数量',
+                    summary: summary,
+                    matched: matched,
+                    target: target,
+                    shortfall: shortfall,
+                    suggestions: suggestions,
+                    kind: notice.kind,
+                    missingPositions: notice.missingPositions || [],
+                    copy: summary,
+                    action: '查看混剪结果'
+                };
             };
 
             const openPreviousResult = (context, action) => {
@@ -1385,13 +1411,37 @@
                 }
             };
 
+            const dismissReeditNotice = () => {
+                if (reeditContext?.taskId) {
+                    const noticeKey = `workflow-reedit-notice-${reeditContext.taskId}`;
+                    sessionStorage.setItem(noticeKey, 'dismissed');
+                }
+                setReeditContext(prev => prev ? { ...prev, showNotice: false } : null);
+            };
+
             const renderReeditNotice = (context, label) => {
                 const content = getReeditNotice(context);
                 return <div>
                     {label && <div className="reedit-showcase-label">{label}</div>}
-                    <div className="reedit-notice">
-                        <div className="reedit-notice-main"><div className="reedit-notice-title">原任务结果需要确认</div><div className="reedit-notice-copy">{content.copy}</div></div>
-                        <button className="reedit-notice-action" type="button" onClick={() => openPreviousResult(context, content.action)}>{content.action}</button>
+                    <div className={'reedit-notice' + (reeditNoticeExpanded ? ' expanded' : '')}>
+                        <div className="reedit-notice-main">
+                            <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between'}}>
+                                <div className="reedit-notice-title">{content.title}</div>
+                                <button className="reedit-notice-close" type="button" onClick={dismissReeditNotice} title="关闭">×</button>
+                            </div>
+                            <div className="reedit-notice-body">
+                                <div className="reedit-notice-main">
+                                    <div className="reedit-notice-copy">{content.summary}</div>
+                                </div>
+                                <div className="reedit-notice-actions">
+                                    <button className="reedit-notice-toggle" type="button" onClick={() => setReeditNoticeExpanded(!reeditNoticeExpanded)}>{reeditNoticeExpanded ? '收起建议' : '展开建议'}</button>
+                                </div>
+                            </div>
+                            <div className="reedit-notice-suggestions">
+                                <div className="reedit-notice-suggestions-title">建议补充（任选一种）：</div>
+                                {content.suggestions.map((s, i) => <div key={i} className="reedit-notice-suggestion">{s}</div>)}
+                            </div>
+                        </div>
                     </div>
                 </div>;
             };

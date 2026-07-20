@@ -362,11 +362,25 @@
     .card-bottom-meta { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-muted); margin-left: auto; }
     .card-bottom-meta .c-tag { margin: 0; }
     .card-bottom-count { color: var(--text-lo); font-size: var(--text-sm); font-variant-numeric: tabular-nums; }
-    .workflow-business-notice { margin: 0 var(--space-5) var(--space-3); padding: var(--space-3) var(--space-4); border: 1px solid var(--accent-border); border-radius: var(--r-md); background: var(--accent-bg); color: var(--text-lo); font-size: var(--text-sm); line-height: 1.6; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+    .workflow-business-notice { margin: 0 var(--space-5) var(--space-3); border: 1px solid var(--accent-border); border-radius: var(--r-md); background: var(--accent-bg); color: var(--text-lo); font-size: var(--text-sm); line-height: 1.6; overflow: hidden; }
+    .workflow-business-notice-main { padding: var(--space-3) var(--space-4); display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
     .workflow-business-notice-copy { min-width: 0; }
-    .workflow-business-notice-actions { flex-shrink: 0; display: flex; gap: var(--space-2); }
-    .workflow-business-notice button { height: var(--h-sm); padding: 0 var(--space-3); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--accent-text); font-size: var(--text-sm); cursor: pointer; }
+    .workflow-business-notice-title { font-weight: 600; color: var(--text-hi); margin-bottom: var(--space-1); }
+    .workflow-business-notice-summary { color: var(--text-lo); }
+    .workflow-business-notice-actions { flex-shrink: 0; display: flex; align-items: center; gap: var(--space-2); }
+    .workflow-business-notice button { height: var(--h-sm); padding: 0 var(--space-3); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--accent-text); font-size: var(--text-sm); cursor: pointer; transition: all var(--ease); }
     .workflow-business-notice button:hover { border-color: var(--accent-solid); background: var(--bg-surface); color: var(--accent-solid); }
+    .workflow-business-notice .wf-biz-toggle { border-color: transparent; background: transparent; color: var(--accent-text); padding: 0 var(--space-1); }
+    .workflow-business-notice .wf-biz-toggle:hover { color: var(--accent-solid); background: transparent; }
+    .workflow-business-notice-close { width: 20px; height: 20px; padding: 0; border: none; background: transparent; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: var(--r-sm); transition: all var(--ease); }
+    .workflow-business-notice-close:hover { background: var(--accent-bg); color: var(--text-hi); }
+    .workflow-business-notice-close svg { width: 14px; height: 14px; }
+    .workflow-business-notice-suggestions { display: none; padding: 0 var(--space-4) var(--space-3); }
+    .workflow-business-notice.expanded .workflow-business-notice-suggestions { display: block; }
+    .workflow-business-notice-suggestions-title { font-weight: 500; color: var(--text-hi); margin-bottom: var(--space-2); }
+    .workflow-business-notice-suggestions-list { display: flex; flex-direction: column; gap: var(--space-1); }
+    .workflow-business-notice-suggestion { display: flex; align-items: center; gap: var(--space-2); color: var(--text-lo); }
+    .workflow-business-notice-suggestion::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-solid); flex-shrink: 0; }
     .card-act-btn { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-2) var(--space-4); border-radius: var(--r-full); border: 1px solid var(--border-1); background: var(--bg-surface); font-size: var(--text-base); color: var(--text-lo); cursor: pointer; transition: all var(--ease); position: relative; }
     .card-act-btn:hover { border-color: var(--accent-solid); color: var(--accent-solid); }
     .card-act-btn.card-act-detail { border-color: var(--border-2); background: var(--bg-surface); color: var(--text-lo); }
@@ -654,6 +668,21 @@
     .wf-error-node-detail-value { color: var(--text-lo); word-break: break-word; }
     .wf-error-node-action { margin-top: var(--space-3); height: var(--h-sm); padding: 0 var(--space-3); border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-surface); color: var(--accent-text); font-size: var(--text-sm); font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-1); transition: all var(--ease); }
     .wf-error-node-action:hover { border-color: var(--accent-solid); background: var(--accent-bg); color: var(--accent-solid); }
+    /* 节点展开/收起 */
+    .wf-error-node-core { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+    .wf-error-node-core-metrics { display: flex; flex-direction: column; gap: var(--space-1); font-size: var(--text-sm); flex: 1; min-width: 0; }
+    .wf-error-node-core-metric { display: flex; align-items: center; gap: var(--space-2); }
+    .wf-error-node-core-metric-label { color: var(--text-muted); white-space: nowrap; }
+    .wf-error-node-core-metric-value { color: var(--text-hi); font-weight: 500; }
+    .wf-error-node-toggle { height: var(--h-sm); padding: 0; border: none; background: none; color: var(--accent-text); font-size: var(--text-sm); cursor: pointer; white-space: nowrap; flex-shrink: 0; font-family: inherit; }
+    .wf-error-node-toggle:hover { text-decoration: underline; color: var(--accent-solid); }
+    .wf-error-node-full { display: none; margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px dashed var(--border-1); }
+    .wf-error-node-item.expanded .wf-error-node-full { display: block; }
+    .wf-error-node-running { color: var(--text-muted); font-size: var(--text-sm); font-style: italic; }
+    .wf-error-node-suggestions { margin-top: var(--space-3); }
+    .wf-error-node-suggestions-title { font-weight: 500; color: var(--text-hi); font-size: var(--text-sm); margin-bottom: var(--space-2); }
+    .wf-error-node-suggestion { display: flex; align-items: center; gap: var(--space-2); color: var(--text-lo); font-size: var(--text-sm); margin-bottom: var(--space-1); }
+    .wf-error-node-suggestion::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-solid); flex-shrink: 0; }
     .wf-error-empty { color: var(--text-ghost); font-style: italic; font-size: var(--text-sm); margin: var(--space-2) 0; }
     .wf-run-summary { padding: var(--space-4) var(--space-5); border: 1px solid var(--accent-border); border-radius: var(--r-lg); background: var(--accent-bg); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
     .wf-run-summary-copy { color: var(--text-hi); font-size: var(--text-sm); line-height: 1.65; font-weight: 500; }
@@ -2910,26 +2939,86 @@ function openWorkflowDetail(taskId) {
     html += '<p class="wf-error-empty">暂无节点说明信息</p>';
   } else {
     html += '<div class="wf-error-node-list">';
-    nodeSummaries.forEach(function(summary) {
-      html += '<div class="wf-error-node-item">'
-        + '<div class="wf-error-node-title">' + escHtml(summary.title) + '</div>'
-        + (summary.text ? '<p class="wf-error-node-summary">' + escHtml(summary.text) + '</p>' : '');
-      if (summary.details && summary.details.length) {
-        html += '<div class="wf-error-node-details">';
-        summary.details.forEach(function(detail) {
-          html += '<div class="wf-error-node-detail">'
-            + '<div class="wf-error-node-detail-label">' + escHtml(detail.label || '说明') + '</div>'
-            + '<div class="wf-error-node-detail-value">' + escHtml(detail.value) + '</div>'
+    var notice = task.businessNotice;
+    nodeSummaries.forEach(function(summary, index) {
+      var nodeId = 'wf-run-node-' + encodedTaskId + '-' + index;
+      var title = summary.title || '';
+      var isMixNode = title.indexOf('混剪') !== -1;
+      var isSynthNode = title.indexOf('合成') !== -1;
+      var isBizNode = notice && (isMixNode || isSynthNode);
+      var matched = notice ? (notice.matched || 8) : 8;
+      var target = notice ? (notice.target || 10) : 10;
+      var shortfall = Math.max(target - matched, 0);
+      var suggestions = ['开头片段 2 个', '中段片段 3 个', '结尾片段 2 个', '带操作演示内容的中段片段 1 个'];
+      var hasResult = !!summary.text || (summary.details && summary.details.length > 0);
+
+      html += '<div class="wf-error-node-item" id="' + nodeId + '">'
+        + '<div class="wf-error-node-title">' + escHtml(title) + '</div>';
+
+      if (isBizNode && hasResult) {
+        // 有业务通知数据且有结果 → 展开/收起模式
+        html += '<div class="wf-error-node-core">'
+          + '<div class="wf-error-node-core-metrics">';
+        if (isMixNode) {
+          html += '<div class="wf-error-node-core-metric"><span class="wf-error-node-core-metric-label">卡断视频数：</span><span class="wf-error-node-core-metric-value">10 个</span></div>';
+        }
+        html += '<div class="wf-error-node-core-metric"><span class="wf-error-node-core-metric-label">可用组合数：</span><span class="wf-error-node-core-metric-value">' + matched + ' 组</span></div>'
+          + '<div class="wf-error-node-core-metric"><span class="wf-error-node-core-metric-label">距离目标还差：</span><span class="wf-error-node-core-metric-value">' + shortfall + ' 组</span></div>'
+          + '</div>'
+          + '<button class="wf-error-node-toggle" onclick="event.stopPropagation();toggleNodeDetail(\'' + nodeId + '\')">展开详情</button>'
+          + '</div>';
+
+        // 展开后的完整内容
+        html += '<div class="wf-error-node-full">';
+        if (isMixNode) {
+          html += '<div class="wf-error-node-details">'
+            + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">卡断视频数</div><div class="wf-error-node-detail-value">10 个</div></div>'
+            + '</div>'
+            + '<p class="wf-error-node-summary" style="margin-top:var(--space-3);font-weight:500;">片段结果：</p>'
+            + '<div class="wf-error-node-details">'
+            + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">前贴</div><div class="wf-error-node-detail-value">1 个</div></div>'
+            + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">开头</div><div class="wf-error-node-detail-value">3 个</div></div>'
+            + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">中段</div><div class="wf-error-node-detail-value">1 个</div></div>'
+            + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">结尾</div><div class="wf-error-node-detail-value">1 个</div></div>'
+            + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">包含操作演示的片段</div><div class="wf-error-node-detail-value">2 个</div></div>'
             + '</div>';
-        });
+        }
+        html += '<div class="wf-error-node-details" style="margin-top:var(--space-3);">'
+          + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">可用组合数</div><div class="wf-error-node-detail-value">' + matched + ' 组</div></div>'
+          + '<div class="wf-error-node-detail"><div class="wf-error-node-detail-label">距离目标还差</div><div class="wf-error-node-detail-value">' + shortfall + ' 组</div></div>'
+          + '</div>'
+          + '<div class="wf-error-node-suggestions">'
+          + '<div class="wf-error-node-suggestions-title">建议补充（任选一种）：</div>'
+          + suggestions.map(function(s) { return '<div class="wf-error-node-suggestion">' + escHtml(s) + '</div>'; }).join('')
+          + '</div>';
         html += '</div>';
+
+      } else if (isBizNode && !hasResult) {
+        // 有业务通知数据但节点尚未返回结果
+        html += '<div class="wf-error-node-running">运行中</div>';
+      } else {
+        // 非业务节点：使用原有渲染逻辑
+        if (summary.text) {
+          html += '<p class="wf-error-node-summary">' + escHtml(summary.text) + '</p>';
+        }
+        if (summary.details && summary.details.length) {
+          html += '<div class="wf-error-node-details">';
+          summary.details.forEach(function(detail) {
+            html += '<div class="wf-error-node-detail">'
+              + '<div class="wf-error-node-detail-label">' + escHtml(detail.label || '说明') + '</div>'
+              + '<div class="wf-error-node-detail-value">' + escHtml(detail.value) + '</div>'
+              + '</div>';
+          });
+          html += '</div>';
+        }
+        if (summary.action) {
+          html += '<button class="wf-error-node-action" onclick="event.stopPropagation();openWorkflowNodeResult(decodeURIComponent(\'' + encodedTaskId + '\'),\'' + escJs(summary.action.type) + '\')">'
+            + icon(SVG.eye, 12) + ' ' + escHtml(summary.action.label)
+            + (summary.action.count !== undefined ? '（' + escHtml(summary.action.count) + '）' : '')
+            + '</button>';
+        }
       }
-      if (summary.action) {
-        html += '<button class="wf-error-node-action" onclick="event.stopPropagation();openWorkflowNodeResult(decodeURIComponent(\'' + encodedTaskId + '\'),\'' + escJs(summary.action.type) + '\')">'
-          + icon(SVG.eye, 12) + ' ' + escHtml(summary.action.label)
-          + (summary.action.count !== undefined ? '（' + escHtml(summary.action.count) + '）' : '')
-          + '</button>';
-      }
+
       html += '</div>';
     });
     html += '</div>';
@@ -3021,12 +3110,40 @@ function renderWorkflowBusinessNotice(task) {
   var notice = task && task.businessNotice;
   if (!notice || !notice.message) return '';
   var id = escJs(task.id || '');
-  return '<div class="workflow-business-notice">'
-    + '<div class="workflow-business-notice-copy">' + escHtml(notice.message) + '</div>'
+  var matched = notice.matched || 8;
+  var target = notice.target || 10;
+  var shortfall = Math.max(target - matched, 0);
+  var currentFragments = notice.currentFragments && notice.currentFragments.length
+    ? notice.currentFragments
+    : ['开头片段 3 个', '中段片段 1 个', '结尾片段 1 个', '带产品演示内容的片段 2 个'];
+  var suggestions = notice.suggestions && notice.suggestions.length
+    ? notice.suggestions
+    : ['开头片段 2 个', '中段片段 3 个', '结尾片段 2 个', '带操作演示内容的中段片段 1 个'];
+  return '<div class="workflow-business-notice" id="wf-biz-notice-' + id + '">'
+    + '<div class="workflow-business-notice-main">'
+    + '<div class="workflow-business-notice-copy">'
+    + '<div class="workflow-business-notice-title">可用组合数未达到目标数量</div>'
+    + '<div class="workflow-business-notice-summary">当前可用 ' + matched + '/' + target + ' 组，距离目标还差 ' + shortfall + ' 组。</div>'
+    + '</div>'
     + '<div class="workflow-business-notice-actions">'
-    + '<button onclick="event.stopPropagation();openWorkflowDetail(\'' + id + '\')">查看运行详情</button>'
-    + '<button onclick="event.stopPropagation();handleReEditById(\'' + id + '\')">补充后重新开始</button>'
-    + '</div></div>';
+    + '<button class="wf-biz-toggle" onclick="event.stopPropagation();toggleBusinessNotice(\'' + id + '\')">展开建议</button>'
+    + '<button onclick="event.stopPropagation();handleReEditById(\'' + id + '\')">补充后重试</button>'
+    + '<button class="workflow-business-notice-close" onclick="event.stopPropagation();closeBusinessNotice(\'' + id + '\')" title="关闭">'
+    + '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>'
+    + '</button>'
+    + '</div>'
+    + '</div>'
+    + '<div class="workflow-business-notice-suggestions">'
+    + '<div class="workflow-business-notice-suggestions-title">当前片段数量：</div>'
+    + '<div class="workflow-business-notice-suggestions-list">'
+    + currentFragments.map(function(s) { return '<div class="workflow-business-notice-suggestion">' + escHtml(s) + '</div>'; }).join('')
+    + '</div>'
+    + '<div class="workflow-business-notice-suggestions-title" style="margin-top:var(--space-3);">建议补充（任选一种）：</div>'
+    + '<div class="workflow-business-notice-suggestions-list">'
+    + suggestions.map(function(s) { return '<div class="workflow-business-notice-suggestion">' + escHtml(s) + '</div>'; }).join('')
+    + '</div>'
+    + '</div>'
+    + '</div>';
 }
 
 function renderOutputArea(task, currentOutput, collapsed, vm) {
@@ -4430,6 +4547,24 @@ function handleReEditById(id) { var t=getTaskById(id); if(t) window.__handleReEd
 function handleRetryById(id) { var t=getTaskById(id); if(t) window.__handleRetry(t); }
 function usePrompt(id) { var t=getTaskById(id); if(!t) return; setInputPromptText(t.input.prompt || ''); focusInputPrompt(); }
 function handleStopById(id) { var t=getTaskById(id); if(t) window.__handleStop(t); }
+function toggleBusinessNotice(taskId) {
+  var el = document.getElementById('wf-biz-notice-' + taskId);
+  if (!el) return;
+  var isExpanded = el.classList.toggle('expanded');
+  var toggleBtn = el.querySelector('.wf-biz-toggle');
+  if (toggleBtn) toggleBtn.textContent = isExpanded ? '收起建议' : '展开建议';
+}
+function closeBusinessNotice(taskId) {
+  var el = document.getElementById('wf-biz-notice-' + taskId);
+  if (el) el.remove();
+}
+function toggleNodeDetail(nodeId) {
+  var el = document.getElementById(nodeId);
+  if (!el) return;
+  var isExpanded = el.classList.toggle('expanded');
+  var toggleBtn = el.querySelector('.wf-error-node-toggle');
+  if (toggleBtn) toggleBtn.textContent = isExpanded ? '收起详情' : '展开详情';
+}
 function toggleNoticeCard(kind) {
   state.noticeExpanded[kind] = !state.noticeExpanded[kind];
   renderTaskFeed();
