@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>素材详情 - 量化投放系统</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --ant-primary-1: #E6F4FF;
+      --ant-primary-2: #BAE0FF;
+      --ant-primary-3: #91CAFF;
+      --ant-primary-4: #69B1FF;
+      --ant-primary-5: #4096FF;
+      --ant-primary-6: #1677FF;
+      --ant-primary-7: #0958D9;
+
+      --ant-success-1: #F6FFED;
+      --ant-success-2: #D9F7BE;
+      --ant-success-6: #52C41A;
+      --ant-warning-1: #FFFBE6;
+      --ant-warning-2: #FFF1B8;
+      --ant-warning-6: #FAAD14;
+      --ant-error-1: #FFF1F0;
+      --ant-error-2: #FFCCC7;
+      --ant-error-6: #F5222D;
+
+      --ant-text-color: #262626;
+      --ant-text-color-secondary: #595959;
+      --ant-text-color-tertiary: #8C8C8C;
+      --ant-text-color-quaternary: #BFBFBF;
+      --ant-text-color-inverse: #FFFFFF;
+
+      --ant-bg-base: #F5F5F5;
+      --ant-bg-container: #FFFFFF;
+      --ant-bg-secondary: rgba(0,0,0,0.02);
+      --ant-bg-tertiary: rgba(0,0,0,0.04);
+      --ant-border-color: #D9D9D9;
+      --ant-border-color-secondary: #F0F0F0;
+
+      --ant-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      --ant-font-size-h1: 38px;
+      --ant-font-size-h2: 30px;
+      --ant-font-size-h3: 24px;
+      --ant-font-size-h4: 20px;
+      --ant-font-size-h5: 16px;
+      --ant-font-size-lg: 16px;
+      --ant-font-size: 14px;
+      --ant-font-size-sm: 12px;
+
+      --ant-size-xxs: 4px;
+      --ant-size-xs: 8px;
+      --ant-size-sm: 12px;
+      --ant-size: 16px;
+      --ant-size-md: 20px;
+      --ant-size-lg: 24px;
+      --ant-size-xl: 32px;
+      --ant-size-xxl: 48px;
+
+      --ant-border-radius-xs: 2px;
+      --ant-border-radius-sm: 4px;
+      --ant-border-radius: 6px;
+      --ant-border-radius-lg: 8px;
+      --ant-border-radius-xl: 16px;
+
+      --ant-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      --ant-box-shadow-secondary: 0 4px 16px rgba(0,0,0,0.12);
+      --ant-box-shadow-popup: 0 8px 24px rgba(0,0,0,0.15);
+      --ant-box-shadow-focus: 0 0 0 2px rgba(22,119,255,0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      font-family: var(--ant-font-family);
+      background: var(--ant-bg-base);
+      color: var(--ant-text-color);
+      font-size: var(--ant-font-size);
+      padding: var(--ant-size-xs);
+    }
+
+    button {
+      font: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .page {
+      width: 100%;
+      min-height: calc(100vh - var(--ant-size));
+      display: flex;
+      justify-content: flex-end;
+      align-items: stretch;
+    }
+
+    .drawer-shell {
+      width: min(100%, 1480px);
+      min-height: calc(100vh - var(--ant-size));
+      background: var(--ant-bg-container);
+      border-radius: var(--ant-border-radius-xl);
+      box-shadow: var(--ant-box-shadow-popup);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .drawer-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: var(--ant-bg-container);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      padding: var(--ant-size) var(--ant-size-lg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+    }
+
+    .header-title-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .drawer-title {
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.2;
+    }
+
+    .drawer-subtitle {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      font-size: var(--ant-font-size);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--ant-size-xs);
+      transition: all 0.2s ease;
+      border: 1px solid var(--ant-border-color);
+      color: var(--ant-text-color);
+      background: var(--ant-bg-container);
+    }
+
+    .btn:hover {
+      border-color: var(--ant-primary-5);
+      color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+
+    .btn-primary {
+      background: var(--ant-primary-6);
+      color: var(--ant-text-color-inverse);
+      border-color: var(--ant-primary-6);
+    }
+
+    .btn-primary:hover {
+      background: var(--ant-primary-5);
+      border-color: var(--ant-primary-5);
+      color: var(--ant-text-color-inverse);
+    }
+
+    .drawer-body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--ant-size);
+      padding: var(--ant-size);
+      overflow-y: auto;
+      min-height: 0;
+    }
+
+    .section-card {
+      background: var(--ant-bg-container);
+      border: 1px solid var(--ant-border-color-secondary);
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: var(--ant-box-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .section-head {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--ant-size);
+      background: var(--ant-bg-container);
+    }
+
+    .section-title-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-xs);
+    }
+
+    .section-title {
+      font-size: var(--ant-font-size-h5);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.2;
+    }
+
+    .section-content {
+      padding: var(--ant-size-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .hero-layout {
+      display: flex;
+      align-items: stretch;
+      gap: var(--ant-size);
+      flex-wrap: wrap;
+    }
+
+    .preview-panel {
+      flex: 0 0 320px;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+    }
+
+    .preview-stage {
+      width: 100%;
+      min-height: 480px;
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .preview-actions {
+      display: flex;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .tag {
+      min-height: 24px;
+      padding: 0 var(--ant-size-xs);
+      border-radius: var(--ant-border-radius-sm);
+      font-size: var(--ant-font-size-sm);
+      border: 1px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .tag-primary {
+      background: var(--ant-primary-1);
+      border-color: var(--ant-primary-2);
+      color: var(--ant-primary-6);
+    }
+
+    .tag-default {
+      background: var(--ant-bg-tertiary);
+      border-color: var(--ant-border-color);
+      color: var(--ant-text-color-secondary);
+    }
+
+    .info-panel {
+      flex: 1 1 500px;
+      min-width: 320px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--ant-size);
+      background: var(--ant-bg-container);
+      padding: var(--ant-size-lg);
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .detail-row-inline {
+      display: flex;
+      gap: var(--ant-size-sm);
+      align-items: flex-start;
+      margin-bottom: var(--ant-size-xs);
+    }
+
+    .detail-key {
+      flex: 0 0 100px;
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .detail-val {
+      flex: 1 1 auto;
+      font-size: var(--ant-font-size);
+      color: var(--ant-text-color);
+      font-weight: 400;
+      line-height: 1.5;
+      display: flex;
+      gap: var(--ant-size-xs);
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--ant-border-color-secondary);
+      margin: var(--ant-size-sm) 0;
+    }
+
+    .info-grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: var(--ant-size-lg);
+      row-gap: var(--ant-size-sm);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: var(--ant-size);
+    }
+
+    .stat-card {
+      padding: var(--ant-size);
+      border-radius: var(--ant-border-radius-lg);
+      border: 1px solid var(--ant-border-color-secondary);
+      background: var(--ant-bg-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--ant-size-sm);
+    }
+
+    .stat-title {
+      font-size: var(--ant-font-size-sm);
+      color: var(--ant-text-color-tertiary);
+      line-height: 1.5;
+    }
+
+    .stat-value {
+      font-size: var(--ant-font-size-h4);
+      font-weight: 600;
+      color: var(--ant-text-color);
+      line-height: 1.2;
+    }
+
+    .media-tabs {
+      display: flex;
+      align-items: center;
+      gap: var(--ant-size-sm);
+      flex-wrap: wrap;
+    }
+
+    .media-tab {
+      min-height: 32px;
+      padding: 0 var(--ant-size);
+      border-radius: var(--ant-border-radius);
+      border: 1px solid var(--ant-border-color);
+      color: var(--ant-text-color-secondary);
+      background: var(--ant-bg-container);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .media-tab:hover {
+      border-color: var(--ant-primary-5);
+      color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+    }
+
+    .media-tab.active {
+      border-color: var(--ant-primary-2);
+      color: var(--ant-primary-6);
+      background: var(--ant-primary-1);
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      box-shadow: var(--ant-box-shadow-popup);
+      border-radius: var(--ant-border-radius);
+      z-index: 100;
+      min-width: 140px;
+      padding: 4px 0;
+      margin-top: 4px;
+      border: 1px solid var(--ant-border-color-secondary);
+    }
+
+    .dropdown-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: var(--ant-font-size);
+      transition: background 0.2s;
+      color: var(--ant-text-color);
+    }
+
+    .dropdown-item:hover {
+      background: var(--ant-primary-1);
+      color: var(--ant-primary-6);
+    }
+
+    .dropdown-item.danger {
+      color: var(--ant-error-6);
+    }
+    
+    .dropdown-item.danger:hover {
+      background: var(--ant-error-1);
+      color: var(--ant-error-6);
+    }
+
+    .dropdown-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* 编辑图标与交互样式 */
+    .detail-row-inline {
+      position: relative;
+      padding: 4px 8px;
+      border-radius: var(--ant-border-radius);
+      transition: background 0.2s;
+    }
+
+    .detail-row-inline:hover {
+      background: var(--ant-bg-secondary);
+    }
+
+    .edit-icon {
+      font-size: 12px;
+      color: var(--ant-primary-6);
+      cursor: pointer;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .detail-row-inline:hover .edit-icon {
+      opacity: 1;
+    }
+
+    .editable-val {
+      transition: color 0.2s;
+    }
+
+    /* 编辑弹窗样式 */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--ant-bg-container);
+      width: 400px;
+      border-radius: var(--ant-border-radius-lg);
+      box-shadow: var(--ant-box-shadow-popup);
+      overflow: hidden;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-header {
+      padding: var(--ant-size) var(--ant-size-lg);
+      border-bottom: 1px solid var(--ant-border-color-secondary);
+      font-weight: 600;
+      font-size: var(--ant-font-size-h5);
+    }
+
+    .modal-body {
+      padding: var(--ant-size-lg);
+    }
+
+    .modal-footer {
+      padding: var(--ant-size-sm) var(--ant-size-lg);
+      border-top: 1px solid var(--ant-border-color-secondary);
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--ant-size-sm);
+    }
+
+    .input-field {
+      width: 100%;
+      height: 32px;
+      padding: 0 var(--ant-size-sm);
+      border: 1px solid var(--ant-border-color);
+      border-radius: var(--ant-border-radius);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: var(--ant-primary-6);
+      box-shadow: var(--ant-box-shadow-focus);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="drawer-shell">
+      <header class="drawer-header">
+        <div class="header-title-wrap">
+          <h1 class="drawer-title">素材详情</h1>
+        </div>
+        <div class="header-actions">
+          <button class="btn" type="button" onclick="handleClose()">关闭</button>
+        </div>
+      </header>
+
+      <div class="drawer-body">
+        <!-- 上半部分 -->
+        <section class="section-card" style="border: none; box-shadow: none; background: transparent;">
+          <div class="hero-layout">
+            <!-- 上半部分左侧：图像/视频预览及操作 -->
+            <aside class="preview-panel">
+              <div class="preview-stage">
+                <video src="https://www.w3schools.com/html/mov_bbb.mp4" controls style="width: 100%; height: 100%; object-fit: contain;"></video>
+              </div>
+              <div class="preview-actions">
+                <button class="btn" title="下载"><i class="fa-solid fa-download"></i> 下载</button>
+                <button class="btn" title="移动"><i class="fa-solid fa-folder-tree"></i> 移动</button>
+                <div class="dropdown-container">
+                  <button class="btn" onclick="toggleDropdown(this)" title="入库"><i class="fa-solid fa-box-archive"></i> 入库 <i class="fa-solid fa-chevron-down" style="font-size: 10px; margin-left: 2px;"></i></button>
+                  <div class="dropdown-menu">
+                    <div class="dropdown-item">入库到待优化</div>
+                    <div class="dropdown-item danger">入库到回收站</div>
+                  </div>
+                </div>
+                <button class="btn" title="收藏"><i class="fa-regular fa-star"></i> 收藏</button>
+              </div>
+            </aside>
+
+            <!-- 上半部分右侧：信息展示 -->
+            <div class="info-panel">
+              <!-- 一列布局 -->
+              <div class="detail-row-inline">
+                <div class="detail-key">目录</div>
+                <div class="detail-val">全部素材 / 素材库 / 春季大促活动 / 视频素材</div>
+              </div>
+              <div class="detail-row-inline">
+                <div class="detail-key">标签</div>
+                <div class="detail-val">
+                  <span class="tag tag-primary">女装</span>
+                  <span class="tag tag-primary">春夏上新</span>
+                  <span class="tag tag-default">爆款</span>
+                  <span class="tag tag-default">口播</span>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <!-- 两列布局 -->
+              <div class="info-grid-2col">
+                <div class="detail-row-inline"><div class="detail-key">编导</div><div class="detail-val"><span class="editable-val">Yuki</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('编导', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">策划</div><div class="detail-val"><span class="editable-val">张三</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('策划', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">设计师</div><div class="detail-val"><span class="editable-val">Mila</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('设计师', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">剪辑</div><div class="detail-val"><span class="editable-val">Allen</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('剪辑', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">拍摄</div><div class="detail-val"><span class="editable-val">李四</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('拍摄', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">演员</div><div class="detail-val"><span class="editable-val">安安</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('演员', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">上传人</div><div class="detail-val"><span class="editable-val">张宁</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('上传人', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">素材供应商</div><div class="detail-val"><span class="editable-val">自投团队</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('素材供应商', this)"></i></div></div>
+                <div class="detail-row-inline"><div class="detail-key">优化供应商</div><div class="detail-val"><span class="editable-val">星火传媒</span><i class="fa-solid fa-pen edit-icon" onclick="openEditModal('优化供应商', this)"></i></div></div>
+              </div>
+
+              <div class="divider"></div>
+
+              <!-- 两列布局 -->
+              <div class="info-grid-2col">
+                <div class="detail-row-inline"><div class="detail-key">上传时间</div><div class="detail-val">2026-04-20 09:12:33</div></div>
+                <div class="detail-row-inline"><div class="detail-key">上传人</div><div class="detail-val">张宁</div></div>
+                <div class="detail-row-inline"><div class="detail-key">大小</div><div class="detail-val">42.8 MB</div></div>
+                <div class="detail-row-inline"><div class="detail-key">素材来源</div><div class="detail-val">自产原创</div></div>
+                <div class="detail-row-inline"><div class="detail-key">尺寸</div><div class="detail-val">1080 × 1920</div></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 下半部分：数据表现 -->
+        <section class="section-card">
+          <div class="section-head" style="flex-wrap: wrap;">
+            <div class="section-title-wrap">
+              <div class="section-title">数据表现</div>
+            </div>
+            <div class="media-tabs" role="tablist">
+              <span style="font-size: 14px; color: var(--ant-text-color-secondary); margin-right: 8px;">选择媒体:</span>
+              <button class="media-tab active" type="button" onclick="switchMediaTab(this)">全部</button>
+              <button class="media-tab" type="button" onclick="switchMediaTab(this)">巨量</button>
+              <button class="media-tab" type="button" onclick="switchMediaTab(this)">快手</button>
+              <button class="media-tab" type="button" onclick="switchMediaTab(this)">腾讯</button>
+            </div>
+          </div>
+          <div class="section-content">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-title">拒审率</div>
+                <div class="stat-value">2.1%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">展示数</div>
+                <div class="stat-value">128,430</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">平均千次展现费用</div>
+                <div class="stat-value">¥12.5</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">点击数</div>
+                <div class="stat-value">4,957</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">点击率</div>
+                <div class="stat-value">3.86%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">转化数</div>
+                <div class="stat-value">319</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">转化率</div>
+                <div class="stat-value">6.43%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">转化成本</div>
+                <div class="stat-value">¥26.4</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-title">ROI</div>
+                <div class="stat-value">1.82</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- 编辑弹窗 -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <span id="modalTitle">编辑字段</span>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="editInput" class="input-field" placeholder="请输入新值">
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeEditModal()">取消</button>
+        <button class="btn btn-primary" onclick="saveEdit()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleClose() {
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ action: 'closeCurrentTab' }, '*');
+        return;
+      }
+      window.history.back();
+    }
+
+    function switchMediaTab(button) {
+      const buttons = document.querySelectorAll('.media-tab');
+      buttons.forEach(item => item.classList.remove('active'));
+      button.classList.add('active');
+      // 这里可以根据不同媒体加载不同数据，当前使用静态数据展示
+    }
+
+    function toggleDropdown(btn) {
+      const menu = btn.nextElementSibling;
+      const isDisplay = menu.style.display === 'block';
+      
+      // 关闭其他下拉菜单
+      document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+      
+      if (!isDisplay) {
+        menu.style.display = 'block';
+      }
+    }
+
+    // 编辑弹窗逻辑
+    let currentEditElement = null;
+
+    function openEditModal(label, iconBtn) {
+      const valSpan = iconBtn.previousElementSibling;
+      currentEditElement = valSpan;
+      
+      const modal = document.getElementById('editModal');
+      const title = document.getElementById('modalTitle');
+      const input = document.getElementById('editInput');
+      
+      title.textContent = `编辑${label}`;
+      input.value = valSpan.textContent;
+      modal.classList.add('active');
+      
+      // 自动聚焦
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('active');
+      currentEditElement = null;
+    }
+
+    function saveEdit() {
+      if (currentEditElement) {
+        const newValue = document.getElementById('editInput').value.trim();
+        if (newValue !== "") {
+          currentEditElement.textContent = newValue;
+          
+          // 给一个成功提示（简单变色效果）
+          currentEditElement.style.color = 'var(--ant-success-6)';
+          setTimeout(() => {
+            currentEditElement.style.color = '';
+          }, 1000);
+        }
+      }
+      closeEditModal();
+    }
+
+    // 支持回车保存
+    document.getElementById('editInput')?.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') saveEdit();
+    });
+
+    // 点击外部关闭下拉菜单
+    document.addEventListener('click', function(event) {
+      if (!event.target.closest('.dropdown-container')) {
+        document.querySelectorAll('.dropdown-menu').forEach(m => m.style.display = 'none');
+      }
+      // 如果点击的是弹窗遮罩层
+      if (event.target.id === 'editModal') {
+        closeEditModal();
+      }
+    });
+  </script>
+</body>
+</html>

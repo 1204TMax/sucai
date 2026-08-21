@@ -69,32 +69,6 @@ const MENU_CONFIG = [
     ]
   },
   {
-    id: 'material',
-    name: '素材管理',
-    children: [
-      {
-        name: '素材库',
-        page: '素材管理/素材库.html',
-        icon: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><circle cx="15.5" cy="8.5" r="1.5"></circle><circle cx="15.5" cy="15.5" r="1.5"></circle><circle cx="8.5" cy="15.5" r="1.5"></circle>'
-      },
-      {
-        name: '物料库',
-        page: '素材管理/物料库.html',
-        icon: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>'
-      },
-      {
-        name: '合成策略',
-        page: '素材管理/合成策略.html',
-        icon: '<polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline>'
-      },
-      {
-        name: '我的任务',
-        page: '素材管理/我的任务.html',
-        icon: '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>'
-      }
-    ]
-  },
-  {
     id: 'settings',
     name: '系统设置',
     children: [
