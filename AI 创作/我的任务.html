@@ -6,7 +6,7 @@
   <title>我的任务 - 量化投放系统</title>
   <link rel="stylesheet" href="../共享样式/components.css">
   <link rel="stylesheet" href="../共享样式/project-picker.css">
-  <link rel="stylesheet" href="../共享样式/image-preview.css">
+  <link rel="stylesheet" href="../共享样式/image-preview.css?v=20260724a">
   <link rel="stylesheet" href="../共享样式/asset-intake-modal.css">
   <link rel="stylesheet" href="../共享样式/download-archive-confirm.css">
   <link rel="stylesheet" href="../共享样式/confirm-modal.css">
@@ -411,8 +411,10 @@
     .wf-abs-node.is-completed .wf-abs-point { background: var(--accent-solid); border-color: var(--accent-solid); }
     .wf-abs-node.is-completed .wf-abs-label { color: var(--text-hi); }
     .wf-abs-node.is-active-review { min-width: 168px; }
+    .wf-abs-node.product-demo-node { min-width: 248px; }
     .wf-abs-node.is-active-review .wf-abs-point { width: 16px; height: 16px; background: #fff; border: 3px solid var(--accent-solid); box-shadow: 0 0 0 4px rgba(74,158,255,0.18); }
     .wf-abs-node.is-active-review .wf-abs-label { color: var(--text-hi); font-weight: 600; }
+    .wf-abs-node.product-demo-node .wf-abs-label { max-width: 248px; line-height: 1.5; white-space: normal; }
     .wf-abs-node.is-pending .wf-abs-label { color: var(--text-lo); }
     .wf-abs-cta { margin-top: 10px; height: 28px; padding: 0 12px; border: none; border-radius: var(--r-md); background: var(--accent-solid); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; cursor: pointer; box-shadow: 0 4px 12px rgba(74,158,255,0.22); transition: background var(--ease), transform var(--ease), box-shadow var(--ease); }
     .wf-abs-cta:hover { background: var(--accent-solid-h); transform: translateY(-1px); box-shadow: 0 6px 14px rgba(74,158,255,0.26); }
@@ -1043,7 +1045,7 @@
 <body>
 
 <script src="../共享样式/components.js"></script>
-<script src="../共享样式/image-preview.js?v=20260710d"></script>
+<script src="../共享样式/image-preview.js?v=20260723f"></script>
 <script src="../共享样式/material-library.js?v=20260712a"></script>
 <script src="../共享样式/asset-intake-modal.js"></script>
 <script src="../共享样式/download-archive-confirm.js"></script>
@@ -1618,6 +1620,17 @@ const INITIAL_TASKS = [
     source:'poster', project:'美白精华',
     input:{ prompt:'大字报风格Q2季度营销活动主视觉海报，正红底色，金色粗体标题"Q2战役 势不可挡"，副标题"全场爆发 限时特惠"，火炬图案与上升箭头装饰，强烈视觉冲击', refImages:[], inputType:'text', models:['seedream5'], ratio:'2:3', res:'2K', count:4 },
     output:{ byModel:{ seedream5:{ total:0, items:[] }}}},
+  { id:'wf-product-demo-replacement', name:'日常清洁产品视频', type:'workflow', taskType:'workflow_run', resultType:'video', status:'pending_review', createdTime:'2026-08-14 23:58', creator:'我',
+    source:'workflow', project:'护肤品推广', productDemoReplacement:true,
+    workflowRun:{ workflowId:'flow-product-demo-replacement', workflowName:'产品演示替换工作流', currentNodeId:'product-demo-replacement', endBehavior:{ destination:'task_system' }, summary:{ total:1, generated:0, pendingReview:2, approved:0, downstreamRunning:0 }, nodes:[
+      { nodeId:'start', processorType:'system.start', title:'开始', status:'completed' },
+      { nodeId:'source-video', processorType:'video.process', title:'原视频处理', status:'completed' },
+      { nodeId:'product-demo-replacement', processorType:'control.intermediate', title:'产品演示替换', status:'pending_review', metrics:{ pendingReview:2 } },
+      { nodeId:'video-compose', processorType:'video.compose', title:'视频合成', status:'pending' },
+      { nodeId:'end', processorType:'system.end', title:'结束', status:'pending' }
+    ], reviewQueues:[{ reviewTaskId:'product-demo-replacement-task', sourceNodeId:'source-video', resultType:'video', status:'pending_review', pendingCount:2, approvedCount:0, rejectedCount:0 }] },
+    input:{ prompt:'将原视频中的产品演示片段替换为用户选择的候选视频。', models:['工作流'], ratio:'16:9', dur:'01:48', count:1 },
+    output:{ byModel:{ '工作流':{ total:0, items:[] } } } },
 ];
 
 // ═══ 工具函数 ═══
@@ -2128,6 +2141,23 @@ const INITIAL_CHATS = [
 
 // ═══ State ═══
 const routeParams = new URLSearchParams(window.location.search);
+const PRODUCT_DEMO_REPLACEMENT_STATE_KEY = 'ai-creation.product-demo-replacement.wf-product-demo-replacement.v4';
+function applyProductDemoReplacementState(task, payload) {
+  if (!task || !task.productDemoReplacement || !payload || payload.submitted !== true) return;
+  task.productDemoReplacementState = 'compositing';
+  task.status = 'generating';
+  if (task.workflowRun) {
+    task.workflowRun.currentNodeId = 'video-compose';
+    (task.workflowRun.nodes || []).forEach(function(node) {
+      if (node.nodeId === 'product-demo-replacement') node.status = 'completed';
+      if (node.nodeId === 'video-compose') node.status = 'generating';
+    });
+  }
+}
+INITIAL_TASKS.forEach(function(task) {
+  if (!task.productDemoReplacement) return;
+  try { applyProductDemoReplacementState(task, JSON.parse(localStorage.getItem(PRODUCT_DEMO_REPLACEMENT_STATE_KEY) || 'null')); } catch (error) {}
+});
 const state = {
   contentTab: 'image',
   viewMode: 'expanded',
@@ -3066,6 +3096,10 @@ function renderTaskCard(task) {
   var currentOutput = vm.output;
   var sourceName = task.type === 'workflow' ? '工作流' : (GEN_SOURCES[task.source] || task.source || '通用生成');
 
+  if (task.productDemoReplacement) {
+    return renderProductDemoReplacementCard(task, vm);
+  }
+
   if (task.type === 'workflow' && vm.displayStatus === 'pending_review') {
     return renderWorkflowReviewCard(task, vm, collapsed);
   }
@@ -3105,6 +3139,75 @@ function renderTaskCard(task) {
     +'<div class="card-bottom">'+renderCardActions(task, vm)+'<div class="card-bottom-meta"><span class="c-tag c-tag-'+vm.displayStatus+'">'+statusLabel+pulseDot+'</span>'+renderBottomCountMeta(task, vm)+'<span>'+relativeTime(task.createdTime)+'</span>'+renderCardMoreMenu(task)+'</div></div>'
     +'</div>';
 }
+
+function openProductDemoReplacement() {
+  var targetUrl = '../实验/AI创作系统V2.7.0原型/产品演示替换-工作流使用页.html?entry=task';
+  if (window.parent === window) {
+    window.location.href = targetUrl;
+    return;
+  }
+  parent.postMessage({
+    action: 'openTab',
+    title: '产品演示替换',
+    url: '实验/AI创作系统V2.7.0原型/产品演示替换-工作流使用页.html?entry=task'
+  }, '*');
+}
+
+function renderProductDemoReplacementCard(task, vm) {
+  var metaHtml = renderTaskMetaItems(task, vm, task.input.models[0], false);
+  var arrowHtml = '<div class="wf-animated-arrow"><div class="wf-arrow-line"></div><div class="wf-arrow-head"></div></div>';
+  var isCompositing = task.productDemoReplacementState === 'compositing';
+  var segmentCount = Number((task.workflowRun && task.workflowRun.summary && task.workflowRun.summary.pendingReview) || 0) || 1;
+  var activeLabel = isCompositing ? '视频合成中' : '发现 ' + segmentCount + ' 个产品演示片段，选择替换方案';
+  var activeAction = isCompositing ? '' : '<button class="wf-abs-cta" onclick="openProductDemoReplacement()">去处理</button>';
+  var statusLabel = isCompositing ? '视频合成中' : '待处理';
+  var statusClass = isCompositing ? 'c-tag-generating' : 'c-tag-pending_review';
+  var nodesHtml = ''
+    + '<div class="wf-abs-node is-completed">'
+      + '<div class="wf-abs-point"></div>'
+      + '<div class="wf-abs-label">开始</div>'
+    + '</div>'
+    + arrowHtml
+    + '<div class="wf-abs-node is-active-review product-demo-node">'
+      + '<div class="wf-abs-point"></div>'
+      + '<div class="wf-abs-label">' + activeLabel + '</div>'
+      + activeAction
+    + '</div>'
+    + arrowHtml
+    + '<div class="wf-abs-node is-pending">'
+      + '<div class="wf-abs-point"></div>'
+      + '<div class="wf-abs-label">结束</div>'
+    + '</div>';
+
+  return '<div class="task-card workflow-task-card new-highlight" id="task-card-' + escHtml(task.id) + '" data-task-id="' + escHtml(task.id) + '">'
+    + '<div class="card-header">'
+      + '<span class="c-tag" style="background:var(--bg-subtle);color:var(--text-lo)">工作流</span>'
+      + renderTaskPromptBlock({ input:{ prompt: task.name }, id: task.id }, false)
+      + '<div class="card-meta">' + metaHtml + '</div>'
+    + '</div>'
+    + '<div class="card-output workflow-review-output"><div class="wf-abs-flow">' + nodesHtml + '</div></div>'
+    + '<div class="card-bottom">'
+      + '<div class="card-actions">'
+        + '<button class="card-act-btn" onclick="handleReEditById(\'' + escJs(task.id) + '\')">' + icon(SVG.edit) + ' 重新编辑</button>'
+        + '<button class="card-act-btn" onclick="handleRetryById(\'' + escJs(task.id) + '\')">' + icon(SVG.retry) + ' 再次生成</button>'
+        + '<button class="card-act-btn card-act-detail" onclick="openWorkflowDetail(\'' + escJs(task.id) + '\')">' + icon(SVG.eye) + ' 运行详情</button>'
+      + '</div>'
+      + '<div class="card-bottom-meta"><span class="c-tag ' + statusClass + '">' + statusLabel + '</span><span>' + escHtml(task.createdTime) + '</span>' + renderCardMoreMenu(task) + '</div>'
+    + '</div>'
+  + '</div>';
+}
+
+window.addEventListener('storage', function(event) {
+  if (event.key !== PRODUCT_DEMO_REPLACEMENT_STATE_KEY || !event.newValue) return;
+  try { applyProductDemoReplacementState(getTaskById('wf-product-demo-replacement'), JSON.parse(event.newValue)); } catch (error) { return; }
+  renderTaskFeed(false);
+});
+window.addEventListener('message', function(event) {
+  var data = event && event.data;
+  if (!data || data.action !== 'productDemoReplacementSubmitted') return;
+  applyProductDemoReplacementState(getTaskById(data.taskId), { submitted:true });
+  renderTaskFeed(false);
+});
 
 function renderWorkflowBusinessNotice(task) {
   var notice = task && task.businessNotice;
