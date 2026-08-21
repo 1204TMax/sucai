@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1200" viewBox="0 0 1800 1200">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#0f172a" flood-opacity="0.10"/>
+    </filter>
+    <style>
+      .title { font: 700 34px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #0f172a; }
+      .subtitle { font: 400 17px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #64748b; }
+      .level { font: 700 15px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #ffffff; }
+      .root-title { font: 700 25px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #ffffff; }
+      .root-note { font: 400 16px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #dbeafe; }
+      .card-title { font: 700 22px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #0f172a; }
+      .card-note { font: 400 15px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #64748b; }
+      .small-title { font: 700 19px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #0f172a; }
+      .small-note { font: 400 15px "PingFang SC", "Microsoft YaHei", sans-serif; fill: #64748b; }
+    </style>
+  </defs>
+
+  <rect width="1800" height="1200" fill="#f8fafc"/>
+  <text x="80" y="68" class="title">量化投放系统｜创作系统用户入口地图</text>
+  <text x="80" y="103" class="subtitle">测试环境页面层级版 · 2026-08-12　三级入口完整展示，页面内区域单独展开</text>
+
+  <!-- level 1 -->
+  <rect x="650" y="135" width="500" height="82" rx="18" fill="#172554" filter="url(#shadow)"/>
+  <rect x="675" y="153" width="72" height="27" rx="13.5" fill="#3b82f6"/><text x="711" y="172" text-anchor="middle" class="level">一级</text>
+  <text x="900" y="177" text-anchor="middle" class="root-title">量化投放系统</text>
+  <text x="900" y="202" text-anchor="middle" class="root-note">产品级入口</text>
+
+  <!-- level 2 -->
+  <path d="M900 217 L900 260" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <rect x="650" y="275" width="500" height="82" rx="18" fill="#1e3a8a" filter="url(#shadow)"/>
+  <rect x="675" y="293" width="72" height="27" rx="13.5" fill="#60a5fa"/><text x="711" y="312" text-anchor="middle" class="level">二级</text>
+  <text x="900" y="317" text-anchor="middle" class="root-title">创作系统</text>
+  <text x="900" y="342" text-anchor="middle" class="root-note">AI 素材创作与工作流入口</text>
+
+  <!-- peer level 3 connectors: both rows originate from level 2 -->
+  <path d="M900 357 L900 390 L280 390 L280 425" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M900 390 L1420 390 L1420 425" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M900 357 L900 570 L280 570 L280 605" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M900 570 L1420 570 L1420 605" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M660 390 L660 425" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M1040 390 L1040 425" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M660 570 L660 605" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+  <path d="M1040 570 L1040 605" fill="none" stroke="#64748b" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <!-- row 1: four peer pages -->
+  <rect x="100" y="425" width="360" height="145" rx="16" fill="#eff6ff" stroke="#60a5fa" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="125" y="448" width="72" height="27" rx="13.5" fill="#2563eb"/><text x="161" y="467" text-anchor="middle" class="level">三级</text>
+  <text x="125" y="515" class="card-title">通用生成</text>
+  <text x="125" y="545" class="card-note">文案、图像、视频创作表单</text>
+
+  <rect x="480" y="425" width="360" height="145" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="505" y="448" width="72" height="27" rx="13.5" fill="#64748b"/><text x="541" y="467" text-anchor="middle" class="level">三级</text>
+  <text x="505" y="515" class="card-title">我的任务</text>
+  <text x="505" y="545" class="card-note">任务状态、结果和运行详情</text>
+
+  <rect x="860" y="425" width="360" height="145" rx="16" fill="#f0fdf4" stroke="#4ade80" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="885" y="448" width="72" height="27" rx="13.5" fill="#16a34a"/><text x="921" y="467" text-anchor="middle" class="level">三级</text>
+  <text x="885" y="515" class="card-title">工作流广场</text>
+  <text x="885" y="545" class="card-note">工作流卡片列表和筛选</text>
+
+  <rect x="1240" y="425" width="360" height="145" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1265" y="448" width="72" height="27" rx="13.5" fill="#64748b"/><text x="1301" y="467" text-anchor="middle" class="level">三级</text>
+  <text x="1265" y="515" class="card-title">原料库</text>
+  <text x="1265" y="545" class="card-note">原料分类、导入、标签和筛选</text>
+
+  <!-- row 2: four peer pages -->
+  <rect x="100" y="605" width="360" height="145" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="125" y="628" width="72" height="27" rx="13.5" fill="#64748b"/><text x="161" y="647" text-anchor="middle" class="level">三级</text>
+  <text x="125" y="695" class="card-title">项目管理</text>
+  <text x="125" y="725" class="card-note">品类/产品搜索和详情入口</text>
+
+  <rect x="480" y="605" width="360" height="145" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="505" y="628" width="72" height="27" rx="13.5" fill="#64748b"/><text x="541" y="647" text-anchor="middle" class="level">三级</text>
+  <text x="505" y="695" class="card-title">ComfyUI 节点管理</text>
+  <text x="505" y="725" class="card-note">节点新建、状态和操作管理</text>
+
+  <rect x="860" y="605" width="360" height="145" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="885" y="628" width="72" height="27" rx="13.5" fill="#64748b"/><text x="921" y="647" text-anchor="middle" class="level">三级</text>
+  <text x="885" y="695" class="card-title">节点类型管理</text>
+  <text x="885" y="725" class="card-note">节点类型分组配置</text>
+
+  <rect x="1240" y="605" width="360" height="145" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1265" y="628" width="72" height="27" rx="13.5" fill="#64748b"/><text x="1301" y="647" text-anchor="middle" class="level">三级</text>
+  <text x="1265" y="695" class="card-title">成本管理</text>
+  <text x="1265" y="725" class="card-note">时间、部门、用户、模型等费用</text>
+
+  <!-- page-internal expansion -->
+  <path d="M280 570 L280 820" fill="none" stroke="#2563eb" stroke-width="3" marker-end="url(#arrow)"/>
+  <rect x="100" y="820" width="740" height="170" rx="16" fill="#dbeafe" stroke="#60a5fa" stroke-width="2"/>
+  <text x="130" y="862" class="small-title">通用生成页面内的工作流与表单区域</text>
+  <text x="130" y="897" class="small-note">上方：文案表单、图像表单、视频表单</text>
+  <text x="130" y="927" class="small-note">下方：按文案/图像/视频展示工作流区域，包含“我的收藏”“我的创建”“新建工作流”等入口</text>
+  <text x="130" y="957" class="small-note">注意：这是通用生成页面内的区域，不是创作系统下新的三级目录</text>
+
+  <rect x="860" y="820" width="740" height="170" rx="16" fill="#dcfce7" stroke="#4ade80" stroke-width="2"/>
+  <text x="890" y="862" class="small-title">工作流广场页面主体</text>
+  <text x="890" y="897" class="small-note">工作流卡片列表：类型筛选、搜索、创建者、日期、排序</text>
+  <text x="890" y="927" class="small-note">卡片展示成本、说明、星级、使用次数、详情等信息</text>
+  <text x="890" y="957" class="small-note">本次按用户入口层级未确认需要继续拆出的下级页面</text>
+
+  <rect x="100" y="1035" width="1500" height="68" rx="14" fill="#ffffff" stroke="#e2e8f0"/>
+  <text x="130" y="1076" class="small-note">层级原则：8 个页面都是“创作系统”下的同级三级入口；只有通用生成页面内部继续展开表单/工作流区域。</text>
+</svg>
