@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>量化投放系统</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+    <link rel="stylesheet" href="共享样式/download-task-center.css">
     <style>
         * {
             margin: 0;
@@ -225,6 +226,10 @@
             background: linear-gradient(135deg, #edf4ff 0%, #f7fbff 100%);
             border: 1px solid #dbeafe;
             box-shadow: 0 6px 16px rgba(22, 119, 255, 0.08);
+        }
+
+        .sidebar-banner.hidden {
+            display: none;
         }
 
         .sidebar-banner-close {
@@ -688,9 +693,26 @@
 
             const bottomDiv = document.createElement('div');
             bottomDiv.className = 'sidebar-bottom';
-            bottomDiv.id = 'sidebar-bottom-banner';
             bottomDiv.innerHTML = `
-                <div class="sidebar-banner">
+                <div class="dtc-root dtc-sidebar-root">
+                    <button
+                        class="dtc-sidebar-trigger"
+                        id="download-task-trigger"
+                        type="button"
+                        title="下载中心"
+                        aria-label="下载中心"
+                        aria-controls="download-task-popover"
+                        aria-haspopup="dialog"
+                        aria-expanded="false"
+                    >
+                        <span class="dtc-sidebar-icon-wrap">
+                            <img class="dtc-trigger-icon" src="icon/入库管理.svg" alt="">
+                        </span>
+                        <span class="dtc-sidebar-label">下载中心</span>
+                        <span class="dtc-trigger-badge" id="download-task-badge" aria-label="2 个进行中的下载任务">2</span>
+                    </button>
+                </div>
+                <div class="sidebar-banner" id="sidebar-bottom-banner">
                     <button class="sidebar-banner-close" onclick="closeSidebarBanner()" aria-label="关闭">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -826,5 +848,6 @@
         addTab(DEFAULT_TAB_NAME);
         activateTab(DEFAULT_TAB_NAME);
     </script>
+    <script src="共享样式/download-task-center.js"></script>
 </body>
 </html>

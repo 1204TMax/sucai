@@ -168,6 +168,43 @@
 }
 .edit-submenu-item:hover { background: var(--bg-subtle); }
 
+.workflow-submenu { min-width: 210px; }
+.workflow-menu-item { display: flex; align-items: center; gap: 2px; min-width: 0; }
+.workflow-menu-name {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: var(--r-md);
+  padding: var(--space-2) var(--space-3);
+  background: transparent;
+  color: var(--text-hi);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+}
+.workflow-menu-name:hover { background: var(--bg-subtle); }
+.workflow-favorite { width: 28px; height: 28px; border: 0; border-radius: var(--r-md); background: transparent; color: var(--text-muted); cursor: pointer; font-size: 16px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; }
+.workflow-favorite:hover, .workflow-favorite.active { background: var(--bg-subtle); color: var(--warning, #faad14); }
+.workflow-name-tip {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 6px);
+  left: 0;
+  display: none;
+  max-width: 260px;
+  padding: 6px 8px;
+  border-radius: var(--r-md);
+  background: var(--text-hi, #1f1f1f);
+  color: #fff;
+  font-size: var(--text-xs);
+  white-space: normal;
+  box-shadow: 0 4px 12px rgba(0,0,0,.16);
+}
+.workflow-menu-name:hover .workflow-name-tip { display: block; }
+
 /* ═══════════════════════════════════════════
    3. 大图预览
    ═══════════════════════════════════════════ */
@@ -310,3 +347,10 @@
   display: none;
 }
 .img-preview-store-dd .pv-dd-item:hover .pv-dd-sub { display: block; }
+
+/* 工作流列表通常更长，贴住当前选项底边向上展开，避免被视口底部裁切。 */
+.edit-submenu.workflow-submenu,
+.img-preview-store-dd .pv-dd-sub.workflow-submenu {
+  top: auto;
+  bottom: 0;
+}

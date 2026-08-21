@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>视频裂变工作流 - 量化投放系统</title>
+    <title>视频去重工作流 V2，支持一个视频裂变多个视频 - 量化投放系统</title>
     <link rel="icon" href="data:,">
     <!-- React & ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -202,6 +202,190 @@
             width: 40px;
             height: 40px;
             flex: 0 0 40px;
+        }
+
+        .sticker-selected-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
+            border-radius: 8px;
+            background: #fff;
+        }
+
+        .sticker-selected-thumb,
+        .sticker-option-thumb {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #6d5dfc, #4a9eff);
+            overflow: hidden;
+        }
+
+        .sticker-selected-thumb { width: 52px; height: 52px; flex: 0 0 52px; }
+        .sticker-selected-thumb img,
+        .sticker-option-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .sticker-selected-info { min-width: 0; flex: 1; }
+        .sticker-selected-name { color: #1f1f1f; font-weight: 600; margin-bottom: 4px; }
+        .sticker-selected-meta { color: #8c8c8c; font-size: 12px; }
+        .sticker-selected-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .sticker-workspace { display: grid; grid-template-columns: minmax(260px, 1fr) minmax(200px, 220px); gap: 24px; align-items: start; }
+        .sticker-list-column { min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+        .sticker-add-section { display: flex; flex-direction: column; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+        .sticker-actions-title { color: #595959; font-size: 12px; }
+        .sticker-add-section .reference-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 0; }
+        .sticker-add-section .reference-btn { justify-content: center; }
+        .sticker-actions-tip { color: #8c8c8c; font-size: 11px; line-height: 1.5; }
+        .sticker-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #595959; font-size: 12px; }
+        .sticker-list-heading strong { color: #1f1f1f; font-size: 13px; font-weight: 500; }
+        .sticker-list-heading-count { color: #8c8c8c; }
+        .sticker-canvas-column { min-width: 0; display: flex; justify-content: flex-end; }
+        .sticker-canvas-column .sticker-preview-wrap { width: 100%; display: flex; justify-content: flex-end; }
+        .sticker-canvas-column .sticker-preview-canvas { width: min(100%, 220px); }
+        .sticker-preview-canvas {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 9 / 16;
+            overflow: visible;
+            border: 1px solid #434343;
+            border-radius: 8px;
+            background: #000;
+            user-select: none;
+        }
+        .sticker-canvas-status { position: absolute; top: 8px; right: 8px; z-index: 5; display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 10px; background: rgba(0,0,0,.55); color: var(--ant-success-color, #52c41a); font-size: 11px; line-height: 18px; white-space: nowrap; pointer-events: none; }
+        .sticker-overlay {
+            position: absolute;
+            min-width: 56px;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #1677ff;
+            border-radius: 6px;
+            background: rgba(255,255,255,.14);
+            cursor: move;
+            touch-action: none;
+            z-index: 2;
+        }
+        .sticker-overlay.active { border-color: #52c41a; z-index: 4; }
+        .sticker-overlay::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border: 1px dashed rgba(255,255,255,.9);
+            border-radius: 5px;
+            pointer-events: none;
+        }
+        .sticker-overlay img { width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+        .sticker-overlay-symbol { color: #fff; font-size: clamp(18px, 3vw, 34px); font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,.35); pointer-events: none; }
+        .sticker-handle {
+            position: absolute;
+            right: -7px;
+            bottom: -7px;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            background: #1677ff;
+            cursor: nwse-resize;
+            touch-action: none;
+        }
+        .sticker-delete {
+            position: absolute;
+            top: -30px;
+            right: -2px;
+            height: 24px;
+            padding: 0 8px;
+            border: 1px solid #ffccc7;
+            border-radius: 4px;
+            background: #fff1f0;
+            color: #f5222d;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .sticker-guide-v, .sticker-guide-h { position: absolute; z-index: 3; pointer-events: none; border-color: rgba(255,255,255,.75); border-style: dashed; }
+        .sticker-guide-v { top: 0; bottom: 0; border-left-width: 1px; }
+        .sticker-guide-h { left: 0; right: 0; border-top-width: 1px; }
+        .sticker-list { display: flex; flex-direction: column; gap: 8px; margin-top: 0; max-height: 533px; overflow: auto; }
+        .sticker-list-empty { min-height: 120px; display: flex; align-items: center; justify-content: center; border: 1px dashed #d9d9d9; border-radius: 8px; color: #8c8c8c; font-size: 12px; }
+        .sticker-list-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 1px solid #f0f0f0; border-radius: 8px; background: #fff; cursor: pointer; }
+        .sticker-list-item.active { border-color: #1677ff; background: #e6f4ff; }
+        .sticker-list-thumb { width: 40px; height: 40px; flex: 0 0 40px; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 6px; background: #1f1f1f; color: #fff; font-size: 12px; }
+        .sticker-list-thumb img { width: 100%; height: 100%; object-fit: contain; }
+        .sticker-list-info { min-width: 0; flex: 1; display: flex; align-items: center; }
+        .sticker-list-name { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #1f1f1f; font-size: 13px; }
+        .sticker-list-meta { flex-shrink: 0; color: #8c8c8c; font-size: 11px; }
+        .sticker-gif-tag { display: inline-flex; align-items: center; height: 18px; padding: 0 5px; border-radius: 4px; background: #fff1b8; color: #ad6800; font-size: 10px; font-weight: 600; }
+        .sticker-list-remove { border: none; background: transparent; color: #8c8c8c; cursor: pointer; font-size: 18px; }
+        .sticker-list-remove:hover { color: #f5222d; }
+        @media (max-width: 720px) {
+            .sticker-workspace { grid-template-columns: 1fr; }
+            .sticker-canvas-column, .sticker-canvas-column .sticker-preview-wrap { justify-content: center; }
+            .sticker-canvas-column .sticker-preview-canvas { width: min(100%, 280px); }
+        }
+
+        .sticker-picker-modal .ant-modal-content { padding: 0; overflow: hidden; border-radius: 12px; }
+        .sticker-picker-modal .ant-modal-header { margin: 0; padding: 16px 20px; border-bottom: 1px solid #f0f0f0; }
+        .sticker-picker-modal .ant-modal-body { padding: 0; }
+        .sticker-picker-modal .ant-modal-footer { margin: 0; padding: 12px 20px; border-top: 1px solid #f0f0f0; }
+        .sticker-picker-tabs { display: flex; align-items: center; gap: 4px; padding: 12px 20px 0; border-bottom: 1px solid #f0f0f0; }
+        .sticker-picker-tab { height: 36px; padding: 0 14px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #8c8c8c; cursor: pointer; font-size: 13px; }
+        .sticker-picker-tab.active { color: #1677ff; border-bottom-color: #1677ff; font-weight: 500; }
+        .sticker-picker-content { min-height: 330px; padding: 18px 20px; }
+        .sticker-picker-tip { margin-bottom: 14px; color: #8c8c8c; font-size: 12px; }
+        .sticker-option-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+        .sticker-option { min-width: 0; padding: 0; border: 1px solid #f0f0f0; border-radius: 8px; background: #fff; text-align: left; cursor: pointer; overflow: hidden; transition: border-color 120ms ease, box-shadow 120ms ease; }
+        .sticker-option:hover, .sticker-option.active { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,.1); }
+        .sticker-option-thumb { width: 100%; height: 112px; border-radius: 0; }
+        .sticker-option-name { display: block; padding: 9px 10px 2px; color: #1f1f1f; font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sticker-option-meta { display: block; padding: 0 10px 10px; color: #8c8c8c; font-size: 11px; }
+        .sticker-picker-upload { display: flex; align-items: center; justify-content: center; min-height: 210px; border: 1px dashed #bfbfbf; border-radius: 8px; background: #fafafa; }
+        .sticker-picker-upload input { display: none; }
+        .sticker-picker-upload label { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #595959; cursor: pointer; }
+        .sticker-picker-upload small { color: #8c8c8c; }
+
+        .variation-option-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+        .variation-option-count { color: #1677ff; font-size: 13px; font-weight: 600; }
+        .variation-option-tip { color: #8c8c8c; font-size: 12px; }
+        .variation-option-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+        .variation-option-card { min-width: 0; min-height: 136px; padding: 10px 12px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; text-align: left; cursor: pointer; transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease; }
+        .variation-option-card:hover { border-color: #69b1ff; background: #f7fbff; }
+        .variation-option-card.active { border-color: #1677ff; background: #e8f4ff; box-shadow: 0 0 0 1px rgba(22,119,255,.12); }
+        .variation-option-card.disabled { opacity: .45; cursor: not-allowed; }
+        .variation-option-card-title { display: flex; align-items: center; gap: 7px; color: #1f1f1f; font-weight: 500; }
+        .variation-option-card-title input { accent-color: #1677ff; }
+        .variation-option-control { display: grid; grid-template-columns: minmax(0, 1fr) 72px auto; align-items: center; gap: 8px; margin-top: 10px; }
+        .variation-option-control .ant-slider { min-width: 0; margin: 6px 0; }
+        .variation-option-control .ant-input-number { width: 72px !important; }
+        .variation-option-unit { color: #8c8c8c; font-size: 11px; white-space: nowrap; }
+        .variation-option-card-desc { display: block; margin: 8px 0 0 22px; color: #8c8c8c; font-size: 11px; line-height: 1.4; }
+        .mode-tip { margin-top: 8px; color: #8c8c8c; font-size: 12px; line-height: 1.5; }
+        .variation-single-list { display: flex; flex-direction: column; gap: 0; border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; }
+        .variation-single-item { display: grid; grid-template-columns: minmax(160px, 0.8fr) minmax(260px, 1.2fr); align-items: center; gap: 16px; min-height: 78px; padding: 12px; border-bottom: 1px solid #f0f0f0; background: #fff; }
+        .variation-single-item:last-child { border-bottom: 0; }
+        .variation-single-copy { min-width: 0; }
+        .variation-single-name { display: inline-flex; align-items: center; color: #1f1f1f; font-weight: 500; }
+        .variation-single-copy .variation-option-card-desc { margin: 4px 0 0; }
+        .variation-single-control { display: grid; grid-template-columns: minmax(0, 1fr) 82px auto; align-items: center; gap: 8px; min-width: 0; }
+        .variation-single-control .ant-slider { min-width: 0; margin: 6px 0; }
+        .variation-single-control .ant-input-number { width: 82px !important; }
+        .variation-single-unit { color: #8c8c8c; font-size: 12px; white-space: nowrap; }
+        .variation-output-summary { margin-top: 12px; padding: 10px 12px; border-radius: 7px; background: #f5f7fa; color: #595959; font-size: 13px; line-height: 1.5; }
+        .variation-output-summary strong { color: #1677ff; }
+
+        @media (max-width: 720px) {
+            .sticker-option-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .variation-option-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .variation-single-item { grid-template-columns: 1fr; gap: 8px; }
+            .variation-single-control { grid-template-columns: minmax(0, 1fr) 82px auto; }
+            .sticker-selected-card { align-items: flex-start; flex-wrap: wrap; }
+            .sticker-selected-actions { width: 100%; margin-left: 64px; }
         }
 
         .reference-picker-content {
@@ -1133,13 +1317,18 @@
     <div id="root"></div>
     <script src="../共享样式/material-library.js?v=20260712a"></script>
     <script type="text/babel">
-        const { useState, useEffect, useCallback } = React;
-        const { Input, Upload, Button, Form, InputNumber, Radio, Modal, message, ConfigProvider, Select, Tooltip, Segmented } = antd;
+        const { useState, useEffect, useCallback, useRef } = React;
+        const { Input, Upload, Button, Form, InputNumber, Slider, Checkbox, Radio, Modal, message, ConfigProvider, Select, Tooltip, Segmented } = antd;
         const { CheckOutlined, UploadOutlined, DatabaseOutlined, AppstoreOutlined, FileDoneOutlined } = icons;
         const { Dragger } = Upload;
 
         const CUSTOM_RESOLUTION = 'custom';
         const MAX_IMAGE_MATERIALS = 100;
+        const DEFAULT_MAX_STICKERS = 10;
+        const stickerRatioConfig = {
+            source: 'fixed',
+            fixedRatio: '9:16',
+        };
         const resolutionPresets = [
             { label: '竖屏 9:16', value: 'vertical-9-16', width: 1080, height: 1920 },
             { label: '横屏 16:9', value: 'horizontal-16-9', width: 1920, height: 1080 },
@@ -1155,14 +1344,32 @@
             },
             {
                 key: 'imageMaterials',
-                title: '爆款图片素材',
-                description: '上传图片文件作为素材来源，最多 100 个。',
-                required: true,
+                title: '参考图片素材（可选）',
+                description: '如需提供参考画面，可上传图片文件，最多 100 个。',
+                required: false,
             },
             {
                 key: 'videoMaterials',
                 title: '爆款视频素材',
                 description: '上传视频文件作为素材来源。',
+                required: false,
+            },
+            {
+                key: 'generationMode',
+                title: '生成模式',
+                description: '1 生 1 生成一个结果；1 生多按选中的下拉或数值方案拆分生成多个结果。',
+                required: true,
+            },
+            {
+                key: 'variationOptions',
+                title: '变化参数',
+                description: '每个变化参数单独调节数值；1 生 1 按需开启，1 生多按选中的参数分别生成，最多 9 项。',
+                required: false,
+            },
+            {
+                key: 'sticker',
+                title: '贴纸',
+                description: '最多添加 10 个 PNG、JPG、GIF 等图片贴纸，并调整位置和大小。',
                 required: false,
             },
             {
@@ -1219,6 +1426,27 @@
             task: { label: '我的任务', items: materialLibrary.tasks || [] },
         };
 
+        const stickerOptions = [
+            { id: 'official-hot', name: '爆款强调', meta: '官方贴纸 · PNG', symbol: '爆款', color: 'linear-gradient(135deg,#ff7a45,#ff4d4f)' },
+            { id: 'official-sale', name: '限时优惠', meta: '官方贴纸 · GIF', symbol: '限时', color: 'linear-gradient(135deg,#ff4d4f,#cf1322)' },
+            { id: 'official-new', name: '新品上新', meta: '官方贴纸 · PNG', symbol: '上新', color: 'linear-gradient(135deg,#722ed1,#1677ff)' },
+            { id: 'official-click', name: '点击查看', meta: '官方贴纸 · GIF', symbol: '点击', color: 'linear-gradient(135deg,#13c2c2,#1677ff)' },
+            { id: 'library-coupon', name: '优惠券角标', meta: '原料库 · PNG', symbol: '券', color: 'linear-gradient(135deg,#fadb14,#fa8c16)' },
+            { id: 'library-free', name: '免费试用', meta: '原料库 · GIF', symbol: '免费', color: 'linear-gradient(135deg,#52c41a,#08979c)' },
+        ];
+
+        const variationOptions = [
+            { id: 'random-frame', name: '随机抽帧', desc: '调整视频帧节奏，生成画面差异', min: 1, max: 30, step: 1, defaultValue: 3, unit: '帧' },
+            { id: 'color', name: '改变色彩', desc: '改变整体色彩和明暗关系', min: 1, max: 100, step: 1, defaultValue: 10, unit: '%' },
+            { id: 'style', name: '改变画面风格', desc: '调整画面质感和视觉风格', min: 1, max: 100, step: 1, defaultValue: 10, unit: '%' },
+            { id: 'speed', name: '调整速度', desc: '改变视频播放速度', min: 0.5, max: 2, step: 0.1, defaultValue: 1.1, unit: '倍' },
+            { id: 'pitch', name: '改变音调', desc: '改变原视频声音音调', min: -12, max: 12, step: 1, defaultValue: 2, unit: '半音' },
+            { id: 'scale', name: '画面缩放', desc: '调整画面缩放比例', min: 80, max: 120, step: 1, defaultValue: 105, unit: '%' },
+            { id: 'mirror', name: '画面镜像', desc: '水平翻转视频画面', min: 1, max: 1, step: 1, defaultValue: 1, unit: '次' },
+            { id: 'crop', name: '画面裁切', desc: '改变画面裁切区域', min: 1, max: 30, step: 1, defaultValue: 5, unit: '%' },
+            { id: 'sticker-change', name: '贴纸变化', desc: '改变贴纸或贴纸位置', min: 1, max: 5, step: 1, defaultValue: 1, unit: '套' },
+        ];
+
         const normalizeFileList = event => {
             if (Array.isArray(event)) {
                 return event;
@@ -1249,6 +1477,25 @@
             size: file.size,
             type: file.type || getRawFile(file).type || '',
         }));
+
+        const parseRatio = value => {
+            const [width, height] = String(value || '').split(':').map(Number);
+            return Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0 ? { width, height } : null;
+        };
+
+        const getFileRatio = file => {
+            const width = Number(file?.width || file?.videoWidth);
+            const height = Number(file?.height || file?.videoHeight);
+            if (width > 0 && height > 0) return { width, height };
+            return { width: 16, height: 9 };
+        };
+
+        const formatRatioLabel = ratio => {
+            if (!ratio) return '';
+            const gcd = (a, b) => b ? gcd(b, a % b) : a;
+            const divisor = gcd(Math.round(ratio.width), Math.round(ratio.height));
+            return `${Math.round(ratio.width / divisor)}:${Math.round(ratio.height / divisor)}`;
+        };
 
         const App = () => {
             const [form] = Form.useForm();
@@ -1281,6 +1528,17 @@
                 selectedTaskId: '',
                 selectedIds: [],
             });
+            const [selectedStickers, setSelectedStickers] = useState([]);
+            const [activeStickerId, setActiveStickerId] = useState('');
+            const [stickerPickerOpen, setStickerPickerOpen] = useState(false);
+            const [stickerSource, setStickerSource] = useState('official');
+            const [stickerTargetUid, setStickerTargetUid] = useState('');
+            const [stickerPositions, setStickerPositions] = useState({});
+            const [stickerGuidesVisible, setStickerGuidesVisible] = useState(false);
+            const stickerDragRef = useRef(null);
+            const [generationMode, setGenerationMode] = useState('one_to_one');
+            const [selectedVariationOptions, setSelectedVariationOptions] = useState([]);
+            const [variationValues, setVariationValues] = useState({});
 
             const handlePaste = useCallback((e) => {
                 const clipboardFiles = e.clipboardData?.files;
@@ -1288,10 +1546,16 @@
 
                 const newImages = [];
                 const newVideos = [];
+                let skippedGifCount = 0;
 
                 Array.from(clipboardFiles).forEach(file => {
                     const mediaType = getMediaType(file);
                     if (!mediaType) return;
+
+                    if (mediaType === 'image' && (/\.gif$/i.test(file.name || '') || file.type === 'image/gif')) {
+                        skippedGifCount += 1;
+                        return;
+                    }
 
                     const rcFile = {
                         uid: `rc-upload-paste-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -1310,6 +1574,7 @@
                 });
 
                 if (newImages.length === 0 && newVideos.length === 0) {
+                    if (skippedGifCount > 0) message.warning('普通图像上传组件不支持 GIF，已忽略；如需使用请从贴纸入口添加。');
                     return;
                 }
 
@@ -1324,11 +1589,14 @@
                 if (newVideos.length > 0) {
                     const combinedVideos = [...videoFiles, ...newVideos];
                     setVideoFiles(combinedVideos);
+                    if (!stickerTargetUid) setStickerTargetUid(combinedVideos[0]?.uid || '');
                     form.setFieldsValue({ videoMaterials: combinedVideos });
                 }
 
+                if (skippedGifCount > 0) message.warning('普通图像上传组件不支持 GIF，已忽略；如需使用请从贴纸入口添加。');
+
                 message.success(`成功从剪贴板粘贴添加 ${newImages.length + newVideos.length} 个文件`);
-            }, [imageFiles, videoFiles, form]);
+            }, [imageFiles, videoFiles, stickerTargetUid, form]);
 
             useEffect(() => {
                 document.addEventListener('paste', handlePaste);
@@ -1361,6 +1629,36 @@
                 const restoredVideos = (input.videoMaterials || []).map((item, index) => restoreFile(item, index, 'video'));
                 setImageFiles(restoredImages);
                 setVideoFiles(restoredVideos);
+                if (restoredVideos.length) setStickerTargetUid(input.stickerTargetUid || restoredVideos[0].uid);
+                const restoredStickerItems = (input.stickers || (input.sticker ? [input.sticker] : [])).slice(0, DEFAULT_MAX_STICKERS).map((item, index) => ({
+                    ...item,
+                    id: item.id || `restored-sticker-${index}`,
+                    type: item.type || ((item.meta || '').includes('GIF') ? 'image/gif' : 'image/png'),
+                }));
+                const restoredPositions = {};
+                restoredStickerItems.forEach((item, index) => {
+                    restoredPositions[item.id] = item.position || input.stickerPositions?.[item.id] || input.stickerPosition || { x: 12 + index * 4, y: 18 + index * 4, width: 24, height: 20, aspectRatio: 1.2, targetUid: input.stickerTargetUid || restoredVideos[0]?.uid || '' };
+                });
+                setSelectedStickers(restoredStickerItems);
+                setActiveStickerId(restoredStickerItems[0]?.id || '');
+                setStickerPositions(restoredPositions);
+                const restoredVariationValues = {};
+                const restoredMode = input.generationMode || ((input.variationOptions || []).length ? 'one_to_many' : 'one_to_one');
+                const restoredVariationIds = (input.variationOptions || []).map(item => {
+                    if (typeof item === 'string') {
+                        const option = variationOptions.find(optionItem => optionItem.id === item);
+                        if (option) restoredVariationValues[item] = option.defaultValue;
+                        return item;
+                    }
+                    if (item?.id) {
+                        restoredVariationValues[item.id] = item.value ?? variationOptions.find(optionItem => optionItem.id === item.id)?.defaultValue;
+                        return item.id;
+                    }
+                    return '';
+                }).filter(Boolean);
+                setSelectedVariationOptions(restoredVariationIds);
+                setVariationValues(restoredVariationValues);
+                setGenerationMode(restoredMode);
                 setReusePreviousCutResult(Boolean(data.previousCutResult));
                 setResolutionPreset(input.resolutionPreset || CUSTOM_RESOLUTION);
                 form.setFieldsValue({
@@ -1368,6 +1666,9 @@
                     copyContent: input.copyContent || data.prompt || '',
                     imageMaterials: restoredImages,
                     videoMaterials: restoredVideos,
+                    generationMode: restoredMode,
+                    stickers: restoredStickerItems,
+                    variationOptions: input.variationOptions || [],
                     resolutionPreset: input.resolutionPreset || CUSTOM_RESOLUTION,
                     resolutionWidth: input.resolutionWidth || null,
                     resolutionHeight: input.resolutionHeight || null,
@@ -1451,10 +1752,42 @@
                     message.warning('请补充或调整内容后，再创建新任务');
                     return;
                 }
+                const oneToOneParameters = variationOptions.filter(option => variationValues[option.id] !== undefined && variationValues[option.id] !== null && variationValues[option.id] !== '').map(option => ({
+                    id: option.id,
+                    name: option.name,
+                    value: variationValues[option.id],
+                }));
+                if (generationMode === 'one_to_many' && !selectedVariationOptions.length) {
+                    message.warning('1 生多请至少选择 1 个变化参数');
+                    return;
+                }
+                if (generationMode === 'one_to_one' && !oneToOneParameters.length) {
+                    message.warning('请至少填写 1 个变化参数');
+                    return;
+                }
                 const payload = {
                     ...values,
+                    generationMode,
+                    variationParameters: generationMode === 'one_to_many' ? selectedVariationOptions.map(optionId => ({
+                        id: optionId,
+                        value: variationValues[optionId],
+                    })) : oneToOneParameters,
                     imageMaterials: formatFiles(values.imageMaterials),
                     videoMaterials: formatFiles(values.videoMaterials),
+                    variationOptions: (generationMode === 'one_to_many' ? selectedVariationOptions : oneToOneParameters.map(item => item.id)).map(optionId => ({
+                        id: optionId,
+                        name: variationOptions.find(option => option.id === optionId)?.name || optionId,
+                        value: variationValues[optionId],
+                    })),
+                    stickers: selectedStickers.map(sticker => ({
+                        ...sticker,
+                        loop: isGifSticker(sticker),
+                        position: stickerPositions[sticker.id] || null,
+                    })),
+                    stickerRatioSource: stickerRatioConfig.source,
+                    stickerRatio: outputRatio ? { width: outputRatio.width, height: outputRatio.height, label: outputRatioLabel } : null,
+                    stickerTargetUid,
+                    stickerPositions,
                     reusePreviousCutResult,
                 };
                 console.log('Success:', payload);
@@ -1483,6 +1816,11 @@
                     return Upload.LIST_IGNORE;
                 }
 
+                if (mediaType === 'image' && (/\.gif$/i.test(file.name || '') || file.type === 'image/gif')) {
+                    message.error('普通图像上传组件不支持 GIF，GIF 请使用贴纸类型上传');
+                    return Upload.LIST_IGNORE;
+                }
+
                 const currentFiles = mediaType === 'image' ? imageFiles : videoFiles;
                 if (maxCount && currentFiles.length >= maxCount) {
                     message.warning(`最多上传 ${maxCount} 个文件`);
@@ -1503,6 +1841,9 @@
                     form.setFieldsValue({ imageMaterials: nextFiles });
                 } else {
                     setVideoFiles(nextFiles);
+                    if (!stickerTargetUid || !nextFiles.some(file => file.uid === stickerTargetUid)) {
+                        setStickerTargetUid(nextFiles[0]?.uid || '');
+                    }
                     form.setFieldsValue({ videoMaterials: nextFiles });
                 }
                 setReeditChanged(true);
@@ -1696,7 +2037,13 @@
                 setReferencePicker(prev => {
                     const set = new Set(prev.selectedIds);
                     if (set.has(id)) set.delete(id);
-                    else set.add(id);
+                    else {
+                        if (prev.field === 'sticker' && set.size >= DEFAULT_MAX_STICKERS) {
+                            message.warning(`最多选择 ${DEFAULT_MAX_STICKERS} 个贴纸`);
+                            return prev;
+                        }
+                        set.add(id);
+                    }
                     return { ...prev, selectedIds: Array.from(set) };
                 });
             };
@@ -1704,7 +2051,7 @@
             const referenceToFile = item => ({
                 uid: `library-${item.id}-${Date.now()}`,
                 name: item.name,
-                type: item.type === 'video' ? 'video/mp4' : 'image/png',
+                type: item.type === 'video' ? 'video/mp4' : isGifReference(item) ? 'image/gif' : 'image/png',
                 size: 0,
                 status: 'done',
                 url: item.url || item.thumb,
@@ -1712,8 +2059,25 @@
                 librarySource: item.source,
             });
 
+            const referenceToSticker = item => ({
+                id: `library-sticker-${item.id}`,
+                name: item.name,
+                type: isGifReference(item) ? 'image/gif' : 'image/png',
+                meta: `系统资源 · ${isGifReference(item) ? 'GIF' : '图片'}`,
+                thumb: item.thumb || item.url,
+                url: item.url || item.thumb,
+                symbol: '贴纸',
+                color: 'linear-gradient(135deg,#595959,#1f1f1f)',
+            });
+
             const confirmReferencePicker = () => {
                 if (!selectedReferenceItems.length) return;
+                if (referencePicker.field === 'sticker') {
+                    addStickers(selectedReferenceItems.map(referenceToSticker));
+                    message.success(`已添加 ${Math.min(selectedReferenceItems.length, Math.max(DEFAULT_MAX_STICKERS - selectedStickers.length, 0))} 个贴纸`);
+                    closeReferencePicker();
+                    return;
+                }
                 if (referencePicker.field === 'copyContent') {
                     const existing = String(form.getFieldValue('copyContent') || '').trim();
                     const copyText = selectedReferenceItems.map(item => item.content || item.name).filter(Boolean).join('\n\n');
@@ -1724,12 +2088,15 @@
                 }
                 const selected = selectedReferenceItems.map(referenceToFile);
                 if (referencePicker.field === 'imageMaterials') {
-                    const nextFiles = [...imageFiles, ...selected].slice(0, MAX_IMAGE_MATERIALS);
+                    const supported = selected.filter(file => file.type !== 'image/gif' && !/\.gif$/i.test(file.name || ''));
+                    if (supported.length !== selected.length) message.warning('普通图像上传不支持 GIF，已忽略 GIF 资源；如需使用请添加到贴纸。');
+                    const nextFiles = [...imageFiles, ...supported].slice(0, MAX_IMAGE_MATERIALS);
                     setImageFiles(nextFiles);
                     form.setFieldsValue({ imageMaterials: nextFiles });
                 } else {
                     const nextFiles = [...videoFiles, ...selected];
                     setVideoFiles(nextFiles);
+                    if (!stickerTargetUid) setStickerTargetUid(nextFiles[0]?.uid || '');
                     form.setFieldsValue({ videoMaterials: nextFiles });
                 }
                 message.success(`已引用 ${selected.length} 个${referencePicker.mediaType === 'video' ? '视频' : '图片'}`);
@@ -1763,13 +2130,25 @@
                 });
             };
 
+            const isGifReference = item => {
+                const type = String(item?.type || '').toLowerCase();
+                if (type === 'gif' || type === 'image/gif') return true;
+                return /\.gif(?:$|[?#\s])/i.test([
+                    item?.name,
+                    item?.fileName,
+                    item?.mimeType,
+                    item?.url,
+                    item?.thumb,
+                ].filter(Boolean).join(' '));
+            };
+
             const renderReferenceMedia = item => {
                 if (item.type === 'copy') {
                     return <div className="reference-thumb"><div className="reference-copy-thumb">{item.content || item.name}</div></div>;
                 }
                 const rawFileName = /\.[a-z0-9]+$/i.test(item.name || '')
                     ? item.name
-                    : `${item.name || '原料'}.${item.type === 'video' ? 'mp4' : 'png'}`;
+                    : `${item.name || '原料'}.${item.type === 'video' ? 'mp4' : isGifReference(item) ? 'gif' : 'png'}`;
                 if (item.type === 'video') {
                     return (
                         <div className="reference-thumb">
@@ -1782,6 +2161,7 @@
                 return (
                     <div className="reference-thumb">
                         <img src={item.thumb || item.url} alt={item.name} />
+                        {isGifReference(item) ? <span className="sticker-gif-tag" style={{ position: 'absolute', top: 8, left: 8 }}>GIF</span> : null}
                         {referencePicker.source === 'library' && <span className="reference-file-name">{rawFileName}</span>}
                     </div>
                 );
@@ -1822,14 +2202,251 @@
                 form.setFieldsValue({ resolutionPreset: CUSTOM_RESOLUTION });
             };
 
+            const handleGenerationModeChange = event => {
+                const value = event.target.value;
+                setGenerationMode(value);
+                form.setFieldsValue({ generationMode: value });
+                setReeditChanged(true);
+            };
+
+            const toggleVariationOption = optionId => {
+                setSelectedVariationOptions(prev => {
+                    if (prev.includes(optionId)) {
+                        const next = prev.filter(id => id !== optionId);
+                        setVariationValues(values => {
+                            const nextValues = { ...values };
+                            delete nextValues[optionId];
+                            return nextValues;
+                        });
+                        form.setFieldsValue({ variationOptions: next });
+                        return next;
+                    }
+                    if (prev.length >= 9) {
+                        message.warning('最多选择 9 个变化参数');
+                        return prev;
+                    }
+                    const next = [...prev, optionId];
+                    const option = variationOptions.find(item => item.id === optionId);
+                    setVariationValues(values => ({ ...values, [optionId]: option?.defaultValue ?? 0 }));
+                    form.setFieldsValue({ variationOptions: next });
+                    return next;
+                });
+                setReeditChanged(true);
+            };
+
+            const updateVariationValue = (optionId, value) => {
+                setVariationValues(values => {
+                    const next = { ...values };
+                    if (value === null || value === undefined || value === '') {
+                        delete next[optionId];
+                    } else {
+                        next[optionId] = value;
+                    }
+                    return next;
+                });
+                setReeditChanged(true);
+            };
+
+            const selectedVariationCount = selectedVariationOptions.length;
+            const videoCount = videoFiles.length;
+            const oneToOneParameterCount = variationOptions.filter(option => variationValues[option.id] !== undefined && variationValues[option.id] !== null && variationValues[option.id] !== '').length;
+            const estimatedVariationCount = generationMode === 'one_to_many'
+                ? selectedVariationCount * videoCount
+                : (oneToOneParameterCount > 0 ? videoCount : 0);
+
+            const getDefaultStickerPosition = index => ({
+                x: 12 + (index % 4) * 5,
+                y: 16 + (index % 3) * 5,
+                width: 24,
+                height: 20,
+                aspectRatio: 1.2,
+                targetUid: stickerTargetUid || videoFiles[0]?.uid || '',
+            });
+
+            const isGifSticker = sticker => {
+                const type = String(sticker?.type || '').toLowerCase();
+                if (type === 'gif' || type === 'image/gif') return true;
+                return /(?:\.gif(?:$|[?#\s])|(?:^|[\s·])gif(?:$|[\s·]))/i.test(`${sticker?.meta || ''} ${sticker?.name || ''}`);
+            };
+
+            const normalizeStickerItem = (sticker, index) => ({
+                ...sticker,
+                id: sticker.id || `sticker-${Date.now()}-${index}`,
+                type: sticker.type || (isGifSticker(sticker) ? 'image/gif' : 'image/png'),
+                meta: sticker.meta || '贴纸 · PNG',
+            });
+
+            const addStickers = items => {
+                const incoming = (items || []).map(normalizeStickerItem);
+                const existingIds = new Set(selectedStickers.map(item => item.id));
+                const uniqueIncoming = incoming.filter(item => !existingIds.has(item.id));
+                const availableCount = DEFAULT_MAX_STICKERS - selectedStickers.length;
+                if (uniqueIncoming.length > availableCount) {
+                    message.warning(`最多添加 ${DEFAULT_MAX_STICKERS} 个贴纸，已自动截取前 ${availableCount} 个`);
+                }
+                const accepted = uniqueIncoming.slice(0, Math.max(availableCount, 0));
+                if (!accepted.length) return;
+                const next = [...selectedStickers, ...accepted];
+                const nextPositions = { ...stickerPositions };
+                accepted.forEach((item, index) => {
+                    nextPositions[item.id] = nextPositions[item.id] || getDefaultStickerPosition(selectedStickers.length + index);
+                });
+                setSelectedStickers(next);
+                setStickerPositions(nextPositions);
+                setActiveStickerId(accepted[0].id);
+                setReeditChanged(true);
+                // 用实际图片尺寸计算比例，后续拖拽/缩放始终保持贴纸原比例。
+                accepted.forEach(item => {
+                    const source = item.thumb || item.url;
+                    if (!source) return;
+                    const image = new Image();
+                    image.onload = () => {
+                        if (!image.naturalWidth || !image.naturalHeight) return;
+                        const aspectRatio = image.naturalWidth / image.naturalHeight;
+                        setStickerPositions(prev => {
+                            const current = prev[item.id];
+                            if (!current) return prev;
+                            return {
+                                ...prev,
+                                [item.id]: { ...current, aspectRatio, height: current.width / aspectRatio },
+                            };
+                        });
+                    };
+                    image.src = source;
+                });
+            };
+
+            const toggleStickerSelection = sticker => {
+                const existing = selectedStickers.find(item => item.id === sticker.id);
+                if (existing) {
+                    removeSticker(sticker.id);
+                    return;
+                }
+                addStickers([sticker]);
+            };
+
+            const handleStickerLocalUpload = event => {
+                const files = Array.from(event.target.files || []);
+                event.target.value = '';
+                if (!files.length) return;
+                const supported = files.filter(file => /\.(png|jpe?g|gif|webp)$/i.test(file.name || '') || /^image\/(png|jpe?g|gif|webp)$/i.test(file.type || ''));
+                if (supported.length !== files.length) message.warning('仅支持 PNG、JPG、GIF、WEBP 等图片格式，已忽略不支持的文件');
+                addStickers(supported.map(file => ({
+                    id: `local-${Date.now()}-${file.name}`,
+                    name: file.name,
+                    type: file.type || (/\.gif$/i.test(file.name) ? 'image/gif' : 'image/png'),
+                    meta: `本地上传 · ${/\.gif$/i.test(file.name) ? 'GIF' : '图片'}`,
+                    thumb: URL.createObjectURL(file),
+                    symbol: '贴纸',
+                    color: 'linear-gradient(135deg,#595959,#1f1f1f)',
+                })));
+                setStickerPickerOpen(false);
+            };
+
+            const removeSticker = stickerId => {
+                setSelectedStickers(prev => prev.filter(item => item.id !== stickerId));
+                setStickerPositions(prev => {
+                    const next = { ...prev };
+                    delete next[stickerId];
+                    return next;
+                });
+                setActiveStickerId(prev => prev === stickerId ? (selectedStickers.find(item => item.id !== stickerId)?.id || '') : prev);
+                setReeditChanged(true);
+            };
+
+            const snapValue = value => {
+                const targets = [0, 50, 100];
+                const target = targets.find(item => Math.abs(item - value) <= 2);
+                return target === undefined ? value : target;
+            };
+
+            const stickerPointerDown = (event, stickerId, mode) => {
+                event.preventDefault();
+                const canvas = event.currentTarget.closest('.sticker-preview-canvas');
+                if (!canvas) return;
+                canvas.setPointerCapture?.(event.pointerId);
+                setActiveStickerId(stickerId);
+                setStickerGuidesVisible(true);
+                stickerDragRef.current = {
+                    stickerId,
+                    mode,
+                    startX: event.clientX,
+                    startY: event.clientY,
+                    start: { ...(stickerPositions[stickerId] || getDefaultStickerPosition(0)) },
+                };
+            };
+
+            const stickerPointerMove = event => {
+                const drag = stickerDragRef.current;
+                if (!drag) return;
+                const canvas = event.currentTarget;
+                const rect = canvas.getBoundingClientRect();
+                const dx = ((event.clientX - drag.startX) / rect.width) * 100;
+                const dy = ((event.clientY - drag.startY) / rect.height) * 100;
+                if (drag.mode === 'resize') {
+                    setStickerPositions(prev => {
+                        const current = prev[drag.stickerId] || drag.start;
+                        const width = Math.min(90, Math.max(6, drag.start.width + dx));
+                        return { ...prev, [drag.stickerId]: { ...current, width, height: width / (current.aspectRatio || 1.2) } };
+                    });
+                } else {
+                    setStickerPositions(prev => {
+                        const current = prev[drag.stickerId] || drag.start;
+                        return { ...prev, [drag.stickerId]: { ...current, x: snapValue(drag.start.x + dx), y: snapValue(drag.start.y + dy) } };
+                    });
+                }
+            };
+
+            const stickerPointerUp = event => {
+                const canvas = event.currentTarget;
+                canvas.releasePointerCapture?.(event.pointerId);
+                stickerDragRef.current = null;
+                setStickerGuidesVisible(false);
+                setReeditChanged(true);
+            };
+
+            const renderStickerThumb = sticker => sticker?.thumb
+                ? <img src={sticker.thumb} alt={sticker.name} />
+                : <span>{sticker?.symbol || '贴纸'}</span>;
+
+            const stickerPickerItems = stickerSource === 'library'
+                ? stickerOptions.filter(item => item.meta.includes('原料库'))
+                : stickerOptions.filter(item => item.meta.includes('官方贴纸'));
+
+            const getOutputRatio = () => {
+                if (stickerRatioConfig.source === 'fixed') return parseRatio(stickerRatioConfig.fixedRatio);
+                if (stickerRatioConfig.source === 'video') return videoFiles.length ? getFileRatio(videoFiles[0]) : null;
+                if (resolutionPreset === CUSTOM_RESOLUTION) {
+                    const width = Number(form.getFieldValue('resolutionWidth'));
+                    const height = Number(form.getFieldValue('resolutionHeight'));
+                    return width > 0 && height > 0 ? { width, height } : null;
+                }
+                const preset = resolutionPresets.find(item => item.value === resolutionPreset);
+                return preset ? { width: preset.width, height: preset.height } : null;
+            };
+
+            const outputRatio = getOutputRatio();
+            const outputRatioLabel = formatRatioLabel(outputRatio);
+
             const resetForm = () => {
                 form.resetFields();
                 setImageFiles([]);
                 setVideoFiles([]);
+                setSelectedStickers([]);
+                setActiveStickerId('');
+                setStickerTargetUid('');
+                setStickerPositions({});
+                setStickerGuidesVisible(false);
+                setGenerationMode('one_to_one');
+                setSelectedVariationOptions([]);
+                setVariationValues({});
                 setResolutionPreset(CUSTOM_RESOLUTION);
                 form.setFieldsValue({
                     imageMaterials: [],
                     videoMaterials: [],
+                    generationMode: 'one_to_one',
+                    variationOptions: [],
+                    stickers: [],
                     resolutionPreset: CUSTOM_RESOLUTION,
                     resolutionWidth: null,
                     resolutionHeight: null,
@@ -1849,7 +2466,7 @@
                     }}
                 >
                     <div className="page-container">
-                        <div className="page-title">视频裂变工作流</div>
+                        <div className="page-title">视频去重工作流 V2，支持一个视频裂变多个视频</div>
                         {reeditContext?.showNotice && <div className="reedit-notice-wrap">{renderReeditNotice(reeditContext)}</div>}
                         
                         <Form 
@@ -1863,6 +2480,9 @@
                                 copyContent: '',
                                 imageMaterials: [],
                                 videoMaterials: [],
+                                generationMode: 'one_to_one',
+                                variationOptions: [],
+                                stickers: [],
                                 resolutionPreset: CUSTOM_RESOLUTION,
                                 resolutionWidth: null,
                                 resolutionHeight: null,
@@ -1915,7 +2535,6 @@
                                 <div className="field-meta">
                                     <div className="field-title-line">
                                         <span className="field-title">{fieldMeta.imageMaterials.title}</span>
-                                        <span className="required">*</span>
                                     </div>
                                     <p className="field-description">{fieldMeta.imageMaterials.description}</p>
                                 </div>
@@ -1927,9 +2546,6 @@
                                         name="imageMaterials"
                                         valuePropName="fileList"
                                         getValueFromEvent={normalizeFileList}
-                                        rules={[{
-                                            validator: (_, value) => value?.length ? Promise.resolve() : Promise.reject(new Error('请上传至少 1 个爆款图片素材')),
-                                        }]}
                                     >
                                         <Dragger
                                             className="custom-dragger"
@@ -1964,7 +2580,14 @@
                                     <div className="reference-actions">
                                         <button className="reference-btn" type="button" onClick={() => openReferencePicker('videoMaterials', 'video', 'product')}>选择系统资源</button>
                                     </div>
-                                    <Form.Item name="videoMaterials" valuePropName="fileList" getValueFromEvent={normalizeFileList}>
+                                    <Form.Item
+                                        name="videoMaterials"
+                                        valuePropName="fileList"
+                                        getValueFromEvent={normalizeFileList}
+                                        rules={[{
+                                            validator: (_, value) => value?.length ? Promise.resolve() : Promise.reject(new Error('请上传至少 1 个视频素材')),
+                                        }]}
+                                    >
                                         <Dragger
                                             className="custom-dragger"
                                             accept="video/*"
@@ -1981,6 +2604,176 @@
                                     </Form.Item>
                                     <div className="upload-summary">
                                         <span>已选择 {videoFiles.length} 个文件</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">生成模式</span>
+                                        <span className="required">*</span>
+                                    </div>
+                                    <p className="field-description">选择本次任务生成一个结果，或按变化参数拆分生成多个结果。</p>
+                                </div>
+                                <div className="field-control">
+                                    <Radio.Group value={generationMode} onChange={handleGenerationModeChange} optionType="button" buttonStyle="solid">
+                                        <Radio.Button value="one_to_one">1 生 1</Radio.Button>
+                                        <Radio.Button value="one_to_many">1 生多</Radio.Button>
+                                    </Radio.Group>
+                                    <div className="mode-tip">{generationMode === 'one_to_many' ? '选择多个参数后，每个参数对应生成 1 个视频，最多 9 个；滑杆用于调节该参数数值。' : '开启需要的参数后，用滑杆调节数值；关闭的参数不生效。'}</div>
+                                </div>
+                            </div>
+
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldMeta.variationOptions.title}</span>
+                                        {generationMode === 'one_to_many' && <span className="required">*</span>}
+                                    </div>
+                                    <p className="field-description">{fieldMeta.variationOptions.description}</p>
+                                </div>
+                                <div className="field-control">
+                                    {generationMode === 'one_to_many' ? (
+                                        <>
+                                            <div className="variation-option-head">
+                                                <span className="variation-option-count">已选择 {selectedVariationCount} / 9</span>
+                                                <span className="variation-option-tip">每项生成 1 个视频</span>
+                                            </div>
+                                            <div className="variation-option-grid">
+                                                {variationOptions.map(option => {
+                                                    const active = selectedVariationOptions.includes(option.id);
+                                                    const disabled = !active && selectedVariationCount >= 9;
+                                                    return (
+                                                        <div key={option.id} className={`variation-option-card ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}`}>
+                                                            <label className="variation-option-card-title">
+                                                                <input type="checkbox" checked={active} disabled={disabled} onChange={() => toggleVariationOption(option.id)} />
+                                                                <span>{option.name}</span>
+                                                            </label>
+                                                            <div className="variation-option-control">
+                                                                <Slider min={option.min} max={option.max} step={option.step} value={variationValues[option.id] ?? option.defaultValue} disabled={!active} onChange={value => updateVariationValue(option.id, value)} tooltip={{ formatter: value => `${value} ${option.unit}` }} />
+                                                                <InputNumber size="small" min={option.min} max={option.max} step={option.step} value={variationValues[option.id] ?? option.defaultValue} disabled={!active} onChange={value => updateVariationValue(option.id, value)} />
+                                                                <span className="variation-option-unit">{option.unit}</span>
+                                                            </div>
+                                                            <span className="variation-option-card-desc">开启后生效 · {option.desc}</span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="variation-single-list">
+                                            {variationOptions.map(option => {
+                                                const enabled = variationValues[option.id] !== undefined && variationValues[option.id] !== null && variationValues[option.id] !== '';
+                                                const currentValue = variationValues[option.id] ?? option.defaultValue;
+                                                return (
+                                                <div key={option.id} className={`variation-single-item ${enabled ? 'active' : ''}`}>
+                                                    <div className="variation-single-copy">
+                                                        <div className="variation-single-name">
+                                                            <Checkbox checked={enabled} onChange={event => updateVariationValue(option.id, event.target.checked ? option.defaultValue : null)}>
+                                                                {option.name}
+                                                            </Checkbox>
+                                                        </div>
+                                                        <span className="variation-option-card-desc">开启后生效 · {option.desc}</span>
+                                                    </div>
+                                                    <div className="variation-single-control">
+                                                        <Slider min={option.min} max={option.max} step={option.step} value={currentValue} disabled={!enabled} onChange={value => updateVariationValue(option.id, value)} tooltip={{ formatter: value => `${value} ${option.unit}` }} />
+                                                        <InputNumber size="small" min={option.min} max={option.max} step={option.step} value={currentValue} disabled={!enabled} onChange={value => updateVariationValue(option.id, value)} />
+                                                        <span className="variation-single-unit">{option.unit}</span>
+                                                    </div>
+                                                </div>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                    <div className="variation-output-summary">
+                                        {videoCount ? (
+                                            generationMode === 'one_to_many'
+                                                ? <>当前上传 <strong>{videoCount}</strong> 个视频，选择 <strong>{selectedVariationCount}</strong> 个参数，预计生成 <strong>{estimatedVariationCount}</strong> 个视频。</>
+                                                : <>当前上传 <strong>{videoCount}</strong> 个视频，预计生成 <strong>{estimatedVariationCount}</strong> 个视频。</>
+                                        ) : (
+                                            generationMode === 'one_to_many' ? <>上传视频后显示预计生成数量。每选择 1 个参数，对每个视频生成 1 个变体。</> : <>上传视频后显示预计生成数量。填写多个参数也只生成 1 个视频。</>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field-row">
+                                <div className="field-meta">
+                                    <div className="field-title-line">
+                                        <span className="field-title">{fieldMeta.sticker.title}</span>
+                                    </div>
+                                    <p className="field-description">最多添加 10 个 PNG、JPG、GIF 等图片贴纸，在画布上拖拽调整位置、等比缩放；GIF 会循环播放至视频结束。</p>
+                                </div>
+                                <div className="field-control">
+                                    <div className="sticker-workspace">
+                                        <div className="sticker-list-column">
+                                            <div className="sticker-add-section">
+                                                <div className="sticker-actions-title">添加贴纸</div>
+                                                <div className="reference-actions">
+                                                    <label className="reference-btn" style={{ cursor: 'pointer' }}>
+                                                        <UploadOutlined />
+                                                        本地上传
+                                                        <input type="file" accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" multiple style={{ display: 'none' }} onChange={handleStickerLocalUpload} />
+                                                    </label>
+                                                    <button className="reference-btn" type="button" onClick={() => openReferencePicker('sticker', 'image', 'library')}>
+                                                        <DatabaseOutlined />
+                                                        系统资源
+                                                    </button>
+                                                </div>
+                                                <div className="sticker-actions-tip">支持 PNG、JPG、GIF，最多添加 10 个</div>
+                                            </div>
+                                            <div className="sticker-list-heading">
+                                                <strong>已选贴纸</strong>
+                                                <span className="sticker-list-heading-count">{selectedStickers.length}/{DEFAULT_MAX_STICKERS}</span>
+                                            </div>
+                                            {selectedStickers.length > 0 ? (
+                                                <div className="sticker-list">
+                                                    {selectedStickers.map(sticker => (
+                                                        <div key={sticker.id} className={`sticker-list-item ${activeStickerId === sticker.id ? 'active' : ''}`} onClick={() => setActiveStickerId(sticker.id)}>
+                                                            <div className="sticker-list-thumb">{renderStickerThumb(sticker)}</div>
+                                                            <div className="sticker-list-info">
+                                                                <div className="sticker-list-name">{sticker.name}</div>
+                                                            <div className="sticker-list-meta">{isGifSticker(sticker) && <span className="sticker-gif-tag">GIF</span>}</div>
+                                                            </div>
+                                                            <button className="sticker-list-remove" type="button" aria-label={`删除${sticker.name}`} onClick={event => { event.stopPropagation(); removeSticker(sticker.id); }}>×</button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="sticker-list-empty">暂无贴纸</div>
+                                            )}
+                                        </div>
+                                        <div className="sticker-canvas-column">
+                                            <div className="sticker-preview-wrap">
+                                                <div
+                                                    className="sticker-preview-canvas"
+                                                    onPointerMove={stickerPointerMove}
+                                                    onPointerUp={stickerPointerUp}
+                                                    onPointerCancel={stickerPointerUp}
+                                                >
+                                                    {selectedStickers.length > 0 && <div className="sticker-canvas-status"><CheckOutlined /> 添加成功</div>}
+                                                    {stickerGuidesVisible && <><span className="sticker-guide-v" style={{ left: '50%' }} /><span className="sticker-guide-h" style={{ top: '50%' }} /></>}
+                                                    {selectedStickers.map(sticker => {
+                                                        const position = stickerPositions[sticker.id] || getDefaultStickerPosition(0);
+                                                        const active = activeStickerId === sticker.id;
+                                                        return (
+                                                            <div
+                                                                key={sticker.id}
+                                                                className={`sticker-overlay ${active ? 'active' : ''}`}
+                                                                style={{ left: `${position.x}%`, top: `${position.y}%`, width: `${position.width}%`, height: `${position.height}%` }}
+                                                                onClick={() => setActiveStickerId(sticker.id)}
+                                                                onPointerDown={event => stickerPointerDown(event, sticker.id, 'move')}
+                                                            >
+                                                                {active && <button className="sticker-delete" type="button" onPointerDown={event => event.stopPropagation()} onClick={event => { event.stopPropagation(); removeSticker(sticker.id); }}>删除</button>}
+                                                                {renderStickerThumb(sticker)}
+                                                                <span className="sticker-handle" onPointerDown={event => { event.stopPropagation(); stickerPointerDown(event, sticker.id, 'resize'); }} />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -2155,7 +2948,7 @@
                         onCancel={closeReferencePicker}
                         footer={(
                             <div className="reference-modal-footer">
-                                <span className="reference-modal-count">已选择 <strong>{referencePicker.selectedIds.length}</strong> 项</span>
+                                <span className="reference-modal-count">已选择 <strong>{referencePicker.selectedIds.length}</strong> 项{referencePicker.field === 'sticker' ? ` / ${DEFAULT_MAX_STICKERS}` : ''}</span>
                                 <div className="reference-modal-actions">
                                     <Button onClick={closeReferencePicker}>取消</Button>
                                     <Button type="primary" disabled={referencePicker.selectedIds.length === 0} onClick={confirmReferencePicker}>确认添加</Button>
@@ -2491,10 +3284,59 @@
                         destroyOnClose
                         onCancel={() => setPreview({ open: false, title: '', url: '', type: '' })}
                     >
-                        {preview.type === 'image' && <img src={preview.url} alt={preview.title} className="preview-media" />}
+                        {preview.type === 'image' && (
+                            <div style={{ position: 'relative', width: 'fit-content', maxWidth: '100%', margin: '0 auto' }}>
+                                {isGifReference({ name: preview.title, url: preview.url }) && <span className="sticker-gif-tag" style={{ position: 'absolute', top: 8, left: 8, zIndex: 2 }}>GIF</span>}
+                                <img src={preview.url} alt={preview.title} className="preview-media" />
+                            </div>
+                        )}
                         {preview.type === 'video' && <video src={preview.url} className="preview-media" controls />}
                         {preview.type === 'copy' && <div className="reference-copy-thumb">{preview.content || '暂无文案内容'}</div>}
                         {!preview.type && <p className="preview-empty">当前文件暂不支持预览</p>}
+                    </Modal>
+                    <Modal
+                        open={stickerPickerOpen}
+                        title="选择贴纸"
+                        width={760}
+                        className="sticker-picker-modal"
+                        destroyOnClose
+                        onCancel={() => setStickerPickerOpen(false)}
+                        footer={<Button onClick={() => setStickerPickerOpen(false)}>取消</Button>}
+                    >
+                        <div className="sticker-picker-tabs">
+                            {[
+                                { value: 'official', label: '官方贴纸' },
+                                { value: 'library', label: '原料库' },
+                                { value: 'local', label: '本地上传' },
+                            ].map(tab => (
+                                <button key={tab.value} type="button" className={`sticker-picker-tab ${stickerSource === tab.value ? 'active' : ''}`} onClick={() => setStickerSource(tab.value)}>{tab.label}</button>
+                            ))}
+                        </div>
+                        <div className="sticker-picker-content">
+                            {stickerSource === 'local' ? (
+                                <div className="sticker-picker-upload">
+                                    <label htmlFor="sticker-local-file">
+                                        <span style={{ fontSize: 28, color: '#1677ff' }}>＋</span>
+                                        <strong>选择 PNG 或 GIF 文件</strong>
+                                        <small>支持透明背景；单个文件建议不超过 10 MB</small>
+                                        <input id="sticker-local-file" type="file" accept=".png,.gif,image/png,image/gif" onChange={handleStickerLocalUpload} />
+                                    </label>
+                                </div>
+                            ) : (
+                                <>
+                                    <div className="sticker-picker-tip">选择后立即返回表单；贴纸实际作用对象在下方“位置预览”中指定。</div>
+                                    <div className="sticker-option-grid">
+                                        {stickerPickerItems.map(item => (
+                                            <button key={item.id} type="button" className={`sticker-option ${selectedStickers.some(sticker => sticker.id === item.id) ? 'active' : ''}`} onClick={() => toggleStickerSelection(item)}>
+                                                <div className="sticker-option-thumb" style={{ background: item.color }}>{renderStickerThumb(item)}</div>
+                                                <span className="sticker-option-name">{item.name}</span>
+                                                <span className="sticker-option-meta">{item.meta}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </Modal>
                 </ConfigProvider>
             );

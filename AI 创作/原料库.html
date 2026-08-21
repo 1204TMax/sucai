@@ -760,6 +760,26 @@
       backdrop-filter: blur(6px);
     }
 
+    .media-gif-badge {
+      position: absolute;
+      top: var(--ant-size-xs);
+      left: var(--ant-size-xs);
+      z-index: 3;
+      height: 22px;
+      padding: 0 var(--ant-size-xs);
+      border-radius: var(--ant-border-radius-sm);
+      background: rgba(22,119,255,0.9);
+      color: var(--ant-text-color-inverse);
+      font-size: var(--ant-font-size-sm);
+      font-weight: 600;
+      line-height: 22px;
+    }
+
+    .media-is-gif .media-file-name {
+      left: 52px;
+      max-width: calc(100% - 60px);
+    }
+
     .audio-preview {
       width: 100%;
       height: 100%;
@@ -1240,6 +1260,16 @@
       margin: 0 auto;
     }
 
+    .preview-image-wrap {
+      position: relative;
+      width: fit-content;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .preview-image-wrap .preview-media { margin: 0; }
+    .preview-image-wrap .media-gif-badge { top: var(--ant-size-sm); left: var(--ant-size-sm); }
+
     .preview-copy {
       max-height: min(70vh, 680px);
       overflow: auto;
@@ -1652,6 +1682,20 @@
       return raw + fallbackExt;
     }
 
+    function isGifMaterial(item) {
+      const type = String(item && item.type || '').toLowerCase();
+      if (type === 'gif' || type === 'image/gif') return true;
+      return /\.gif(?:$|[?#\s])/i.test([
+        item && item.fileName,
+        item && item.filename,
+        item && item.name,
+        item && item.url,
+        item && item.thumb,
+        item && item.mimeType,
+        item && item.type,
+      ].filter(Boolean).join(' '));
+    }
+
     function actionMenu(item) {
       if (item.type === 'copy') {
         return '<button class="action-item" type="button" onclick="editCopy(\'' + esc(item.id) + '\')">编辑</button>'
@@ -1669,14 +1713,16 @@
     }
 
     function mediaCard(item) {
+      const isGif = item.type !== 'video' && isGifMaterial(item);
       const media = item.type === 'audio'
         ? '<div class="audio-preview"><div class="audio-bars"><span></span><span></span><span></span><span></span><span></span></div><strong>' + esc(typeLabel(currentType)) + '</strong></div>'
         : item.type === 'video'
         ? '<video src="' + esc(item.url) + '" poster="' + esc(item.thumb || '') + '" muted playsinline preload="metadata"></video><span class="media-play"></span>'
-        : '<img src="' + esc(item.thumb || item.url) + '" alt="' + esc(item.name) + '">';
+        : '<img src="' + esc(isGif ? (item.url || item.thumb) : (item.thumb || item.url)) + '" alt="' + esc(item.name) + '">';
       return '<article class="material-card">'
-        + '<button class="media" type="button" onclick="previewMaterial(\'' + esc(item.id) + '\')">'
+        + '<button class="media' + (isGif ? ' media-is-gif' : '') + '" type="button" onclick="previewMaterial(\'' + esc(item.id) + '\')">'
         + '<span class="media-file-name" title="' + esc(fileNameFor(item)) + '">' + esc(fileNameFor(item)) + '</span>'
+        + (item.type !== 'video' && isGifMaterial(item) ? '<span class="media-gif-badge">GIF</span>' : '')
         + media + '</button>'
         + '<div class="card-body">'
         + '<div class="tag-list">' + tagHtml(item) + '</div>'
@@ -1891,7 +1937,9 @@
       document.getElementById('materialFile').accept = format === 'copy' ? '.txt,.md,.doc,.docx' : format === 'image' ? 'image/*' : format === 'audio' ? 'audio/*' : 'video/*';
       document.getElementById('materialFile').value = '';
       document.getElementById('uploadMainText').textContent = '点击或拖拽文件到此处上传';
-      document.getElementById('uploadHint').textContent = '支持单个或批量文件，不支持文件夹';
+      document.getElementById('uploadHint').textContent = format === 'image'
+        ? '支持 PNG、JPG、GIF、WEBP 等图片，可批量导入，不支持文件夹'
+        : '支持单个或批量文件，不支持文件夹';
     }
 
     function setImportType(type) {
@@ -2191,7 +2239,9 @@
       } else if (item.type === 'video') {
         document.getElementById('previewBody').innerHTML = '<video class="preview-media" src="' + esc(item.url) + '" controls></video>';
       } else {
-        document.getElementById('previewBody').innerHTML = '<img class="preview-media" src="' + esc(item.url || item.thumb) + '" alt="' + esc(item.name) + '">';
+        document.getElementById('previewBody').innerHTML = '<div class="preview-image-wrap">'
+          + (isGifMaterial(item) ? '<span class="media-gif-badge">GIF</span>' : '')
+          + '<img class="preview-media" src="' + esc(item.url || item.thumb) + '" alt="' + esc(item.name) + '"></div>';
       }
       document.getElementById('previewMask').classList.add('show');
     }

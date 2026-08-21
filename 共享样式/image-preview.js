@@ -8,12 +8,16 @@
  */
 
 var CC_PREVIEW_STORAGE_TARGETS = ['素材库', '原料库'];
-var CC_PREVIEW_EDIT_OPTIONS = [
-  { l: '文本创作' },
-  { l: '图像创作' },
-  { l: '视频创作' },
-  { l: '工作流', children: ['图片衍生'] }
+var CC_PREVIEW_GENERAL_EDIT_OPTIONS = ['文案', '图片', '视频'];
+// 共享预览中的工作流菜单数据。lastUsedAt 表示当前用户最近一次使用时间；
+// 未使用过的工作流按 createdAt 排序。
+var CC_PREVIEW_WORKFLOWS = [
+  { id: 'wf-image-derive', name: '爆款图片衍生0427', lastUsedAt: '2026-07-23T10:20:00', createdAt: '2026-04-27T10:20:00' },
+  { id: 'wf-video-cover', name: '视频封面钩子提炼', lastUsedAt: '2026-07-22T16:40:00', createdAt: '2026-04-15T09:20:00' },
+  { id: 'wf-poster-batch', name: '电商夏季大促商品图批量衍生', lastUsedAt: '', createdAt: '2026-04-18T14:30:00' },
+  { id: 'wf-copy-rewrite', name: '小红书标题批量改写', lastUsedAt: '', createdAt: '2026-04-24T11:00:00' }
 ];
+var CC_PREVIEW_WORKFLOW_FAVORITES_KEY = 'cc_preview_workflow_favorites';
 
 var CC_PREVIEW_ICONS = {
   download: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
@@ -39,6 +43,56 @@ function ccPreviewJs(value) {
 
 function ccPreviewInferType(url) {
   return /\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(String(url || '')) ? 'video' : 'image';
+}
+
+function ccPreviewGetWorkflowFavorites() {
+  try { return JSON.parse(localStorage.getItem(CC_PREVIEW_WORKFLOW_FAVORITES_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+
+function ccPreviewWorkflowMenuItems(menuClass) {
+  var favorites = ccPreviewGetWorkflowFavorites();
+  return CC_PREVIEW_WORKFLOWS.slice().sort(function(a, b) {
+    var aFavorite = favorites.indexOf(a.id) >= 0;
+    var bFavorite = favorites.indexOf(b.id) >= 0;
+    if (aFavorite !== bFavorite) return aFavorite ? -1 : 1;
+    if (a.lastUsedAt && b.lastUsedAt) return new Date(b.lastUsedAt) - new Date(a.lastUsedAt);
+    if (a.lastUsedAt) return -1;
+    if (b.lastUsedAt) return 1;
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  }).map(function(workflow) {
+    var favorite = favorites.indexOf(workflow.id) >= 0;
+    var visibleName = workflow.name.length > 10 ? workflow.name.slice(0, 10) + '…' : workflow.name;
+    return '<div class="workflow-menu-item">'
+      + '<div class="workflow-menu-name" data-workflow-id="' + ccPreviewAttr(workflow.id) + '">'
+      + '<span>' + ccPreviewAttr(visibleName) + '</span>'
+      + (workflow.name.length > 10 ? '<span class="workflow-name-tip">' + ccPreviewAttr(workflow.name) + '</span>' : '')
+      + '</div>'
+      + '<span class="workflow-favorite' + (favorite ? ' active' : '') + '" role="button" tabindex="0" title="' + (favorite ? '取消收藏' : '收藏并置顶') + '" aria-label="' + (favorite ? '取消收藏' : '收藏并置顶') + '" onclick="event.stopPropagation();ccPreviewToggleWorkflowFavorite(\'' + ccPreviewJs(workflow.id) + '\', this.closest(\'.' + menuClass + '\'))">' + (favorite ? '★' : '☆') + '</span>'
+      + '</div>';
+  }).join('');
+}
+
+function ccPreviewToggleWorkflowFavorite(id, menu) {
+  var favorites = ccPreviewGetWorkflowFavorites();
+  var index = favorites.indexOf(id);
+  if (index >= 0) favorites.splice(index, 1);
+  else favorites.push(id);
+  try { localStorage.setItem(CC_PREVIEW_WORKFLOW_FAVORITES_KEY, JSON.stringify(favorites)); } catch (e) {}
+  if (menu) menu.innerHTML = ccPreviewEditMenuItems(menu.classList.contains('edit-menu') ? 'thumb' : 'preview');
+}
+
+function ccPreviewEditMenuItems(context) {
+  var isThumb = context === 'thumb';
+  var itemClass = isThumb ? 'edit-menu-item' : 'pv-dd-item';
+  var subClass = isThumb ? 'edit-submenu' : 'pv-dd-sub';
+  var subItemClass = isThumb ? 'edit-submenu-item' : 'pv-dd-item';
+  var workflowItems = ccPreviewWorkflowMenuItems(isThumb ? 'edit-menu' : 'img-preview-store-dd');
+  var generalItems = CC_PREVIEW_GENERAL_EDIT_OPTIONS.map(function(label) {
+    return '<div class="' + subItemClass + '">' + label + '</div>';
+  }).join('');
+  return '<div class="' + itemClass + '">通用生成 <span class="sub-arrow">▸</span><div class="' + subClass + '">' + generalItems + '</div></div>'
+    + '<div class="' + itemClass + '">工作流 <span class="sub-arrow">▸</span><div class="' + subClass + ' workflow-submenu">' + workflowItems + '</div></div>';
 }
 
 function ccPreviewOpenArchive(items, target) {
@@ -94,16 +148,7 @@ function thumbOverlayHtml(url, downloadAction) {
   storeControl = '<button class="thumb-act" title="入库" data-archive-url="' + ccPreviewAttr(url) + '" onclick="event.stopPropagation();toggleThumbDD(this,\'store\')">' + CC_PREVIEW_ICONS.store
     + '<div class="storage-dropdown" onclick="event.stopPropagation()">' + storeDD + '</div></button>';
 
-  var editDD = CC_PREVIEW_EDIT_OPTIONS.map(function(opt) {
-    if (opt.children) {
-      var subs = opt.children.map(function(s) {
-        return '<div class="edit-submenu-item" onclick="event.stopPropagation();showToast(\'已添加到' + s + '工作流\');this.closest(\'.edit-menu\').style.display=\'none\'">' + s + '</div>';
-      }).join('');
-      return '<div class="edit-menu-item" style="position:relative">' + opt.l + ' <span class="sub-arrow">▸</span>'
-        + '<div class="edit-submenu">' + subs + '</div></div>';
-    }
-    return '<div class="edit-menu-item" onclick="event.stopPropagation();showToast(\'已添加到' + opt.l + '\');this.closest(\'.edit-menu\').style.display=\'none\'">' + opt.l + '</div>';
-  }).join('');
+  var editDD = ccPreviewEditMenuItems('thumb');
 
   return '<div class="thumb-overlay">'
     + '<button class="thumb-act" title="下载" onclick="' + downloadAction + '">' + CC_PREVIEW_ICONS.download + '</button>'
@@ -149,15 +194,7 @@ function initImagePreview() {
     + '<div class="img-preview-store-dd" onclick="event.stopPropagation()">' + storeItems + '</div>'
     + '</div>';
 
-  var editItems = CC_PREVIEW_EDIT_OPTIONS.map(function(opt) {
-    if (opt.children) {
-      var subs = opt.children.map(function(s) {
-        return '<div class="pv-dd-item" onclick="showToast(\'已添加到' + s + '工作流\');this.closest(\'.img-preview-store-dd\').classList.remove(\'show\')">' + s + '</div>';
-      }).join('');
-      return '<div class="pv-dd-item">' + opt.l + ' <span class="sub-arrow">▸</span><div class="pv-dd-sub">' + subs + '</div></div>';
-    }
-    return '<div class="pv-dd-item" onclick="showToast(\'已添加到' + opt.l + '\');this.closest(\'.img-preview-store-dd\').classList.remove(\'show\')">' + opt.l + '</div>';
-  }).join('');
+  var editItems = ccPreviewEditMenuItems('preview');
 
   var html = '<div class="img-preview-mask" id="imgPreviewMask" onclick="closeImagePreview()">'
     + '<img class="img-preview-img" id="imgPreviewImg" src="" alt="" onclick="event.stopPropagation()">'
