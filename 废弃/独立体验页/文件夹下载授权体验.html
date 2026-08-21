@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>文件夹下载授权体验</title>
+  <style>
+    :root {
+      /* 主色 */
+      --primary-1: #e8f4ff;
+      --primary-2: #c4e2ff;
+      --primary-3: #96c8ff;
+      --primary-4: #6dafff;
+      --primary-5: #5aa4ff;
+      --primary-6: #4a9eff;
+      --primary-7: #3580db;
+      --primary-8: #2463b5;
+      --primary-9: #164a8f;
+      --primary-10: #0b336a;
+
+      /* 灰阶 */
+      --gray-1: #fcfcfd;
+      --gray-2: #f8f9fa;
+      --gray-3: #f1f3f5;
+      --gray-4: #e9ecef;
+      --gray-5: #dee2e6;
+      --gray-6: #ced4da;
+      --gray-7: #adb5bd;
+      --gray-8: #868e96;
+      --gray-9: #6c757d;
+      --gray-10: #5a6169;
+      --gray-11: #495057;
+      --gray-12: #212529;
+
+      /* 语义颜色 */
+      --bg-page: var(--gray-2);
+      --bg-surface: var(--gray-1);
+      --bg-subtle: var(--gray-3);
+      --bg-hover: var(--gray-4);
+      --border-1: var(--gray-4);
+      --border-2: var(--gray-6);
+      --text-hi: var(--gray-12);
+      --text-lo: var(--gray-11);
+      --text-muted: var(--gray-9);
+      --text-ghost: var(--gray-8);
+      --accent-bg: var(--primary-1);
+      --accent-border: var(--primary-2);
+      --accent-solid: var(--primary-6);
+      --accent-solid-hover: var(--primary-5);
+      --accent-solid-active: var(--primary-7);
+      --accent-text: var(--primary-7);
+      --success: #34c759;
+      --success-bg: #f6ffed;
+      --success-border: #d9f7be;
+      --warning: #ff9500;
+      --warning-bg: #fffbe6;
+      --warning-border: #ffe58f;
+      --error: #e5484d;
+      --error-bg: #fff2f0;
+      --error-border: #ffccc7;
+      --white: #ffffff;
+      --overlay-soft: rgba(11, 51, 106, 0.08);
+      --shadow-card: 0 16px 48px rgba(11, 51, 106, 0.10);
+      --shadow-toast: 0 8px 28px rgba(33, 37, 41, 0.16);
+
+      /* 字体 */
+      --font: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+        "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+      --text-xs: 11px;
+      --text-sm: 12px;
+      --text-base: 13px;
+      --text-md: 14px;
+      --text-lg: 16px;
+      --text-xl: 18px;
+      --text-title: 28px;
+
+      /* 间距 */
+      --space-0: 2px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-7: 32px;
+      --space-8: 40px;
+      --space-9: 48px;
+
+      /* 尺寸 */
+      --control-height-sm: 32px;
+      --control-height-md: 40px;
+      --control-height-lg: 48px;
+
+      /* 圆角与动效 */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 12px;
+      --radius-xxl: 20px;
+      --radius-full: 9999px;
+      --ease-fast: 120ms ease;
+      --ease-base: 200ms ease;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      padding: var(--space-2);
+      color: var(--text-hi);
+      background:
+        radial-gradient(circle at 50% 0%, var(--accent-bg), transparent 42%),
+        var(--bg-page);
+      font-family: var(--font);
+      font-size: var(--text-base);
+      line-height: 1.6;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .cc-folder-demo-shell {
+      min-height: calc(100vh - (var(--space-2) * 2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-7) var(--space-4);
+    }
+
+    .cc-folder-demo-card {
+      width: min(100%, 680px);
+      padding: var(--space-8);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-1);
+      border-radius: var(--radius-xxl);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+    }
+
+    .cc-folder-demo-heading {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .cc-folder-demo-kicker {
+      width: fit-content;
+      min-height: var(--control-height-sm);
+      padding: 0 var(--space-3);
+      border: 1px solid var(--accent-border);
+      border-radius: var(--radius-full);
+      color: var(--accent-text);
+      background: var(--accent-bg);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      font-weight: 600;
+    }
+
+    .cc-folder-demo-kicker-dot {
+      width: var(--space-2);
+      height: var(--space-2);
+      border-radius: var(--radius-full);
+      background: var(--accent-solid);
+    }
+
+    .cc-folder-demo-title {
+      margin: 0;
+      font-size: var(--text-title);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .cc-folder-demo-description {
+      margin: 0;
+      max-width: 560px;
+      color: var(--text-muted);
+      font-size: var(--text-md);
+    }
+
+    .cc-folder-demo-status {
+      min-height: 64px;
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border-1);
+      border-radius: var(--radius-xl);
+      background: var(--bg-subtle);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .cc-folder-demo-status-icon {
+      width: var(--control-height-md);
+      height: var(--control-height-md);
+      flex: 0 0 auto;
+      border-radius: var(--radius-lg);
+      color: var(--accent-text);
+      background: var(--accent-bg);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cc-folder-demo-status-icon svg {
+      width: var(--space-5);
+      height: var(--space-5);
+    }
+
+    .cc-folder-demo-status-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .cc-folder-demo-status-title {
+      color: var(--text-hi);
+      font-size: var(--text-md);
+      font-weight: 600;
+    }
+
+    .cc-folder-demo-status-detail {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .cc-folder-demo-action {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3);
+    }
+
+    .cc-folder-demo-button {
+      min-width: 184px;
+      height: var(--control-height-lg);
+      padding: 0 var(--space-5);
+      border: 1px solid transparent;
+      border-radius: var(--radius-lg);
+      color: var(--white);
+      background: var(--accent-solid);
+      box-shadow: 0 var(--space-1) var(--space-3) var(--overlay-soft);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      font-size: var(--text-md);
+      font-weight: 600;
+      transition:
+        background var(--ease-fast),
+        transform var(--ease-fast),
+        box-shadow var(--ease-fast);
+    }
+
+    .cc-folder-demo-button:hover {
+      background: var(--accent-solid-hover);
+      box-shadow: 0 var(--space-2) var(--space-4) var(--overlay-soft);
+    }
+
+    .cc-folder-demo-button:active {
+      background: var(--accent-solid-active);
+      transform: translateY(1px);
+    }
+
+    .cc-folder-demo-button:focus-visible {
+      outline: 2px solid var(--accent-solid);
+      outline-offset: var(--space-0);
+    }
+
+    .cc-folder-demo-button:disabled {
+      cursor: wait;
+      opacity: 0.72;
+      transform: none;
+    }
+
+    .cc-folder-demo-button svg {
+      width: var(--space-5);
+      height: var(--space-5);
+    }
+
+    .cc-folder-demo-spinner {
+      width: var(--space-4);
+      height: var(--space-4);
+      border: 2px solid var(--primary-3);
+      border-top-color: var(--white);
+      border-radius: var(--radius-full);
+      animation: cc-folder-demo-spin 700ms linear infinite;
+    }
+
+    .cc-folder-demo-helper {
+      margin: 0;
+      color: var(--text-ghost);
+      font-size: var(--text-sm);
+    }
+
+    .cc-folder-demo-facts {
+      padding-top: var(--space-5);
+      border-top: 1px solid var(--border-1);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-4);
+    }
+
+    .cc-folder-demo-fact {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .cc-folder-demo-fact strong {
+      font-size: var(--text-sm);
+      font-weight: 600;
+    }
+
+    .cc-folder-demo-fact span {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .cc-folder-demo-toast {
+      position: fixed;
+      z-index: 1000;
+      top: var(--space-5);
+      left: 50%;
+      width: min(calc(100% - (var(--space-4) * 2)), 520px);
+      min-height: 64px;
+      padding: var(--space-3) var(--space-4);
+      border: 1px solid var(--border-1);
+      border-radius: var(--radius-xl);
+      background: var(--bg-surface);
+      box-shadow: var(--shadow-toast);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - var(--space-7)));
+      transition:
+        opacity var(--ease-base),
+        transform var(--ease-base);
+    }
+
+    .cc-folder-demo-toast.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, 0);
+    }
+
+    .cc-folder-demo-toast-mark {
+      width: var(--control-height-sm);
+      height: var(--control-height-sm);
+      flex: 0 0 auto;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent-text);
+      background: var(--accent-bg);
+    }
+
+    .cc-folder-demo-toast.is-success .cc-folder-demo-toast-mark {
+      color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .cc-folder-demo-toast.is-error .cc-folder-demo-toast-mark {
+      color: var(--error);
+      background: var(--error-bg);
+    }
+
+    .cc-folder-demo-toast-copy {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .cc-folder-demo-toast-title {
+      color: var(--text-hi);
+      font-size: var(--text-md);
+      font-weight: 600;
+    }
+
+    .cc-folder-demo-toast-detail {
+      color: var(--text-muted);
+      font-size: var(--text-sm);
+    }
+
+    .cc-folder-demo-toast-close {
+      width: var(--control-height-sm);
+      height: var(--control-height-sm);
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-md);
+      color: var(--text-ghost);
+      background: transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition:
+        color var(--ease-fast),
+        background var(--ease-fast);
+    }
+
+    .cc-folder-demo-toast-close:hover {
+      color: var(--text-hi);
+      background: var(--bg-hover);
+    }
+
+    .cc-folder-demo-toast-close:focus-visible {
+      outline: 2px solid var(--accent-solid);
+      outline-offset: var(--space-0);
+    }
+
+    @keyframes cc-folder-demo-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .cc-folder-demo-shell {
+        align-items: flex-start;
+        padding: var(--space-5) 0;
+      }
+
+      .cc-folder-demo-card {
+        padding: var(--space-6);
+      }
+
+      .cc-folder-demo-title {
+        font-size: var(--text-xl);
+      }
+
+      .cc-folder-demo-button {
+        width: 100%;
+      }
+
+      .cc-folder-demo-facts {
+        grid-template-columns: 1fr;
+        gap: var(--space-3);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div
+    class="cc-folder-demo-toast"
+    id="resultToast"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <span class="cc-folder-demo-toast-mark" id="toastMark" aria-hidden="true">i</span>
+    <span class="cc-folder-demo-toast-copy">
+      <span class="cc-folder-demo-toast-title" id="toastTitle">提示</span>
+      <span class="cc-folder-demo-toast-detail" id="toastDetail"></span>
+    </span>
+    <button class="cc-folder-demo-toast-close" id="toastClose" type="button" aria-label="关闭提示">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <main class="cc-folder-demo-shell">
+    <section class="cc-folder-demo-card" aria-labelledby="pageTitle">
+      <header class="cc-folder-demo-heading">
+        <span class="cc-folder-demo-kicker">
+          <span class="cc-folder-demo-kicker-dot" aria-hidden="true"></span>
+          真实浏览器权限体验
+        </span>
+        <h1 class="cc-folder-demo-title" id="pageTitle">体验“选择下载文件夹”弹窗</h1>
+        <p class="cc-folder-demo-description">
+          点击按钮后，Chrome 或 Edge 会打开系统文件夹选择窗口。这个页面不会创建、读取或上传任何文件。
+        </p>
+      </header>
+
+      <div class="cc-folder-demo-status" id="environmentStatus">
+        <span class="cc-folder-demo-status-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3.75 8.75V6.5A1.75 1.75 0 0 1 5.5 4.75h4l2 2h7A1.75 1.75 0 0 1 20.25 8.5v9A1.75 1.75 0 0 1 18.5 19.25h-13a1.75 1.75 0 0 1-1.75-1.75V8.75Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="cc-folder-demo-status-copy">
+          <span class="cc-folder-demo-status-title" id="environmentTitle">正在检查浏览器…</span>
+          <span class="cc-folder-demo-status-detail" id="environmentDetail">请稍候</span>
+        </span>
+      </div>
+
+      <div class="cc-folder-demo-action">
+        <button class="cc-folder-demo-button" id="pickFolderButton" type="button">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M3.75 8.75V6.5A1.75 1.75 0 0 1 5.5 4.75h4l2 2h7A1.75 1.75 0 0 1 20.25 8.5v9A1.75 1.75 0 0 1 18.5 19.25h-13a1.75 1.75 0 0 1-1.75-1.75V8.75Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M12 10.5v5m-2-2 2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>选择下载文件夹</span>
+        </button>
+        <p class="cc-folder-demo-helper">建议选择“下载”文件夹；也可以直接取消，不会留下任何内容。</p>
+      </div>
+
+      <div class="cc-folder-demo-facts" aria-label="体验说明">
+        <div class="cc-folder-demo-fact">
+          <strong>第 1 步</strong>
+          <span>点击按钮</span>
+        </div>
+        <div class="cc-folder-demo-fact">
+          <strong>第 2 步</strong>
+          <span>浏览器询问文件夹权限</span>
+        </div>
+        <div class="cc-folder-demo-fact">
+          <strong>第 3 步</strong>
+          <span>选择或取消后返回页面</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const pickButton = document.getElementById('pickFolderButton');
+      const environmentTitle = document.getElementById('environmentTitle');
+      const environmentDetail = document.getElementById('environmentDetail');
+      const resultToast = document.getElementById('resultToast');
+      const toastMark = document.getElementById('toastMark');
+      const toastTitle = document.getElementById('toastTitle');
+      const toastDetail = document.getElementById('toastDetail');
+      const toastClose = document.getElementById('toastClose');
+
+      const folderIcon = `
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M3.75 8.75V6.5A1.75 1.75 0 0 1 5.5 4.75h4l2 2h7A1.75 1.75 0 0 1 20.25 8.5v9A1.75 1.75 0 0 1 18.5 19.25h-13a1.75 1.75 0 0 1-1.75-1.75V8.75Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M12 10.5v5m-2-2 2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `;
+
+      function getBrowserName() {
+        const userAgent = navigator.userAgent;
+        if (userAgent.includes('Edg/')) return 'Edge';
+        if (userAgent.includes('Chrome/') || userAgent.includes('CriOS/')) return 'Chrome';
+        if (userAgent.includes('Safari/') && !userAgent.includes('Chrome/')) return 'Safari';
+        return '当前浏览器';
+      }
+
+      function updateEnvironmentStatus() {
+        const browserName = getBrowserName();
+        const supportsFolderPicker = typeof window.showDirectoryPicker === 'function';
+
+        if (!window.isSecureContext) {
+          environmentTitle.textContent = `${browserName}：当前打开方式不安全`;
+          environmentDetail.textContent = '请通过 localhost 或 HTTPS 打开后再体验。';
+          return;
+        }
+
+        if (!supportsFolderPicker) {
+          environmentTitle.textContent = `${browserName}：不支持直接选择下载文件夹`;
+          environmentDetail.textContent = '请使用 Chrome 或 Edge 打开这个页面。';
+          return;
+        }
+
+        environmentTitle.textContent = `${browserName}：可以体验`;
+        environmentDetail.textContent = '点击按钮后会出现浏览器真实的文件夹选择窗口。';
+      }
+
+      function showToast(type, title, detail) {
+        resultToast.className = `cc-folder-demo-toast is-visible is-${type}`;
+        toastMark.textContent = type === 'success' ? '✓' : type === 'error' ? '!' : 'i';
+        toastTitle.textContent = title;
+        toastDetail.textContent = detail;
+      }
+
+      function hideToast() {
+        resultToast.classList.remove('is-visible');
+      }
+
+      function setButtonLoading(isLoading) {
+        pickButton.disabled = isLoading;
+        pickButton.innerHTML = isLoading
+          ? '<span class="cc-folder-demo-spinner" aria-hidden="true"></span><span>正在打开…</span>'
+          : `${folderIcon}<span>选择下载文件夹</span>`;
+      }
+
+      pickButton.addEventListener('click', async () => {
+        hideToast();
+
+        if (typeof window.showDirectoryPicker !== 'function') {
+          showToast(
+            'error',
+            '当前浏览器不支持',
+            '请使用 Chrome 或 Edge 体验；Safari 需要改用压缩包下载。'
+          );
+          return;
+        }
+
+        if (!window.isSecureContext) {
+          showToast(
+            'error',
+            '当前打开方式不支持',
+            '请通过 localhost 或 HTTPS 打开页面后再试。'
+          );
+          return;
+        }
+
+        setButtonLoading(true);
+
+        try {
+          const directoryHandle = await window.showDirectoryPicker({
+            id: 'folder-download-demo',
+            mode: 'readwrite',
+            startIn: 'downloads'
+          });
+
+          showToast(
+            'success',
+            `已选择「${directoryHandle.name}」`,
+            '本页没有读取或写入任何文件。'
+          );
+        } catch (error) {
+          if (error && error.name === 'AbortError') {
+            showToast('info', '已取消', '未选择文件夹，也没有授予权限。');
+          } else if (error && error.name === 'SecurityError') {
+            showToast(
+              'error',
+              '未能打开文件夹选择',
+              '请用 Chrome 或 Edge 通过 localhost 打开后，直接点击按钮。'
+            );
+          } else {
+            showToast(
+              'error',
+              '未能打开文件夹选择',
+              '请重试，或换用 Chrome / Edge。'
+            );
+          }
+        } finally {
+          setButtonLoading(false);
+        }
+      });
+
+      toastClose.addEventListener('click', hideToast);
+      updateEnvironmentStatus();
+    })();
+  </script>
+</body>
+</html>

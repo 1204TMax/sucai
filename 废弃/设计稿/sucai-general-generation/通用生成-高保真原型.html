@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="sucai AI 创作系统通用生成高保真交互原型">
+  <title>通用生成 · sucai 设计原型</title>
+  <style>
+    :root {
+      --shell: #172532;
+      --shell-2: #203344;
+      --shell-3: #2b4053;
+      --canvas: #f3f6f9;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --ink: #18232d;
+      --ink-2: #334351;
+      --muted: #7d8b98;
+      --muted-2: #a7b1ba;
+      --line: #e4e9ee;
+      --line-strong: #d4dce4;
+      --accent: #3f91f5;
+      --accent-strong: #2578dc;
+      --accent-soft: #edf5ff;
+      --green: #2eaa77;
+      --amber: #d99123;
+      --danger: #df6d68;
+      --shadow-sm: 0 2px 8px rgba(25, 43, 59, 0.06);
+      --shadow-md: 0 12px 34px rgba(25, 43, 59, 0.1);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --ease: 180ms cubic-bezier(.2, .8, .2, 1);
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { min-width: 1080px; background: var(--canvas); }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: var(--canvas);
+      font: 400 14px/1.55 var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea { font: inherit; }
+    button { border: 0; }
+    button:focus-visible, textarea:focus-visible { outline: 3px solid rgba(63, 145, 245, .24); outline-offset: 2px; }
+
+    .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+
+    .topbar {
+      height: 58px;
+      flex: 0 0 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      color: #fff;
+      background: linear-gradient(100deg, var(--shell) 0%, #1b2a39 58%, #23384a 100%);
+      box-shadow: 0 1px 0 rgba(255,255,255,.05) inset, 0 3px 12px rgba(14, 28, 40, .13);
+      position: relative;
+      z-index: 20;
+    }
+
+    .topbar-left, .topbar-right, .brand, .primary-nav, .user-menu { display: flex; align-items: center; }
+    .topbar-left { gap: 30px; }
+    .brand { gap: 10px; color: #fff; text-decoration: none; }
+    .brand-mark {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      color: #fff;
+      background: linear-gradient(135deg, #5aa8ff, #6b6ef4);
+      box-shadow: 0 4px 12px rgba(63, 145, 245, .28);
+    }
+    .brand-mark svg { width: 17px; height: 17px; }
+    .brand-name { font-size: 16px; font-weight: 650; letter-spacing: .01em; }
+    .brand-sub { color: rgba(255,255,255,.44); font-size: 11px; margin-left: -4px; }
+    .primary-nav { height: 100%; gap: 5px; }
+    .primary-nav a {
+      height: 100%;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 16px;
+      color: rgba(255,255,255,.66);
+      text-decoration: none;
+      position: relative;
+      transition: color var(--ease), background var(--ease);
+    }
+    .primary-nav a:hover { color: #fff; background: rgba(255,255,255,.05); }
+    .primary-nav a.active { color: #fff; font-weight: 600; }
+    .primary-nav a.active::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      right: 16px;
+      bottom: 0;
+      height: 2px;
+      background: #71b3ff;
+      border-radius: 2px 2px 0 0;
+    }
+    .topbar-right { gap: 16px; }
+    .topbar-icon {
+      width: 31px;
+      height: 31px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      color: rgba(255,255,255,.65);
+      background: transparent;
+      cursor: pointer;
+      transition: background var(--ease), color var(--ease);
+    }
+    .topbar-icon:hover { color: #fff; background: rgba(255,255,255,.1); }
+    .topbar-icon svg { width: 17px; height: 17px; }
+    .user-menu { gap: 9px; padding: 3px 7px 3px 4px; color: rgba(255,255,255,.8); cursor: pointer; border-radius: 9px; }
+    .user-menu:hover { background: rgba(255,255,255,.08); }
+    .avatar { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; color: #fff; font-size: 12px; font-weight: 600; background: linear-gradient(135deg, #8b8df6, #4aa4dc); }
+    .user-name { font-size: 12px; }
+    .user-menu svg { width: 13px; height: 13px; color: rgba(255,255,255,.45); }
+
+    .app-body { flex: 1; display: flex; min-height: 0; }
+
+    .sidebar {
+      width: 214px;
+      flex: 0 0 214px;
+      background: #fff;
+      border-right: 1px solid var(--line);
+      padding: 18px 11px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .side-group + .side-group { margin-top: 24px; }
+    .side-label { padding: 0 12px; margin: 0 0 8px; color: var(--muted-2); font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+    .side-list { display: flex; flex-direction: column; gap: 3px; }
+    .side-item {
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-radius: 9px;
+      color: var(--ink-2);
+      text-decoration: none;
+      cursor: pointer;
+      transition: background var(--ease), color var(--ease), transform var(--ease);
+    }
+    .side-item:hover { color: var(--accent-strong); background: #f5f8fb; }
+    .side-item.active { color: var(--accent-strong); font-weight: 600; background: var(--accent-soft); box-shadow: inset 3px 0 0 var(--accent); }
+    .side-item svg { width: 17px; height: 17px; color: #8d9aa6; flex: 0 0 auto; }
+    .side-item.active svg { color: var(--accent); }
+    .side-item span { flex: 1; }
+    .side-badge { min-width: 18px; padding: 1px 5px; border-radius: 9px; color: #fff; background: #ff8b85; font-size: 10px; line-height: 16px; text-align: center; }
+    .side-divider { height: 1px; margin: 13px 12px; background: var(--line); }
+    .sidebar-footer { padding: 12px 12px 2px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .sidebar-footer-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #48bd88; box-shadow: 0 0 0 3px rgba(72,189,136,.12); }
+    .sidebar-footer strong { color: var(--ink-2); font-weight: 600; }
+
+    .main {
+      min-width: 0;
+      flex: 1;
+      overflow: auto;
+      background:
+        radial-gradient(circle at 84% 0%, rgba(119, 183, 246, .08), transparent 27%),
+        var(--canvas);
+    }
+    .content { width: min(1440px, 100%); margin: 0 auto; padding: 26px 34px 48px; }
+    .breadcrumb { display: flex; align-items: center; gap: 8px; margin-bottom: 13px; color: var(--muted); font-size: 12px; }
+    .breadcrumb svg { width: 13px; height: 13px; color: #aeb8c2; }
+    .breadcrumb strong { color: var(--ink-2); font-weight: 600; }
+    .page-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+    .page-title { margin: 0; color: var(--ink); font-size: 25px; font-weight: 700; letter-spacing: -.02em; }
+    .page-desc { margin: 5px 0 0; color: var(--muted); font-size: 13px; }
+    .head-actions { display: flex; align-items: center; gap: 9px; }
+    .button {
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 13px;
+      border-radius: 8px;
+      border: 1px solid var(--line-strong);
+      color: var(--ink-2);
+      background: #fff;
+      cursor: pointer;
+      transition: border-color var(--ease), color var(--ease), background var(--ease), box-shadow var(--ease), transform var(--ease);
+    }
+    .button:hover { color: var(--accent-strong); border-color: #a6c9f5; background: #fbfdff; box-shadow: var(--shadow-sm); }
+    .button:active { transform: translateY(1px); }
+    .button svg { width: 15px; height: 15px; }
+    .button-primary { color: #fff; border-color: var(--accent); background: var(--accent); box-shadow: 0 5px 12px rgba(63, 145, 245, .22); }
+    .button-primary:hover { color: #fff; border-color: var(--accent-strong); background: var(--accent-strong); }
+
+    .workspace { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(330px, .85fr); gap: 18px; align-items: start; }
+    .card { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-sm); }
+    .composer-card { overflow: visible; }
+    .card-topline { min-height: 57px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--line); }
+    .mode-tabs { display: flex; align-items: stretch; gap: 26px; height: 57px; }
+    .mode-tab { position: relative; display: inline-flex; align-items: center; gap: 7px; padding: 0 2px; color: var(--muted); background: transparent; cursor: pointer; }
+    .mode-tab:hover { color: var(--ink-2); }
+    .mode-tab.active { color: var(--ink); font-weight: 650; }
+    .mode-tab.active::after { content: ""; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; border-radius: 2px 2px 0 0; background: var(--accent); }
+    .mode-tab svg { width: 16px; height: 16px; }
+    .mode-tab.active svg { color: var(--accent); }
+    .card-toplink { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 12px; background: transparent; cursor: pointer; }
+    .card-toplink:hover { color: var(--accent-strong); }
+    .card-toplink svg { width: 14px; height: 14px; }
+
+    .composer-body { padding: 20px; }
+    .prompt-label-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+    .section-label { color: var(--ink-2); font-size: 13px; font-weight: 650; }
+    .section-note { color: var(--muted-2); font-size: 11px; }
+    .prompt-wrap { position: relative; border: 1px solid var(--line-strong); border-radius: 13px; background: #fcfdff; transition: border-color var(--ease), box-shadow var(--ease), background var(--ease); }
+    .prompt-wrap:focus-within { border-color: #8dbcf2; background: #fff; box-shadow: 0 0 0 4px rgba(63, 145, 245, .1); }
+    .prompt-textarea { display: block; width: 100%; min-height: 154px; padding: 16px 17px 12px; resize: vertical; color: var(--ink); border: 0; outline: 0; background: transparent; line-height: 1.7; }
+    .prompt-textarea::placeholder { color: #b4bec8; }
+    .prompt-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 12px 11px 15px; border-top: 1px solid #eef1f4; }
+    .prompt-tools, .prompt-actions, .ref-list, .chip-row, .result-meta, .result-actions, .workflow-card-actions { display: flex; align-items: center; gap: 7px; }
+    .tool-button { display: inline-flex; align-items: center; gap: 6px; height: 29px; padding: 0 9px; border-radius: 7px; color: var(--muted); background: transparent; cursor: pointer; }
+    .tool-button:hover { color: var(--accent-strong); background: var(--accent-soft); }
+    .tool-button svg { width: 15px; height: 15px; }
+    .char-count { color: var(--muted-2); font-size: 11px; }
+    .ref-list { flex-wrap: wrap; }
+    .ref-chip { display: inline-flex; align-items: center; gap: 6px; height: 25px; padding: 0 8px 0 5px; border: 1px solid #dce8f7; border-radius: 7px; color: #4f6d8e; background: #f4f8fe; font-size: 11px; }
+    .ref-thumb { width: 17px; height: 17px; border-radius: 4px; background: linear-gradient(135deg, #b3d8ff, #ffd4e8); }
+    .ref-chip button { display: grid; place-items: center; width: 15px; height: 15px; color: #9bb2cb; background: transparent; cursor: pointer; }
+    .ref-chip button:hover { color: var(--danger); }
+    .ref-chip button svg { width: 12px; height: 12px; }
+
+    .parameter-section { margin-top: 22px; }
+    .parameter-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+    .parameter-header .section-label { font-size: 12px; }
+    .clear-link { color: var(--muted); font-size: 11px; background: transparent; cursor: pointer; }
+    .clear-link:hover { color: var(--accent-strong); }
+    .parameter-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
+    .control { position: relative; min-width: 0; }
+    .control-label { display: block; margin: 0 0 5px 2px; color: var(--muted); font-size: 11px; }
+    .control-button { width: 100%; height: 38px; display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink-2); background: var(--surface-soft); cursor: pointer; text-align: left; transition: border-color var(--ease), background var(--ease); }
+    .control-button:hover, .control-button.open { border-color: #9fc5f3; background: #fff; }
+    .control-button .value { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .control-button .value strong { color: var(--ink); font-weight: 600; }
+    .control-button svg { width: 14px; height: 14px; flex: 0 0 auto; color: #a2adb7; }
+    .popover { position: absolute; left: 0; top: calc(100% + 8px); z-index: 50; min-width: 100%; padding: 7px; border: 1px solid var(--line); border-radius: 10px; background: #fff; box-shadow: var(--shadow-md); display: none; }
+    .popover.show { display: block; animation: pop-in 150ms ease-out; }
+    @keyframes pop-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .popover-option { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 9px; border-radius: 7px; color: var(--ink-2); background: transparent; cursor: pointer; text-align: left; white-space: nowrap; }
+    .popover-option:hover { background: #f4f8fc; }
+    .popover-option.active { color: var(--accent-strong); background: var(--accent-soft); font-weight: 600; }
+    .popover-option small { color: var(--muted); font-size: 10px; font-weight: 400; }
+    .popover-option.active small { color: #6f9bd0; }
+    .ratio-popover { width: 218px; }
+    .ratio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 4px; }
+    .ratio-option { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 3px; border-radius: 7px; color: var(--muted); background: transparent; cursor: pointer; font-size: 10px; }
+    .ratio-option:hover, .ratio-option.active { color: var(--accent-strong); background: var(--accent-soft); }
+    .ratio-shape { width: 27px; height: 18px; border: 1.5px solid currentColor; border-radius: 3px; }
+    .ratio-shape.square { width: 20px; }
+    .ratio-shape.tall { width: 16px; height: 25px; }
+    .ratio-shape.wide { width: 31px; height: 17px; }
+
+    .advanced-row { display: flex; align-items: center; justify-content: space-between; margin-top: 17px; padding-top: 14px; border-top: 1px solid #edf0f3; }
+    .advanced-toggle { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); background: transparent; cursor: pointer; font-size: 12px; }
+    .advanced-toggle:hover { color: var(--accent-strong); }
+    .advanced-toggle svg { width: 14px; height: 14px; transition: transform var(--ease); }
+    .advanced-toggle.open svg { transform: rotate(180deg); }
+    .advanced-hint { color: var(--muted-2); font-size: 11px; }
+    .advanced-panel { display: none; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 13px; padding: 13px; border-radius: 10px; background: #f8fafc; }
+    .advanced-panel.show { display: grid; animation: fade-up 160ms ease-out; }
+    .advanced-field { display: flex; flex-direction: column; gap: 5px; }
+    .advanced-field span { color: var(--muted); font-size: 11px; }
+    .advanced-field input, .advanced-field select { width: 100%; height: 32px; padding: 0 9px; color: var(--ink-2); border: 1px solid var(--line); border-radius: 7px; outline: 0; background: #fff; }
+    .advanced-field input:focus, .advanced-field select:focus { border-color: #9fc5f3; box-shadow: 0 0 0 3px rgba(63,145,245,.1); }
+
+    .composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; }
+    .credit-note { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; }
+    .credit-note svg { width: 14px; height: 14px; color: #9eabb6; }
+    .generate-button { min-width: 132px; height: 39px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 17px; border-radius: 9px; color: #fff; background: var(--accent); box-shadow: 0 6px 15px rgba(63,145,245,.25); cursor: pointer; font-weight: 650; transition: background var(--ease), box-shadow var(--ease), transform var(--ease); }
+    .generate-button:hover { background: var(--accent-strong); box-shadow: 0 8px 19px rgba(63,145,245,.3); }
+    .generate-button:active { transform: translateY(1px); }
+    .generate-button:disabled { cursor: wait; opacity: .78; }
+    .generate-button svg { width: 16px; height: 16px; }
+    .spinner { width: 15px; height: 15px; display: none; border: 2px solid rgba(255,255,255,.38); border-top-color: #fff; border-radius: 50%; animation: spin 700ms linear infinite; }
+    .generate-button.loading .button-spark { display: none; }
+    .generate-button.loading .spinner { display: block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fade-up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .side-stack { display: flex; flex-direction: column; gap: 14px; }
+    .side-card { padding: 16px; }
+    .side-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+    .side-card-title { color: var(--ink); font-size: 13px; font-weight: 650; }
+    .side-card-link { color: var(--accent-strong); font-size: 11px; background: transparent; cursor: pointer; }
+    .side-card-link:hover { text-decoration: underline; }
+    .queue-item { display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid #edf0f3; }
+    .queue-item:first-child { padding-top: 0; border-top: 0; }
+    .queue-thumb { width: 42px; height: 42px; border-radius: 8px; overflow: hidden; position: relative; background: #edf3fa; }
+    .queue-thumb.art-one { background: linear-gradient(135deg, #f4d9bd 0%, #eea78d 44%, #5e7698 45%, #25394f 100%); }
+    .queue-thumb.art-two { background: linear-gradient(135deg, #d6eff1, #89c7d3 48%, #3e6a82 49%, #243e55); }
+    .queue-thumb.art-three { background: linear-gradient(135deg, #f5d0cf, #c18ba1 46%, #503d66 47%, #262a43); }
+    .queue-thumb.loading-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, transparent, rgba(255,255,255,.54), transparent); transform: translateX(-100%); animation: shimmer 1.5s infinite; }
+    @keyframes shimmer { to { transform: translateX(100%); } }
+    .queue-main { min-width: 0; }
+    .queue-name { overflow: hidden; color: var(--ink-2); font-size: 12px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
+    .queue-sub { margin-top: 2px; color: var(--muted); font-size: 10px; }
+    .queue-status { display: inline-flex; align-items: center; gap: 5px; color: var(--green); font-size: 10px; white-space: nowrap; }
+    .queue-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .queue-status.generating { color: var(--accent); }
+    .queue-status.generating::before { animation: pulse 1.1s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+    .quick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .quick-card { min-height: 72px; display: flex; flex-direction: column; justify-content: space-between; padding: 11px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink-2); background: var(--surface-soft); text-decoration: none; transition: border-color var(--ease), background var(--ease), transform var(--ease); }
+    .quick-card:hover { border-color: #a6c9f5; background: #f8fbff; transform: translateY(-1px); }
+    .quick-card-icon { width: 23px; height: 23px; display: grid; place-items: center; border-radius: 7px; color: var(--accent-strong); background: #e6f1ff; }
+    .quick-card-icon.green { color: #208a63; background: #e5f7ef; }
+    .quick-card-icon.purple { color: #7567c8; background: #efecff; }
+    .quick-card-icon.orange { color: #c3781d; background: #fff1da; }
+    .quick-card-icon svg { width: 14px; height: 14px; }
+    .quick-card-title { margin-top: 8px; font-size: 11px; font-weight: 600; }
+    .workflow-card { padding: 15px 16px; background: linear-gradient(135deg, #f4f8ff 0%, #fff 76%); }
+    .workflow-kicker { display: flex; align-items: center; gap: 6px; color: #7193ba; font-size: 10px; letter-spacing: .04em; }
+    .workflow-kicker svg { width: 14px; height: 14px; }
+    .workflow-title { margin: 9px 0 4px; color: var(--ink); font-size: 13px; font-weight: 650; }
+    .workflow-desc { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .workflow-card-actions { margin-top: 12px; justify-content: space-between; }
+    .workflow-tag { padding: 3px 7px; border-radius: 5px; color: #6d8bad; background: #eaf3ff; font-size: 10px; }
+    .workflow-use { display: inline-flex; align-items: center; gap: 4px; color: var(--accent-strong); background: transparent; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .workflow-use svg { width: 13px; height: 13px; }
+
+    .results-section { margin-top: 22px; }
+    .results-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+    .results-title-wrap { display: flex; align-items: baseline; gap: 9px; }
+    .results-title { margin: 0; color: var(--ink); font-size: 16px; font-weight: 700; }
+    .results-count { color: var(--muted); font-size: 11px; }
+    .results-filters { display: flex; align-items: center; gap: 6px; }
+    .filter-button { height: 29px; display: inline-flex; align-items: center; gap: 5px; padding: 0 9px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); background: #fff; cursor: pointer; font-size: 11px; }
+    .filter-button:hover { color: var(--accent-strong); border-color: #a6c9f5; }
+    .filter-button svg { width: 13px; height: 13px; }
+    .result-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .result-card { overflow: hidden; border: 1px solid var(--line); border-radius: 13px; background: #fff; box-shadow: var(--shadow-sm); transition: transform var(--ease), box-shadow var(--ease), border-color var(--ease); }
+    .result-card:hover { border-color: #bdd5f2; box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .result-art { position: relative; aspect-ratio: 1.45; overflow: hidden; background: #dce7f2; }
+    .result-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(140deg, rgba(255,255,255,.12), transparent 43%, rgba(13, 32, 48, .22)); pointer-events: none; }
+    .result-art.art-one { background: radial-gradient(circle at 24% 28%, rgba(255,255,255,.85) 0 5%, transparent 6%), radial-gradient(circle at 78% 30%, rgba(255,224,175,.5) 0 16%, transparent 17%), linear-gradient(135deg, #eec7a9 0%, #dd947f 38%, #607b9c 39%, #253d55 100%); }
+    .result-art.art-two { background: radial-gradient(ellipse at 74% 30%, rgba(255,255,255,.46) 0 4%, transparent 5%), linear-gradient(160deg, #c4e9ed 0%, #75b9c9 46%, #3e687a 47%, #24384b 100%); }
+    .result-art.art-three { background: radial-gradient(circle at 50% 42%, rgba(246,220,188,.82) 0 13%, transparent 14%), radial-gradient(circle at 50% 42%, rgba(255,255,255,.28) 0 30%, transparent 31%), linear-gradient(145deg, #f0c8ca, #a66d91 48%, #443752 49%, #202b42); }
+    .result-art::before { content: ""; position: absolute; width: 42%; height: 63%; right: 12%; bottom: -11%; border-radius: 52% 48% 0 0; background: rgba(255,255,255,.12); filter: blur(2px); transform: rotate(13deg); }
+    .result-art.art-two::before { left: 7%; right: auto; width: 62%; height: 38%; bottom: 8%; border-radius: 50%; background: rgba(255,255,255,.18); transform: rotate(-12deg); }
+    .result-art.art-three::before { width: 26%; height: 49%; right: 37%; background: rgba(255,242,219,.28); transform: rotate(-8deg); }
+    .result-badge { position: absolute; top: 10px; left: 10px; z-index: 2; padding: 4px 7px; border-radius: 5px; color: #fff; background: rgba(21, 38, 54, .65); font-size: 10px; backdrop-filter: blur(8px); }
+    .result-card-body { padding: 12px 13px 11px; }
+    .result-card-title { overflow: hidden; color: var(--ink-2); font-size: 12px; font-weight: 650; white-space: nowrap; text-overflow: ellipsis; }
+    .result-card-sub { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .result-meta { justify-content: space-between; margin-top: 12px; }
+    .result-type { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 10px; }
+    .result-type svg { width: 13px; height: 13px; color: var(--accent); }
+    .result-actions { gap: 3px; }
+    .result-action { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 6px; color: #9aa7b2; background: transparent; cursor: pointer; }
+    .result-action:hover { color: var(--accent-strong); background: var(--accent-soft); }
+    .result-action svg { width: 14px; height: 14px; }
+    .new-result { animation: result-in 360ms ease-out both; }
+    @keyframes result-in { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .asset-popover { width: 330px; padding: 13px; }
+    .asset-popover-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; color: var(--ink-2); font-size: 12px; font-weight: 650; }
+    .asset-popover-title small { color: var(--muted); font-weight: 400; }
+    .asset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .asset-option { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid transparent; border-radius: 7px; cursor: pointer; }
+    .asset-option:hover { border-color: var(--accent); }
+    .asset-option.selected { border: 2px solid var(--accent); }
+    .asset-option.selected::after { content: "✓"; position: absolute; top: 4px; right: 4px; width: 15px; height: 15px; display: grid; place-items: center; border-radius: 50%; color: #fff; background: var(--accent); font-size: 10px; font-weight: 700; }
+    .asset-option.asset-a { background: linear-gradient(135deg, #f0d8bf, #c6837c 50%, #34475c); }
+    .asset-option.asset-b { background: linear-gradient(135deg, #e1eff0, #76b8be 45%, #2b5267); }
+    .asset-option.asset-c { background: linear-gradient(135deg, #d8def4, #9b8dd1 48%, #383c66); }
+    .asset-option.asset-d { background: linear-gradient(135deg, #e4edcf, #9ab879 48%, #4b624a); }
+    .asset-option.asset-e { background: linear-gradient(135deg, #f4e7cc, #c49b6d 44%, #69524a); }
+    .asset-option.asset-f { background: linear-gradient(135deg, #f1d4e8, #b56e9f 44%, #4e4567); }
+    .asset-option.asset-g { background: linear-gradient(135deg, #d7ebfa, #71a8d1 44%, #365271); }
+    .asset-option.asset-h { background: linear-gradient(135deg, #f6dfd0, #d98e77 42%, #6a4f4d); }
+    .asset-option-label { position: absolute; left: 5px; right: 5px; bottom: 4px; overflow: hidden; color: #fff; font-size: 9px; text-shadow: 0 1px 3px rgba(0,0,0,.32); white-space: nowrap; text-overflow: ellipsis; }
+    .asset-popover-footer { display: flex; justify-content: flex-end; margin-top: 10px; padding-top: 10px; border-top: 1px solid #edf0f3; }
+    .asset-confirm { height: 28px; padding: 0 10px; border-radius: 6px; color: #fff; background: var(--accent); cursor: pointer; font-size: 11px; }
+
+    .toast { position: fixed; right: 24px; bottom: 26px; z-index: 100; display: flex; align-items: center; gap: 8px; max-width: 360px; padding: 11px 14px; border: 1px solid rgba(255,255,255,.1); border-radius: 9px; color: #fff; background: rgba(24, 37, 50, .93); box-shadow: var(--shadow-md); opacity: 0; transform: translateY(9px); pointer-events: none; transition: opacity 220ms ease, transform 220ms ease; font-size: 12px; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast svg { width: 15px; height: 15px; color: #7fd2aa; flex: 0 0 auto; }
+    .modal-backdrop { position: fixed; inset: 0; z-index: 80; display: none; place-items: center; padding: 28px; background: rgba(16, 28, 40, .48); backdrop-filter: blur(3px); }
+    .modal-backdrop.show { display: grid; }
+    .preview-modal { width: min(680px, 100%); overflow: hidden; border: 1px solid rgba(255,255,255,.22); border-radius: 16px; background: #fff; box-shadow: 0 26px 70px rgba(10, 20, 30, .3); animation: pop-in 180ms ease-out; }
+    .preview-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 17px; border-bottom: 1px solid var(--line); }
+    .preview-modal-head strong { color: var(--ink); font-size: 13px; }
+    .modal-close { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 7px; color: var(--muted); background: transparent; cursor: pointer; }
+    .modal-close:hover { color: var(--ink); background: var(--surface-soft); }
+    .modal-close svg { width: 15px; height: 15px; }
+    .preview-modal-art { margin: 17px; aspect-ratio: 1.8; border-radius: 11px; }
+    .preview-modal-foot { display: flex; justify-content: space-between; align-items: center; padding: 0 17px 16px; color: var(--muted); font-size: 11px; }
+    .preview-modal-foot .button { height: 31px; font-size: 11px; }
+
+    @media (max-width: 1220px) {
+      .content { padding-left: 24px; padding-right: 24px; }
+      .workspace { grid-template-columns: minmax(0, 1.35fr) minmax(300px, .8fr); }
+      .primary-nav a { padding: 0 11px; }
+      .topbar-left { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-left">
+        <a class="brand" href="#" aria-label="sucai 首页">
+          <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 7.5v9L12 21l7.5-4.5v-9L12 3Z"/><path d="m4.5 7.5 7.5 4.6 7.5-4.6M12 12.1V21"/></svg></span>
+          <span class="brand-name">sucai</span>
+          <span class="brand-sub">AI 创作系统</span>
+        </a>
+        <nav class="primary-nav" aria-label="主导航">
+          <a class="active" href="#">AI创作</a>
+          <a href="#">素材管理</a>
+          <a href="#">系统设置</a>
+        </nav>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-icon" type="button" title="通知" aria-label="通知"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg></button>
+        <button class="topbar-icon" type="button" title="帮助" aria-label="帮助"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.35 2.35 0 1 1 3.7 1.9c-.9.63-1.5 1.1-1.5 2.35M12 16.7h.01"/></svg></button>
+        <div class="user-menu" role="button" tabindex="0"><span class="avatar">林</span><span class="user-name">林设计</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <aside class="sidebar" aria-label="侧边导航">
+        <div>
+          <section class="side-group">
+            <div class="side-label">AI 创作</div>
+            <div class="side-list">
+              <a class="side-item active" href="#workbench"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/></svg><span>通用生成</span></a>
+              <a class="side-item" href="#results"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h10a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M8 2h6v4H8zM8 11h8M8 15h6"/></svg><span>我的任务</span><span class="side-badge">3</span></a>
+              <a class="side-item" href="#workflow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>工作流广场</span></a>
+              <a class="side-item" href="#material"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8.5 4.8v8.4L12 21l-8.5-4.8V7.8L12 3Z"/><path d="m3.5 7.8 8.5 5 8.5-5M12 12.8V21"/></svg><span>原料库</span></a>
+            </div>
+          </section>
+          <div class="side-divider"></div>
+          <section class="side-group">
+            <div class="side-label">生产管理</div>
+            <div class="side-list">
+              <a class="side-item" href="#projects"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="m3 7.5 9 5 9-5M12 12.5V21"/></svg><span>项目管理</span></a>
+              <a class="side-item" href="#review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/><path d="M4 4h16v16H4z"/></svg><span>人工审核</span></a>
+            </div>
+          </section>
+        </div>
+        <div class="sidebar-footer">
+          <div class="sidebar-footer-row"><span><strong>生产环境</strong> · 图像服务正常</span><span class="status-dot" aria-label="服务正常"></span></div>
+        </div>
+      </aside>
+
+      <main class="main" id="workbench">
+        <div class="content">
+          <div class="breadcrumb"><span>AI 创作</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg><strong>通用生成</strong></div>
+          <div class="page-head">
+            <div>
+              <h1 class="page-title">通用生成</h1>
+              <p class="page-desc">从一个想法开始，生成可以继续加工、审核和入库的素材。</p>
+            </div>
+            <div class="head-actions">
+              <button class="button" type="button" data-toast="已打开全部生成结果"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Z"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20"/></svg>全部结果</button>
+              <button class="button button-primary" type="button" data-toast="新建工作流入口已打开"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>新建工作流</button>
+            </div>
+          </div>
+
+          <section class="workspace" aria-label="生成工作区">
+            <article class="card composer-card">
+              <div class="card-topline">
+                <div class="mode-tabs" role="tablist" aria-label="生成类型">
+                  <button class="mode-tab" type="button" data-mode="copy" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>文案</button>
+                  <button class="mode-tab active" type="button" data-mode="image" role="tab" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>图像</button>
+                  <button class="mode-tab" type="button" data-mode="video" role="tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>视频</button>
+                </div>
+                <button class="card-toplink" type="button" data-toast="提示词模板功能将在这里打开"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 9.8 9.8 3 12l6.8 2.2L12 21l2.2-6.8L21 12l-6.8-2.2L12 3Z"/></svg>提示词模板</button>
+              </div>
+              <div class="composer-body">
+                <div class="prompt-label-row"><span class="section-label">描述你想生成的内容</span><span class="section-note" id="promptHint">图像生成 · 支持参考素材</span></div>
+                <div class="prompt-wrap">
+                  <textarea class="prompt-textarea" id="promptInput" maxlength="1000" placeholder="例如：一位年轻女性在清晨的城市街道使用产品，画面自然、明亮，适合信息流广告首图"></textarea>
+                  <div class="prompt-footer">
+                    <div class="prompt-tools">
+                      <div class="control" id="assetControl">
+                        <button class="tool-button" type="button" id="assetTrigger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05 12.25 20.24a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>参考素材<span id="refCount"></span></button>
+                        <div class="popover asset-popover" id="assetPopover">
+                          <div class="asset-popover-title"><span>选择参考素材</span><small>可多选</small></div>
+                          <div class="asset-grid" id="assetGrid">
+                            <button class="asset-option asset-a" type="button" data-ref="人物室内场景"><span class="asset-option-label">人物室内场景</span></button>
+                            <button class="asset-option asset-b" type="button" data-ref="蓝色产品台"><span class="asset-option-label">蓝色产品台</span></button>
+                            <button class="asset-option asset-c" type="button" data-ref="夜景氛围"><span class="asset-option-label">夜景氛围</span></button>
+                            <button class="asset-option asset-d" type="button" data-ref="自然光背景"><span class="asset-option-label">自然光背景</span></button>
+                            <button class="asset-option asset-e" type="button" data-ref="产品手持"><span class="asset-option-label">产品手持</span></button>
+                            <button class="asset-option asset-f" type="button" data-ref="女性肖像"><span class="asset-option-label">女性肖像</span></button>
+                            <button class="asset-option asset-g" type="button" data-ref="手机界面"><span class="asset-option-label">手机界面</span></button>
+                            <button class="asset-option asset-h" type="button" data-ref="生活方式"><span class="asset-option-label">生活方式</span></button>
+                          </div>
+                          <div class="asset-popover-footer"><button class="asset-confirm" type="button" id="assetConfirm">添加选中素材</button></div>
+                        </div>
+                      </div>
+                      <button class="tool-button" type="button" data-toast="提示词格式化完成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M7 12h10M10 17h4"/></svg>提示词格式化</button>
+                    </div>
+                    <div class="prompt-actions"><span class="char-count"><span id="charCount">0</span> / 1000</span><button class="tool-button" type="button" id="clearPrompt" title="清空提示词" aria-label="清空提示词"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 14h10l1-14M9 7V4h6v3"/></svg></button></div>
+                  </div>
+                </div>
+                <div class="ref-list" id="refList" aria-label="已选择的参考素材"></div>
+
+                <div class="parameter-section">
+                  <div class="parameter-header"><span class="section-label">生成参数</span><button class="clear-link" type="button" id="resetParams">恢复默认</button></div>
+                  <div class="parameter-grid">
+                    <div class="control">
+                      <span class="control-label">模型</span>
+                      <button class="control-button" type="button" data-popover="modelPopover"><span class="value"><strong id="modelValue">Banana 2</strong></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+                      <div class="popover" id="modelPopover"><button class="popover-option active" type="button" data-value="Banana 2">Banana 2<small>细节稳定</small></button><button class="popover-option" type="button" data-value="Nano Banana Pro">Nano Banana Pro<small>文字更清晰</small></button><button class="popover-option" type="button" data-value="Seedream 5">Seedream 5<small>风格丰富</small></button></div>
+                    </div>
+                    <div class="control">
+                      <span class="control-label">比例</span>
+                      <button class="control-button" type="button" data-popover="ratioPopover"><span class="value"><strong id="ratioValue">1:1</strong></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+                      <div class="popover ratio-popover" id="ratioPopover"><div class="ratio-grid"><button class="ratio-option active" type="button" data-value="1:1"><span class="ratio-shape square"></span><span>1:1</span></button><button class="ratio-option" type="button" data-value="4:3"><span class="ratio-shape"></span><span>4:3</span></button><button class="ratio-option" type="button" data-value="16:9"><span class="ratio-shape wide"></span><span>16:9</span></button><button class="ratio-option" type="button" data-value="3:4"><span class="ratio-shape tall"></span><span>3:4</span></button><button class="ratio-option" type="button" data-value="9:16"><span class="ratio-shape tall"></span><span>9:16</span></button><button class="ratio-option" type="button" data-value="自定义"><span class="ratio-shape" style="border-style:dashed"></span><span>自定义</span></button></div></div>
+                    </div>
+                    <div class="control">
+                      <span class="control-label">清晰度</span>
+                      <button class="control-button" type="button" data-popover="qualityPopover"><span class="value"><strong id="qualityValue">2K</strong></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+                      <div class="popover" id="qualityPopover"><button class="popover-option active" type="button" data-value="2K">2K<small>推荐</small></button><button class="popover-option" type="button" data-value="4K">4K<small>消耗更多额度</small></button></div>
+                    </div>
+                    <div class="control">
+                      <span class="control-label" id="countLabel">生成数量</span>
+                      <button class="control-button" type="button" data-popover="countPopover"><span class="value"><strong id="countValue">4 张</strong></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+                      <div class="popover" id="countPopover"><button class="popover-option" type="button" data-value="1">1 张</button><button class="popover-option active" type="button" data-value="4">4 张</button><button class="popover-option" type="button" data-value="8">8 张</button></div>
+                    </div>
+                  </div>
+                  <div class="advanced-row"><button class="advanced-toggle" type="button" id="advancedToggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>更多设置</button><span class="advanced-hint">种子、风格强度、负面提示词</span></div>
+                  <div class="advanced-panel" id="advancedPanel"><label class="advanced-field"><span>随机种子</span><input type="text" value="自动" aria-label="随机种子"></label><label class="advanced-field"><span>风格强度</span><select aria-label="风格强度"><option>适中</option><option>偏写实</option><option>偏风格化</option></select></label><label class="advanced-field"><span>负面提示词</span><input type="text" placeholder="可选" aria-label="负面提示词"></label><label class="advanced-field"><span>结果命名</span><input type="text" placeholder="自动生成" aria-label="结果命名"></label></div>
+                </div>
+
+                <div class="composer-footer"><div class="credit-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="creditText">预计消耗 4 次生成额度 · 生成后可继续加工</span></div><button class="generate-button" type="button" id="generateButton"><span class="button-spark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3ZM19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"/></svg></span><span id="generateLabel">生成图像</span><span class="spinner"></span></button></div>
+              </div>
+            </article>
+
+            <aside class="side-stack">
+              <section class="card side-card" aria-labelledby="queueTitle">
+                <div class="side-card-head"><span class="side-card-title" id="queueTitle">生成队列</span><button class="side-card-link" type="button" data-toast="已打开任务中心">查看任务</button></div>
+                <div id="queueList">
+                  <div class="queue-item"><div class="queue-thumb loading-art art-two"></div><div class="queue-main"><div class="queue-name">产品演示替换 · 4 个结果</div><div class="queue-sub">图像 · 刚刚提交</div></div><span class="queue-status generating">生成中</span></div>
+                  <div class="queue-item"><div class="queue-thumb art-one"></div><div class="queue-main"><div class="queue-name">春日通勤场景</div><div class="queue-sub">图像 · 2 分钟前</div></div><span class="queue-status">已完成</span></div>
+                  <div class="queue-item"><div class="queue-thumb art-three"></div><div class="queue-main"><div class="queue-name">15 秒剧情开头</div><div class="queue-sub">视频 · 18 分钟前</div></div><span class="queue-status">已完成</span></div>
+                </div>
+              </section>
+              <section class="card side-card" aria-labelledby="quickTitle">
+                <div class="side-card-head"><span class="side-card-title" id="quickTitle">快速进入</span><button class="side-card-link" type="button" data-toast="已打开全部入口">全部</button></div>
+                <div class="quick-grid">
+                  <a class="quick-card" href="#workflow" data-toast="已进入工作流广场"><span class="quick-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="quick-card-title">工作流广场</span></a>
+                  <a class="quick-card" href="#material" data-toast="已打开原料库"><span class="quick-card-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8.5 4.8v8.4L12 21l-8.5-4.8V7.8L12 3Z"/><path d="m3.5 7.8 8.5 5 8.5-5M12 12.8V21"/></svg></span><span class="quick-card-title">原料库</span></a>
+                  <a class="quick-card" href="#projects" data-toast="已打开项目管理"><span class="quick-card-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5v-9Z"/><path d="m3 7.5 9 5 9-5M12 12.5V21"/></svg></span><span class="quick-card-title">项目管理</span></a>
+                  <a class="quick-card" href="#review" data-toast="已打开人工审核"><span class="quick-card-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/><path d="M4 4h16v16H4z"/></svg></span><span class="quick-card-title">人工审核</span></a>
+                </div>
+              </section>
+              <section class="card workflow-card" id="workflow">
+                <div class="workflow-kicker"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z"/></svg>从生成继续加工</div>
+                <h2 class="workflow-title">制作类简单提示词生图</h2>
+                <p class="workflow-desc">已有素材、提示词和参考图可以直接送入工作流，减少下载再上传的重复操作。</p>
+                <div class="workflow-card-actions"><span class="workflow-tag">图像工作流</span><button class="workflow-use" type="button" data-toast="已打开工作流详情">查看并使用<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+              </section>
+            </aside>
+          </section>
+
+          <section class="results-section" id="results" aria-labelledby="resultsTitle">
+            <div class="results-head"><div class="results-title-wrap"><h2 class="results-title" id="resultsTitle">最近结果</h2><span class="results-count" id="resultCount">展示最近 3 个结果</span></div><div class="results-filters"><button class="filter-button" type="button" data-toast="筛选器已打开"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>筛选</button><button class="filter-button" type="button" data-toast="已打开全部结果">查看全部<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div>
+            <div class="result-grid" id="resultGrid">
+              <article class="result-card" data-title="春日通勤场景"><div class="result-art art-one"><span class="result-badge">最新完成</span></div><div class="result-card-body"><div class="result-card-title">春日通勤场景 · 1:1</div><div class="result-card-sub">Banana 2 · 2K · 2 分钟前</div><div class="result-meta"><span class="result-type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>图像 · 4 张</span><div class="result-actions"><button class="result-action" type="button" data-action="preview" title="预览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button><button class="result-action" type="button" data-action="workflow" title="送入工作流"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div></div></article>
+              <article class="result-card" data-title="蓝色产品台"><div class="result-art art-two"><span class="result-badge">已入库</span></div><div class="result-card-body"><div class="result-card-title">蓝色产品台 · 16:9</div><div class="result-card-sub">Seedream 5 · 2K · 昨天</div><div class="result-meta"><span class="result-type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>图像 · 4 张</span><div class="result-actions"><button class="result-action" type="button" data-action="preview" title="预览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button><button class="result-action" type="button" data-action="workflow" title="送入工作流"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div></div></article>
+              <article class="result-card" data-title="夜景氛围"><div class="result-art art-three"><span class="result-badge">可继续加工</span></div><div class="result-card-body"><div class="result-card-title">夜景氛围 · 9:16</div><div class="result-card-sub">Nano Banana Pro · 4K · 昨天</div><div class="result-meta"><span class="result-type"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>图像 · 2 张</span><div class="result-actions"><button class="result-action" type="button" data-action="preview" title="预览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button><button class="result-action" type="button" data-action="workflow" title="送入工作流"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div></div></article>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4L19 6"/></svg><span id="toastText"></span></div>
+  <div class="modal-backdrop" id="previewModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle">
+    <div class="preview-modal">
+      <div class="preview-modal-head"><strong id="previewTitle">预览结果</strong><button class="modal-close" type="button" id="closePreview" aria-label="关闭预览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+      <div class="preview-modal-art result-art art-one" id="previewArt"></div>
+      <div class="preview-modal-foot"><span id="previewMeta">图像 · 1:1 · 可继续加工</span><button class="button button-primary" type="button" data-toast="已送入工作流">送入工作流<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const modeConfig = {
+        image: { label: '图像', promptHint: '图像生成 · 支持参考素材', placeholder: '例如：一位年轻女性在清晨的城市街道使用产品，画面自然、明亮，适合信息流广告首图', button: '生成图像', credit: '预计消耗 4 次生成额度 · 生成后可继续加工' },
+        video: { label: '视频', promptHint: '视频生成 · 支持首尾帧和参考视频', placeholder: '例如：镜头从产品特写缓慢拉远，展示真实使用场景，节奏自然，适合 15 秒信息流广告', button: '生成视频', credit: '预计消耗 1 次视频额度 · 生成后可继续加工' },
+        copy: { label: '文案', promptHint: '文案生成 · 支持产品物料和文档参考', placeholder: '例如：围绕“第一次使用就能看懂”的卖点，写 3 组信息流广告开头文案', button: '生成文案', credit: '预计消耗 1 次文案额度 · 生成后可进入审核' }
+      };
+      let currentMode = 'image';
+      let toastTimer;
+      let selectedRefs = [];
+
+      const $ = (selector, root = document) => root.querySelector(selector);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+      function showToast(message) {
+        const toast = $('#toast');
+        $('#toastText').textContent = message;
+        toast.classList.add('show');
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+
+      function closePopovers(except) {
+        $$('.popover.show').forEach((popover) => {
+          if (popover !== except) popover.classList.remove('show');
+        });
+        $$('.control-button.open').forEach((button) => {
+          if (!except || button.dataset.popover !== except.id) button.classList.remove('open');
+        });
+      }
+
+      function setMode(mode) {
+        currentMode = mode;
+        const config = modeConfig[mode];
+        $$('.mode-tab').forEach((tab) => {
+          const active = tab.dataset.mode === mode;
+          tab.classList.toggle('active', active);
+          tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        $('#promptHint').textContent = config.promptHint;
+        $('#promptInput').placeholder = config.placeholder;
+        $('#generateLabel').textContent = config.button;
+        $('#creditText').textContent = config.credit;
+        $('#countLabel').textContent = mode === 'copy' ? '生成数量' : '生成数量';
+        if (mode === 'video') {
+          $('#ratioValue').textContent = '16:9';
+          $('#qualityValue').textContent = '高清';
+          $('#countValue').textContent = '1 个';
+        } else if (mode === 'copy') {
+          $('#ratioValue').textContent = '不适用';
+          $('#qualityValue').textContent = '标准';
+          $('#countValue').textContent = '3 组';
+        } else {
+          $('#ratioValue').textContent = '1:1';
+          $('#qualityValue').textContent = '2K';
+          $('#countValue').textContent = '4 张';
+        }
+        $$('.parameter-grid .control:nth-child(2), .parameter-grid .control:nth-child(3)').forEach((control) => {
+          control.style.opacity = mode === 'copy' ? '.45' : '1';
+        });
+        showToast(`已切换到${config.label}生成`);
+      }
+
+      function renderRefs() {
+        const list = $('#refList');
+        list.innerHTML = selectedRefs.map((name, index) => `<span class="ref-chip"><span class="ref-thumb"></span><span>${name}</span><button type="button" data-remove-ref="${index}" aria-label="移除${name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg></button></span>`).join('');
+        $('#refCount').textContent = selectedRefs.length ? ` · ${selectedRefs.length}` : '';
+      }
+
+      function addGeneratedResult() {
+        const prompt = $('#promptInput').value.trim();
+        const title = prompt ? prompt.slice(0, 22) : `${modeConfig[currentMode].label}新结果`;
+        const grid = $('#resultGrid');
+        const card = document.createElement('article');
+        card.className = 'result-card new-result';
+        card.dataset.title = title;
+        const artClass = currentMode === 'video' ? 'art-two' : currentMode === 'copy' ? 'art-three' : 'art-one';
+        const typeIcon = currentMode === 'video' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>' : currentMode === 'copy' ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v16H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>';
+        const format = currentMode === 'video' ? '16:9' : currentMode === 'copy' ? '3 组' : '1:1';
+        card.innerHTML = `<div class="result-art ${artClass}"><span class="result-badge">刚刚生成</span></div><div class="result-card-body"><div class="result-card-title">${escapeHtml(title)}</div><div class="result-card-sub">${escapeHtml($('#modelValue').textContent)} · ${format} · 刚刚</div><div class="result-meta"><span class="result-type">${typeIcon}${modeConfig[currentMode].label} · ${format}</span><div class="result-actions"><button class="result-action" type="button" data-action="preview" title="预览"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button><button class="result-action" type="button" data-action="workflow" title="送入工作流"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></div></div>`;
+        grid.prepend(card);
+        $('#resultCount').textContent = `展示最近 ${grid.children.length} 个结果`;
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[char]));
+      }
+
+      $$('.mode-tab').forEach((tab) => tab.addEventListener('click', () => setMode(tab.dataset.mode)));
+
+      $$('.control-button').forEach((button) => {
+        button.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const popover = $('#' + button.dataset.popover);
+          const willOpen = !popover.classList.contains('show');
+          closePopovers(willOpen ? popover : null);
+          popover.classList.toggle('show', willOpen);
+          button.classList.toggle('open', willOpen);
+        });
+      });
+
+      $$('.popover-option, .ratio-option').forEach((option) => {
+        option.addEventListener('click', () => {
+          const popover = option.closest('.popover');
+          $$('.popover-option.active, .ratio-option.active', popover).forEach((item) => item.classList.remove('active'));
+          option.classList.add('active');
+          const value = option.dataset.value;
+          if (popover.id === 'modelPopover') $('#modelValue').textContent = value;
+          if (popover.id === 'ratioPopover') $('#ratioValue').textContent = value;
+          if (popover.id === 'qualityPopover') $('#qualityValue').textContent = value;
+          if (popover.id === 'countPopover') $('#countValue').textContent = `${value} ${currentMode === 'copy' ? '组' : currentMode === 'video' ? '个' : '张'}`;
+          if (popover.id === 'countPopover') $('#creditText').textContent = `预计消耗 ${value} 次生成额度 · 生成后可继续加工`;
+          closePopovers();
+        });
+      });
+
+      $('#assetTrigger').addEventListener('click', (event) => {
+        event.stopPropagation();
+        const popover = $('#assetPopover');
+        const willOpen = !popover.classList.contains('show');
+        closePopovers(willOpen ? popover : null);
+        popover.classList.toggle('show', willOpen);
+      });
+
+      $$('.asset-option').forEach((asset) => asset.addEventListener('click', (event) => {
+        event.stopPropagation();
+        asset.classList.toggle('selected');
+      }));
+      $('#assetConfirm').addEventListener('click', () => {
+        selectedRefs = $$('.asset-option.selected').map((asset) => asset.dataset.ref);
+        renderRefs();
+        $('#assetPopover').classList.remove('show');
+        showToast(selectedRefs.length ? `已添加 ${selectedRefs.length} 个参考素材` : '未选择参考素材');
+      });
+
+      $('#refList').addEventListener('click', (event) => {
+        const button = event.target.closest('[data-remove-ref]');
+        if (!button) return;
+        selectedRefs.splice(Number(button.dataset.removeRef), 1);
+        $$('.asset-option').forEach((asset) => asset.classList.toggle('selected', selectedRefs.includes(asset.dataset.ref)));
+        renderRefs();
+      });
+
+      $('#advancedToggle').addEventListener('click', () => {
+        const toggle = $('#advancedToggle');
+        const panel = $('#advancedPanel');
+        const open = !panel.classList.contains('show');
+        panel.classList.toggle('show', open);
+        toggle.classList.toggle('open', open);
+      });
+
+      $('#promptInput').addEventListener('input', () => { $('#charCount').textContent = $('#promptInput').value.length; });
+      $('#clearPrompt').addEventListener('click', () => { $('#promptInput').value = ''; $('#charCount').textContent = '0'; $('#promptInput').focus(); showToast('提示词已清空'); });
+      $('#resetParams').addEventListener('click', () => { $('#modelValue').textContent = 'Banana 2'; $('#ratioValue').textContent = '1:1'; $('#qualityValue').textContent = '2K'; $('#countValue').textContent = '4 张'; showToast('已恢复默认参数'); });
+
+      $('#generateButton').addEventListener('click', () => {
+        const prompt = $('#promptInput').value.trim();
+        if (!prompt) { showToast('请先描述你想生成的内容'); $('#promptInput').focus(); return; }
+        const button = $('#generateButton');
+        button.disabled = true;
+        button.classList.add('loading');
+        $('#generateLabel').textContent = '生成中';
+        showToast('任务已提交，正在生成');
+        window.setTimeout(() => {
+          button.disabled = false;
+          button.classList.remove('loading');
+          $('#generateLabel').textContent = modeConfig[currentMode].button;
+          addGeneratedResult();
+          showToast('生成完成，结果已出现在最近结果');
+        }, 1300);
+      });
+
+      function openPreview(card) {
+        const art = $('.result-art', card);
+        $('#previewTitle').textContent = $('.result-card-title', card).textContent;
+        $('#previewMeta').textContent = $('.result-card-sub', card).textContent + ' · 可继续加工';
+        $('#previewArt').className = `preview-modal-art result-art ${Array.from(art.classList).filter((name) => name.startsWith('art-')).join(' ')}`;
+        $('#previewModal').classList.add('show');
+      }
+
+      $('#resultGrid').addEventListener('click', (event) => {
+        const action = event.target.closest('[data-action]');
+        if (!action) return;
+        const card = action.closest('.result-card');
+        if (action.dataset.action === 'preview') openPreview(card);
+        if (action.dataset.action === 'workflow') showToast('已送入工作流，正在打开工作流配置');
+      });
+
+      $('#closePreview').addEventListener('click', () => $('#previewModal').classList.remove('show'));
+      $('#previewModal').addEventListener('click', (event) => { if (event.target === $('#previewModal')) $('#previewModal').classList.remove('show'); });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape') { closePopovers(); $('#previewModal').classList.remove('show'); } });
+      document.addEventListener('click', () => closePopovers());
+      $$('[data-toast]').forEach((element) => element.addEventListener('click', (event) => { if (element.tagName === 'A') event.preventDefault(); showToast(element.dataset.toast); }));
+      $('#promptInput').addEventListener('keydown', (event) => { if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') $('#generateButton').click(); });
+    }());
+  </script>
+</body>
+</html>
