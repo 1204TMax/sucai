@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>下拉选项多媒体组件演示 - 量化投放系统</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        background: #f5f7fa;
+        color: #1a1a1a;
+        font-size: 14px;
+        padding: 24px;
+    }
+    .page-head { max-width: 720px; margin: 0 auto 24px; }
+    .page-title { font-size: 22px; font-weight: 600; margin-bottom: 8px; }
+    .page-desc { font-size: 13px; color: #666; line-height: 1.7; }
+    .page-desc code { background: #eef1f5; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+
+    .cards { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+    .demo-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px 24px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        border: 1px solid #eef0f3;
+    }
+    .demo-card-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .demo-card-desc { font-size: 12px; color: #999; margin-bottom: 16px; }
+    .demo-field { margin-bottom: 10px; }
+    .demo-field-label { font-size: 12px; color: #555; margin-bottom: 6px; }
+
+    /* ===== 下拉组件 ===== */
+    .mm-select { position: relative; }
+    .mm-trigger {
+        display: flex; align-items: center; gap: 10px;
+        min-height: 40px; padding: 6px 12px;
+        border: 1px solid #d9d9d9; border-radius: 8px; background: #fff;
+        cursor: pointer; transition: border-color .2s, box-shadow .2s;
+    }
+    .mm-trigger:hover { border-color: #4096ff; }
+    .mm-trigger.open { border-color: #1677ff; box-shadow: 0 0 0 2px rgba(22,119,255,.15); }
+    .mm-trigger-thumb { width: 30px; height: 30px; border-radius: 6px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; overflow: hidden; flex: 0 0 auto; position: relative; }
+    .mm-trigger-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mm-trigger-info { flex: 1; min-width: 0; }
+    .mm-trigger-name { font-size: 13px; font-weight: 500; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mm-trigger-desc { font-size: 11px; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mm-trigger-arrow { color: #bfbfbf; flex: 0 0 auto; transition: transform .2s; }
+    .mm-trigger.open .mm-trigger-arrow { transform: rotate(180deg); }
+
+    .mm-panel {
+        position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 20;
+        background: #fff; border: 1px solid #e5e8ec; border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(15,23,42,.12);
+        display: none; overflow: visible;
+    }
+    .mm-panel.open { display: block; }
+    .mm-opt { position: relative; display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f5f6f8; transition: background .15s; }
+    .mm-opt:last-child { border-bottom: none; }
+    .mm-opt:hover { background: #f5f9ff; }
+    .mm-opt.sel { background: #e6f4ff; }
+    .mm-opt-radio { width: 16px; height: 16px; border: 1.5px solid #bfbfbf; border-radius: 50%; flex: 0 0 auto; margin-top: 10px; display: flex; align-items: center; justify-content: center; }
+    .mm-opt.sel .mm-opt-radio { border-color: #1677ff; }
+    .mm-opt.sel .mm-opt-radio::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: #1677ff; }
+
+    /* 缩略图与 hover 浮层 */
+    .mm-thumb { width: 44px; height: 44px; border-radius: 8px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; overflow: visible; flex: 0 0 auto; position: relative; margin-top: 2px; }
+    .mm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 8px; }
+    .mm-thumb .play-badge { position: absolute; right: 3px; bottom: 3px; width: 17px; height: 17px; border-radius: 50%; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; }
+
+    /* 图片 hover 大图浮层 */
+    .mm-hover-img { position: absolute; z-index: 40; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%); display: none; width: 220px; padding: 4px; background: #fff; border: 1px solid #e5e8ec; border-radius: 10px; box-shadow: 0 12px 28px rgba(15,23,42,.18); pointer-events: none; }
+    .mm-hover-img img { width: 100%; height: auto; border-radius: 6px; display: block; }
+    .mm-thumb:hover .mm-hover-img { display: block; }
+
+    /* 视频 hover 浮层 */
+    .mm-hover-video { position: absolute; z-index: 40; right: 0; bottom: calc(100% + 6px); display: none; width: 260px; padding-bottom: 6px; }
+    .mm-hover-video .box { position: relative; background: #000; border: 1px solid #e5e8ec; border-radius: 10px; overflow: hidden; aspect-ratio: 16/9; cursor: pointer; }
+    .mm-hover-video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mm-hover-video .cover { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+    .mm-hover-video .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .mm-hover-video .cover .btn-play { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; }
+    .mm-hover-video .cover.hide { display: none; }
+    .mm-opt:hover .mm-hover-video { display: block; }
+
+    .mm-opt-body { flex: 1; min-width: 0; }
+    .mm-opt-name { font-size: 13px; font-weight: 500; line-height: 1.4; }
+    .mm-opt-desc { font-size: 12px; color: #666; line-height: 1.5; margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .mm-opt-btn { width: 30px; height: 30px; border-radius: 50%; border: 1px solid #d9d9d9; background: #fff; color: #1677ff; display: flex; align-items: center; justify-content: center; flex: 0 0 auto; cursor: pointer; margin-top: 10px; transition: all .15s; }
+    .mm-opt-btn:hover { border-color: #1677ff; background: #e6f4ff; }
+    .mm-opt-btn.playing { background: #1677ff; border-color: #1677ff; color: #fff; }
+
+    .mm-player { display: none; align-items: center; gap: 10px; padding: 8px 12px; margin: 8px 12px 10px 78px; background: #f7f9fc; border: 1px solid #eef0f3; border-radius: 8px; }
+    .mm-player.show { display: flex; }
+    .mm-player audio { width: 100%; height: 34px; outline: none; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+    <h1 class="page-title">下拉选项多媒体组件演示</h1>
+    <p class="page-desc">
+        同一个下拉单选组件，通过可选字段（<code>image</code>/<code>audio</code>/<code>video</code>）自动适配展示形态。
+        图片 hover 看大图；视频 hover 出现预览、点播放；音频点 ▶ 试听（播放中变停止）。
+    </p>
+</div>
+
+<div class="cards" id="cards"></div>
+
+<script>
+/* ============ 工具：生成柔和的试听提示音（和弦琶音，带衰减包络） ============ */
+function writeString(view, offset, str) {
+    for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+}
+function generateChime(baseFreq, seconds) {
+    const sampleRate = 16000;
+    const n = Math.floor(sampleRate * seconds);
+    const buffer = new ArrayBuffer(44 + n * 2);
+    const view = new DataView(buffer);
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + n * 2, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, n * 2, true);
+    const chords = [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 2];
+    const noteDur = 0.3;
+    for (let i = 0; i < n; i++) {
+        const t = i / sampleRate;
+        let val = 0;
+        chords.forEach((f, ci) => {
+            const noteStart = ci * noteDur;
+            const noteEnd = noteStart + noteDur;
+            if (t >= noteStart && t < noteEnd) {
+                const nt = t - noteStart;
+                const env = Math.exp(-nt * 6) * 0.35 * (0.8 + 0.2 * Math.sin(Math.PI * nt / noteDur));
+                val += Math.sin(2 * Math.PI * f * nt) * env;
+            }
+        });
+        view.setInt16(44 + i * 2, val * 32767, true);
+    }
+    return URL.createObjectURL(new Blob([buffer], { type: 'audio/wav' }));
+}
+
+/* ============ 占位图（SVG data URI，支持尺寸） ============ */
+function svgAvatar(color, bg, size) {
+    const s = size || 44;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${s}" height="${s}"><rect width="${s}" height="${s}" fill="${bg}"/><circle cx="${s/2}" cy="${s*0.4}" r="${s*0.18}" fill="${color}"/><path d="M${s*0.18} ${s*0.96}c${s*0.05}-${s*0.18} ${s*0.18}-${s*0.3} ${s*0.32}-${s*0.3}s${s*0.27} ${s*0.12} ${s*0.32} ${s*0.3}z" fill="${color}"/></svg>`
+    );
+}
+
+/* ============ 图标 ============ */
+const ICONS = {
+    audio: '<span style="display:flex;align-items:flex-end;gap:2px;height:22px"><i style="width:3px;height:8px;background:#fa8c16;border-radius:1px"></i><i style="width:3px;height:15px;background:#fa8c16;border-radius:1px"></i><i style="width:3px;height:12px;background:#fa8c16;border-radius:1px"></i><i style="width:3px;height:20px;background:#fa8c16;border-radius:1px"></i><i style="width:3px;height:10px;background:#fa8c16;border-radius:1px"></i></span>',
+    playWhite: '<svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>',
+    playBtn: '<svg width="12" height="12" viewBox="0 0 24 24" fill="#1677ff"><path d="M8 5v14l11-7z"/></svg>',
+    stopBtn: '<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>'
+};
+
+/* ============ 真实视频流（canvas 动态画面） ============ */
+function makeVideoStream(color, bg) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 320;
+    canvas.height = 180;
+    const ctx = canvas.getContext('2d');
+    const stream = canvas.captureStream(30);
+    let raf = null;
+    let t = 0;
+    function draw() {
+        t += 0.02;
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, 320, 180);
+        const x = 40 + 240 * Math.abs(Math.sin(t * 0.8));
+        const y = 60 + 40 * Math.sin(t * 1.3);
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 26, 0, Math.PI * 2);
+        ctx.fill();
+        for (let i = 0; i < 12; i++) {
+            const bx = 20 + i * 24;
+            const bh = 10 + 30 * Math.abs(Math.sin(t * 2 + i));
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.fillRect(bx, 160 - bh, 12, bh);
+        }
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(Math.floor((t * 30) % 320), 0, 2, 180);
+        raf = requestAnimationFrame(draw);
+    }
+    return {
+        stream,
+        start() { if (!raf) raf = requestAnimationFrame(draw); },
+        stop() { if (raf) { cancelAnimationFrame(raf); raf = null; } }
+    };
+}
+
+/* ============ 选项数据 ============ */
+const TONES = {
+    a: generateChime(523, 1.2),
+    b: generateChime(392, 1.2),
+    c: generateChime(330, 1.2),
+    d: generateChime(262, 1.2),
+    e: generateChime(440, 1.2),
+    f: generateChime(587, 1.2)
+};
+
+const VIDEOS = {
+    v1: makeVideoStream('#1d9e75', '#e1f5ee'),
+    v2: makeVideoStream('#185fa5', '#e6f1fb'),
+    v3: makeVideoStream('#d4537e', '#fbeaf0')
+};
+
+/* 五种类型的演示配置：每种一个下拉框，含多个选项 */
+const DEMOS = [
+    {
+        title: '仅文案',
+        desc: '选项只有 标题 + 描述，无图、无音频、无视频。',
+        options: [
+            { name: '清晰女声 · 知性', desc: '知性干练的讲解嗓，适合知识科普与资讯播报，语气平稳、吐字清晰。' },
+            { name: '沉稳男声 · 厚重', desc: '低沉厚重的男声，适合纪录片旁白与品牌宣传片配音，大气沉稳。' },
+            { name: '活力女声 · 阳光', desc: '阳光明快的女声，适合生活记录与趣味短视频，节奏感强。' }
+        ]
+    },
+    {
+        title: '文案 + 图',
+        desc: '选项包含 标题 + 描述 + 图片；鼠标 hover 缩略图可看大图。',
+        options: [
+            { name: '知性女声 · 琳琳', desc: '沉稳清晰的青年女声，适合知识讲解与资讯播报。', image: svgAvatar('#f06292', '#fbeaf0') },
+            { name: '绅士男声 · 艾伦', desc: '温润绅士的男声，适合商务场景与品牌叙述。', image: svgAvatar('#ffb74d', '#faedda') },
+            { name: '甜美女声 · 糖糖', desc: '甜美可爱的女声，适合美妆与时尚类内容。', image: svgAvatar('#9575cd', '#eee9fb') }
+        ]
+    },
+    {
+        title: '文案 + 音频',
+        desc: '选项包含 标题 + 描述 + 试听音频；缩略图显示声波图标，▶ 播放试听（播放中变停止）。',
+        options: [
+            { name: '童声 · 壮壮', desc: '明快可爱的儿童音，适合趣味内容与亲子向视频配音。', audio: TONES.a },
+            { name: '元气男声 · 小帅', desc: '活泼带感的营销嗓，语速稍快，适合带货与活动口播。', audio: TONES.b },
+            { name: '磁性男声 · 老K', desc: '富有磁性的成熟男声，适合访谈与深度内容旁白。', audio: TONES.c }
+        ]
+    },
+    {
+        title: '文案 + 视频',
+        desc: '选项不设播放按钮；鼠标 hover 选项时右侧浮出视频，可移过去点击播放。',
+        options: [
+            { name: '元气男声 · 配音1', desc: '活泼带感的营销嗓，试听视频演示了搭配画面的实际成片效果。', video: 'v1', vcolor: '#1d9e75', vbg: '#e1f5ee' },
+            { name: '御姐女声 · 配音2', desc: '干练利落的御姐音，试听视频为搭配剧情画面的演示成片。', video: 'v2', vcolor: '#185fa5', vbg: '#e6f1fb' },
+            { name: '邻家女声 · 配音3', desc: '亲切自然的邻家女声，试听视频演示了生活化场景配音。', video: 'v3', vcolor: '#d4537e', vbg: '#fbeaf0' }
+        ]
+    },
+    {
+        title: '文案 + 图 + 音频',
+        desc: '选项包含 标题 + 描述 + 图片 + 试听音频；图片 hover 看大图，▶ 播放音频。',
+        options: [
+            { name: '温柔女声 · 晓晓', desc: '温柔自然的青年女声，适合产品种草、剧情解说。示例：这款面膜的锁水成分能持续保湿八小时。', image: svgAvatar('#378add', '#e6f1fb'), audio: TONES.d },
+            { name: '知性女声 · 苏苏', desc: '知性温柔的女声，适合美妆教程与生活方式类内容。', image: svgAvatar('#7f77dd', '#eeedfe'), audio: TONES.e },
+            { name: '阳光男声 · 大阳', desc: '阳光开朗的男声，适合运动、户外与旅行类内容。', image: svgAvatar('#1d9e75', '#e1f5ee'), audio: TONES.f }
+        ]
+    }
+];
+
+/* ============ 音频播放（全局互斥） ============ */
+let activeAudio = null;
+let activeAudioBtn = null;
+
+function stopAudio() {
+    if (activeAudio) {
+        activeAudio.pause();
+        activeAudio.onended = null;
+        activeAudio = null;
+    }
+    if (activeAudioBtn) {
+        activeAudioBtn.classList.remove('playing');
+        activeAudioBtn.innerHTML = ICONS.playBtn;
+        const player = activeAudioBtn.closest('.mm-opt').querySelector('.mm-player');
+        if (player) player.classList.remove('show');
+        activeAudioBtn = null;
+    }
+}
+
+function toggleAudio(btn) {
+    const optEl = btn.closest('.mm-opt');
+    const entry = optEl.__entry;
+    if (!entry.audio) return;
+    const player = optEl.querySelector('.mm-player');
+    if (!player) return;
+
+    if (activeAudioBtn && activeAudioBtn !== btn) stopAudio();
+
+    if (btn.classList.contains('playing')) {
+        stopAudio();
+        return;
+    }
+
+    const audio = player.querySelector('audio');
+    btn.classList.add('playing');
+    btn.innerHTML = ICONS.stopBtn;
+    player.classList.add('show');
+    audio.currentTime = 0;
+    audio.play().catch(() => {});
+    activeAudio = audio;
+    activeAudioBtn = btn;
+    audio.onended = () => stopAudio();
+}
+
+/* ============ 视频 hover 播放（全局互斥） ============ */
+let activeVideo = null;
+let activeVStream = null;
+
+function stopVideo() {
+    if (activeVideo) {
+        activeVideo.pause();
+        activeVideo.srcObject = null;
+        activeVideo = null;
+    }
+    if (activeVStream) {
+        activeVStream.stop();
+        activeVStream = null;
+    }
+}
+
+function toggleHoverVideo(videoEl) {
+    const optEl = videoEl.closest('.mm-opt');
+    const entry = optEl.__entry;
+    if (!entry.video) return;
+    const cover = videoEl.previousElementSibling;
+
+    if (activeVideo && activeVideo !== videoEl) {
+        // 切走时把上一个 cover 恢复
+        const prevCover = activeVideo.closest('.mm-hover-video').querySelector('.cover');
+        if (prevCover) prevCover.classList.remove('hide');
+        stopVideo();
+    }
+
+    if (!videoEl.paused) {
+        stopVideo();
+        if (cover) cover.classList.remove('hide');
+        return;
+    }
+
+    const vstream = VIDEOS[entry.video];
+    videoEl.srcObject = vstream.stream;
+    videoEl.play().catch(() => {});
+    vstream.start();
+    activeVideo = videoEl;
+    activeVStream = vstream;
+    if (cover) cover.classList.add('hide');
+    videoEl.onended = () => {
+        stopVideo();
+        if (cover) cover.classList.remove('hide');
+    };
+}
+
+function handleHoverVideoLeave(videoEl) {
+    const optEl = videoEl.closest('.mm-opt');
+    const cover = videoEl.previousElementSibling;
+    if (activeVideo === videoEl) {
+        stopVideo();
+        if (cover) cover.classList.remove('hide');
+    } else {
+        videoEl.srcObject = null;
+        videoEl.pause();
+    }
+}
+
+/* ============ 渲染 ============ */
+function renderThumb(entry) {
+    if (entry.video) {
+        const cover = svgAvatar(entry.vcolor, entry.vbg);
+        return `
+            <span class="mm-thumb">
+                <img src="${cover}" alt="">
+                <span class="play-badge">${ICONS.playWhite.replace('width="16" height="16"', 'width="9" height="9"')}</span>
+            </span>`;
+    }
+    if (entry.image) {
+        const big = entry.image.replace(/width%3D%2244%22/g, 'width%3D%22320%22').replace(/height%3D%2244%22/g, 'height%3D%22320%22');
+        return `
+            <span class="mm-thumb">
+                <img src="${entry.image}" alt="">
+                <span class="mm-hover-img"><img src="${big}" alt=""></span>
+            </span>`;
+    }
+    if (entry.audio) {
+        return `<span class="mm-thumb">${ICONS.audio}</span>`;
+    }
+    return '';
+}
+
+function renderTriggerThumb(entry) {
+    if (entry.video) {
+        return `<span class="mm-trigger-thumb"><img src="${svgAvatar(entry.vcolor, entry.vbg)}" alt=""></span>`;
+    }
+    if (entry.image) {
+        return `<span class="mm-trigger-thumb"><img src="${entry.image}" alt=""></span>`;
+    }
+    if (entry.audio) {
+        return `<span class="mm-trigger-thumb">${ICONS.audio.replace('height:22px','height:16px').replace(/width:3px/g,'width:2.5px')}</span>`;
+    }
+    return '';
+}
+
+function renderTrigger(sel) {
+    return `
+        <div class="mm-trigger" onclick="togglePanel(${sel.__demoIndex})" id="mm-trigger-${sel.__demoIndex}">
+            ${renderTriggerThumb(sel.__entry)}
+            <div class="mm-trigger-info">
+                <div class="mm-trigger-name">${sel.__entry.name}</div>
+                <div class="mm-trigger-desc">${sel.__entry.desc}</div>
+            </div>
+            <span class="mm-trigger-arrow">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+            </span>
+        </div>`;
+}
+
+function renderPanel(sel) {
+    const optsHtml = sel.__entries.map((entry, i) => {
+        let rightArea = '';
+        if (entry.audio) {
+            rightArea = `
+                <button type="button" class="mm-opt-btn" onclick="event.stopPropagation(); toggleAudio(this)">${ICONS.playBtn}</button>
+                <div class="mm-player"><audio src="${entry.audio}" preload="none" controls></audio></div>`;
+        }
+        let hoverVideo = '';
+        if (entry.video) {
+            const cover = svgAvatar(entry.vcolor, entry.vbg);
+            hoverVideo = `
+                <span class="mm-hover-video" onmouseleave="handleHoverVideoLeave(this.querySelector('video'))">
+                    <span class="box" onclick="event.stopPropagation(); toggleHoverVideo(this.querySelector('video'))">
+                        <span class="cover"><img src="${cover}" alt=""><span class="btn-play">${ICONS.playWhite}</span></span>
+                        <video muted playsinline></video>
+                    </span>
+                </span>`;
+        }
+        return `
+            <div class="mm-opt ${i === sel.__selected ? 'sel' : ''}" data-idx="${i}" onclick="selectOption(${sel.__demoIndex}, ${i})">
+                <span class="mm-opt-radio"></span>
+                ${renderThumb(entry)}
+                <div class="mm-opt-body">
+                    <div class="mm-opt-name">${entry.name}</div>
+                    <div class="mm-opt-desc">${entry.desc}</div>
+                </div>
+                ${rightArea}
+                ${hoverVideo}
+            </div>`;
+    }).join('');
+    return `<div class="mm-panel" id="mm-panel-${sel.__demoIndex}">${optsHtml}</div>`;
+}
+
+function buildDemo(demo, demoIndex) {
+    const container = document.createElement('div');
+    container.className = 'demo-card';
+    container.innerHTML = `
+        <div class="demo-card-title">${demoIndex + 1}. ${demo.title}</div>
+        <div class="demo-card-desc">${demo.desc}</div>
+        <div class="demo-field">
+            <div class="demo-field-label">下拉单选组件</div>
+            <div class="mm-select" id="mm-${demoIndex}"></div>
+        </div>
+    `;
+
+    const selEl = container.querySelector('.mm-select');
+    selEl.__demoIndex = demoIndex;
+    selEl.__selected = 0;
+    selEl.__entries = demo.options.map(o => ({ ...o }));
+    selEl.__entry = selEl.__entries[0];
+    selEl.__render = function () {
+        selEl.__entry = selEl.__entries[selEl.__selected];
+        selEl.innerHTML = renderTrigger(selEl) + renderPanel(selEl);
+        selEl.querySelectorAll('.mm-opt').forEach(el => {
+            el.__entry = selEl.__entries[Number(el.dataset.idx)];
+        });
+    };
+    selEl.__render();
+    return container;
+}
+
+/* ============ 全局交互 ============ */
+function closeAllPanels() {
+    document.querySelectorAll('.mm-panel').forEach(p => p.classList.remove('open'));
+    document.querySelectorAll('.mm-trigger').forEach(t => t.classList.remove('open'));
+    stopAudio();
+    stopVideo();
+}
+
+function togglePanel(demoIndex) {
+    const panel = document.getElementById(`mm-panel-${demoIndex}`);
+    const trigger = document.getElementById(`mm-trigger-${demoIndex}`);
+    const isOpen = panel.classList.contains('open');
+    closeAllPanels();
+    if (!isOpen) {
+        panel.classList.add('open');
+        trigger.classList.add('open');
+    }
+}
+
+function selectOption(demoIndex, optIndex) {
+    const selEl = document.getElementById(`mm-${demoIndex}`);
+    if (!selEl) return;
+    selEl.__selected = optIndex;
+    selEl.__render();
+    closeAllPanels();
+}
+
+/* 初始化 */
+function init() {
+    const cards = document.getElementById('cards');
+    DEMOS.forEach((demo, i) => {
+        cards.appendChild(buildDemo(demo, i));
+    });
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.mm-select')) closeAllPanels();
+    });
+}
+init();
+</script>
+</body>
+</html>

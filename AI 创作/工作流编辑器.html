@@ -472,6 +472,50 @@
             font-size: 13px;
             text-align: center;
         }
+        .start-option-image-editor { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+        .start-option-image-thumb { width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--border-2); border-radius: 6px; background: var(--bg-subtle); }
+        .start-option-image-action { height: 28px; padding: 0 10px; border: 1px solid var(--border-2); border-radius: 6px; background: #fff; color: var(--accent-text); font: 500 12px var(--font); cursor: pointer; }
+        .start-option-image-action:hover { border-color: var(--accent-solid); background: var(--accent-bg); }
+        .start-option-image-remove { color: var(--text-muted); }
+        .start-option-image-remove:hover { color: #ff4d4f; }
+        .run-select-options { display: flex; flex-direction: column; gap: 8px; }
+        .run-select-option { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; min-height: 48px; padding: 7px 10px; border: 1px solid var(--border-2); border-radius: var(--r-md); background: #fff; color: var(--text-hi); cursor: pointer; transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease; }
+        .run-select-option:hover { border-color: var(--accent-border); background: var(--bg-subtle); }
+        .run-select-option:has(input:checked) { border-color: var(--accent-solid); background: var(--accent-bg); box-shadow: 0 0 0 1px var(--accent-border); }
+        .run-select-option input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent-solid); flex: 0 0 auto; }
+        .run-select-option-image-wrap { position: relative; display: flex; flex: 0 0 auto; }
+        .run-select-option-image { width: 40px; height: 40px; object-fit: cover; border: 1px solid var(--border-2); border-radius: 6px; background: var(--bg-subtle); outline: none; }
+        .run-select-option-image:focus { box-shadow: 0 0 0 2px var(--accent-bg); border-color: var(--accent-solid); }
+        .run-select-option-image-preview { position: absolute; z-index: 20; left: 0; bottom: calc(100% + 8px); display: none; width: 220px; max-width: min(220px, calc(100vw - 64px)); padding: 4px; border: 1px solid var(--border-2); border-radius: var(--r-md); background: #fff; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18); pointer-events: none; }
+        .run-select-option-image-preview img { display: block; width: 100%; max-height: 220px; object-fit: contain; border-radius: 5px; background: var(--bg-subtle); }
+        .run-select-option-image-wrap:hover .run-select-option-image-preview,
+        .run-select-option-image-wrap:focus-within .run-select-option-image-preview { display: block; }
+        .run-select-option-content { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+        .run-select-option-label { font-size: 13px; line-height: 1.4; }
+        .run-select-option-desc { font-size: 12px; line-height: 1.4; color: var(--text-muted); }
+        .run-select-option-media { position: relative; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid var(--border-2); border-radius: 6px; background: var(--bg-subtle); overflow: hidden; flex: 0 0 auto; }
+        .run-select-option-media img, .run-select-option-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .run-select-option-media .media-play-badge { position: absolute; right: 3px; bottom: 3px; width: 16px; height: 16px; border-radius: 50%; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
+        .run-select-option-media .media-type-icon { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); font-size: 10px; }
+        .run-select-option-media .media-type-icon svg { width: 16px; height: 16px; }
+        .run-select-audio-btn { flex: 0 0 auto; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-2); background: #fff; color: var(--accent-solid); cursor: pointer; transition: 0.15s; }
+        .run-select-audio-btn:hover { border-color: var(--accent-solid); background: var(--accent-bg); }
+        .run-select-audio-btn.playing { background: var(--accent-solid); border-color: var(--accent-solid); color: #fff; }
+        .run-select-audio-btn.playing svg { animation: mediaSpin 1.2s linear infinite; }
+        @keyframes mediaSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .run-select-player { display: flex; align-items: center; gap: 10px; width: 100%; margin-top: 2px; padding: 8px 10px; border: 1px solid var(--border-2); border-radius: var(--r-md); background: var(--bg-subtle); }
+        .run-select-player audio { width: 100%; height: 32px; outline: none; }
+        .run-select-player video { width: 100%; max-height: 180px; border-radius: 6px; outline: none; }
+        .run-select-player-time { flex: 0 0 auto; font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+        .start-option-media-editor { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .start-option-media-action { display: inline-flex; align-items: center; gap: 4px; padding: 0 8px; height: 24px; font-size: 12px; border: 1px solid var(--border-2); border-radius: 4px; color: var(--text-hi); cursor: pointer; background: #fff; }
+        .start-option-media-action:hover { border-color: var(--accent-solid); background: var(--accent-bg); }
+        .start-option-media-hint { font-size: 11px; color: var(--text-muted); }
+        .run-select-hover-video { position: fixed; z-index: 200; width: 240px; display: none; }
+        .run-select-hover-video .box { position: relative; display: block; width: 100%; aspect-ratio: 16/9; background: #000; border: 1px solid var(--border-2); border-radius: 10px; overflow: hidden; cursor: pointer; box-shadow: 0 8px 24px rgba(15,23,42,.22); }
+        .run-select-hover-video .box video { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .run-select-hover-video .hover-video-play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); }
+        .run-select-hover-video .hover-video-play .btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
         .cover-editor { display: flex; gap: 16px; align-items: flex-start; }
         .cover-preview { width: 110px; height: 150px; border-radius: 12px; background: linear-gradient(180deg, #3aa0ff 0%, #1677ff 100%); color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; line-height: 1.4; }
         .radio-row { display: flex; flex-wrap: wrap; gap: 16px; }
@@ -1180,12 +1224,27 @@ const START_INPUT_TYPES = [
     { value: 'text', label: '文本' },
     { value: 'image', label: '图片' },
     { value: 'video', label: '视频' },
+    { value: 'sticker', label: '贴纸' },
     { value: 'resolution', label: '分辨率' },
     { value: 'number', label: '数值' }
 ];
 const UPLOAD_COUNT_INPUT_TYPES = ['image', 'video'];
 const SELECT_CONTROL_INPUT_TYPES = ['text', 'number'];
 const TEXT_LIKE_INPUT_TYPES = ['text', 'number', 'resolution', 'count', 'text.generate'];
+const RUN_MODE_OPTIONS = [
+    { value: 'one_to_one', label: '1 生 1' },
+    { value: 'one_to_many', label: '1 生多' },
+];
+const STICKER_RATIO_SOURCES = [
+    { value: 'fixed', label: '固定比例' },
+    { value: 'resolution', label: '跟随分辨率设置组件' },
+    { value: 'video', label: '跟随视频上传组件' },
+];
+const STICKER_FIXED_RATIOS = [
+    { value: '9:16', label: '9:16' },
+    { value: '16:9', label: '16:9' },
+    { value: 'custom', label: '自己输入' },
+];
 const OUTPUT_TYPE_OPTIONS = [
     { value: 'text', label: '文本' },
     { value: 'image', label: '图片' },
@@ -1204,11 +1263,41 @@ function isSelectControlConfigurableInput(type) {
     return SELECT_CONTROL_INPUT_TYPES.includes(type);
 }
 
+function isOptionGroupInput(type) {
+    return type === 'option_group';
+}
+
 function normalizeStartInputConfig(input) {
     if (!input) return input;
     if (input.type === 'select') {
         input.type = 'text';
         input.control = 'select';
+    }
+    // 兼容早期原型中的“选项组”数据，统一迁移为数值下拉选项。
+    if (isOptionGroupInput(input.type)) {
+        input.type = 'number';
+        input.control = 'select';
+        input.options = (input.options || []).map(option => ({
+            name: option.name || '',
+            value: option.value ?? option.defaultValue ?? '',
+            desc: option.desc || '',
+            image: option.image || '',
+            audio: option.audio || '',
+            video: option.video || '',
+            text: option.text || '',
+        }));
+        if (!input.options.length) input.options = [{ name: '', value: '', desc: '' }];
+    }
+    if (input.type === 'sticker') {
+        delete input.control;
+        delete input.options;
+        input.maxStickerCount = normalizeStickerMaxCount(input.maxStickerCount);
+        input.ratioSource = input.ratioSource || 'fixed';
+        input.fixedRatio = input.fixedRatio || '9:16';
+        input.ratioWidth = input.ratioWidth ?? 16;
+        input.ratioHeight = input.ratioHeight ?? 9;
+        input.ratioRefKey = input.ratioRefKey || '';
+        return input;
     }
     if (!isSelectControlConfigurableInput(input.type)) {
         delete input.control;
@@ -1228,6 +1317,9 @@ function normalizeStartInputConfig(input) {
             }
             return option;
         });
+        if (!Object.prototype.hasOwnProperty.call(input, 'defaultOptionValue')) {
+            input.defaultOptionValue = '';
+        }
     }
     return input;
 }
@@ -1236,10 +1328,232 @@ function getConfiguredOptionCount(input) {
     return (input.options || []).filter(option => String(option.name || '').trim()).length;
 }
 
+function hasConfiguredOptionValue(option) {
+    return option && option.value !== undefined && option.value !== null && String(option.value).trim() !== '';
+}
+
+function getStartOptionImageDataUrl(option) {
+    const image = String(option?.image || '');
+    return /^data:image\/(?:png|jpe?g|gif|webp|bmp|svg\+xml);base64,/i.test(image) ? image : '';
+}
+
+function getStartOptionAudioDataUrl(option) {
+    const audio = String(option?.audio || '');
+    if (/^https?:\/\/.+\.(?:mp3|wav|ogg|m4a|aac)(?:\?.*)?$/i.test(audio)) return audio;
+    return /^data:audio\/(?:mpeg|mp3|wav|ogg|m4a|aac|x-m4a);base64,/i.test(audio) ? audio : '';
+}
+
+function getStartOptionVideoDataUrl(option) {
+    const video = String(option?.video || '');
+    if (/^https?:\/\/.+\.(?:mp4|webm|ogv|mov|m4v)(?:\?.*)?$/i.test(video)) return video;
+    return /^data:video\/(?:mp4|webm|ogg|quicktime|x-matroska);base64,/i.test(video) ? video : '';
+}
+
+function getStartOptionText(option) {
+    return String(option?.text || '').trim();
+}
+
+// 根据选项配置的媒体，返回媒体区展示 HTML（视频封面 > 图片 > 声波图标；纯文案不渲染缩略图）
+function renderRunOptionMediaHtml(option, name) {
+    const video = getStartOptionVideoDataUrl(option);
+    if (video) {
+        return `<span class="run-select-option-media">
+            <video src="${escapeAttr(video)}" muted playsinline preload="metadata"></video>
+            <span class="media-play-badge"><svg width="8" height="8" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span>
+        </span>`;
+    }
+    const image = getStartOptionImageDataUrl(option);
+    if (image) {
+        return `<span class="run-select-option-image-wrap">
+            <img class="run-select-option-image" src="${escapeAttr(image)}" alt="${escapeAttr(name)} 示例图片" tabindex="0">
+            <span class="run-select-option-image-preview" role="tooltip"><img src="${escapeAttr(image)}" alt="${escapeAttr(name)} 示例大图"></span>
+        </span>`;
+    }
+    const audio = getStartOptionAudioDataUrl(option);
+    if (audio) {
+        return `<span class="run-select-option-media">
+            <span class="media-type-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v10.55a4 4 0 1 0 4 4V7h4"/></svg></span>
+        </span>`;
+    }
+    return '';
+}
+
+// 试听播放（全局互斥：同时只播一个）
+let runPreviewCache = [];
+let runPreviewMedia = null;
+let runPreviewBtn = null;
+let runPreviewBox = null;
+
+function stopRunPreview() {
+    if (runPreviewMedia) {
+        runPreviewMedia.pause();
+        runPreviewMedia.removeAttribute('controls');
+        runPreviewMedia = null;
+    }
+    if (runPreviewBtn) {
+        runPreviewBtn.classList.remove('playing');
+        runPreviewBtn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+        runPreviewBtn = null;
+    }
+    if (runPreviewBox) {
+        runPreviewBox.style.display = 'none';
+        runPreviewBox = null;
+    }
+}
+
+function toggleRunOptionPreview(btn, index) {
+    const entry = runPreviewCache[index];
+    if (!entry || !entry.audio) return;
+    const box = btn.nextElementSibling;
+    const media = box ? box.querySelector('audio') : null;
+    if (!media) return;
+
+    hideRunHoverVideo();
+
+    // 正在播另一个 → 先停
+    if (runPreviewMedia && runPreviewMedia !== media) {
+        stopRunPreview();
+    }
+
+    if (media.paused) {
+        media.currentTime = 0;
+        media.setAttribute('controls', '');
+        box.style.display = 'flex';
+        media.play().catch(() => {});
+        btn.classList.add('playing');
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg>';
+        runPreviewMedia = media;
+        runPreviewBtn = btn;
+        runPreviewBox = box;
+        media.onended = () => stopRunPreview();
+    } else {
+        stopRunPreview();
+    }
+}
+
+// 渲染试听按钮 + 播放条（仅音频；视频走 hover 浮层）
+function renderRunOptionPlayerHtml(option, optKey, cacheIndex) {
+    const audio = getStartOptionAudioDataUrl(option);
+    if (!audio) return '';
+    runPreviewCache[cacheIndex] = { audio };
+    return `
+        <button type="button" class="run-select-audio-btn" onclick="event.preventDefault(); event.stopPropagation(); toggleRunOptionPreview(this, ${cacheIndex})" title="试听">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <span class="run-select-player" style="display:none;" onclick="event.preventDefault(); event.stopPropagation();"><audio src="${escapeAttr(audio)}" preload="none" style="width:100%;height:32px;outline:none;"></audio></span>`;
+}
+
+// 视频选项：注册 hover 浮层所需的数据与事件（返回 label 属性字符串）
+function renderRunOptionVideoHoverAttrs(option, cacheIndex) {
+    const video = getStartOptionVideoDataUrl(option);
+    if (!video) return '';
+    runPreviewCache[cacheIndex] = { video };
+    return ` onmouseenter="showRunHoverVideo(this, ${cacheIndex})" onmouseleave="scheduleHideRunHoverVideo()"`;
+}
+
+// ===== 视频 hover 浮层（fixed 挂 body，绕开面板 overflow 裁剪） =====
+let runHoverVideoEl = null;
+let runHoverVideoTimer = null;
+
+function hideRunHoverVideo() {
+    clearTimeout(runHoverVideoTimer);
+    if (runHoverVideoEl) {
+        runHoverVideoEl.remove();
+        runHoverVideoEl = null;
+    }
+}
+
+function showRunHoverVideo(optEl, cacheIndex) {
+    const entry = runPreviewCache[cacheIndex];
+    if (!entry || !entry.video) return;
+    clearTimeout(runHoverVideoTimer);
+    if (runHoverVideoEl && runHoverVideoEl.dataset.cacheIndex === String(cacheIndex)) return;
+
+    hideRunHoverVideo();
+    stopRunPreview();
+
+    const float = document.createElement('span');
+    float.className = 'run-select-hover-video';
+    float.dataset.cacheIndex = String(cacheIndex);
+    float.innerHTML = `
+        <span class="box" onclick="event.preventDefault(); event.stopPropagation(); toggleRunHoverVideo(this)">
+            <video src="${escapeAttr(entry.video)}" muted playsinline preload="none"></video>
+            <span class="hover-video-play"><span class="btn"><svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></span></span>
+        </span>`;
+    document.body.appendChild(float);
+    // 鼠标从选项移到浮层时保持显示，移出后延迟隐藏
+    float.addEventListener('mouseenter', () => clearTimeout(runHoverVideoTimer));
+    float.addEventListener('mouseleave', scheduleHideRunHoverVideo);
+
+    const rect = optEl.getBoundingClientRect();
+    const W = 240;
+    const H = Math.round(W * 9 / 16);
+    let left = rect.right - W;
+    let top = rect.top - H - 8;
+    if (top < 8) top = rect.bottom + 8;
+    if (top + H > window.innerHeight - 8) top = Math.max(8, rect.top - H - 8);
+    left = Math.max(8, Math.min(left, window.innerWidth - W - 8));
+    float.style.left = left + 'px';
+    float.style.top = top + 'px';
+    float.style.display = 'block';
+    runHoverVideoEl = float;
+}
+
+function scheduleHideRunHoverVideo() {
+    clearTimeout(runHoverVideoTimer);
+    runHoverVideoTimer = setTimeout(hideRunHoverVideo, 200);
+}
+
+function toggleRunHoverVideo(box) {
+    const video = box.querySelector('video');
+    if (!video) return;
+    const playBadge = box.querySelector('.hover-video-play');
+    if (video.paused) {
+        video.play().catch(() => {});
+        if (playBadge) playBadge.style.display = 'none';
+        video.onended = () => { if (playBadge) playBadge.style.display = 'flex'; };
+    } else {
+        video.pause();
+        if (playBadge) playBadge.style.display = 'flex';
+    }
+}
+
 function normalizeMaxUploadCount(value) {
     const num = parseInt(value, 10);
     if (!Number.isFinite(num)) return 1;
     return Math.min(99, Math.max(1, num));
+}
+
+function normalizeStickerMaxCount(value) {
+    const num = parseInt(value, 10);
+    if (!Number.isFinite(num)) return 10;
+    return Math.min(10, Math.max(1, num));
+}
+
+function getStickerRatioError(input) {
+    const width = Number(input?.ratioWidth);
+    const height = Number(input?.ratioHeight);
+    if (!Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return '';
+    if (Math.max(width, height) / Math.min(width, height) > 21 / 9) return '长宽比不可超过 21:9';
+    return '';
+}
+
+function getStickerRatioReferenceInputs(node, source) {
+    const type = source === 'resolution' ? 'resolution' : 'video';
+    return (node?.config?.inputs || []).filter(input => input.type === type);
+}
+
+function normalizeStickerRatioReference(input, node) {
+    if (input?.type !== 'sticker') return input;
+    const source = STICKER_RATIO_SOURCES.some(option => option.value === input.ratioSource) ? input.ratioSource : 'fixed';
+    input.ratioSource = source;
+    if (source === 'resolution' || source === 'video') {
+        const references = getStickerRatioReferenceInputs(node, source);
+        if (!references.some(reference => reference.key === input.ratioRefKey)) input.ratioRefKey = '';
+    } else {
+        input.ratioRefKey = '';
+    }
+    return input;
 }
 
 function renderRefSelectorControl({ nodeId, tokenKey, sourceKey, acceptTypes, currentRefVar, placeholder = '点击选择', clearAction = '' }) {
@@ -1516,13 +1830,26 @@ const PROCESSOR_REGISTRY = {
         hasOut: true,
         createDefaultConfig: () => ({
             name: '开始',
+            runMode: 'one_to_one',
             inputs: [
                 { key: createInputKey(), label: '主提示词', type: 'text', control: 'input', required: true },
                 { key: createInputKey(), label: '参考图片', type: 'image', required: true, maxUploadCount: 1 }
             ]
         }),
-        getSummary: (config) => renderSummary([`输入项：${(config.inputs || []).length} 个`]),
+        getSummary: (config) => renderSummary([
+            `生成模式：${config.runMode === 'one_to_many' ? '1 生多' : '1 生 1'}`,
+            `输入项：${(config.inputs || []).length} 个`
+        ]),
         renderConfig: (node) => `
+            <div class="form-item">
+                <label>生成模式</label>
+                <div style="display:flex;gap:8px;">
+                    ${RUN_MODE_OPTIONS.map(option => `
+                        <button type="button" class="start-control-radio-button ${(node.config.runMode || 'one_to_one') === option.value ? 'active' : ''}" onclick="updateStartRunMode('${option.value}')">${option.label}</button>
+                    `).join('')}
+                </div>
+                <div class="form-hint" style="margin-top:8px;">1 生多时，文本或数值下拉选项可多选，最多生成 9 个变体；每次传给后续节点的仍是一个普通值。</div>
+            </div>
             <div class="form-item">
                 <label style="margin-bottom: 4px;">输入</label>
                 <div class="form-hint" style="margin-bottom: 12px; margin-top: 0; color: var(--text-muted);">设置使用该工作流必须输入的内容</div>
@@ -2364,26 +2691,58 @@ function getRunInputs() {
 function renderRunInput(input) {
     normalizeStartInputConfig(input);
     const maxUploadCount = normalizeMaxUploadCount(input.maxUploadCount);
+    const startNode = nodes.find(node => node.processorType === 'system.start');
+    const isOneToMany = startNode?.config?.runMode === 'one_to_many';
     if (input.control === 'select' && isSelectControlConfigurableInput(input.type)) {
-        const options = (input.options || []).filter(opt => String(opt.name || '').trim() && String(opt.value || '').trim());
+        const options = (input.options || []).filter(opt => String(opt.name || '').trim() && hasConfiguredOptionValue(opt));
         if (!options.length) {
-            return `<select disabled style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit; background:#fff; color:var(--text-muted);">
-                <option>请先设置选项</option>
-            </select>`;
+            return `<div class="run-select-options" aria-disabled="true"><div class="run-select-option" style="color:var(--text-muted); cursor:default;">请先设置选项</div></div>`;
         }
-        const optionsHtml = options.map(opt => {
+        if (isOneToMany) {
+            const selectedValues = Array.isArray(runState.values[input.key])
+                ? runState.values[input.key]
+                : (input.defaultOptionValue ? [String(input.defaultOptionValue)] : []);
+            if (runState.values[input.key] === undefined && selectedValues.length) {
+                runState.values[input.key] = selectedValues;
+            }
+            runPreviewCache = [];
+            const optionsHtml = options.map((opt, optIndex) => {
+                const name = String(opt.name || '').trim();
+                const value = String(opt.value || '').trim();
+                const isSelected = selectedValues.includes(value);
+                const mediaHtml = renderRunOptionMediaHtml(opt, name);
+                const playerHtml = renderRunOptionPlayerHtml(opt, input.key + '_' + value, optIndex);
+                const videoHoverAttrs = renderRunOptionVideoHoverAttrs(opt, optIndex);
+                const descText = String(opt.desc || opt.text || '').trim();
+                return `<label class="run-select-option"${videoHoverAttrs}>
+                    <input type="checkbox" value="${escapeAttr(value)}" ${isSelected ? 'checked' : ''} onchange="toggleRunSelectOption('${escapeAttr(input.key)}', '${escapeAttr(value)}')">
+                    ${mediaHtml}
+                    <span class="run-select-option-content"><span class="run-select-option-label">${escapeAttr(name)}</span>${descText ? `<span class="run-select-option-desc">${escapeAttr(descText)}</span>` : ''}</span>
+                    ${playerHtml}
+                </label>`;
+            }).join('');
+            return `<div class="run-select-options" role="group" aria-label="${escapeAttr(input.label)}">${optionsHtml}</div><div style="font-size:12px;color:var(--text-muted);margin-top:8px;">已选 ${selectedValues.length} 项，最多 9 项；每项会生成一个结果。</div>`;
+        }
+        if (runState.values[input.key] === undefined && input.defaultOptionValue) {
+            runState.values[input.key] = String(input.defaultOptionValue);
+        }
+        runPreviewCache = [];
+        const optionsHtml = options.map((opt, optIndex) => {
             const name = String(opt.name || '').trim();
             const value = String(opt.value || '').trim();
-            const displayLabel = opt.desc ? `${escapeAttr(name)}（${escapeAttr(opt.desc)}）` : escapeAttr(name);
             const isSelected = runState.values[input.key] === value;
-            return `<option value="${escapeAttr(value)}" ${isSelected ? 'selected' : ''}>${displayLabel}</option>`;
+            const mediaHtml = renderRunOptionMediaHtml(opt, name);
+            const playerHtml = renderRunOptionPlayerHtml(opt, input.key + '_' + value, optIndex);
+            const videoHoverAttrs = renderRunOptionVideoHoverAttrs(opt, optIndex);
+            const descText = String(opt.desc || opt.text || '').trim();
+            return `<label class="run-select-option"${videoHoverAttrs}>
+                <input type="radio" name="run-select-${escapeAttr(input.key)}" value="${escapeAttr(value)}" ${isSelected ? 'checked' : ''} onchange="updateRunValue('${input.key}', this.value)">
+                ${mediaHtml}
+                <span class="run-select-option-content"><span class="run-select-option-label">${escapeAttr(name)}</span>${descText ? `<span class="run-select-option-desc">${escapeAttr(descText)}</span>` : ''}</span>
+                ${playerHtml}
+            </label>`;
         }).join('');
-        if (!runState.values[input.key] && options.length > 0) {
-            runState.values[input.key] = String(options[0].value || '').trim();
-        }
-        return `<select onchange="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit; background:#fff;">
-            ${optionsHtml}
-        </select>`;
+        return `<div class="run-select-options" role="radiogroup" aria-label="${escapeAttr(input.label)}">${optionsHtml}</div>`;
     }
     if (input.type === 'text') {
         return `<textarea rows="3" placeholder="请输入${input.label}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; border:1px solid var(--border-2); border-radius:8px; padding:8px 12px; outline:none; resize:vertical; font-family:inherit;">${runState.values[input.key] || ''}</textarea>`;
@@ -2393,6 +2752,18 @@ function renderRunInput(input) {
     }
     if (input.type === 'resolution') {
         return `<input type="text" placeholder="例如 1080×1920" value="${runState.values[input.key] || ''}" oninput="updateRunValue('${input.key}', this.value)" style="width:100%; height:36px; border:1px solid var(--border-2); border-radius:8px; padding:0 12px; outline:none; font-family:inherit;">`;
+    }
+    if (input.type === 'sticker') {
+        const stickerValue = runState.values[input.key] || '';
+        const stickers = ['爆款强调', '限时优惠', '新品上新'];
+        return `
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    ${stickers.map(name => `<button type="button" class="btn btn-default" style="height:34px; padding:0 12px; border:1px solid ${stickerValue === name ? '#1677ff' : 'var(--border-2)'}; background:${stickerValue === name ? '#e8f4ff' : '#fff'}; color:${stickerValue === name ? '#1677ff' : 'var(--text-hi)'}; border-radius:6px; cursor:pointer;" onclick="updateRunValue('${input.key}', '${name}'); openRunPanel();">${name}</button>`).join('')}
+                </div>
+                <span style="font-size:12px; color:var(--text-muted);">支持 PNG、GIF；选择后可在运行页调整作用视频、位置和大小。</span>
+            </div>
+        `;
     }
     if (input.type === 'image' || input.type === 'video' || input.type === 'image_array' || input.type === 'video_array') {
         const fileName = runState.values[input.key] || '';
@@ -2413,6 +2784,18 @@ function updateRunValue(key, val) {
     }
 }
 
+function toggleRunSelectOption(key, value) {
+    const current = Array.isArray(runState.values[key]) ? runState.values[key] : [];
+    if (current.includes(value)) {
+        runState.values[key] = current.filter(item => item !== value);
+    } else if (current.length < 9) {
+        runState.values[key] = [...current, value];
+    } else {
+        showToastMessage('1 生多最多选择 9 个选项');
+    }
+    openPanel('试运行', renderRunForm());
+}
+
 function mockUploadRunFile(key, type) {
     const exts = type.includes('video') ? '.mp4' : '.png';
     const fakeName = '参考文件_' + Math.random().toString(36).slice(2,6) + exts;
@@ -2422,8 +2805,16 @@ function mockUploadRunFile(key, type) {
 
 function renderRunForm() {
     const inputs = getRunInputs();
+    const runMode = nodes.find(node => node.processorType === 'system.start')?.config?.runMode === 'one_to_many' ? 'one_to_many' : 'one_to_one';
     
     let html = '<div style="margin-bottom:20px;">';
+
+    html += `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;padding:10px 12px;border:1px solid ${runMode === 'one_to_many' ? 'var(--accent-border)' : 'var(--border-1)'};border-radius:8px;background:${runMode === 'one_to_many' ? 'var(--accent-bg)' : 'var(--bg-subtle)'};">
+            <div><strong style="font-size:13px;color:var(--text-hi);">生成模式：${runMode === 'one_to_many' ? '1 生多' : '1 生 1'}</strong><div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${runMode === 'one_to_many' ? '下拉选项可多选，每个选项生成一个结果。' : '所有输入合并生成一个结果。'}</div></div>
+            ${runMode === 'one_to_many' ? '<span style="font-size:12px;color:var(--accent-solid);">最多 9 个结果</span>' : ''}
+        </div>
+    `;
     
     // Add default task name field
     const defaultTaskName = (workflowMeta.name || '工作流') + '-' + new Date().toISOString().slice(0,10).replace(/-/g,'');
@@ -2636,7 +3027,11 @@ function getModelLabel(models, id) {
 }
 
 function getOutputTypeLabel(value) {
-    return OUTPUT_TYPE_OPTIONS.find(option => option.value === value)?.label || '未设置';
+    const labels = {
+        image_array: '图片列表',
+        video_array: '视频列表',
+    };
+    return OUTPUT_TYPE_OPTIONS.find(option => option.value === value)?.label || labels[value] || '未设置';
 }
 
 function getAcceptTypesByOutputType(type) {
@@ -2668,9 +3063,12 @@ function getNodeOutputItems(node) {
     if (node.processorType === 'system.start') {
         return (node.config.inputs || []).map(normalizeStartInputConfig).map(input => ({
             key: input.key,
-            label: input.label,
+            label: input.type === 'sticker' ? `${input.label}（贴纸图片列表+位置）` : input.label,
             token: `{{start.${input.key}}}`,
-            type: input.type,
+            // 贴纸在开始节点中是配置型组件，但实际输出沿用现有图片列表类型，
+            // 避免给 ComfyUI 和已有图片节点增加一套新的数据类型。
+            type: input.type === 'sticker' ? 'image_array' : input.type,
+            valueShape: input.type === 'sticker' ? 'sticker_list_with_position' : input.type,
             source: '开始节点'
         }));
     }
@@ -2979,6 +3377,7 @@ function renderStartInputsEditor(node) {
                 <input type="number" min="1" max="99" value="${normalizeMaxUploadCount(input.maxUploadCount)}" oninput="this.value = normalizeMaxUploadCount(this.value); updateStartInput(${idx}, 'maxUploadCount', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 32px; padding: 0 10px; font-size: 13px; color: var(--text-hi); outline: none; transition: 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);" onfocus="this.style.borderColor='var(--accent-solid)'; this.style.boxShadow='0 0 0 2px var(--accent-bg)';" onblur="this.style.borderColor='var(--border-2)'; this.style.boxShadow='inset 0 1px 2px rgba(0,0,0,0.02)';">
             </div>
             ` : ''}
+            ${input.type === 'sticker' ? renderStickerInputConfig(input, idx, node) : ''}
             ${canConfigureControl ? renderStartInputControlSwitch(input, idx) : ''}
             ${canConfigureControl && input.control === 'select' ? renderStartInputSelectOptionsSummary(input, idx) : ''}
             <div class="start-required-row">
@@ -3000,10 +3399,10 @@ function renderStartInputControlSwitch(input, inputIdx) {
     const mode = input.control === 'select' ? 'select' : 'input';
     return `
         <div class="start-control-row" style="padding-bottom: 12px; border-bottom: 1px dashed var(--border-2);">
-            <span class="start-control-label">填写方式</span>
+            <span class="start-control-label">控件类型</span>
             <div class="start-control-radio-group" role="radiogroup" aria-label="填写方式">
                 <div class="start-control-radio-button ${mode !== 'select' ? 'active' : ''}" role="radio" aria-checked="${mode !== 'select' ? 'true' : 'false'}" onclick="updateStartInput(${inputIdx}, 'control', 'input')">输入框</div>
-                <div class="start-control-radio-button ${mode === 'select' ? 'active' : ''}" role="radio" aria-checked="${mode === 'select' ? 'true' : 'false'}" onclick="updateStartInput(${inputIdx}, 'control', 'select')">下拉菜单</div>
+                <div class="start-control-radio-button ${mode === 'select' ? 'active' : ''}" role="radio" aria-checked="${mode === 'select' ? 'true' : 'false'}" onclick="updateStartInput(${inputIdx}, 'control', 'select')">下拉选择</div>
             </div>
         </div>
     `;
@@ -3018,9 +3417,56 @@ function renderStartInputSelectOptionsSummary(input, inputIdx) {
     `;
 }
 
+function renderStickerInputConfig(input, inputIdx, node) {
+    normalizeStickerRatioReference(input, node);
+    const ratioSource = input.ratioSource || 'fixed';
+    const ratioReferences = getStickerRatioReferenceInputs(node, ratioSource);
+    const ratioError = ratioSource === 'fixed' && input.fixedRatio === 'custom' ? getStickerRatioError(input) : '';
+    return `
+        <div class="form-item" style="margin:12px 0 0;">
+            <label style="font-size:12px;color:var(--text-lo);margin-bottom:6px;display:block;">最多添加数量</label>
+            <input type="number" min="1" max="10" value="${normalizeStickerMaxCount(input.maxStickerCount)}" oninput="this.value = normalizeStickerMaxCount(this.value); updateStickerInputConfig(${inputIdx}, 'maxStickerCount', this.value)" style="width:100%;border:1px solid var(--border-2);background:#fff;border-radius:6px;height:32px;padding:0 10px;font-size:13px;color:var(--text-hi);outline:none;">
+            <div class="form-hint" style="margin-top:5px;">未填写时默认最多添加 10 个贴纸。</div>
+        </div>
+        <div class="form-item" style="margin:12px 0 0;">
+            <label style="font-size:12px;color:var(--text-lo);margin-bottom:6px;display:block;">比例来源</label>
+            <select onchange="updateStickerInputConfig(${inputIdx}, 'ratioSource', this.value)" style="width:100%;border:1px solid var(--border-2);background:#fff;border-radius:6px;height:32px;padding:0 10px;font-size:13px;color:var(--text-hi);outline:none;">
+                ${STICKER_RATIO_SOURCES.map(option => `<option value="${option.value}" ${ratioSource === option.value ? 'selected' : ''}>${option.label}</option>`).join('')}
+            </select>
+            ${ratioSource === 'fixed' ? `
+                <select onchange="updateStickerInputConfig(${inputIdx}, 'fixedRatio', this.value)" style="width:100%;margin-top:8px;border:1px solid var(--border-2);background:#fff;border-radius:6px;height:32px;padding:0 10px;font-size:13px;color:var(--text-hi);outline:none;">
+                    ${STICKER_FIXED_RATIOS.map(option => `<option value="${option.value}" ${input.fixedRatio === option.value ? 'selected' : ''}>${option.label}</option>`).join('')}
+                </select>
+                ${input.fixedRatio === 'custom' ? `
+                    <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                        <input type="number" min="1" placeholder="宽" value="${escapeAttr(input.ratioWidth ?? '')}" oninput="updateStickerInputConfig(${inputIdx}, 'ratioWidth', this.value)" style="width:100%;height:32px;border:1px solid ${ratioError ? '#ff4d4f' : 'var(--border-2)'};border-radius:6px;padding:0 10px;font-size:13px;">
+                        <span style="color:var(--text-muted);">:</span>
+                        <input type="number" min="1" placeholder="高" value="${escapeAttr(input.ratioHeight ?? '')}" oninput="updateStickerInputConfig(${inputIdx}, 'ratioHeight', this.value)" style="width:100%;height:32px;border:1px solid ${ratioError ? '#ff4d4f' : 'var(--border-2)'};border-radius:6px;padding:0 10px;font-size:13px;">
+                    </div>
+                    ${ratioError ? `<div style="margin-top:5px;color:#ff4d4f;font-size:12px;">${ratioError}</div>` : ''}
+                ` : ''}
+            ` : `
+                <select ${ratioReferences.length ? '' : 'disabled'} onchange="updateStickerInputConfig(${inputIdx}, 'ratioRefKey', this.value)" style="width:100%;margin-top:8px;border:1px solid var(--border-2);background:${ratioReferences.length ? '#fff' : 'var(--bg-subtle)'};border-radius:6px;height:32px;padding:0 10px;font-size:13px;color:${ratioReferences.length ? 'var(--text-hi)' : 'var(--text-muted)'};outline:none;">
+                    <option value="">${ratioReferences.length ? '请选择组件' : `暂无${ratioSource === 'resolution' ? '分辨率设置' : '视频上传'}组件`}</option>
+                    ${ratioReferences.map(reference => `<option value="${escapeAttr(reference.key)}" ${input.ratioRefKey === reference.key ? 'selected' : ''}>${escapeAttr(reference.label || reference.key)}</option>`).join('')}
+                </select>
+            `}
+            <div class="form-hint" style="margin-top:5px;">画布比例只能选择一个来源；组件删除后，关联选项自动置空。</div>
+        </div>
+    `;
+}
+
 function renderStartInputSelectOptions(input, inputIdx) {
     if (!input.options || input.options.length === 0) input.options = [{ name: '', value: '', desc: '' }];
-    let html = '';
+    let html = `
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:8px 10px;border-radius:6px;background:var(--bg-subtle);">
+            <span style="font-size:12px;color:var(--text-lo);white-space:nowrap;">默认选项</span>
+            <select onchange="updateStartInputDefaultOption(${inputIdx}, this.value)" style="flex:1;height:28px;border:1px solid var(--border-2);border-radius:6px;padding:0 8px;font-size:12px;background:#fff;">
+                <option value="" ${!input.defaultOptionValue ? 'selected' : ''}>不设置默认值</option>
+                ${(input.options || []).filter(opt => String(opt.name || '').trim() && hasConfiguredOptionValue(opt)).map(opt => `<option value="${escapeAttr(opt.value)}" ${String(input.defaultOptionValue) === String(opt.value) ? 'selected' : ''}>${escapeAttr(opt.name)}</option>`).join('')}
+            </select>
+        </div>
+    `;
 
     input.options.forEach((opt, optIdx) => {
         html += `
@@ -3033,8 +3479,25 @@ function renderStartInputSelectOptions(input, inputIdx) {
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <input type="text" placeholder="选项名称（必填）" value="${escapeAttr(opt.name)}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'name', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
-                    <input type="text" placeholder="绑定值（必填）" value="${escapeAttr(opt.value || '')}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'value', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
+                    <input type="text" placeholder="绑定值（必填）" value="${escapeAttr(opt.value ?? '')}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'value', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
                     <input type="text" placeholder="描述（可选）" value="${escapeAttr(opt.desc)}" oninput="updateStartInputOption(${inputIdx}, ${optIdx}, 'desc', this.value)" style="width: 100%; border: 1px solid var(--border-2); background: #ffffff; border-radius: 6px; height: 28px; padding: 0 8px; font-size: 12px; color: var(--text-hi); outline: none; box-sizing: border-box;">
+                    <div class="start-option-image-editor">
+                        ${getStartOptionImageDataUrl(opt) ? `<img class="start-option-image-thumb" src="${escapeAttr(getStartOptionImageDataUrl(opt))}" alt="选项 ${optIdx + 1} 示例图片缩略图">` : ''}
+                        <label class="start-option-image-action">选择示例图片<input type="file" accept="image/*" style="display:none;" onchange="handleStartInputOptionImage(${inputIdx}, ${optIdx}, this.files[0])"></label>
+                        ${getStartOptionImageDataUrl(opt) ? `<button class="btn btn-ghost start-option-image-remove" type="button" style="height:28px; padding:0 6px;" onclick="removeStartInputOptionImage(${inputIdx}, ${optIdx})">移除图片</button>` : '<span class="form-hint" style="margin:0;">可选</span>'}
+                    </div>
+                    <div class="start-option-media-editor">
+                        ${getStartOptionAudioDataUrl(opt) ? `<audio controls src="${escapeAttr(getStartOptionAudioDataUrl(opt))}" style="height:28px;flex:1;min-width:120px;"></audio>` : ''}
+                        <label class="start-option-media-action">选择试听音频<input type="file" accept="audio/*" style="display:none;" onchange="handleStartInputOptionAudio(${inputIdx}, ${optIdx}, this.files[0])"></label>
+                        ${getStartOptionAudioDataUrl(opt) ? `<button class="btn btn-ghost" type="button" style="height:24px;padding:0 6px;color:var(--text-muted);" onclick="removeStartInputOptionAudio(${inputIdx}, ${optIdx})">移除音频</button>` : ''}
+                    </div>
+                    <div class="start-option-media-editor">
+                        ${getStartOptionVideoDataUrl(opt) ? `<video controls src="${escapeAttr(getStartOptionVideoDataUrl(opt))}" style="height:36px;flex:1;min-width:120px;border-radius:4px;"></video>` : ''}
+                        <label class="start-option-media-action">选择试听视频<input type="file" accept="video/*" style="display:none;" onchange="handleStartInputOptionVideo(${inputIdx}, ${optIdx}, this.files[0])"></label>
+                        ${getStartOptionVideoDataUrl(opt) ? `<button class="btn btn-ghost" type="button" style="height:24px;padding:0 6px;color:var(--text-muted);" onclick="removeStartInputOptionVideo(${inputIdx}, ${optIdx})">移除视频</button>` : ''}
+                        ${!getStartOptionAudioDataUrl(opt) && !getStartOptionVideoDataUrl(opt) ? '<span class="start-option-media-hint">音频/视频二选一，可选</span>' : ''}
+                        <span class="start-option-media-hint">视频建议小于 5MB，过大会拖慢配置保存</span>
+                    </div>
                 </div>
             </div>
         `;
@@ -3128,9 +3591,19 @@ function submitStartInputOptionsModal() {
                 showToastMessage(`第 ${i + 1} 个选项名称不能为空`);
                 return;
             }
-            if (!opt.value || !opt.value.trim()) {
+            if (!hasConfiguredOptionValue(opt)) {
                 showToastMessage(`第 ${i + 1} 个选项绑定值不能为空`);
                 return;
+            }
+            if (isOptionGroupInput(input.type)) {
+                const min = Number(opt.min);
+                const max = Number(opt.max);
+                const step = Number(opt.step);
+                const defaultValue = Number(opt.defaultValue);
+                if (![min, max, step, defaultValue].every(Number.isFinite) || min > max || step <= 0 || defaultValue < min || defaultValue > max) {
+                    showToastMessage(`第 ${i + 1} 个变化项的数值范围或默认值不合法`);
+                    return;
+                }
             }
         }
     }
@@ -3164,6 +3637,102 @@ function updateStartInputOption(inputIdx, optIdx, key, value) {
     }
 }
 
+function updateStartInputDefaultOption(inputIdx, value) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    const input = normalizeStartInputConfig(node.config.inputs?.[inputIdx]);
+    if (!input || input.control !== 'select') return;
+    input.defaultOptionValue = value || '';
+    touchAutoSave();
+    renderStartInputOptionsModal();
+}
+
+function handleStartInputOptionImage(inputIdx, optIdx, file) {
+    if (!file) return;
+    if (!file.type || !file.type.startsWith('image/')) {
+        showToastMessage('请选择图片文件');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+        const image = String(reader.result || '');
+        if (!getStartOptionImageDataUrl({ image })) {
+            showToastMessage('图片读取失败，请重新选择');
+            return;
+        }
+        updateStartInputOption(inputIdx, optIdx, 'image', image);
+        if (document.getElementById('start-options-modal')?.classList.contains('open')) {
+            renderStartInputOptionsModal();
+        }
+    };
+    reader.onerror = () => showToastMessage('图片读取失败，请重新选择');
+    reader.readAsDataURL(file);
+}
+
+function removeStartInputOptionImage(inputIdx, optIdx) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    const input = normalizeStartInputConfig(node.config.inputs?.[inputIdx]);
+    if (!input?.options?.[optIdx]) return;
+    delete input.options[optIdx].image;
+    touchAutoSave();
+    renderStartInputOptionsModal();
+}
+
+function readOptionMediaFile(inputIdx, optIdx, field, file, validators, toastPrefix) {
+    if (!file) return;
+    const type = String(file.type || '').toLowerCase();
+    if (!validators.some(v => type.startsWith(v))) {
+        showToastMessage(`请选择${toastPrefix}文件`);
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+        const data = String(reader.result || '');
+        if (!getStartOptionAudioDataUrl({ [field]: data }) && !getStartOptionVideoDataUrl({ [field]: data })) {
+            showToastMessage(`${toastPrefix}读取失败，请重新选择`);
+            return;
+        }
+        const node = nodes.find(n => n.id === activeNodeId);
+        const input = node ? normalizeStartInputConfig(node.config.inputs?.[inputIdx]) : null;
+        if (!input?.options?.[optIdx]) return;
+        // audio 与 video 互斥：填一个，清空另一个
+        if (field === 'audio') delete input.options[optIdx].video;
+        if (field === 'video') delete input.options[optIdx].audio;
+        input.options[optIdx][field] = data;
+        touchAutoSave();
+        renderStartInputOptionsModal();
+    };
+    reader.onerror = () => showToastMessage(`${toastPrefix}读取失败，请重新选择`);
+    reader.readAsDataURL(file);
+}
+
+function handleStartInputOptionAudio(inputIdx, optIdx, file) {
+    readOptionMediaFile(inputIdx, optIdx, 'audio', file, ['audio/'], '音频');
+}
+
+function handleStartInputOptionVideo(inputIdx, optIdx, file) {
+    readOptionMediaFile(inputIdx, optIdx, 'video', file, ['video/'], '视频');
+}
+
+function removeStartInputOptionAudio(inputIdx, optIdx) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    const input = node ? normalizeStartInputConfig(node.config.inputs?.[inputIdx]) : null;
+    if (!input?.options?.[optIdx]) return;
+    delete input.options[optIdx].audio;
+    touchAutoSave();
+    renderStartInputOptionsModal();
+}
+
+function removeStartInputOptionVideo(inputIdx, optIdx) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    const input = node ? normalizeStartInputConfig(node.config.inputs?.[inputIdx]) : null;
+    if (!input?.options?.[optIdx]) return;
+    delete input.options[optIdx].video;
+    touchAutoSave();
+    renderStartInputOptionsModal();
+}
+
 function removeStartInputOption(inputIdx, optIdx) {
     const node = nodes.find(n => n.id === activeNodeId);
     if (!node || node.processorType !== 'system.start') return;
@@ -3184,9 +3753,12 @@ function addStartInputOption(inputIdx) {
     if (!node || node.processorType !== 'system.start') return;
     if (!node.config.inputs || !node.config.inputs[inputIdx]) return;
     const input = normalizeStartInputConfig(node.config.inputs[inputIdx]);
-    if (input && (!input.options || input.options.length < 20)) {
+    const maxOptions = isOptionGroupInput(input.type) ? 9 : 20;
+    if (input && (!input.options || input.options.length < maxOptions)) {
         if (!input.options) input.options = [];
-        input.options.push({ name: '', value: '', desc: '' });
+        input.options.push(isOptionGroupInput(input.type)
+            ? { name: '', value: '', desc: '', min: 0, max: 100, step: 1, defaultValue: 0, unit: '' }
+            : { name: '', value: '', desc: '', image: '', audio: '', video: '', text: '' });
         touchAutoSave();
         openConfig(activeNodeId);
         if (document.getElementById('start-options-modal')?.classList.contains('open')) {
@@ -3210,6 +3782,9 @@ function updateStartInput(index, key, value) {
             if (input.control === 'select' && (!input.options || input.options.length === 0)) {
                 input.options = [{ name: '', value: '', desc: '' }];
             }
+            if (input.control !== 'select') {
+                delete input.defaultOptionValue;
+            }
         }
     } else if (key === 'type') {
         input.type = value === 'select' ? 'text' : value;
@@ -3218,7 +3793,21 @@ function updateStartInput(index, key, value) {
         } else {
             delete input.maxUploadCount;
         }
-        if (!isSelectControlConfigurableInput(input.type)) {
+        if (isOptionGroupInput(input.type)) {
+            delete input.control;
+            input.options = Array.isArray(input.options) && input.options.length
+                ? input.options
+                : [{ name: '', value: '', desc: '', min: 0, max: 100, step: 1, defaultValue: 0, unit: '' }];
+        } else if (input.type === 'sticker') {
+            delete input.control;
+            delete input.options;
+            input.maxStickerCount = normalizeStickerMaxCount(input.maxStickerCount);
+            input.ratioSource = input.ratioSource || 'fixed';
+            input.fixedRatio = input.fixedRatio || '9:16';
+            input.ratioWidth = input.ratioWidth ?? 16;
+            input.ratioHeight = input.ratioHeight ?? 9;
+            input.ratioRefKey = input.ratioRefKey || '';
+        } else if (!isSelectControlConfigurableInput(input.type)) {
             delete input.control;
             delete input.options;
         } else {
@@ -3229,6 +3818,36 @@ function updateStartInput(index, key, value) {
     }
     touchAutoSave();
     if (key === 'type' || key === 'control') openConfig(activeNodeId);
+    renderBoard();
+}
+
+function updateStickerInputConfig(index, key, value) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    const input = node.config.inputs?.[index];
+    if (!input || input.type !== 'sticker') return;
+    if (key === 'maxStickerCount') input.maxStickerCount = normalizeStickerMaxCount(value);
+    else if (key === 'ratioSource') {
+        input.ratioSource = STICKER_RATIO_SOURCES.some(option => option.value === value) ? value : 'fixed';
+        if (input.ratioSource !== 'fixed') input.ratioRefKey = '';
+    } else if (key === 'fixedRatio') {
+        input.fixedRatio = STICKER_FIXED_RATIOS.some(option => option.value === value) ? value : '9:16';
+    } else if (key === 'ratioWidth' || key === 'ratioHeight') {
+        input[key] = value;
+    } else if (key === 'ratioRefKey') {
+        input.ratioRefKey = value || '';
+    }
+    touchAutoSave();
+    openConfig(activeNodeId);
+    renderBoard();
+}
+
+function updateStartRunMode(value) {
+    const node = nodes.find(n => n.id === activeNodeId);
+    if (!node || node.processorType !== 'system.start') return;
+    node.config.runMode = value === 'one_to_many' ? 'one_to_many' : 'one_to_one';
+    touchAutoSave();
+    openConfig(activeNodeId);
     renderBoard();
 }
 
