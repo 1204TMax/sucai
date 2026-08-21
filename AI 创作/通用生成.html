@@ -88,7 +88,7 @@
             transition: border-color 0.15s, color 0.15s, background-color 0.15s;
         }
         .upload-block:hover { border-color: #4A9EFF; color: #4A9EFF; background-color: #f0f7ff; }
-        #uploadInput, #uploadFirst, #uploadLast, #chatMediaInput, #chatFileInput { display: none; }
+        #uploadInput, #uploadFirst, #uploadLast, #uploadVideoInput, #chatMediaInput, #chatFileInput { display: none; }
 
         textarea.prompt {
             flex: 1; min-height: 108px; border: none; outline: none;
@@ -228,6 +228,10 @@
         }
         #optArea[data-type="video"] .opt-dd { min-width: 380px; }
         #optArea[data-type="video"] .dd-chips { flex-wrap: nowrap; }
+        #optArea[data-type="video"] .dd-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; }
+        #optArea[data-type="video"] .dd-grid .dd-chip { justify-content: center; }
+        #optArea[data-type="video"] .dd-grid .dd-chip:first-child { grid-column: span 2; font-weight: 600; }
+        .dd-note { font-size: 12px; color: #999; line-height: 1.6; margin-top: 10px; }
         .opt-dd.show { display: block; }
         .dd-section-title {
             font-size: 10px; color: #aaa; font-weight: 600;
@@ -1621,6 +1625,7 @@
         <input type="file" id="uploadInput" accept="image/*,video/*" multiple onchange="onUpload(event)">
         <input type="file" id="uploadFirst" accept="image/*" onchange="onUploadFrame(event,'frameFirst')">
         <input type="file" id="uploadLast"  accept="image/*" onchange="onUploadFrame(event,'frameLast')">
+        <input type="file" id="uploadVideoInput" accept="video/mp4,video/quicktime" onchange="onUploadSrcVideo(event)">
         <input type="file" id="chatMediaInput" accept="image/*,video/*" multiple onchange="onChatMedia(event)">
         <input type="file" id="chatFileInput" multiple onchange="onChatFile(event)">
         <div class="toolbox-wrap" id="toolboxWrap" onmouseenter="toolboxShow()" onmouseleave="toolboxHide()">
@@ -2127,10 +2132,28 @@ const MODELS = [
 ];
 
 const VIDEO_MODELS = [
+    { id: 'seedance25', name: 'Seedance 2.5', desc: '视频模型 · 支持 4 秒到 30 秒', durations: ['自动','4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒','16秒','17秒','18秒','19秒','20秒','21秒','22秒','23秒','24秒','25秒','26秒','27秒','28秒','29秒','30秒'] },
     { id: 'seedance2', name: 'Seedance 2.0', desc: '视频模型 · 支持 4 秒到 15 秒', durations: ['4秒', '5秒', '6秒', '7秒', '8秒', '9秒', '10秒', '11秒', '12秒', '13秒', '14秒', '15秒'] },
     { id: 'seedance2fast', name: 'Seedance 2.0 Fast', desc: '视频模型 · 支持 4 秒到 15 秒', durations: ['4秒', '5秒', '6秒', '7秒', '8秒', '9秒', '10秒', '11秒', '12秒', '13秒', '14秒', '15秒'] },
     { id: 'seedance15pro', name: 'Seedance 1.5Pro', desc: '视频模型 · 支持 5 秒 / 10 秒 / 12 秒', durations: ['5秒', '10秒', '12秒'] },
 ];
+
+// Seedance 2.5 专属：生成模式扩展为 4 项（编辑 / 延长仅 2.5 支持）
+const VIDEO_MODES_25 = ['智能参考', '首尾帧', '编辑', '延长'];
+const VIDEO_MODES_DEFAULT = ['智能参考', '首尾帧'];
+
+function isSeedance25Single() {
+    return curType === 'video' && sel.video.models.length === 1 && sel.video.models[0] === 'seedance25';
+}
+function isVideoWorkMode() {
+    return curType === 'video' && (sel.video.mode === '编辑' || sel.video.mode === '延长');
+}
+function normalizeVideoMode() {
+    if (curType !== 'video') return false;
+    const vals = isSeedance25Single() ? VIDEO_MODES_25 : VIDEO_MODES_DEFAULT;
+    if (!vals.includes(sel.video.mode)) { sel.video.mode = vals[0]; return true; }
+    return false;
+}
 
 const CHAT_MODELS = [
     { id: 'gemini-31-pro',    name: 'Gemini 3.1 Pro Prview', desc: 'Google · 多模态强，百万级上下文', tags: ['图片', '视频', '音频'] },
@@ -2225,7 +2248,7 @@ let curType = 'image';
 const sel = {
     chat:  { models: ['gemini-31-pro'], modelCounts: {}, count: '1', project: '' },
     image: { models: ['banana2'], modelCounts: {}, modelQuality: {}, ratio: '1:1', res: '2K', sizeW: 2048, sizeH: 2048, count: '1', project: '', ratioTab: '常用', platformSize: null, customRatios: [] },
-    video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '5秒', project: '', frameFirst: null, frameLast: null },
+    video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '5秒', project: '', frameFirst: null, frameLast: null, srcVideo: null, srcVideoName: '' },
 };
 
 const TYPE_ICONS = {
@@ -2489,8 +2512,18 @@ function referenceMediaHtml(ref) {
     return `<img src="${src}" alt="${refAttr(ref.name)}" style="cursor:pointer" onclick="previewImage('${refAttr(ref.url)}')">`;
 }
 
+function isGifReference(ref) {
+    const type = String(ref && ref.type || '').toLowerCase();
+    if (type === 'gif' || type === 'image/gif') return true;
+    return /\.gif(?:$|[?#\s])/i.test([ref && ref.name, ref && ref.fileName, ref && ref.mimeType, ref && ref.url, ref && ref.thumb].filter(Boolean).join(' '));
+}
+
 function appendReferenceItem(ref) {
     ref = normalizeReference(ref);
+    if (curType !== 'chat' && ref.type === 'image' && isGifReference(ref)) {
+        showToast('通用生成暂不支持 GIF，请改用工作流中的贴纸类型');
+        return;
+    }
     if (curType === 'chat') {
         const id = 'ca' + (++_chatAttachId);
         chatAttachments.push({ id, type: 'media', url: ref.url, name: ref.name, isVideo: ref.type === 'video' });
@@ -2556,6 +2589,34 @@ function removeRef(btn) {
 // ── 首尾帧 ──
 function renderKeyframeStrip() {
     const strip = document.getElementById('keyframeStrip');
+    const refStrip = document.getElementById('refStrip');
+
+    // 编辑 / 延长模式：单个「原视频」槽位
+    if (isVideoWorkMode()) {
+        strip.classList.add('show');
+        if (refStrip) refStrip.style.display = 'none';
+        document.getElementById('uploadBlock').style.display = 'none';
+
+        const url = sel.video.srcVideo;
+        const boxHTML = url
+            ? `<div class="keyframe-slot-box">
+                   <div class="keyframe-thumb" onclick="previewImage('${url}')">
+                       <video src="${url}" muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></video>
+                   </div>
+                   <div class="keyframe-del" onclick="removeSrcVideo()">✕</div>
+               </div>`
+            : `<div class="keyframe-add" onclick="document.getElementById('uploadVideoInput').click()">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+               </div>`;
+        const tip = url
+            ? `<span class="keyframe-lbl">${sel.video.srcVideoName || '原视频'}</span>`
+            : `<span class="keyframe-lbl">原视频 · 4~30秒 · mp4 / mov</span>`;
+        strip.innerHTML = `<div class="keyframe-slot">${boxHTML}${tip}</div>`;
+        return;
+    }
+
+    if (refStrip) refStrip.style.display = '';
+
     const isKeyframe = curType === 'video' && sel.video.mode === '首尾帧';
     if (!isKeyframe) {
         strip.classList.remove('show');
@@ -2595,6 +2656,24 @@ function onUploadFrame(e, frameKey) {
     if (sel.video[frameKey]) URL.revokeObjectURL(sel.video[frameKey]);
     sel.video[frameKey] = URL.createObjectURL(f);
     e.target.value = '';
+    renderKeyframeStrip();
+}
+
+// ── 编辑 / 延长：原视频上传 ──
+function onUploadSrcVideo(e) {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (sel.video.srcVideo) URL.revokeObjectURL(sel.video.srcVideo);
+    sel.video.srcVideo = URL.createObjectURL(f);
+    sel.video.srcVideoName = f.name;
+    e.target.value = '';
+    renderKeyframeStrip();
+}
+
+function removeSrcVideo() {
+    if (sel.video.srcVideo) URL.revokeObjectURL(sel.video.srcVideo);
+    sel.video.srcVideo = null;
+    sel.video.srcVideoName = '';
     renderKeyframeStrip();
 }
 
@@ -3607,6 +3686,7 @@ function renderOpts() {
     const area = document.getElementById('optArea');
     area.dataset.type = curType;
     area.innerHTML = '';
+    normalizeVideoMode();
 
     // 动态计算图像模式下选项顺序
     let opts;
@@ -3861,6 +3941,15 @@ function renderOpts() {
             </div>` : ''}`;
 
         } else if (opt.type === 'ratio-dur') {
+            if (isVideoWorkMode()) {
+                // 编辑 / 延长：比例锁定「自动」，时长隐藏
+                pillVal = ratioPillIconHtml(11, 7) + '自动';
+                ddInner = `<div class="dd-section">
+                    <div class="dd-section-title">比例</div>
+                    <div class="dd-chips"><span class="dd-chip active">自动</span></div>
+                    <div class="dd-note">${sel.video.mode}模式沿用原视频的画幅与时长，比例与时长无需设置。</div>
+                </div>`;
+            } else {
             const ratio = sel[curType].ratio || '16:9';
             const ratioTab = sel[curType].ratioTab || '常用';
             const ps = sel[curType].platformSize;
@@ -3929,13 +4018,14 @@ function renderOpts() {
             </div>
             ${sel[curType].models.length === 1 ? `<div class="dd-section">
                 <div class="dd-section-title">时长</div>
-                <div class="dd-chips">
+                <div class="${isSeedance25Single() ? 'dd-grid' : 'dd-chips'}">
                     ${(VIDEO_MODELS.find(x => x.id === sel[curType].models[0])?.durations || [dur]).map(v =>
                         `<span class="dd-chip${v===dur?' active':''}"
                                onclick="pickDur(event,'${v}')">${v}</span>`
                     ).join('')}
                 </div>
             </div>` : ''}`;
+            }
 
         } else if (opt.type === 'ratio') {
             const val = sel[curType][opt.key] || opt.def;
@@ -3958,12 +4048,17 @@ function renderOpts() {
             </div>`;
 
         } else if (opt.type === 'chips') {
-            const val = sel[curType][opt.key] || opt.def;
+            let values = opt.values;
+            if (curType === 'video' && opt.key === 'mode') {
+                values = isSeedance25Single() ? VIDEO_MODES_25 : VIDEO_MODES_DEFAULT;
+            }
+            let val = sel[curType][opt.key] || opt.def;
+            if (!values.includes(val)) val = values[0];
             pillVal = val;
             ddInner = `<div class="dd-section">
                 <div class="dd-section-title">${opt.label}</div>
                 <div class="dd-chips">
-                    ${opt.values.map(v =>
+                    ${values.map(v =>
                         `<span class="dd-chip${v===val?' active':''}"
                                onclick="pickOpt(event,'${opt.key}','${v}')">${v}</span>`
                     ).join('')}
@@ -4135,7 +4230,14 @@ function pickOpt(e, key, val) {
     sel[curType][key] = val;
     closeAll();
     renderOpts();
-    if (curType === 'video' && key === 'mode') renderKeyframeStrip();
+    if (curType === 'video' && key === 'mode') {
+        renderKeyframeStrip();
+        const ph = {
+            '编辑': '描述要修改的内容，如：把背景换成夜晚的赛博城市',
+            '延长': '描述延长后的内容走向，如：镜头缓缓拉远，展现城市全景'
+        };
+        setPromptPlaceholder(ph[val] || '尝试描述您想要创建的视频');
+    }
 }
 
 function getModelList(type = curType) {
@@ -4202,6 +4304,12 @@ function toggleModel(e, modelId) {
         } else {
             ensureModelState(curType, modelId);
         }
+    }
+    // 离开 Seedance 2.5 单选时，编辑 / 延长回退为智能参考
+    if (curType === 'video' && isVideoWorkMode() && !isSeedance25Single()) {
+        sel.video.mode = '智能参考';
+        setPromptPlaceholder('尝试描述您想要创建的视频');
+        renderKeyframeStrip();
     }
     reopenModelPanel();
 }
