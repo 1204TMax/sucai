@@ -9,6 +9,7 @@
  * 结构说明：
  *   - id：模块唯一标识（英文，不要改）
  *   - name：顶部一级菜单显示的名称
+ *   - label：侧边栏顶部模块标题（可选，如"创作中心"）
  *   - children：二级菜单列表，支持两种写法：
  *       a) 平铺数组（兼容旧版）：直接放菜单项对象
  *       b) 分组数组（推荐）：每个分组包含 title 和 items
@@ -24,6 +25,7 @@ const MENU_CONFIG = [
   {
     id: 'ai',
     name: 'AI创作',
+    label: '创作中心',
     children: [
       {
         items: [
@@ -90,9 +92,9 @@ const MENU_CONFIG = [
   {
     id: 'settings',
     name: '系统设置',
+    label: '系统设置',
     children: [
       {
-        title: '系统设置',
         items: [
           {
             name: '模型配置',

@@ -297,8 +297,13 @@
             margin-bottom: 4px;
         }
 
-        .menu-group:first-child .submenu-section {
-            margin-top: 8px;
+        .sidebar-module-label {
+            padding: 16px 20px 8px;
+            color: rgba(0, 0, 0, 0.88);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 22px;
+            user-select: none;
         }
 
         .menu-group-title {
@@ -742,6 +747,14 @@
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'sidebar-content' + (moduleIndex === 0 ? ' active' : '');
                 contentDiv.dataset.for = module.id;
+
+                // 模块标题（侧边栏顶部，如"创作中心"）
+                if (module.label) {
+                    const label = document.createElement('div');
+                    label.className = 'sidebar-module-label';
+                    label.textContent = module.label;
+                    contentDiv.appendChild(label);
+                }
 
                 if (isGroupedChildren(module.children)) {
                     // 分组结构
