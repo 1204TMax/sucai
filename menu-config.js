@@ -26,7 +26,6 @@ const MENU_CONFIG = [
     name: 'AI创作',
     children: [
       {
-        title: '创作中心',
         items: [
           {
             name: '通用生成',

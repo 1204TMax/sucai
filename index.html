@@ -297,6 +297,10 @@
             margin-bottom: 4px;
         }
 
+        .menu-group:first-child .submenu-section {
+            margin-top: 8px;
+        }
+
         .menu-group-title {
             padding: 16px 20px 8px;
             color: rgba(0, 0, 0, 0.45);
@@ -745,27 +749,29 @@
                         const groupEl = document.createElement('div');
                         groupEl.className = 'menu-group';
 
-                        const title = document.createElement('div');
-                        title.className = 'menu-group-title';
+                        if (group.title) {
+                            const title = document.createElement('div');
+                            title.className = 'menu-group-title';
 
-                        const titleText = document.createElement('span');
-                        titleText.textContent = group.title || '';
-                        title.appendChild(titleText);
+                            const titleText = document.createElement('span');
+                            titleText.textContent = group.title;
+                            title.appendChild(titleText);
 
-                        title.addEventListener('click', () => {
-                            groupEl.classList.toggle('collapsed');
-                        });
+                            title.addEventListener('click', () => {
+                                groupEl.classList.toggle('collapsed');
+                            });
 
-                        const collapseBtn = document.createElement('span');
-                        collapseBtn.className = 'menu-group-collapse';
-                        collapseBtn.title = '收起/展开';
-                        collapseBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
-                        collapseBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                        });
-                        title.appendChild(collapseBtn);
+                            const collapseBtn = document.createElement('span');
+                            collapseBtn.className = 'menu-group-collapse';
+                            collapseBtn.title = '收起/展开';
+                            collapseBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+                            collapseBtn.addEventListener('click', (e) => {
+                                e.stopPropagation();
+                            });
+                            title.appendChild(collapseBtn);
 
-                        groupEl.appendChild(title);
+                            groupEl.appendChild(title);
+                        }
 
                         const section = document.createElement('div');
                         section.className = 'submenu-section';
