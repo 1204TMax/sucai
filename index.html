@@ -293,26 +293,95 @@
             margin-bottom: 4px;
         }
 
+        .menu-group {
+            margin-bottom: 4px;
+        }
+
+        .menu-group-title {
+            padding: 16px 20px 8px;
+            color: rgba(0, 0, 0, 0.45);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 18px;
+            letter-spacing: 0.5px;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: padding 0.2s;
+        }
+
+        .menu-group-title:hover {
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        .menu-group-collapse {
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s, background 0.2s, transform 0.2s;
+            color: rgba(0, 0, 0, 0.45);
+        }
+
+        .menu-group-title:hover .menu-group-collapse {
+            opacity: 1;
+        }
+
+        .menu-group-collapse:hover {
+            background: #f0f0f0;
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        .menu-group-collapse svg {
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s;
+        }
+
+        .menu-group.collapsed .menu-group-collapse svg {
+            transform: rotate(-90deg);
+        }
+
+        .menu-group.collapsed {
+            margin-bottom: -4px;
+        }
+
+        .menu-group.collapsed .menu-group-title {
+            padding-bottom: 12px;
+        }
+
+        .menu-group.collapsed .submenu-section {
+            display: none;
+        }
+
         .submenu-item {
-            padding: 10px 20px;
-            color: #666;
+            padding: 9px 12px;
+            margin: 0 8px;
+            border-radius: 6px;
+            color: rgba(0, 0, 0, 0.65);
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .submenu-item:hover {
-            color: #4a9eff;
+            color: #1677ff;
             background: #f5f7fa;
         }
 
         .submenu-item.active {
-            color: #4a9eff;
-            background: #e6f7ff;
+            color: #1677ff;
+            background: #e6f4ff;
+            font-weight: 500;
         }
 
         .menu-item-label {
@@ -329,9 +398,9 @@
             display: inline-flex;
             align-items: center;
             gap: 2px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 500;
-            color: #999;
+            color: #fa8c16;
         }
 
         .menu-badge img {
@@ -343,7 +412,7 @@
         .submenu-item svg {
             width: 16px;
             height: 16px;
-            color: #999;
+            color: currentColor;
             flex-shrink: 0;
         }
 
@@ -616,6 +685,48 @@
             if (banner) banner.classList.add('hidden');
         }
 
+        // 判断 children 是否为分组结构
+        function isGroupedChildren(children) {
+            return Array.isArray(children) && children.length > 0 && children[0].items !== undefined;
+        }
+
+        // 判断是否为默认激活的第一个菜单项
+        function isFirstActiveItem(module, group, childIndex) {
+            if (isGroupedChildren(module.children)) {
+                return module.children[0] === group && childIndex === 0;
+            }
+            return childIndex === 0;
+        }
+
+        // 创建单个菜单项 DOM
+        function createMenuItem(child, isActive) {
+            const item = document.createElement('div');
+            item.className = 'submenu-item' + (isActive ? ' active' : '');
+            item.dataset.page = child.page;
+            if (child.isExternal) {
+                item.dataset.isExternal = "true";
+            }
+
+            let badgeHtml = '';
+            if (child.badge) {
+                if (child.badge.text !== undefined) {
+                    badgeHtml = `<span class="menu-badges"><span class="menu-badge">${child.badge.text}</span></span>`;
+                } else {
+                    badgeHtml = `<span class="menu-badges">`
+                        + (child.badge.generating !== undefined ? `<span class="menu-badge generating"><img src="icon/生成中 2.svg">${child.badge.generating}</span>` : '')
+                        + (child.badge.unviewed !== undefined ? `<span class="menu-badge unviewed"><img src="icon/已完成 2.svg">${child.badge.unviewed}</span>` : '')
+                        + `</span>`;
+                }
+            }
+
+            item.innerHTML = (child.icon ? svgIcon(child.icon) : '')
+                + `<span class="menu-item-label">${child.name}</span>`
+                + badgeHtml;
+
+            item.addEventListener('click', () => onSubmenuClick(item));
+            return item;
+        }
+
         function renderSidebar() {
             const sidebar = document.getElementById('sidebar');
 
@@ -628,39 +739,64 @@
                 contentDiv.className = 'sidebar-content' + (moduleIndex === 0 ? ' active' : '');
                 contentDiv.dataset.for = module.id;
 
-                const section = document.createElement('div');
-                section.className = 'submenu-section';
+                if (isGroupedChildren(module.children)) {
+                    // 分组结构
+                    module.children.forEach(group => {
+                        const groupEl = document.createElement('div');
+                        groupEl.className = 'menu-group';
 
-                module.children.forEach((child, childIndex) => {
-                    if (child.type === 'divider') {
-                        const divider = document.createElement('div');
-                        divider.className = 'menu-divider';
-                        section.appendChild(divider);
-                        return;
-                    }
+                        const title = document.createElement('div');
+                        title.className = 'menu-group-title';
 
-                    const item = document.createElement('div');
-                    item.className = 'submenu-item' + (moduleIndex === 0 && childIndex === 0 ? ' active' : '');
-                    item.dataset.page = child.page;
-                    if (child.isExternal) {
-                        item.dataset.isExternal = "true";
-                    }
+                        const titleText = document.createElement('span');
+                        titleText.textContent = group.title || '';
+                        title.appendChild(titleText);
 
-                    if (child.badge) {                        item.innerHTML = (child.icon ? svgIcon(child.icon) : '')
-                            + `<span class="menu-item-label">${child.name}</span>`
-                            + `<span class="menu-badges">`
-                            + `<span class="menu-badge generating"><img src="icon/生成中 2.svg">${child.badge.generating}</span>`
-                            + `<span class="menu-badge unviewed"><img src="icon/已完成 2.svg">${child.badge.unviewed}</span>`
-                            + `</span>`;
-                    } else {
-                        item.innerHTML = (child.icon ? svgIcon(child.icon) : '') + child.name;
-                    }
+                        title.addEventListener('click', () => {
+                            groupEl.classList.toggle('collapsed');
+                        });
 
-                    item.addEventListener('click', () => onSubmenuClick(item));
-                    section.appendChild(item);
-                });
+                        const collapseBtn = document.createElement('span');
+                        collapseBtn.className = 'menu-group-collapse';
+                        collapseBtn.title = '收起/展开';
+                        collapseBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>`;
+                        collapseBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                        });
+                        title.appendChild(collapseBtn);
 
-                contentDiv.appendChild(section);
+                        groupEl.appendChild(title);
+
+                        const section = document.createElement('div');
+                        section.className = 'submenu-section';
+
+                        group.items.forEach((child, childIndex) => {
+                            const isActive = moduleIndex === 0 && isFirstActiveItem(module, group, childIndex);
+                            section.appendChild(createMenuItem(child, isActive));
+                        });
+
+                        groupEl.appendChild(section);
+                        contentDiv.appendChild(groupEl);
+                    });
+                } else {
+                    // 兼容旧版平铺结构
+                    const section = document.createElement('div');
+                    section.className = 'submenu-section';
+
+                    module.children.forEach((child, childIndex) => {
+                        if (child.type === 'divider') {
+                            const divider = document.createElement('div');
+                            divider.className = 'menu-divider';
+                            section.appendChild(divider);
+                            return;
+                        }
+
+                        const isActive = moduleIndex === 0 && childIndex === 0;
+                        section.appendChild(createMenuItem(child, isActive));
+                    });
+
+                    contentDiv.appendChild(section);
+                }
 
                 // 渲染快捷入口（如首页的"常用功能"）
                 if (module.shortcuts) {
@@ -747,7 +883,8 @@
             if (firstItem) {
                 document.querySelectorAll('.submenu-item, .shortcut-item').forEach(i => i.classList.remove('active'));
                 firstItem.classList.add('active');
-                loadPage(firstItem.textContent.trim(), firstItem.dataset.page);
+                const label = firstItem.querySelector('.menu-item-label');
+                loadPage(label ? label.textContent.trim() : firstItem.textContent.trim(), firstItem.dataset.page);
             }
 
             currentModule = moduleId;
