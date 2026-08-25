@@ -103,6 +103,7 @@
         /* ── 参考图缩略图条 ── */
         .ref-strip {
             display: flex; flex-wrap: wrap; gap: 8px;
+            align-items: flex-start;
             padding: 10px 18px 12px;
             border-top: 1px solid rgba(0,0,0,0.06);
         }
@@ -118,6 +119,10 @@
             transition: border-color 0.15s, color 0.15s, background-color 0.15s;
         }
         .ref-add:hover { border-color: #4A9EFF; color: #4A9EFF; background-color: #f0f7ff; }
+        .ref-divider {
+            width: 1px; height: 60px; flex-shrink: 0;
+            background: rgba(0,0,0,0.08); margin: 0 4px;
+        }
 
         .ref-item {
             position: relative; width: 60px; height: 60px;
@@ -231,6 +236,28 @@
         #optArea[data-type="video"] .dd-grid { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 5px; }
         #optArea[data-type="video"] .dd-grid .dd-chip { justify-content: center; }
         #optArea[data-type="video"] .dd-grid .dd-chip:first-child { grid-column: span 2; font-weight: 600; }
+        /* 时长：滑竿 + 手动输入 */
+        .dur-row { display: flex; align-items: center; gap: 12px; }
+        .dur-slider-wrap { flex: 1; padding: 2px 2px 0; }
+        .dur-slider-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+        .dur-slider-val { font-size: 15px; font-weight: 700; color: #111; }
+        .dur-slider-val small { font-size: 11px; font-weight: 500; color: #999; margin-left: 2px; }
+        .dur-slider-scale { display: flex; justify-content: space-between; font-size: 10px; color: #bbb; margin-top: 6px; }
+        input.dur-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; border-radius: 2px; background: #e4e4e7; outline: none; display: block; }
+        input.dur-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #111; border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer; }
+        input.dur-slider::-moz-range-thumb { width: 12px; height: 12px; border-radius: 50%; background: #111; border: 3px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer; }
+        .dur-input-box { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid #e4e4e7; border-radius: 8px; background: #fff; flex: none; min-width: 78px; }
+        .dur-input-box input { width: 36px; border: none; outline: none; font-size: 15px; font-weight: 700; color: #111; text-align: right; -moz-appearance: textfield; }
+        .dur-input-box input::-webkit-outer-spin-button,
+        .dur-input-box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .dur-input-box span { font-size: 12px; color: #999; }
+        .dur-auto-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #666; background: #f4f4f5; padding: 6px 10px; border-radius: 6px; }
+        .dur-auto-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #111; }
+        .dur-tip {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ccc;
+            color: #999; font-size: 11px; line-height: 1; cursor: help; margin-left: 4px;
+        }
         .dd-note { font-size: 12px; color: #999; line-height: 1.6; margin-top: 10px; }
         .opt-dd.show { display: block; }
         .dd-section-title {
@@ -2132,21 +2159,21 @@ const MODELS = [
 ];
 
 const VIDEO_MODELS = [
-    { id: 'seedance25', name: 'Seedance 2.5', desc: '视频模型 · 支持 4 秒到 30 秒', durations: ['自动','4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒','16秒','17秒','18秒','19秒','20秒','21秒','22秒','23秒','24秒','25秒','26秒','27秒','28秒','29秒','30秒'] },
+    { id: 'seedance25', name: 'Seedance 2.5', desc: '视频模型 · 支持 4 秒到 30 秒', durations: ['4秒','5秒','6秒','7秒','8秒','9秒','10秒','11秒','12秒','13秒','14秒','15秒','16秒','17秒','18秒','19秒','20秒','21秒','22秒','23秒','24秒','25秒','26秒','27秒','28秒','29秒','30秒'], defaultDuration: '10秒' },
     { id: 'seedance2', name: 'Seedance 2.0', desc: '视频模型 · 支持 4 秒到 15 秒', durations: ['4秒', '5秒', '6秒', '7秒', '8秒', '9秒', '10秒', '11秒', '12秒', '13秒', '14秒', '15秒'] },
     { id: 'seedance2fast', name: 'Seedance 2.0 Fast', desc: '视频模型 · 支持 4 秒到 15 秒', durations: ['4秒', '5秒', '6秒', '7秒', '8秒', '9秒', '10秒', '11秒', '12秒', '13秒', '14秒', '15秒'] },
     { id: 'seedance15pro', name: 'Seedance 1.5Pro', desc: '视频模型 · 支持 5 秒 / 10 秒 / 12 秒', durations: ['5秒', '10秒', '12秒'] },
 ];
 
 // Seedance 2.5 专属：生成模式扩展为 4 项（编辑 / 延长仅 2.5 支持）
-const VIDEO_MODES_25 = ['智能参考', '首尾帧', '编辑', '延长'];
+const VIDEO_MODES_25 = ['智能参考', '首尾帧', '视频编辑', '视频延长'];
 const VIDEO_MODES_DEFAULT = ['智能参考', '首尾帧'];
 
 function isSeedance25Single() {
     return curType === 'video' && sel.video.models.length === 1 && sel.video.models[0] === 'seedance25';
 }
 function isVideoWorkMode() {
-    return curType === 'video' && (sel.video.mode === '编辑' || sel.video.mode === '延长');
+    return curType === 'video' && (sel.video.mode === '视频编辑' || sel.video.mode === '视频延长');
 }
 function normalizeVideoMode() {
     if (curType !== 'video') return false;
@@ -2248,7 +2275,7 @@ let curType = 'image';
 const sel = {
     chat:  { models: ['gemini-31-pro'], modelCounts: {}, count: '1', project: '' },
     image: { models: ['banana2'], modelCounts: {}, modelQuality: {}, ratio: '1:1', res: '2K', sizeW: 2048, sizeH: 2048, count: '1', project: '', ratioTab: '常用', platformSize: null, customRatios: [] },
-    video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '5秒', project: '', frameFirst: null, frameLast: null, srcVideo: null, srcVideoName: '' },
+    video: { models: ['seedance2'], modelCounts: {}, modelDuration: {}, count: '1', mode: '智能参考', ratio: '16:9', ratioTab: '常用', platformSize: null, dur: '10秒', durCustom: 10, project: '', frameFirst: null, frameLast: null, srcVideo: null, srcVideoName: '' },
 };
 
 const TYPE_ICONS = {
@@ -2488,19 +2515,28 @@ function normalizeReference(input) {
     };
 }
 
+function createRefAddButton(label, tooltip) {
+    const wrap = document.createElement('div');
+    wrap.className = 'keyframe-slot ref-add-slot';
+    wrap.innerHTML = `<div class="ref-add" id="refAddBtn" title="${refAttr(tooltip || '')}" onclick="showUploadMenu(event,this)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>${label ? `<span class="keyframe-lbl">${refAttr(label)}</span>` : ''}`;
+    return wrap;
+}
+
 function ensureRefAddButton() {
     const strip = document.getElementById('refStrip');
     if (document.getElementById('refAddBtn')) return;
     document.getElementById('uploadBlock').style.display = 'none';
-    const addBtn = document.createElement('div');
-    addBtn.className = 'ref-add';
-    addBtn.id = 'refAddBtn';
-    addBtn.onclick = function(ev) { showUploadMenu(ev, this); };
-    addBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2" stroke-linecap="round">
-        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-    </svg>`;
-    strip.insertBefore(addBtn, strip.firstChild);
+    // 只有视频编辑需要带「参考内容」label 和 tooltip；视频延长 / 智能参考保持默认样式
+    const isEdit = sel.video.mode === '视频编辑';
+    const label = isEdit ? '参考内容' : '';
+    const tooltip = isEdit ? '上传参考内容' : '';
+    const addBtn = createRefAddButton(label, tooltip);
+    // 视频编辑下「+」放在最后，其他模式放在最前（与智能参考一致）
+    if (isEdit) {
+        strip.appendChild(addBtn);
+    } else {
+        strip.insertBefore(addBtn, strip.firstChild);
+    }
     syncToolboxParseState();
 }
 
@@ -2575,11 +2611,16 @@ function addRefFromAsset(asset) {
 
 function removeRef(btn) {
     btn.parentElement.remove();
-    // 所有缩略图都删完了：移除小添加按钮，恢复左侧大按钮
+    // 所有缩略图都删完了
     const strip = document.getElementById('refStrip');
     if (!strip.querySelector('.ref-item')) {
-        document.getElementById('refAddBtn')?.remove();
-        document.getElementById('uploadBlock').style.display = '';
+        if (isVideoWorkMode()) {
+            // 编辑 / 延长模式保留小添加按钮，方便继续添加参考素材
+            if (!document.getElementById('refAddBtn')) ensureRefAddButton();
+        } else {
+            document.getElementById('refAddBtn')?.remove();
+            document.getElementById('uploadBlock').style.display = '';
+        }
         syncToolboxParseState();
     } else {
         syncToolboxParseState();
@@ -2591,27 +2632,50 @@ function renderKeyframeStrip() {
     const strip = document.getElementById('keyframeStrip');
     const refStrip = document.getElementById('refStrip');
 
-    // 编辑 / 延长模式：单个「原视频」槽位
-    if (isVideoWorkMode()) {
-        strip.classList.add('show');
-        if (refStrip) refStrip.style.display = 'none';
-        document.getElementById('uploadBlock').style.display = 'none';
+    // 切出视频编辑时清理原视频卡占位和分隔线
+    refStrip?.querySelectorAll('.src-video-slot, .ref-divider').forEach(el => el.remove());
 
-        const url = sel.video.srcVideo;
-        const boxHTML = url
-            ? `<div class="keyframe-slot-box">
-                   <div class="keyframe-thumb" onclick="previewImage('${url}')">
-                       <video src="${url}" muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></video>
-                   </div>
-                   <div class="keyframe-del" onclick="removeSrcVideo()">✕</div>
-               </div>`
-            : `<div class="keyframe-add" onclick="document.getElementById('uploadVideoInput').click()">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-               </div>`;
-        const tip = url
-            ? `<span class="keyframe-lbl">${sel.video.srcVideoName || '原视频'}</span>`
-            : `<span class="keyframe-lbl">原视频 · 4~30秒 · mp4 / mov</span>`;
-        strip.innerHTML = `<div class="keyframe-slot">${boxHTML}${tip}</div>`;
+    // 视频编辑模式：原视频槽位 + 参考素材添加，合并到同一行
+    if (sel.video.mode === '视频编辑') {
+        strip.classList.remove('show');
+        if (refStrip) {
+            refStrip.style.display = '';
+
+            // 保留已有参考素材（避免重建丢失 DOM）
+            const existingItems = Array.from(refStrip.querySelectorAll('.ref-item'));
+            refStrip.innerHTML = '';
+
+            const url = sel.video.srcVideo;
+            const srcSlot = document.createElement('div');
+            srcSlot.className = 'keyframe-slot src-video-slot';
+            const boxHTML = url
+                ? `<div class="keyframe-slot-box">
+                       <div class="keyframe-thumb" onclick="previewImage('${url}')">
+                           <video src="${url}" muted playsinline style="width:100%;height:100%;object-fit:cover;border-radius:8px;"></video>
+                       </div>
+                       <div class="keyframe-del" onclick="removeSrcVideo()">✕</div>
+                   </div>`
+                : `<div class="keyframe-add" title="上传要编辑的视频" onclick="document.getElementById('uploadVideoInput').click()">
+                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                   </div>`;
+            const tip = url
+                ? `<span class="keyframe-lbl">${sel.video.srcVideoName || '待编辑视频'}</span>`
+                : `<span class="keyframe-lbl">待编辑视频</span>`;
+            srcSlot.innerHTML = boxHTML + tip;
+            refStrip.appendChild(srcSlot);
+
+            // 分隔线：区分「待编辑视频」与「参考内容」
+            const divider = document.createElement('div');
+            divider.className = 'ref-divider';
+            refStrip.appendChild(divider);
+
+            // 参考内容添加按钮
+            refStrip.appendChild(createRefAddButton('参考内容', '上传参考内容'));
+
+            // 追加已有参考素材
+            existingItems.forEach(item => refStrip.appendChild(item));
+        }
+        document.getElementById('uploadBlock').style.display = 'none';
         return;
     }
 
@@ -2620,9 +2684,17 @@ function renderKeyframeStrip() {
     const isKeyframe = curType === 'video' && sel.video.mode === '首尾帧';
     if (!isKeyframe) {
         strip.classList.remove('show');
-        // 恢复上传块（如果没有普通参考图则显示）
-        if (!document.getElementById('refAddBtn')) {
+        const refAddBtn = document.getElementById('refAddBtn');
+        if (!refAddBtn) {
             document.getElementById('uploadBlock').style.display = '';
+        } else if (!document.querySelector('#refStrip .ref-item')) {
+            // 从编辑/延长切回且无参考素材时，移除小添加按钮、恢复大上传按钮
+            refAddBtn.remove();
+            document.getElementById('uploadBlock').style.display = '';
+        } else {
+            // 普通模式下「+」回到最前面，并去掉编辑/延长专属 label
+            refAddBtn.parentElement.remove();
+            refStrip.insertBefore(createRefAddButton('', ''), refStrip.firstChild);
         }
         return;
     }
@@ -4018,12 +4090,12 @@ function renderOpts() {
             </div>
             ${sel[curType].models.length === 1 ? `<div class="dd-section">
                 <div class="dd-section-title">时长</div>
-                <div class="${isSeedance25Single() ? 'dd-grid' : 'dd-chips'}">
+                ${isSeedance25Single() ? durSliderHtml() : `<div class="dd-chips">
                     ${(VIDEO_MODELS.find(x => x.id === sel[curType].models[0])?.durations || [dur]).map(v =>
                         `<span class="dd-chip${v===dur?' active':''}"
                                onclick="pickDur(event,'${v}')">${v}</span>`
                     ).join('')}
-                </div>
+                </div>`}
             </div>` : ''}`;
             }
 
@@ -4233,8 +4305,8 @@ function pickOpt(e, key, val) {
     if (curType === 'video' && key === 'mode') {
         renderKeyframeStrip();
         const ph = {
-            '编辑': '描述要修改的内容，如：把背景换成夜晚的赛博城市',
-            '延长': '描述延长后的内容走向，如：镜头缓缓拉远，展现城市全景'
+            '视频编辑': '描述要修改的内容，如：把背景换成夜晚的赛博城市',
+            '视频延长': '描述延长后的内容走向，如：镜头缓缓拉远，展现城市全景'
         };
         setPromptPlaceholder(ph[val] || '尝试描述您想要创建的视频');
     }
@@ -4251,7 +4323,10 @@ function getModelMeta(type, modelId) {
 function getDefaultModelParam(type, modelId) {
     const meta = getModelMeta(type, modelId);
     if (!meta) return type === 'video' ? '5秒' : '2K';
-    return type === 'video' ? (meta.durations?.[0] || '5秒') : (meta.qualities?.[0] || '2K');
+    if (type === 'video') {
+        return meta.defaultDuration || meta.durations?.[0] || '5秒';
+    }
+    return meta.qualities?.[0] || '2K';
 }
 
 function syncSingleModelState(type = curType, modelId) {
@@ -4278,7 +4353,8 @@ function ensureModelState(type, modelId) {
         if (!state.modelQuality[modelId]) state.modelQuality[modelId] = fallback;
     } else if (type === 'video') {
         const meta = getModelMeta(type, modelId);
-        const fallback = meta?.durations?.includes(state.dur) ? state.dur : getDefaultModelParam(type, modelId);
+        const fallback = modelId === 'seedance25' ? getDefaultModelParam(type, modelId)
+            : (meta?.durations?.includes(state.dur) ? state.dur : getDefaultModelParam(type, modelId));
         if (!state.modelDuration[modelId]) state.modelDuration[modelId] = fallback;
     }
 }
@@ -4353,9 +4429,100 @@ const _projectOpen = new Set();
 function pickDur(e, val) {
     e.stopPropagation();
     sel[curType].dur = val;
+    if (curType === 'video') {
+        const n = parseInt(val, 10);
+        if (n) sel.video.durCustom = n;
+    }
     if (sel[curType].models.length === 1) {
         const mid = sel[curType].models[0];
         sel[curType].modelDuration[mid] = val;
+    }
+    reopenRatioPanel();
+}
+
+function durSliderHtml() {
+    const editModes = ['视频编辑', '视频延长'];
+    const isAuto = editModes.includes(sel.video.mode);
+    if (isAuto) {
+        const isEdit = sel.video.mode === '视频编辑';
+        const tip = isEdit
+            ? '输出时长一般与上传的原视频保持一致。'
+            : '输出时长由模型根据内容和指令自动决定。';
+        return `<div class="dur-auto-badge">自动时长 <span class="dur-tip" title="${tip}">?</span></div>`;
+    }
+    const num = sel.video.durCustom || (parseInt(sel.video.dur, 10) || 10);
+    return `<div class="dur-row">
+        <div class="dur-slider-wrap">
+            <div class="dur-slider-head">
+                <span class="dur-slider-val">${num}<small>秒</small></span>
+                <span style="font-size:10px;color:#bbb;">4 – 30 秒 · 逐秒可选</span>
+            </div>
+            <input type="range" class="dur-slider" min="4" max="30" step="1" value="${num}"
+                   oninput="onDurSlider(event)" onchange="onDurSliderCommit(event)">
+            <div class="dur-slider-scale"><span>4秒</span><span>30秒</span></div>
+        </div>
+        <div class="dur-input-box">
+            <input type="number" min="4" max="30" step="1" value="${num}"
+                   oninput="onDurInput(event)" onchange="onDurInputCommit(event)"
+                   onkeydown="if(event.key==='Enter'){event.target.blur();}"> 
+            <span>秒</span>
+        </div>
+    </div>`;
+}
+
+function clampDur(v) {
+    let n = parseInt(v, 10);
+    if (isNaN(n)) return null;
+    if (n < 4) n = 4;
+    if (n > 30) n = 30;
+    return n;
+}
+
+function setDurNum(v) {
+    const n = clampDur(v);
+    if (n === null) return;
+    sel.video.durCustom = n;
+    sel.video.dur = `${n}秒`;
+    if (sel.video.models.length === 1) {
+        sel.video.modelDuration[sel.video.models[0]] = `${n}秒`;
+    }
+}
+
+function updateDurUI(num) {
+    const wrap = document.querySelector('.dur-slider-wrap');
+    if (!wrap) return;
+    wrap.querySelector('.dur-slider-val').innerHTML = `${num}<small>秒</small>`;
+    wrap.querySelector('input.dur-slider').value = num;
+    wrap.querySelector('.dur-input-box input').value = num;
+}
+
+function onDurSlider(e) {
+    e.stopPropagation();
+    const v = parseInt(e.target.value, 10);
+    setDurNum(v);
+    updateDurUI(v);
+}
+
+function onDurSliderCommit(e) {
+    e.stopPropagation();
+    reopenRatioPanel();
+}
+
+function onDurInput(e) {
+    e.stopPropagation();
+    const n = clampDur(e.target.value);
+    if (n === null) return;
+    setDurNum(n);
+    updateDurUI(n);
+}
+
+function onDurInputCommit(e) {
+    e.stopPropagation();
+    const n = clampDur(e.target.value);
+    if (n !== null) {
+        e.target.value = n;
+        setDurNum(n);
+        updateDurUI(n);
     }
     reopenRatioPanel();
 }

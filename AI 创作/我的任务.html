@@ -1631,6 +1631,20 @@ const INITIAL_TASKS = [
     ], reviewQueues:[{ reviewTaskId:'product-demo-replacement-task', sourceNodeId:'source-video', resultType:'video', status:'pending_review', pendingCount:2, approvedCount:0, rejectedCount:0 }] },
     input:{ prompt:'将原视频中的产品演示片段替换为用户选择的候选视频。', models:['工作流'], ratio:'16:9', dur:'01:48', count:1 },
     output:{ byModel:{ '工作流':{ total:0, items:[] } } } },
+  { id:'wf-kaduan-demo', name:'口播素材卡断拆分', type:'workflow', taskType:'workflow_run', resultType:'video', status:'completed', createdTime:'2026-08-24 16:30', creator:'我',
+    source:'workflow', project:'护肤品推广',
+    workflowRun:{ workflowId:'flow-kaduan-demo', workflowName:'口播素材卡断工作流', currentNodeId:'end', endBehavior:{ destination:'task_system' }, summary:{ total:12, generated:12, pendingReview:0, approved:12, downstreamRunning:0 }, nodes:[
+      { nodeId:'start', processorType:'system.start', title:'开始', status:'completed' },
+      { nodeId:'source-video', processorType:'video.process', title:'原视频处理', status:'completed' },
+      { nodeId:'kaduan', processorType:'video.cut', title:'卡断', status:'completed' },
+      { nodeId:'end', processorType:'system.end', title:'结束', status:'completed' }
+    ], reviewQueues:[] },
+    input:{ prompt:'将口播视频按前贴、开头、中段、结尾进行自动卡断拆分。', models:['工作流'], ratio:'9:16', dur:'4-30秒', count:12 },
+    output:{ byModel:{ '工作流':{ total:12, items:[
+      vid('kd1',0,'5s'),vid('kd2',1,'6s'),vid('kd3',2,'4s'),vid('kd4',3,'7s'),
+      vid('kd5',4,'5s'),vid('kd6',5,'6s'),vid('kd7',6,'4s'),vid('kd8',7,'8s'),
+      vid('kd9',8,'5s'),vid('kd10',9,'6s'),vid('kd11',10,'4s'),vid('kd12',11,'7s')
+    ] } } } },
 ];
 
 // ═══ 工具函数 ═══
@@ -2159,7 +2173,7 @@ INITIAL_TASKS.forEach(function(task) {
   try { applyProductDemoReplacementState(task, JSON.parse(localStorage.getItem(PRODUCT_DEMO_REPLACEMENT_STATE_KEY) || 'null')); } catch (error) {}
 });
 const state = {
-  contentTab: 'image',
+  contentTab: routeParams.get('contentTab') || 'image',
   viewMode: 'expanded',
   pageMode: routeParams.get('view') === 'review' ? 'review' : 'list',
   reviewContext: { taskId: routeParams.get('taskId') || '', reviewTaskId: routeParams.get('reviewTaskId') || '' }, reviewFocusIndex: 0,
@@ -4459,9 +4473,12 @@ function buildUnifiedResultUrl(task, vm) {
   if (task.type === 'workflow') {
     params.set('workflowName', task.workflowRun && task.workflowRun.workflowName ? task.workflowRun.workflowName : (task.name || ''));
   }
-  var baseUrl = 'AI 创作/全部结果-统一版.html';
+  var baseUrl = 'AI 创作/全部结果-通用生成.html';
   if (task.type === 'workflow') {
-    if (resultType === 'text') {
+    var wfName = task.workflowRun && task.workflowRun.workflowName ? task.workflowRun.workflowName : (task.name || '');
+    if (wfName.indexOf('卡断') > -1) {
+      baseUrl = 'AI 创作/全部结果-卡断分组.html';
+    } else if (resultType === 'text') {
       baseUrl = 'AI 创作/文案-工作流-全部结果.html';
     } else {
       var ds = vm && vm.displayStatus ? vm.displayStatus : task.status;
