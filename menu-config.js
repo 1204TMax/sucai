@@ -89,6 +89,11 @@ const MENU_CONFIG = [
             name: '节点类型管理',
             page: 'AI 创作/节点类型管理.html',
             icon: '<circle cx="18" cy="18" r="3"></circle><circle cx="6" cy="6" r="3"></circle><path d="M13 6h2a3 3 0 0 1 3 3v6"></path><path d="M6 9v2a3 3 0 0 0 3 3h1"></path>'
+          },
+          {
+            name: '实时任务查询',
+            page: 'AI 创作/实时任务查询.html',
+            icon: '<circle cx="11" cy="11" r="7"></circle><path d="m20 20-4.2-4.2"></path><path d="M11 8v3l2 1"></path>'
           }
         ]
       },
